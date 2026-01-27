@@ -10,5 +10,5 @@
 transform = Transform3D(6.7000003, 0, 0, 0, 1, 0, 0, 0, 6.7000003, 0, 0, 0)
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06907016, -0.089466184, -0.07274592)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06907016, 0.19123611, -0.07274592)
 mesh = SubResource("BoxMesh_ng7lx")

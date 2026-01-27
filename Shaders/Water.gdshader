@@ -9,9 +9,10 @@ uniform sampler2D texture_normal;
 uniform sampler2D texture_normal2;
 uniform vec2 wave_direction = vec2(2.0, 0.0);
 uniform vec2 wave_direction2 = vec2(0.0, 1.0);
-uniform float time_scale : hint_range(0.0, 0.2, 0.005) = 0.025;
+uniform float wave_speed : hint_range(0.0, 0.2, 0.005) = 0.025;
 uniform float noise_scale = 10.0;
 uniform float height_scale = 0.15;
+uniform float wave_time = 1.0;
 
 // edge foam
 uniform float edge_scale = 0.1;
@@ -36,7 +37,7 @@ void vertex() {
 	// Called for every vertex the material is visible on.
 	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; // set the world position for each vertex
 	// take the noise texture and take the r value (ranges from 0-1) at the location of each vertex per the texture
-	height = texture(wave, world_pos.xz / noise_scale + TIME * time_scale).r; // we also use time to animate it
+	height = texture(wave, world_pos.xz / noise_scale + wave_time * wave_speed).r; // we also use time to animate it
 	VERTEX.y += height * height_scale; // the height is added to the height scale and then set to the verticies new height
 }
 
@@ -79,8 +80,8 @@ void fragment() {
 	float z_dif = z_depth - z_pos;
 
 	// time calculations for wave normal map movement
-	vec2 time = (TIME * wave_direction) * time_scale; // movement of first wave
-	vec2 time2 = (TIME * wave_direction2) * time_scale; // movment rate of second wave
+	vec2 time = (TIME * wave_direction) * wave_speed; // movement of first wave
+	vec2 time2 = (TIME * wave_direction2) * wave_speed; // movment rate of second wave
 	// setting the texture
 	vec3 normal_blend = mix(texture(texture_normal, world_pos.xz + time).rgb, texture(texture_normal2,world_pos.xz + time2).rgb, 0.5);
 
