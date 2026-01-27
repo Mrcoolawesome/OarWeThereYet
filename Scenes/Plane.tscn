@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://tg11vpv4vs0h"]
+
+[ext_resource type="PackedScene" uid="uid://cvuuyp2oxueb0" path="res://Scenes/WaterPlane.tscn" id="1_re6bh"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ng7lx"]
+
+[node name="Plane" type="Node3D"]
+
+[node name="MeshInstance3D" parent="." instance=ExtResource("1_re6bh")]
+transform = Transform3D(6.7000003, 0, 0, 0, 1, 0, 0, 0, 6.7000003, 0, 0, 0)
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06907016, -0.089466184, -0.07274592)
+mesh = SubResource("BoxMesh_ng7lx")

@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://bce1cdqrce7hb"]
+
+[ext_resource type="PackedScene" uid="uid://dvkoqxg3j4klg" path="res://Scenes/Player.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://cvuuyp2oxueb0" path="res://Scenes/WaterPlane.tscn" id="2_bo1nx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
+size = Vector3(30, 1, 30)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
+size = Vector3(30, 1, 30)
+
+[node name="Main" type="Node"]
+
+[node name="Ground" type="StaticBody3D" parent="."]
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_7dm0k")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("BoxMesh_ig7tw")
+
+[node name="Player" parent="." instance=ExtResource("1_ig7tw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0324047, 0)
+collision_layer = 0
+Speed = 12
+Accel = 20.0
+Friction = 20.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.9453309, 0.3261127, 0, -0.3261127, 0.9453309, 0, 3.3527102, 5.7374115)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.68426716, 0.7292314, 0, -0.7292314, 0.68426716, 0, 4.958584, 6.704672)
+
+[node name="MeshInstance3D" parent="." instance=ExtResource("2_bo1nx")]
+transform = Transform3D(15.644413, 0, 0, 0, 1, 0, 0, 0, 16.162828, 0, 2.8427234, 0)
