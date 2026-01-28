@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 
 public partial class Cube : RigidBody3D
 {
@@ -18,12 +19,22 @@ public partial class Cube : RigidBody3D
 	private float _gravity; // get the gravity of the project
 	private float _waterHeight = 0.0f; // height of the water
 	private bool _submerged = false;
+	private Marker3D[] probes = new Marker3D[4];
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		// this might break if it can't actually type cast to a float
 		_gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
+
+		// getting the probes
+		var probeContainer = GetNode<Node3D>("ProbeContainer");
+		int count = 0;
+		foreach(Marker3D child in probeContainer.GetChildren().Cast<Marker3D>())
+		{
+			probes[count] = child;
+			count++;
+		}
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -36,15 +47,20 @@ public partial class Cube : RigidBody3D
 		// not submerged by default
 		_submerged = false;
 
-		// get the depth based on the global posiiton
-    float depth = WaterPlane.GetHeight(GlobalPosition) - GlobalPosition.Y;
-
-		// check if they're under the water
-		if (depth > 0.0)
+		foreach(Marker3D probe in probes)
 		{
-			_submerged = true;
-			ApplyCentralForce(Vector3.Up * FloatForce * _gravity * depth);
+			// get the depth based on the global posiiton
+			float depth = WaterPlane.GetHeight(probe.GlobalPosition) - probe.GlobalPosition.Y;
+
+			// check if they're under the water
+			if (depth > 0.0)
+			{
+				_submerged = true;
+				ApplyForce(Vector3.Up * FloatForce * _gravity * depth, probe.GlobalPosition - GlobalPosition);
+			}
 		}
+
+		
   }
 
 	// this is for accessing the specific physics state of rigid bodies
