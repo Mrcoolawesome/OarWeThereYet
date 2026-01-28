@@ -1,17 +1,40 @@
-[gd_scene load_steps=3 format=3 uid="uid://ja5oulldd28d"]
+[gd_scene load_steps=4 format=3 uid="uid://ja5oulldd28d"]
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_luxk2"]
-top_radius = 10.0
-bottom_radius = 10.0
+[ext_resource type="Script" uid="uid://cqss3kbohkjnu" path="res://Scenes/Boat.cs" id="1_d82p8"]
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_annr2"]
-height = 0.5
-radius = 10.0
+[sub_resource type="BoxMesh" id="BoxMesh_g7r5y"]
+size = Vector3(3, 0.5, 6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_badgh"]
+size = Vector3(3, 0.5, 6)
 
 [node name="Boat" type="RigidBody3D"]
+script = ExtResource("1_d82p8")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("CylinderMesh_luxk2")
+mesh = SubResource("BoxMesh_g7r5y")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("CylinderShape3D_annr2")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.006011963, 0.004638672)
+shape = SubResource("BoxShape3D_badgh")
+
+[node name="ProbeContainer" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1684432, 0)
+
+[node name="Probe" type="Marker3D" parent="ProbeContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.25, 3)
+
+[node name="Probe4" type="Marker3D" parent="ProbeContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.25, -3)
+
+[node name="Probe2" type="Marker3D" parent="ProbeContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.25, 3)
+
+[node name="Probe5" type="Marker3D" parent="ProbeContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.25, 0)
+
+[node name="Probe6" type="Marker3D" parent="ProbeContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.25, 0)
+
+[node name="Probe3" type="Marker3D" parent="ProbeContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.25, -3)

@@ -1,20 +1,15 @@
-[gd_scene load_steps=9 format=3 uid="uid://bce1cdqrce7hb"]
+[gd_scene load_steps=7 format=3 uid="uid://bce1cdqrce7hb"]
 
 [ext_resource type="PackedScene" uid="uid://dvkoqxg3j4klg" path="res://Scenes/Player.tscn" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://cvuuyp2oxueb0" path="res://Scenes/WaterPlane.tscn" id="2_bo1nx"]
-[ext_resource type="Script" uid="uid://cqss3kbohkjnu" path="res://Scenes/Cube.cs" id="3_8gbba"]
 [ext_resource type="Script" uid="uid://bridxviibsjjb" path="res://Scenes/WaterPlane.cs" id="3_jjvhh"]
+[ext_resource type="PackedScene" uid="uid://ja5oulldd28d" path="res://Scenes/boat.tscn" id="4_jjvhh"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
 size = Vector3(30, 1, 30)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
 size = Vector3(30, 1, 30)
-
-[sub_resource type="BoxMesh" id="BoxMesh_bo1nx"]
-size = Vector3(3, 0.5, 6)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_jjvhh"]
 
 [node name="Main" type="Node"]
 
@@ -29,14 +24,11 @@ shape = SubResource("BoxShape3D_7dm0k")
 mesh = SubResource("BoxMesh_ig7tw")
 
 [node name="Player" parent="." instance=ExtResource("1_ig7tw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0324047, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.032405, 0)
 collision_layer = 0
 Speed = 12
 Accel = 20.0
 Friction = 20.0
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.9453309, 0.3261127, 0, -0.3261127, 0.9453309, 0, 0.7361846, 1.7488513)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.9086467, 0.41756582, 0, -0.41756582, 0.9086467, 0, 4.958584, 6.704672)
@@ -45,29 +37,8 @@ transform = Transform3D(1, 0, 0, 0, 0.9086467, 0.41756582, 0, -0.41756582, 0.908
 transform = Transform3D(15.644413, 0, 0, 0, 1, 0, 0, 0, 16.162828, 0, -1, 0)
 script = ExtResource("3_jjvhh")
 
-[node name="Cube" type="RigidBody3D" parent="." node_paths=PackedStringArray("WaterPlane")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.0078034, 0)
-script = ExtResource("3_8gbba")
-FloatForce = 0.5
+[node name="Boat" parent="." node_paths=PackedStringArray("WaterPlane") instance=ExtResource("4_jjvhh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.11, 0)
+WaterDrag = 0.1
+WaterAngularDrag = 1.0
 WaterPlane = NodePath("../Water")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Cube"]
-mesh = SubResource("BoxMesh_bo1nx")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Cube"]
-shape = SubResource("BoxShape3D_jjvhh")
-
-[node name="ProbeContainer" type="Node3D" parent="Cube"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1684432, 0)
-
-[node name="Probe" type="Marker3D" parent="Cube/ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.25, 3)
-
-[node name="Probe4" type="Marker3D" parent="Cube/ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, -0.25, -3)
-
-[node name="Probe2" type="Marker3D" parent="Cube/ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.25, 3)
-
-[node name="Probe3" type="Marker3D" parent="Cube/ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, -0.25, -3)

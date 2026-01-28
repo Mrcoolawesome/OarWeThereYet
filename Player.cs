@@ -19,6 +19,11 @@ public partial class Player : CharacterBody3D
   [Export]
   public float Friction { get; set; } = 10.0f;
 
+
+  // Camera
+  // [Export]
+  // public Camera3D { get; set; } = new Camera3D;
+
   // Jump impulse in m/s
   public int JumpImpulse { get; set; } = 20;
 

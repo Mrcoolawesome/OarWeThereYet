@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Linq;
 
-public partial class Cube : RigidBody3D
+public partial class Boat : RigidBody3D
 {
 
 	// Floating forces 
@@ -19,7 +19,7 @@ public partial class Cube : RigidBody3D
 	private float _gravity; // get the gravity of the project
 	private float _waterHeight = 0.0f; // height of the water
 	private bool _submerged = false;
-	private Marker3D[] probes = new Marker3D[4];
+	private Marker3D[] probes = new Marker3D[6];
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
