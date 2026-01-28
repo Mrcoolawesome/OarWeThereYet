@@ -1,10 +1,9 @@
 [gd_scene load_steps=4 format=3 uid="uid://dvkoqxg3j4klg"]
 
 [ext_resource type="Script" uid="uid://b1q6d4c6iuaau" path="res://Player.cs" id="1_xhfnw"]
+[ext_resource type="PackedScene" uid="uid://byxplkiyaw2ul" path="res://Art/Models/character2.blend" id="2_kyqiw"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4xowi"]
-
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_a202f"]
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_xhfnw")
@@ -14,8 +13,8 @@ shape = SubResource("CapsuleShape3D_4xowi")
 
 [node name="Pivot" type="Node3D" parent="."]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("CapsuleMesh_a202f")
-
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6456237, -0.22432661)
+
+[node name="character2" parent="." instance=ExtResource("2_kyqiw")]
+transform = Transform3D(-0.51, 0, -7.7007854e-08, 0, 0.51, 0, 7.7007854e-08, 0, -0.51, 0, -1, 0)
