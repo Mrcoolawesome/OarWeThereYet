@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Numerics;
 
 public partial class Player : CharacterBody3D
 {
@@ -9,7 +10,7 @@ public partial class Player : CharacterBody3D
 
   // How fast the player falls in m/s^2
   [Export]
-  public int FallAccel { get; set; } = 75;
+  public int FallAccel { get; set; } = 10;
 
   // Acceleration on the xz plane
   [Export]
@@ -19,48 +20,62 @@ public partial class Player : CharacterBody3D
   [Export]
   public float Friction { get; set; } = 10.0f;
 
-
   // Camera
-  // [Export]
-  // public Camera3D { get; set; } = new Camera3D;
+  [Export]
+  public Camera3D Camera { get; set; }
 
   // Jump impulse in m/s
-  public int JumpImpulse { get; set; } = 20;
+  [Export]
+  public int JumpImpulse { get; set; } = 3;
 
   // player's velocity
-  private Vector3 _playerVelocity = Vector3.Zero;
+  private Godot.Vector3 _playerVelocity = Godot.Vector3.Zero;
 
   // Do the physics stuff
   public override void _PhysicsProcess(double delta)
   {
     
     // stores the direction we're going
-    var direction = Vector3.Zero;
+    Godot.Vector3 direction = Godot.Vector3.Zero;
 
-    if (Input.IsActionPressed("move_forward")) direction.Z += 1.0f;
-    if (Input.IsActionPressed("move_backward")) direction.Z -= 1.0f;
-    if (Input.IsActionPressed("move_right")) direction.X += 1.0f;
-    if (Input.IsActionPressed("move_left")) direction.X -= 1.0f;
+    if (Input.IsActionPressed("move_forward")) {
+      // movement in z direction
+      direction.Z -= 1.0f;
+    };
+    if (Input.IsActionPressed("move_backward"))
+    {
+      // movement in -z direction
+      direction.Z += 1.0f;
+    } 
+    if (Input.IsActionPressed("move_right"))
+    {
+      // movement in x direction
+      direction.X += 1.0f;
+    }
+    if (Input.IsActionPressed("move_left"))
+    {
+      // movement in -x direction
+      direction.X -= 1.0f;
+    }
 
     // normalize the vector to be of length 1 if it's greater than zero
     // this is mainly for when they're pressing two buttons at once
-    if (direction != Vector3.Zero)
+    if (direction != Godot.Vector3.Zero)
     {
-      direction = direction.Normalized();
+      direction = direction.Normalized(); // make sure the direction is normalized because that's good (i dont totally understand why this needs to happen)
 
-      // make the character look in the normalized direction
-      // we use the 'basis' property to set where they're looking
-      GetNode<Node3D>("Pivot").Basis = Basis.LookingAt(direction);
+      // rotate the direction
+      direction = direction.Rotated(Godot.Vector3.Up, GlobalRotation.Y);
     }
 
     // Momentum logic
     // Current velocity
-    Vector2 currVelocity = new Vector2(_playerVelocity.X, _playerVelocity.Z);
+    Godot.Vector2 currVelocity = new Godot.Vector2(_playerVelocity.X, _playerVelocity.Z);
     // Target velocity
-    Vector2 targetVelocity = new Vector2(direction.X, direction.Z) * Speed;
+    Godot.Vector2 targetVelocity = new Godot.Vector2(direction.X, direction.Z) * Speed;
 
     // if the direction vector is nothing
-    if (direction != Vector3.Zero)
+    if (direction != Godot.Vector3.Zero)
     {
       // We're accelerating towards the target speed
       // We're using MoveTowards for lerping
@@ -69,7 +84,7 @@ public partial class Player : CharacterBody3D
     else
     {
       // slow down
-      currVelocity = currVelocity.MoveToward(Vector2.Zero, Friction * (float)delta);
+      currVelocity = currVelocity.MoveToward(Godot.Vector2.Zero, Friction * (float)delta);
     }
 
     // Apply movement velocity (the ground is the XZ plane)
@@ -91,7 +106,5 @@ public partial class Player : CharacterBody3D
     // VERY IMPORTANT THIS ACTUALLY MOVES THE PLAYER
     Velocity = _playerVelocity;
     MoveAndSlide();
-
   }
-  
 }

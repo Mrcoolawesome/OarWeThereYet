@@ -27,8 +27,10 @@ mesh = SubResource("BoxMesh_ig7tw")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.032405, 0)
 collision_layer = 0
 Speed = 12
-Accel = 20.0
-Friction = 20.0
+FallAccel = 30
+Accel = 100.0
+Friction = 30.0
+JumpImpulse = 10
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.9086467, 0.41756582, 0, -0.41756582, 0.9086467, 0, 4.958584, 6.704672)
