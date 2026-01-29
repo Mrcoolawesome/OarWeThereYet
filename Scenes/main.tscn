@@ -1,15 +1,54 @@
-[gd_scene load_steps=7 format=3 uid="uid://bce1cdqrce7hb"]
+[gd_scene load_steps=11 format=3 uid="uid://bce1cdqrce7hb"]
 
 [ext_resource type="PackedScene" uid="uid://dvkoqxg3j4klg" path="res://Scenes/Player.tscn" id="1_ig7tw"]
-[ext_resource type="PackedScene" uid="uid://cvuuyp2oxueb0" path="res://Scenes/WaterPlane.tscn" id="2_bo1nx"]
-[ext_resource type="Script" uid="uid://bridxviibsjjb" path="res://Scenes/WaterPlane.cs" id="3_jjvhh"]
 [ext_resource type="PackedScene" uid="uid://ja5oulldd28d" path="res://Scenes/boat.tscn" id="4_jjvhh"]
+[ext_resource type="Script" uid="uid://dautlr3ip8obx" path="res://addons/waterways_net/RiverManager.cs" id="5_6bp64"]
+[ext_resource type="Script" uid="uid://bfg1v8xox324d" path="res://addons/waterways_net/RiverFloatSystem.cs" id="6_21xkr"]
+[ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="6_344ge"]
+[ext_resource type="Script" uid="uid://qm8tqvlho2k0" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="7_ynf5e"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
 size = Vector3(30, 1, 30)
 
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
 size = Vector3(30, 1, 30)
+
+[sub_resource type="Resource" id="Resource_21xkr"]
+script = ExtResource("7_ynf5e")
+MatShaderType = 1
+mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
+mat_albedo_color_second = Color(0.25, 0.35, 0.35, 1)
+mat_albedo_depth = 10.0
+mat_albedo_depth_curve = 0.25
+mat_transparency_clarity = 10.0
+mat_transparency_depth_curve = 0.25
+mat_transparency_refraction = 0.05
+mat_normal_scale = 1.0
+mat_normal_bump_texture = ExtResource("6_344ge")
+mat_flow_speed = 1.0
+mat_flow_base = 0.0
+mat_flow_steepness = 2.0
+mat_flow_distance = 1.0
+mat_flow_pressure = 1.0
+mat_flow_max = 4.0
+mat_foam_color = Color(0.9, 0.9, 0.9, 1)
+mat_foam_amount = 2.0
+mat_foam_steepness = 2.0
+mat_foam_smoothness = 0.3
+mat_uv_scale = Vector3(1, 1, 1)
+mat_roughness = 0.02
+mat_edge_fade = 0.25
+LodLod0Distance = 50.0
+_selectedShader = 1
+
+[sub_resource type="Curve3D" id="Curve3D_6bp64"]
+resource_local_to_scene = true
+bake_interval = 0.05
+_data = {
+"points": PackedVector3Array(0, 0, -0.25, 0, 0, 0.25, 0, 0, 0, 0, 0, -0.25, 0, 0, 0.25, 0, 0, 1, -0.02236202, 0.14034092, -0.37381768, 0.02236202, -0.14034092, 0.37381768, -0.009434424, -0.5847347, 1.5410953, 0.06766989, 1.8253613, -0.3142376, -0.06766989, -1.8253613, 0.3142376, 0.06128461, -1.6787603, 2.6256135, 0.040573508, -0.16747344, -0.32625216, -0.040573508, 0.16747344, 0.32625216, -0.03831035, -13.74165, 3.599372, -0.022066072, -2.6804485, -0.36331558, 0.022066072, 2.6804485, 0.36331558, -0.21816233, -15.336291, 5.9255776),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
+}
+point_count = 6
 
 [node name="Main" type="Node"]
 
@@ -34,9 +73,21 @@ JumpImpulse = 10
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.9086467, 0.41756582, 0, -0.41756582, 0.9086467, 0, 4.958584, 6.704672)
 
-[node name="Water" parent="." instance=ExtResource("2_bo1nx")]
-transform = Transform3D(15.644413, 0, 0, 0, 1, 0, 0, 0, 16.162828, 0, -1, 0)
-script = ExtResource("3_jjvhh")
+[node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("4_jjvhh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.843322, 0)
+River = NodePath("../RiverManager/RiverFloatSystem")
+Marketplier = 5.0
 
-[node name="Boat" parent="." node_paths=PackedStringArray("WaterPlane") instance=ExtResource("4_jjvhh")]
-WaterPlane = NodePath("../Water")
+[node name="RiverManager" type="Node3D" parent="."]
+transform = Transform3D(8.526682, 0, 0, 0, 1, 0, 0, 0, 15.392411, 0, 1.2054613, -8)
+script = ExtResource("5_6bp64")
+ShaderSettings = SubResource("Resource_21xkr")
+PointWidths = Array[float]([1.0, 1.0, 1.0925221, 0.98354024, 1.0, 1.0])
+Curve = SubResource("Curve3D_6bp64")
+metadata/_custom_type_script = "uid://dautlr3ip8obx"
+
+[node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
+script = ExtResource("6_21xkr")
+DefaultHeight = -100.0
+FlowBakeInterval = 1.0
+metadata/_custom_type_script = "uid://bfg1v8xox324d"

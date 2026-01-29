@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Linq;
+using Waterways;
 
 public partial class Boat : RigidBody3D
 {
@@ -13,7 +14,11 @@ public partial class Boat : RigidBody3D
 	[Export]
 	public float WaterAngularDrag { get; set; } = 0.05f;
 	[Export]
-	public WaterPlane WaterPlane;
+	public RiverFloatSystem River { get; set; }
+
+	// speed multiplier for river angle
+	[Export]
+	public float Marketplier {get; set;} = 10.0f;
 
 	// private variables
 	private float _gravity; // get the gravity of the project
@@ -49,14 +54,27 @@ public partial class Boat : RigidBody3D
 
 		foreach(Marker3D probe in probes)
 		{
+			// surface water height
+			float surfaceWaterY = River.GetWaterHeight(probe.GlobalPosition);
 			// get the depth based on the global posiiton
-			float depth = WaterPlane.GetHeight(probe.GlobalPosition) - probe.GlobalPosition.Y;
+			float depth = surfaceWaterY - probe.GlobalPosition.Y;
+
+			// Get the direction vector
+			Vector3 flowDirection = River.GetWaterFlowDirection(probe.GlobalPosition);
+
+			// Angle from the y vector
+			var angleToY = Mathf.RadToDeg(flowDirection.AngleTo(Vector3.Up));
+			GD.Print($"{Mathf.RadToDeg(angleToY)}");
+			// make the angle 0 by default - above 0 is going down below is going up
+			float zeroedAngle = ((angleToY - 90) / Marketplier) + 1;
 
 			// check if they're under the water
 			if (depth > 0.0)
 			{
 				_submerged = true;
 				ApplyForce(Vector3.Up * FloatForce * _gravity * depth, probe.GlobalPosition - GlobalPosition);
+				
+				ApplyForce(River.GetWaterFlowDirection(probe.GlobalPosition) * zeroedAngle);
 			}
 		}
   }
