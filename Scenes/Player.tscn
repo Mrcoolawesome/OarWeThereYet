@@ -1,21 +1,40 @@
-[gd_scene load_steps=4 format=3 uid="uid://dvkoqxg3j4klg"]
+[gd_scene load_steps=6 format=3 uid="uid://dvkoqxg3j4klg"]
 
 [ext_resource type="Script" uid="uid://b1q6d4c6iuaau" path="res://Player.cs" id="1_xhfnw"]
+[ext_resource type="Script" uid="uid://degu58xl5ghho" path="res://Scenes/AimLook.cs" id="2_kyqiw"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4xowi"]
 
+[sub_resource type="CylinderMesh" id="CylinderMesh_kyqiw"]
+top_radius = 0.0
+height = 10.197
+
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_a202f"]
 
-[node name="Player" type="CharacterBody3D"]
+[node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Camera")]
 script = ExtResource("1_xhfnw")
+Camera = NodePath("Head/CameraContainer/Camera3D")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_4xowi")
 
 [node name="Pivot" type="Node3D" parent="."]
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Pivot"]
+transform = Transform3D(1.0572855e-09, -4.3698602e-08, 1, -0.99970746, -0.024187872, 0, 0.024187872, -0.99970746, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("CylinderMesh_kyqiw")
+
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_a202f")
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6456237, -0.22432661)
+[node name="Head" type="Node3D" parent="."]
+
+[node name="CameraContainer" type="Node3D" parent="Head"]
+
+[node name="Camera3D" type="Camera3D" parent="Head/CameraContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+
+[node name="AimLook" type="Node" parent="." node_paths=PackedStringArray("Character", "Head")]
+script = ExtResource("2_kyqiw")
+Character = NodePath("..")
+Head = NodePath("../Head")
