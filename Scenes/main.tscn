@@ -25,7 +25,6 @@ mesh = SubResource("BoxMesh_ig7tw")
 
 [node name="Player" parent="." instance=ExtResource("1_ig7tw")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.032405, 0)
-collision_layer = 0
 Speed = 12
 FallAccel = 30
 Accel = 100.0
@@ -40,7 +39,4 @@ transform = Transform3D(15.644413, 0, 0, 0, 1, 0, 0, 0, 16.162828, 0, -1, 0)
 script = ExtResource("3_jjvhh")
 
 [node name="Boat" parent="." node_paths=PackedStringArray("WaterPlane") instance=ExtResource("4_jjvhh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.11, 0)
-WaterDrag = 0.1
-WaterAngularDrag = 1.0
 WaterPlane = NodePath("../Water")

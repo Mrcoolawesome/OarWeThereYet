@@ -59,8 +59,6 @@ public partial class Boat : RigidBody3D
 				ApplyForce(Vector3.Up * FloatForce * _gravity * depth, probe.GlobalPosition - GlobalPosition);
 			}
 		}
-
-		
   }
 
 	// this is for accessing the specific physics state of rigid bodies

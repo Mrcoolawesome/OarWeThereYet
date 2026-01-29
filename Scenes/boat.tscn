@@ -1,9 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://ja5oulldd28d"]
+[gd_scene load_steps=5 format=3 uid="uid://ja5oulldd28d"]
 
 [ext_resource type="Script" uid="uid://cqss3kbohkjnu" path="res://Scenes/Boat.cs" id="1_d82p8"]
 [ext_resource type="PackedScene" uid="uid://clr7p6s4qdl70" path="res://Art/Models/raft2.blend" id="2_g7r5y"]
+[ext_resource type="Script" uid="uid://b3i6s85dpu2nm" path="res://Scenes/Area3d.cs" id="3_badgh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tcwdh"]
 
 [node name="Boat" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 3
 script = ExtResource("1_d82p8")
 
 [node name="ProbeContainer" type="Node3D" parent="."]
@@ -29,3 +34,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, -0.25, -3)
 
 [node name="raft2" parent="." instance=ExtResource("2_g7r5y")]
 transform = Transform3D(-2.7538174e-08, 0, 0.63, 0, 0.63, 0, -0.63, 0, -2.7538174e-08, 0, 0, 0)
+
+[node name="Area3D" type="Area3D" parent="."]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("3_badgh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.17719948, -2)
+shape = SubResource("BoxShape3D_tcwdh")
+
+[connection signal="body_entered" from="Area3D" to="." method="OnArea3DBodyEntered"]
