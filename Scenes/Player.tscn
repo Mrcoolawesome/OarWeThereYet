@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://dvkoqxg3j4klg"]
+[gd_scene load_steps=6 format=3 uid="uid://dvkoqxg3j4klg"]
 
 [ext_resource type="Script" uid="uid://b1q6d4c6iuaau" path="res://Player.cs" id="1_xhfnw"]
 [ext_resource type="Script" uid="uid://degu58xl5ghho" path="res://Scenes/AimLook.cs" id="2_kyqiw"]
