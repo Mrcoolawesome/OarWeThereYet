@@ -10,7 +10,7 @@ public partial class Player : CharacterBody3D
 
   // How fast the player falls in m/s^2
   [Export]
-  public int FallAccel { get; set; } = 75;
+  public int FallAccel { get; set; } = 10;
 
   // Acceleration on the xz plane
   [Export]
@@ -25,7 +25,8 @@ public partial class Player : CharacterBody3D
   public Camera3D Camera { get; set; }
 
   // Jump impulse in m/s
-  public int JumpImpulse { get; set; } = 20;
+  [Export]
+  public int JumpImpulse { get; set; } = 3;
 
   // player's velocity
   private Godot.Vector3 _playerVelocity = Godot.Vector3.Zero;
@@ -61,11 +62,10 @@ public partial class Player : CharacterBody3D
     // this is mainly for when they're pressing two buttons at once
     if (direction != Godot.Vector3.Zero)
     {
-      direction = direction.Normalized();
+      direction = direction.Normalized(); // make sure the direction is normalized because that's good (i dont totally understand why this needs to happen)
 
-      // make the character look in the normalized direction
-      // we use the 'basis' property to set where they're looking
-      // GetNode<Node3D>("Pivot").Basis = Camera.Basis;
+      // rotate the direction
+      direction = direction.Rotated(Godot.Vector3.Up, GlobalRotation.Y);
     }
 
     // Momentum logic
@@ -73,24 +73,23 @@ public partial class Player : CharacterBody3D
     Godot.Vector2 currVelocity = new Godot.Vector2(_playerVelocity.X, _playerVelocity.Z);
     // Target velocity
     Godot.Vector2 targetVelocity = new Godot.Vector2(direction.X, direction.Z) * Speed;
-    // targetVelocity = targetVelocity.Rotated(GlobalRotation.Y);
 
     // if the direction vector is nothing
     if (direction != Godot.Vector3.Zero)
     {
       // We're accelerating towards the target speed
       // We're using MoveTowards for lerping
-      // currVelocity = currVelocity.MoveToward(targetVelocity, Accel * (float)delta);
+      currVelocity = currVelocity.MoveToward(targetVelocity, Accel * (float)delta);
     }
     else
     {
       // slow down
-      // currVelocity = currVelocity.MoveToward(Godot.Vector2.Zero, Friction * (float)delta);
+      currVelocity = currVelocity.MoveToward(Godot.Vector2.Zero, Friction * (float)delta);
     }
 
     // Apply movement velocity (the ground is the XZ plane)
-    _playerVelocity.X = targetVelocity.X;
-    _playerVelocity.Z = targetVelocity.Y; // currVelcity is a Vector 2 so it only has X and Y
+    _playerVelocity.X = currVelocity.X;
+    _playerVelocity.Z = currVelocity.Y; // currVelcity is a Vector 2 so it only has X and Y
 
     // Gravity
     if (!IsOnFloor())
@@ -103,11 +102,6 @@ public partial class Player : CharacterBody3D
     {
       _playerVelocity.Y = JumpImpulse;
     }
-
-    _playerVelocity = _playerVelocity.Rotated(Godot.Vector3.Up,GlobalRotation.Y);
-
-    GD.Print($"GlobalRotation.Y: {GlobalRotation.Y}");
-    GD.Print($"player velocity {_playerVelocity}");
 
     // VERY IMPORTANT THIS ACTUALLY MOVES THE PLAYER
     Velocity = _playerVelocity;

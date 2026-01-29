@@ -26,7 +26,6 @@ public partial class AimLook : Node
   // We're using 'unhandled input' instead of 'input' bc we don't wanna interfere with the mouse clicking on things like ui elements
   public override void _UnhandledInput(InputEvent @event)
   {
-		GD.Print("hello");
 		// this means we're in the menu if this is true
 		if (Input.MouseMode != Input.MouseModeEnum.Captured)
 		{
