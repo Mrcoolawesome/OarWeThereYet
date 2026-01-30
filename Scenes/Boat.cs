@@ -54,6 +54,7 @@ public partial class Boat : RigidBody3D
 
 		foreach(Marker3D probe in probes)
 		{
+			// get the current nodes velocity
 			// surface water height
 			float surfaceWaterY = River.GetWaterHeight(probe.GlobalPosition);
 			// get the depth based on the global posiiton
@@ -72,9 +73,9 @@ public partial class Boat : RigidBody3D
 			if (depth > 0.0)
 			{
 				_submerged = true;
-				ApplyForce(Vector3.Up * FloatForce * _gravity * depth, probe.GlobalPosition - GlobalPosition);
-				
-				ApplyForce(River.GetWaterFlowDirection(probe.GlobalPosition) * zeroedAngle);
+				Vector3 bouyancy = new Vector3(0, FloatForce * _gravity * depth, 0);
+				Vector3 riverVelocity = flowDirection* zeroedAngle;
+				ApplyForce(bouyancy + riverVelocity, probe.GlobalPosition - GlobalPosition);
 			}
 		}
   }

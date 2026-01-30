@@ -75,8 +75,10 @@ transform = Transform3D(1, 0, 0, 0, 0.9086467, 0.41756582, 0, -0.41756582, 0.908
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("4_jjvhh")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.843322, 0)
+FloatForce = 0.3
+WaterAngularDrag = 0.1
 River = NodePath("../RiverManager/RiverFloatSystem")
-Marketplier = 5.0
+Marketplier = 7.5
 
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(8.526682, 0, 0, 0, 1, 0, 0, 0, 15.392411, 0, 1.2054613, -8)
