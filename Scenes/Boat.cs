@@ -25,6 +25,7 @@ public partial class Boat : RigidBody3D
 	private float _waterHeight = 0.0f; // height of the water
 	private bool _submerged = false;
 	private Marker3D[] probes = new Marker3D[6];
+	private Vector3[] velocities = new Vector3[6];
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -52,9 +53,11 @@ public partial class Boat : RigidBody3D
 		// not submerged by default
 		_submerged = false;
 
+		int i = 0;
 		foreach(Marker3D probe in probes)
 		{
 			// get the current nodes velocity
+			Vector3 currVelocity = velocities[i];
 			// surface water height
 			float surfaceWaterY = River.GetWaterHeight(probe.GlobalPosition);
 			// get the depth based on the global posiiton
@@ -75,8 +78,13 @@ public partial class Boat : RigidBody3D
 				_submerged = true;
 				Vector3 bouyancy = new Vector3(0, FloatForce * _gravity * depth, 0);
 				Vector3 riverVelocity = flowDirection* zeroedAngle;
-				ApplyForce(bouyancy + riverVelocity, probe.GlobalPosition - GlobalPosition);
+				Vector3 targetVelocity = bouyancy + riverVelocity;
+
+				Vector3 interpolated = currVelocity.MoveToward(targetVelocity, 1 * (float)delta);
+				velocities[i] = interpolated;
+				ApplyForce(interpolated, probe.GlobalPosition - GlobalPosition);
 			}
+			i++;
 		}
   }
 
