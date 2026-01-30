@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dvkoqxg3j4klg"]
+[gd_scene load_steps=5 format=3 uid="uid://dvkoqxg3j4klg"]
 
 [ext_resource type="Script" uid="uid://b1q6d4c6iuaau" path="res://Player.cs" id="1_xhfnw"]
 [ext_resource type="Script" uid="uid://degu58xl5ghho" path="res://Scenes/AimLook.cs" id="2_kyqiw"]
@@ -8,6 +8,8 @@
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_a202f"]
 
 [node name="Player" type="CharacterBody3D" node_paths=PackedStringArray("Camera")]
+collision_layer = 2
+collision_mask = 5
 script = ExtResource("1_xhfnw")
 Camera = NodePath("Head/CameraContainer/Camera3D")
 
