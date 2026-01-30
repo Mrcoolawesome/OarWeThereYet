@@ -20,6 +20,9 @@ public partial class Boat : RigidBody3D
 	[Export]
 	public float Marketplier {get; set;} = 10.0f;
 
+	[Export]
+	public float Accel {get; set;} = 10.0f;
+
 	// private variables
 	private float _gravity; // get the gravity of the project
 	private float _waterHeight = 0.0f; // height of the water
@@ -71,20 +74,25 @@ public partial class Boat : RigidBody3D
 			// make the angle 0 by default - above 0 is going down below is going up
 			float zeroedAngle = ((angleToY - 90) / Marketplier) + 1;
 
+			Vector3 finalForce = Vector3.Zero;
 			// check if they're under the water
 			if (depth > 0.0)
 			{
 				_submerged = true;
 				Vector3 bouyancy = new Vector3(0, FloatForce * _gravity * depth, 0);
-				Vector3 riverVelocity = flowDirection * zeroedAngle;
-				Vector3 targetVelocity = bouyancy + riverVelocity;
-				Vector3 interpolated = currVelocity.MoveToward(targetVelocity, 1 * (float)delta); // the 1 should be acceleration
+				Vector3 targetVelocity = flowDirection * zeroedAngle;
+				Vector3 interpolated = currVelocity.MoveToward(targetVelocity, Accel * (float)delta); // the 1 should be acceleration
 				velocities[i] = interpolated;
-				ApplyForce(velocities[i], probe.GlobalPosition - GlobalPosition);
+				// we need to use apply force because if we were to just set the velocity of the boat then the different points wouldn't have velocities
+				// also rigid bodies don't have a Velocity property like player character objects
+				finalForce = bouyancy + velocities[i];
 			} 
-			
-			// for some reason when it's above the water level that's when it gets 'glued' to the water
-			// that's why it sticks to the slope because the slope is pushing up against it the whole time
+			else
+			{
+				velocities[i] = currVelocity.MoveToward(Vector3.Zero, Accel * (float)delta); // reset the bouyancy force 
+				finalForce = velocities[i];
+			}
+			ApplyForce(finalForce, probe.GlobalPosition - GlobalPosition);
 			i++;
 		}
   }
