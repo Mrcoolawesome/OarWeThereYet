@@ -9,6 +9,7 @@
 [node name="Boat" type="RigidBody3D"]
 collision_layer = 4
 collision_mask = 3
+mass = 2.0
 script = ExtResource("1_d82p8")
 
 [node name="ProbeContainer" type="Node3D" parent="."]

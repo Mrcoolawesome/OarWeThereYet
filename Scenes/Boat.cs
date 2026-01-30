@@ -6,13 +6,14 @@ using Waterways;
 public partial class Boat : RigidBody3D
 {
 
+	// MAKE SURE THE BOAT MASS IS SET TO 2KG
 	// Floating forces 
 	[Export]
-	public float FloatForce { get; set; } = 1.0f;
+	public float FloatForce { get; set; } = 0.35f;
 	[Export]
-	public float WaterDrag { get; set; } = 0.05f;
+	public float WaterDrag { get; set; } = 0.03f;
 	[Export]
-	public float WaterAngularDrag { get; set; } = 0.05f;
+	public float WaterAngularDrag { get; set; } = 0.07f;
 	[Export]
 	public RiverFloatSystem River { get; set; }
 
@@ -21,7 +22,7 @@ public partial class Boat : RigidBody3D
 	public float Marketplier {get; set;} = 10.0f;
 
 	[Export]
-	public float Accel {get; set;} = 10.0f;
+	public float Accel {get; set;} = 2.0f;
 
 	// private variables
 	private float _gravity; // get the gravity of the project
