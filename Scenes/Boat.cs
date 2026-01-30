@@ -68,7 +68,6 @@ public partial class Boat : RigidBody3D
 
 			// Angle from the y vector
 			var angleToY = Mathf.RadToDeg(flowDirection.AngleTo(Vector3.Up));
-			GD.Print($"{Mathf.RadToDeg(angleToY)}");
 			// make the angle 0 by default - above 0 is going down below is going up
 			float zeroedAngle = ((angleToY - 90) / Marketplier) + 1;
 
@@ -77,13 +76,15 @@ public partial class Boat : RigidBody3D
 			{
 				_submerged = true;
 				Vector3 bouyancy = new Vector3(0, FloatForce * _gravity * depth, 0);
-				Vector3 riverVelocity = flowDirection* zeroedAngle;
+				Vector3 riverVelocity = flowDirection * zeroedAngle;
 				Vector3 targetVelocity = bouyancy + riverVelocity;
-
-				Vector3 interpolated = currVelocity.MoveToward(targetVelocity, 1 * (float)delta);
+				Vector3 interpolated = currVelocity.MoveToward(targetVelocity, 1 * (float)delta); // the 1 should be acceleration
 				velocities[i] = interpolated;
-				ApplyForce(interpolated, probe.GlobalPosition - GlobalPosition);
-			}
+				ApplyForce(velocities[i], probe.GlobalPosition - GlobalPosition);
+			} 
+			
+			// for some reason when it's above the water level that's when it gets 'glued' to the water
+			// that's why it sticks to the slope because the slope is pushing up against it the whole time
 			i++;
 		}
   }
