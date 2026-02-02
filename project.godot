@@ -11,9 +11,14 @@ config_version=5
 [application]
 
 config/name="OarWeThereYet"
+run/main_scene="uid://cykj32whe33ni"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [dotnet]
 
 project/assembly_name="OarWeThereYet"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/waterways_net/plugin.cfg")
