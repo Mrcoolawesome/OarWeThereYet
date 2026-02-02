@@ -23,14 +23,16 @@ public partial class Player : CharacterBody3D
 
 	private float _gravity = 9.8f;
 
-	private Vector3 direction = Vector3.Zero;
+	private Vector3 _direction = Vector3.Zero;
 
-	private Node3D head;
+	private Node3D _head;
+
+	private float _crouchingDepth = -0.5f; // this is relative to the regular head 
 
 	public override void _Ready()
 	{
 		Input.MouseMode = Input.MouseModeEnum.Captured; // capture the users mouse
-		head = GetNode<Node3D>("Head"); // get the head node
+		_head = GetNode<Node3D>("Head"); // get the head node
 	}
 
   public override void _Input(InputEvent @event)
@@ -45,12 +47,12 @@ public partial class Player : CharacterBody3D
 			float xRotationChange = -Mathf.DegToRad(mouseEvent.Relative.Y * MouseSens);
 
 			// add the rotation change per tick and then clamp the rotation
-			Vector3 newRotation = head.Rotation;
+			Vector3 newRotation = _head.Rotation;
 			newRotation.X += xRotationChange;
 			newRotation.X = Mathf.Clamp(newRotation.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
 
 			// set the head rotation
-			head.Rotation = newRotation;
+			_head.Rotation = newRotation;
 		}
   }
 
@@ -58,14 +60,30 @@ public partial class Player : CharacterBody3D
 	{
 		Vector3 velocity = Velocity;
 
-		if (Input.IsActionPressed("sprint"))
+		// they can only be crouching or sprinting not both hence the else if
+		// if they are pressing both then the speed will be set to crouching speed just bc it's at the beginning of the if else statements
+		if (Input.IsActionPressed("crouch"))
 		{
-			_currSpeed = SprintSpeed;
-		}
+			_currSpeed = CrouchingSpeed;
+
+			// set the head height to be offset by the crouching depth
+			_head.Position = new Vector3(_head.Position.X, _crouchingDepth, _head.Position.Z);
+		} 
 		else
 		{
-			_currSpeed = WalkingSpeed;
+			// set head position to be default in all other scenarios other than crouching
+			_head.Position = _head.Position = new Vector3(_head.Position.X, 0.0f, _head.Position.Z);
+
+			if (Input.IsActionPressed("sprint"))
+			{
+				_currSpeed = SprintSpeed;
+			}
+			else
+			{
+				_currSpeed = WalkingSpeed;
 		}
+		}
+		
 
 		// Add the gravity.
 		if (!IsOnFloor())
@@ -90,9 +108,9 @@ public partial class Player : CharacterBody3D
 		}
 
 		// set the direction and move in that direction
-		direction = direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
-		velocity.X = direction.X * _currSpeed;
-		velocity.Z = direction.Z * _currSpeed;
+		_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
+		velocity.X = _direction.X * _currSpeed;
+		velocity.Z = _direction.Z * _currSpeed;
 		Velocity = velocity;
 		MoveAndSlide();
 	}
