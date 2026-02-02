@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cykj32whe33ni"]
+[gd_scene load_steps=8 format=3 uid="uid://cykj32whe33ni"]
 
 [ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes/boat.tscn" id="6_7mycd"]
 [ext_resource type="PackedScene" uid="uid://dmth1b1qymst1" path="res://scenes/player.tscn" id="7_272bh"]
@@ -9,19 +9,30 @@ size = Vector3(20, 1, 20)
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
 size = Vector3(20, 1, 20)
 
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_h2yge"]
+sky_material = SubResource("ProceduralSkyMaterial_0xm2m")
+
+[sub_resource type="Environment" id="Environment_1bvp3"]
+background_mode = 2
+sky = SubResource("Sky_h2yge")
+tonemap_mode = 2
+glow_enabled = true
+
 [node name="Main" type="Node"]
 
 [node name="StaticBody3D" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
 shape = SubResource("BoxShape3D_7dm0k")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
 mesh = SubResource("BoxMesh_ig7tw")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.67575747, 0, 5.4789433, 10.135457)
 
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-8.742105, 0, 8.766644e-07, 0, 1, 0, -7.642591e-07, 0, -10.027872, 0, 0.6554451, 9)
@@ -30,6 +41,16 @@ transform = Transform3D(-8.742105, 0, 8.766644e-07, 0, 1, 0, -7.642591e-07, 0, -
 
 [node name="Boat" parent="." instance=ExtResource("6_7mycd")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 2.0201302, 0)
+visible = false
 
 [node name="Player" parent="." instance=ExtResource("7_272bh")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 4.21173, 0)
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment"]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
+environment = SubResource("Environment_1bvp3")

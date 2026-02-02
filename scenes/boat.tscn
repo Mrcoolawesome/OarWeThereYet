@@ -2,7 +2,8 @@
 
 [ext_resource type="PackedScene" uid="uid://brhb62qae05bu" path="res://art/models/raft2.blend" id="1_annr2"]
 
-[node name="Boat" type="Node3D"]
+[node name="Boat" type="RigidBody3D"]
+collision_layer = 2
 
 [node name="ProbeContainer" type="Node3D" parent="."]
 
