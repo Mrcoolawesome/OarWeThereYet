@@ -15,14 +15,20 @@ public partial class Boat : RigidBody3D
 
     public override void _Ready()
     {
-        Node3D _probeContainer = GetNode<Node3D>("ProbeContainer");
+        _probeContainer = GetNode<Node3D>("ProbeContainer");
     }
 
     public override void _IntegrateForces(PhysicsDirectBodyState3D state)
     {
         foreach (Marker3D probe in _probeContainer.GetChildren().OfType<Marker3D>())
         {
-            GD.Print("node here");
+            Vector3 pos = probe.GlobalPosition;
+
+            Vector3 flowDirection = River.GetWaterFlowDirection(pos);
+            Vector3 riverRight = flowDirection.Cross(Vector3.Up).Normalized();
+            Vector3 riverNormal = riverRight.Cross(flowDirection).Normalized();
+            
+            ApplyForce(riverNormal * 2, probe.GlobalPosition - GlobalPosition);
         }
     }
 }

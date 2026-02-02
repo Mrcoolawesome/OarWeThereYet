@@ -64,8 +64,9 @@ mesh = SubResource("BoxMesh_ig7tw")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.67575747, 0, 5.4789433, 10.135457)
 
-[node name="Boat" parent="." instance=ExtResource("6_7mycd")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 2.0201302, 0)
+[node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_7mycd")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 1.0201302, -23)
+River = NodePath("../RiverManager/RiverFloatSystem")
 
 [node name="Player" parent="." instance=ExtResource("7_272bh")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 4.21173, 0)
@@ -80,4 +81,5 @@ metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
 script = ExtResource("6_kek77")
+MaxDepth = -100.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
