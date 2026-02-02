@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://clr7p6s4qdl70"
-path="res://.godot/imported/raft2.blend-3c7c367467ddfca635a9604650df19b8.scn"
+uid="uid://drdil87ecc2qr"
+path="res://.godot/imported/character2.blend-361bbb6d1fd5903a5e3db8ca314f2bef.scn"
 
 [deps]
 
-source_file="res://Art/Models/raft2.blend"
-dest_files=["res://.godot/imported/raft2.blend-3c7c367467ddfca635a9604650df19b8.scn"]
+source_file="res://art/models/character2.blend"
+dest_files=["res://.godot/imported/character2.blend-361bbb6d1fd5903a5e3db8ca314f2bef.scn"]
 
 [params]
 
@@ -37,19 +37,7 @@ import_script/path=""
 materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
-_subresources={
-"nodes": {
-"PATH:Raft-rigid/CollisionShape3D": {
-"import/skip_import": true
-},
-"PATH:side ref": {
-"import/skip_import": true
-},
-"PATH:top ref": {
-"import/skip_import": true
-}
-}
-}
+_subresources={}
 blender/nodes/visible=0
 blender/nodes/active_collection_only=false
 blender/nodes/punctual_lights=true
