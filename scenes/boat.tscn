@@ -1,10 +1,11 @@
 [gd_scene load_steps=3 format=3 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="PackedScene" uid="uid://brhb62qae05bu" path="res://art/models/raft2.blend" id="1_annr2"]
-[ext_resource type="Script" uid="uid://eb6r761wm00e" path="res://scenes/boat.gd" id="1_qyrje"]
+[ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scenes/Boat.cs" id="1_qyrje"]
 
-[node name="Boat" type="RigidBody3D"]
+[node name="Boat" type="RigidBody3D" node_paths=PackedStringArray("FloatPoints")]
 script = ExtResource("1_qyrje")
+FloatPoints = []
 
 [node name="ProbeContainer" type="Node3D" parent="."]
 
