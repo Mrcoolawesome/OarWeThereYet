@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Net.Http;
 
 public partial class Player : CharacterBody3D
 {
@@ -20,18 +21,32 @@ public partial class Player : CharacterBody3D
 
 	private float _gravity = 9.8f;
 
+	private Node3D head;
+
 	public override void _Ready()
 	{
 		Input.MouseMode = Input.MouseModeEnum.Captured; // capture the users mouse
+		head = GetNode<Node3D>("Head"); // get the head node
 	}
 
   public override void _Input(InputEvent @event)
   {
     if (@event is InputEventMouseMotion mouseEvent)
 		{
-			// the rotation in radians based off of the mouse sensitivity 
-			float rotation = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
-			RotateY(rotation);
+			// the y rotation of the player in radians based off of the mouse sensitivity 
+			float yRotationChange = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
+			RotateY(yRotationChange);
+
+			// the head rotation
+			float xRotationChange = -Mathf.DegToRad(mouseEvent.Relative.Y * MouseSens);
+
+			// add the rotation change per tick and then clamp the rotation
+			Vector3 newRotation = head.Rotation;
+			newRotation.X += xRotationChange;
+			newRotation.X = Mathf.Clamp(newRotation.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
+
+			// set the head rotation
+			head.Rotation = newRotation;
 		}
   }
 
