@@ -15,11 +15,15 @@ public partial class Player : CharacterBody3D
 	public float CrouchingSpeed = 3.0f;
 	[Export]
 	public float MouseSens = 0.4f;
+	[Export]
+	public float LerpSpeed = 10.0f;
 
 	// private variables
 	private float _currSpeed = 5.0f;
 
 	private float _gravity = 9.8f;
+
+	private Vector3 direction = Vector3.Zero;
 
 	private Node3D head;
 
@@ -78,18 +82,17 @@ public partial class Player : CharacterBody3D
 		// Get the input direction and handle the movement/deceleration.
 		// As good practice, you should replace UI actions with custom gameplay actions.
 		Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
-		Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
-		if (direction != Vector3.Zero)
+		Vector3 targetDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+		// move towards zero vector if we're not trying to move anywhere
+		if (inputDir == Vector2.Zero)
 		{
-			velocity.X = direction.X * _currSpeed;
-			velocity.Z = direction.Z * _currSpeed;
-		}
-		else
-		{
-			velocity.X = Mathf.MoveToward(Velocity.X, 0, _currSpeed);
-			velocity.Z = Mathf.MoveToward(Velocity.Z, 0, _currSpeed);
+			targetDirection = Vector3.Zero;
 		}
 
+		// set the direction and move in that direction
+		direction = direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
+		velocity.X = direction.X * _currSpeed;
+		velocity.Z = direction.Z * _currSpeed;
 		Velocity = velocity;
 		MoveAndSlide();
 	}

@@ -9,6 +9,7 @@
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4
 script = ExtResource("1_3vyb7")
+LerpSpeed = 5.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_u8vuu")
