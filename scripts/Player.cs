@@ -17,6 +17,8 @@ public partial class Player : CharacterBody3D
 	public float MouseSens = 0.4f;
 	[Export]
 	public float LerpSpeed = 10.0f;
+	[Export]
+	public float CrouchLerpSpeed = 10.0f;
 
 	// private variables
 	private float _currSpeed = 5.0f;
@@ -27,12 +29,18 @@ public partial class Player : CharacterBody3D
 
 	private Node3D _head;
 
+	private CollisionShape3D _crouchingCollision;
+
+	private CollisionShape3D _standingCollision;
+
 	private float _crouchingDepth = -0.5f; // this is relative to the regular head 
 
 	public override void _Ready()
 	{
 		Input.MouseMode = Input.MouseModeEnum.Captured; // capture the users mouse
 		_head = GetNode<Node3D>("Head"); // get the head node
+		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
+		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 	}
 
   public override void _Input(InputEvent @event)
@@ -67,12 +75,22 @@ public partial class Player : CharacterBody3D
 			_currSpeed = CrouchingSpeed;
 
 			// set the head height to be offset by the crouching depth
-			_head.Position = new Vector3(_head.Position.X, _crouchingDepth, _head.Position.Z);
+			Vector3 targetHeadPosition = new Vector3(_head.Position.X, _crouchingDepth, _head.Position.Z);
+			_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
+
+			// disable the staning collision shape
+			_standingCollision.Disabled = true;
+			_crouchingCollision.Disabled = false;
 		} 
 		else
 		{
 			// set head position to be default in all other scenarios other than crouching
-			_head.Position = _head.Position = new Vector3(_head.Position.X, 0.0f, _head.Position.Z);
+			Vector3 targetHeadPosition = new Vector3(_head.Position.X, 0.0f, _head.Position.Z);
+			_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
+
+			// enable the standing collision shape
+			_standingCollision.Disabled = false;
+			_crouchingCollision.Disabled = true;
 
 			if (Input.IsActionPressed("sprint"))
 			{

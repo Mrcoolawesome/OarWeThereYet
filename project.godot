@@ -15,6 +15,11 @@ run/main_scene="uid://cykj32whe33ni"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[display]
+
+window/size/viewport_width=2160
+window/size/viewport_height=1440
+
 [dotnet]
 
 project/assembly_name="OarWeThereYet"
