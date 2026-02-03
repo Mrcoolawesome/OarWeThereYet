@@ -9,6 +9,7 @@ public partial class Boat : RigidBody3D
     [Export] public float FloatForce = 1.0f;
     [Export] public float AngleDamp = 0.1f;
     [Export] public float LineDamp = 0.1f;
+    [Export] public float RiverSpeed = 1.0f;
     private Node3D _probeContainer;
     private float _gravity;
 
@@ -26,7 +27,7 @@ public partial class Boat : RigidBody3D
             Vector3 relativePos = probe.GlobalPosition - GlobalPosition;
 
             float waterHeight = River.GetWaterHeight(globalPos);
-            float depth = (waterHeight - globalPos.Y) / 25.0f;
+            float depth = waterHeight - globalPos.Y;
 
             Vector3 flowDirection = River.GetWaterFlowDirection(globalPos);
             Vector3 waterRight = flowDirection.Cross(Vector3.Up);
@@ -35,6 +36,7 @@ public partial class Boat : RigidBody3D
             if (depth > 0)
             {
                 ApplyForce(waterNormal * _gravity * FloatForce * depth, relativePos);
+                ApplyForce(flowDirection * RiverSpeed, relativePos);
             }
         }
     }

@@ -13,8 +13,10 @@ center_of_mass_mode = 1
 center_of_mass = Vector3(0, -1, 0)
 can_sleep = false
 script = ExtResource("1_qyrje")
-FloatForce = 300.0
+FloatForce = 50.0
+AngleDamp = 0.05
 LineDamp = 0.95
+RiverSpeed = 50.0
 
 [node name="ProbeContainer" type="Node3D" parent="."]
 

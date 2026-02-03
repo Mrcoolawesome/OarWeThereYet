@@ -50,17 +50,20 @@ point_count = 10
 transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.67575747, 0, 5.4789433, 10.135457)
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_7mycd")]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 33, 1.3424377, -44)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 18.47345, 0.8988056, -23.104828)
 River = NodePath("../RiverManager/RiverFloatSystem")
+FloatForce = 25.0
+LineDamp = 0.8
+RiverSpeed = 30.0
 
-[node name="Player" parent="." instance=ExtResource("7_272bh")]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 33, 3.5340385, -44)
+[node name="Player" parent="Boat" instance=ExtResource("7_272bh")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2.1916008, 0)
 
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-10, 0, -1.509958e-06, 0, 10, 0, 1.509958e-06, 0, -10, -1, 0, 7)
 script = ExtResource("3_7mycd")
 ShaderSettings = SubResource("Resource_7mycd")
-PointWidths = Array[float]([1.5293229, 1.7632374, 1.818231, 1.4507989, 1.6173458, 1.4707583, 1.590354, 1.6528332, 1.5686626, 1.5686626])
+PointWidths = Array[float]([1.5293229, 1.7632374, 1.818231, 2.1837888, 2.15875, 2.2947788, 2.4448407, 2.4474006, 2.4574125, 1.5686626])
 Curve = SubResource("Curve3D_272bh")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
