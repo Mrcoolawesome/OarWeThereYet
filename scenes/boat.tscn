@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=4 format=3 uid="uid://bchwofjewsivn"]
 
-[ext_resource type="PackedScene" uid="uid://brhb62qae05bu" path="res://art/models/raft2.blend" id="1_annr2"]
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scenes/Boat.cs" id="1_qyrje"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_0063d"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0063d"]
+size = Vector3(10, 1, 6)
 
 [node name="Boat" type="RigidBody3D"]
 mass = 220.0
@@ -9,29 +13,33 @@ center_of_mass_mode = 1
 center_of_mass = Vector3(0, -1, 0)
 can_sleep = false
 script = ExtResource("1_qyrje")
-WaterDensity = 100.0
-FlowSpeed = 10.0
-WaterAngularDrag = 1.0
+FloatForce = 300.0
+LineDamp = 0.95
 
 [node name="ProbeContainer" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="Probe0" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -1, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
 
 [node name="Probe1" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, -1, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 3)
 
 [node name="Probe2" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
 
 [node name="Probe3" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
 [node name="Probe4" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -1, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
 
 [node name="Probe5" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, -1, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 3)
 
-[node name="raft2" parent="." instance=ExtResource("1_annr2")]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(10, 0, 0, 0, 1, 0, 0, 0, 6, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_0063d")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_0063d")
