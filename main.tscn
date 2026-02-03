@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cykj32whe33ni"]
+[gd_scene load_steps=9 format=3 uid="uid://cykj32whe33ni"]
 
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="3_7mycd"]
 [ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="4_272bh"]
@@ -6,12 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes/boat.tscn" id="6_7mycd"]
 [ext_resource type="Script" uid="uid://dw3yrisbnd4me" path="res://addons/waterways_net/RiverFloatSystem.cs" id="6_kek77"]
 [ext_resource type="PackedScene" uid="uid://dmth1b1qymst1" path="res://scenes/player.tscn" id="7_272bh"]
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_7dm0k"]
-size = Vector3(20, 1, 20)
-
-[sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
-size = Vector3(20, 1, 20)
 
 [sub_resource type="Resource" id="Resource_7mycd"]
 script = ExtResource("5_5vw27")
@@ -45,41 +39,34 @@ _selectedShader = 1
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
-"points": PackedVector3Array(0, 0, -0.25, 0, 0, 0.25, 0, 0, 0, 0, 0, -0.25, 0, 0, 0.25, -2.6722068e-07, 0, 4.0566406, 3.4813354e-07, 0, -3.9186707, -3.4813354e-07, 0, 3.9186707, -1.637545e-06, 0, 19.731323, 1.1872386e-06, 4.0365405, -13.329352, -1.1872386e-06, -4.0365405, 13.329352, -6.413932e-06, -15.055798, 73.36683, 2.1376218e-07, 26.772339, -2.44516, -2.1376218e-07, -26.772339, 2.44516, -9.54076e-06, -186.49345, 109.133575, 2.6737825e-06, -0.624176, -30.58451, -2.6737825e-06, 0.624176, 30.58451, -1.1814427e-05, -226.37344, 135.1413, 1.9132153e-06, 0.23981811, -21.884626, -1.9132153e-06, -0.23981811, 21.884626, -1.9467747e-05, -226.37344, 222.68506),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0)
+"points": PackedVector3Array(0, 0, -0.25, 0, 0, 0.25, 0, 0, 0, 0, 0, -0.25, 0, 0, 0.25, -1.4852584e-07, 0, 1.9836426, 0.20245856, 0, -0.30449176, -0.20245856, 0, 0.30449176, -0.42172363, 0, 3.4048746, 0.42369828, 0, -0.12880445, -0.42369828, 0, 0.12880445, -1.86022, 3.8146973e-07, 4.7176075, 0.3620844, 0, 0.0005264282, -0.3620844, 0, -0.0005264282, -3.6957357, 0, 5.059482, 0.20993483, 0.34301034, -0.00015068559, -0.20993483, -0.34301034, 0.00015068559, -4.8069286, -1.1853027, 5.2034, 0.3862569, 0.3951547, 4.5984623e-05, -0.3862569, -0.3951547, -4.5984623e-05, -6.2740707, -2.827278, 4.818334, 0.5837458, 0.018570317, -1.3944724e-05, -0.5837458, -0.018570317, 1.3944724e-05, -8.565348, -3.2830358, 4.8183336, 0.50384516, -0.019702422, 4.903579e-06, -0.50384516, 0.019702422, -4.903579e-06, -10.581921, -3.2455766, 4.8183336),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
 }
-point_count = 7
+point_count = 9
 
 [node name="Main" type="Node"]
-
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
-shape = SubResource("BoxShape3D_7dm0k")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
-mesh = SubResource("BoxMesh_ig7tw")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.67575747, 0, 5.4789433, 10.135457)
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_7mycd")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 1.0201302, -23)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 15.342438, 0)
 River = NodePath("../RiverManager/RiverFloatSystem")
+BouyancyMult = 0.1
 
 [node name="Player" parent="." instance=ExtResource("7_272bh")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 4.21173, 0)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 17.534039, 0)
 
 [node name="RiverManager" type="Node3D" parent="."]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 1, 9)
+transform = Transform3D(-10, 0, -1.509958e-06, 0, 10, 0, 1.509958e-06, 0, -10, -1, 0, 7)
 script = ExtResource("3_7mycd")
 ShaderSettings = SubResource("Resource_7mycd")
-PointWidths = Array[float]([10.100952, 10.100894, 10.100894, 10.100894, 10.100894, 10.100894, 10.100894])
+PointWidths = Array[float]([1.5293229, 1.7632374, 1.818231, 1.4507989, 1.6173458, 1.4707583, 1.590354, 1.6528332, 1.5686626])
 Curve = SubResource("Curve3D_272bh")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
 script = ExtResource("6_kek77")
-MaxDepth = -100.0
+MaxDepth = 50.0
+DefaultHeight = -10000.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
