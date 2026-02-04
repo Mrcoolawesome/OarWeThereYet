@@ -48,4 +48,10 @@ public partial class Boat : RigidBody3D
         Vector3 waterRight = flowDirection.Cross(Vector3.Up);
         return waterRight.Cross(flowDirection);
     }
+
+    // Logic for player entering a chair
+    public void OnChairsBodyEntered(PhysicsBody3D body)
+    {
+        GD.Print("GAMING");
+    }
 }

@@ -10,6 +10,7 @@ height = 1.2
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4
+collision_mask = 3
 script = ExtResource("1_3vyb7")
 MouseSens = 0.5
 LerpSpeed = 5.0

@@ -1,6 +1,8 @@
-[gd_scene load_steps=9 format=4 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=10 format=4 uid="uid://bchwofjewsivn"]
 
-[ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scenes/Boat.cs" id="1_qyrje"]
+[ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scripts/Boat.cs" id="1_0063d"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fsggc"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xqws5"]
 resource_name = "Material"
@@ -53,14 +55,12 @@ size = Vector3(3.1000001, 1.8000001, 1.9)
 size = Vector3(1.6, 2.1000001, 4)
 
 [node name="Boat" type="RigidBody3D"]
+collision_layer = 2
 mass = 220.0
 center_of_mass_mode = 1
 center_of_mass = Vector3(0, -1, 0)
 can_sleep = false
-script = ExtResource("1_qyrje")
-FloatForce = 300.0
-RiverSpeed = 100.0
-WaterDrag = 3.0
+script = ExtResource("1_0063d")
 
 [node name="ProbeContainer" type="Node3D" parent="."]
 
@@ -81,6 +81,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
 
 [node name="Probe5" type="Marker3D" parent="ProbeContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 3)
+
+[node name="ChairsTriggers" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 4
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ChairsTriggers"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+shape = SubResource("BoxShape3D_fsggc")
 
 [node name="Raft" type="MeshInstance3D" parent="."]
 mesh = SubResource("ArrayMesh_jacfy")
@@ -121,3 +129,5 @@ shape = SubResource("BoxShape3D_lw6pk")
 [node name="Wall4" type="CollisionShape3D" parent="."]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -6.98472, 1.7499999, -0.067233324)
 shape = SubResource("BoxShape3D_evv4r")
+
+[connection signal="body_entered" from="ChairsTriggers" to="." method="OnChairsBodyEntered"]

@@ -1,0 +1,102 @@
+[gd_scene load_steps=14 format=3 uid="uid://c56dl370hje57"]
+
+[ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes/boat.tscn" id="1_pcu7d"]
+[ext_resource type="PackedScene" uid="uid://dmth1b1qymst1" path="res://scenes/player.tscn" id="2_l6grw"]
+[ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="3_kri1i"]
+[ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="4_5qbqa"]
+[ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="5_gi1h7"]
+[ext_resource type="Script" uid="uid://dw3yrisbnd4me" path="res://addons/waterways_net/RiverFloatSystem.cs" id="6_jjnc2"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_pcu7d"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_l6grw"]
+sky_material = SubResource("ProceduralSkyMaterial_pcu7d")
+
+[sub_resource type="Environment" id="Environment_3dx25"]
+background_mode = 2
+sky = SubResource("Sky_l6grw")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3dx25"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nuoa6"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="Resource" id="Resource_kri1i"]
+script = ExtResource("5_gi1h7")
+MatShaderType = 1
+mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
+mat_albedo_color_second = Color(0.25, 0.35, 0.35, 1)
+mat_albedo_depth = 10.0
+mat_albedo_depth_curve = 0.25
+mat_transparency_clarity = 10.0
+mat_transparency_depth_curve = 0.25
+mat_transparency_refraction = 0.05
+mat_normal_scale = 1.0
+mat_normal_bump_texture = ExtResource("4_5qbqa")
+mat_flow_speed = 1.0
+mat_flow_base = 0.0
+mat_flow_steepness = 2.0
+mat_flow_distance = 1.0
+mat_flow_pressure = 1.0
+mat_flow_max = 4.0
+mat_foam_color = Color(0.9, 0.9, 0.9, 1)
+mat_foam_amount = 2.0
+mat_foam_steepness = 2.0
+mat_foam_smoothness = 0.3
+mat_uv_scale = Vector3(1, 1, 1)
+mat_roughness = 0.2
+mat_edge_fade = 0.25
+LodLod0Distance = 50.0
+_selectedShader = 1
+
+[sub_resource type="Curve3D" id="Curve3D_5qbqa"]
+resource_local_to_scene = true
+bake_interval = 0.05
+_data = {
+"points": PackedVector3Array(0, 0, -0.25, 0, 0, 0.25, 0, 0, 0, 0, 0, -0.25, 0, 0, 0.25, 0, 0, 1),
+"tilts": PackedFloat32Array(0, 0)
+}
+point_count = 2
+
+[node name="Testing" type="Node"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_3dx25")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.24999999, -0.24999999, 0.8080126, 0.5334937, -0.43301272, 0.39951906, -0.8080127, 0, 12, 0)
+shadow_enabled = true
+
+[node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("1_pcu7d")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1832242, 0)
+River = NodePath("../RiverManager/RiverFloatSystem")
+
+[node name="Player" parent="." instance=ExtResource("2_l6grw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4460502, 0)
+
+[node name="Ground" type="StaticBody3D" parent="."]
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("BoxShape3D_3dx25")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("BoxMesh_nuoa6")
+skeleton = NodePath("../..")
+
+[node name="RiverManager" type="Node3D" parent="."]
+script = ExtResource("3_kri1i")
+ShaderSettings = SubResource("Resource_kri1i")
+Curve = SubResource("Curve3D_5qbqa")
+metadata/_custom_type_script = "uid://d20js1b0dipxh"
+
+[node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
+script = ExtResource("6_jjnc2")
+MaxDepth = -100.0
+DefaultHeight = -100.0
+metadata/_custom_type_script = "uid://dw3yrisbnd4me"
