@@ -30,15 +30,20 @@ public partial class Boat : RigidBody3D
             float depth = waterHeight - globalPos.Y;
 
             Vector3 flowDirection = River.GetWaterFlowDirection(globalPos);
-            Vector3 waterRight = flowDirection.Cross(Vector3.Up);
-            Vector3 waterNormal = waterRight.Cross(flowDirection);
             
             if (depth > 0)
             {
-                ApplyForce(waterNormal * _gravity * FloatForce * depth, relativePos);
+                ApplyForce(waterNormal(globalPos) * _gravity * FloatForce * depth, relativePos);
                 ApplyForce(flowDirection * RiverSpeed, relativePos);
             }
         }
+    }
+
+    private Vector3 waterNormal(Vector3 globalPos)
+    {
+        Vector3 flowDirection = River.GetWaterFlowDirection(globalPos);
+        Vector3 waterRight = flowDirection.Cross(Vector3.Up);
+        return waterRight.Cross(flowDirection);
     }
 
     // public override void _IntegrateForces(PhysicsDirectBodyState3D state)
