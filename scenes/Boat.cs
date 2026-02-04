@@ -7,9 +7,8 @@ public partial class Boat : RigidBody3D
 {
     [Export] public RiverFloatSystem River;
     [Export] public float FloatForce = 1.0f;
-    [Export] public float AngleDamp = 0.1f;
-    [Export] public float LineDamp = 0.1f;
     [Export] public float RiverSpeed = 1.0f;
+    [Export] public float WaterDrag = 2.0f;
     private Node3D _probeContainer;
     private float _gravity;
 
@@ -25,25 +24,28 @@ public partial class Boat : RigidBody3D
         {
             Vector3 globalPos = probe.GlobalPosition;
             Vector3 relativePos = probe.GlobalPosition - GlobalPosition;
+            Vector3 flowDirection = River.GetWaterFlowDirection(globalPos);
 
             float waterHeight = River.GetWaterHeight(globalPos);
             float depth = waterHeight - globalPos.Y;
 
-            Vector3 flowDirection = River.GetWaterFlowDirection(globalPos);
-            Vector3 waterRight = flowDirection.Cross(Vector3.Up);
-            Vector3 waterNormal = waterRight.Cross(flowDirection);
-            
+            Vector3 currentVelocity = LinearVelocity + AngularVelocity.Cross(relativePos);
+            Vector3 frictionForce = -currentVelocity * depth * WaterDrag;
+
+            Vector3 buoyancyForce = waterNormal(globalPos) * _gravity * FloatForce * depth;
+
             if (depth > 0)
             {
-                ApplyForce(waterNormal * _gravity * FloatForce * depth, relativePos);
+                ApplyForce(buoyancyForce + frictionForce, relativePos);
                 ApplyForce(flowDirection * RiverSpeed, relativePos);
             }
         }
     }
 
-    // public override void _IntegrateForces(PhysicsDirectBodyState3D state)
-    // {
-    //     state.AngularVelocity *= AngleDamp;
-    //     state.LinearVelocity *= LineDamp;
-    // }
+    private Vector3 waterNormal(Vector3 globalPos)
+    {
+        Vector3 flowDirection = River.GetWaterFlowDirection(globalPos);
+        Vector3 waterRight = flowDirection.Cross(Vector3.Up);
+        return waterRight.Cross(flowDirection);
+    }
 }
