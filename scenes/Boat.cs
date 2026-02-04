@@ -28,11 +28,11 @@ public partial class Boat : RigidBody3D
 
             float waterHeight = River.GetWaterHeight(globalPos);
             float depth = waterHeight - globalPos.Y;
+            float buoyancyMultiplier = 2 - Mathf.Exp(-depth + 0.6f);
+            Vector3 buoyancyForce = waterNormal(globalPos) * _gravity * FloatForce * buoyancyMultiplier;
 
             Vector3 currentVelocity = LinearVelocity + AngularVelocity.Cross(relativePos);
             Vector3 frictionForce = -currentVelocity * depth * WaterDrag;
-
-            Vector3 buoyancyForce = waterNormal(globalPos) * _gravity * FloatForce * depth;
 
             if (depth > 0)
             {
