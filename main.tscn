@@ -44,35 +44,22 @@ _data = {
 }
 point_count = 10
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
-sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-
-[sub_resource type="Sky" id="Sky_h2yge"]
-sky_material = SubResource("ProceduralSkyMaterial_0xm2m")
-
-[sub_resource type="Environment" id="Environment_1bvp3"]
-background_mode = 2
-sky = SubResource("Sky_h2yge")
-tonemap_mode = 2
-glow_enabled = true
-
 [node name="Main" type="Node"]
+
+[node name="Player" parent="." instance=ExtResource("7_272bh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.27345, 3.0904064, -32.90483)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.67575747, 0, 5.4789433, 10.135457)
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_7mycd")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 18.47345, 0.8988056, -23.104828)
-River = NodePath("../RiverManager/RiverFloatSystem")
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 25.27345, 0.8988056, -32.90483)
+River = NodePath("../ChudRiver/RiverFloatSystem")
 FloatForce = 25.0
 LineDamp = 0.8
 RiverSpeed = 30.0
 
-[node name="Player" parent="Boat" instance=ExtResource("7_272bh")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2.1916008, 0)
-
-[node name="RiverManager" type="Node3D" parent="."]
+[node name="ChudRiver" type="Node3D" parent="."]
 transform = Transform3D(-10, 0, -1.509958e-06, 0, 10, 0, 1.509958e-06, 0, -10, -1, 0, 7)
 script = ExtResource("3_7mycd")
 ShaderSettings = SubResource("Resource_7mycd")
@@ -80,7 +67,7 @@ PointWidths = Array[float]([1.5293229, 1.7632374, 1.818231, 2.1837888, 2.15875, 
 Curve = SubResource("Curve3D_272bh")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
-[node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
+[node name="RiverFloatSystem" type="Node3D" parent="ChudRiver"]
 script = ExtResource("6_kek77")
 MaxDepth = 50.0
 DefaultHeight = -10000.0
