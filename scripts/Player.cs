@@ -35,9 +35,15 @@ public partial class Player : CharacterBody3D
 
 	private float _crouchingDepth = -0.5f; // this is relative to the regular head 
 
+	// different states for being in the menu and just playing the game
+	private enum GameState {
+		Playing, 
+		Menu
+	}
+	private GameState _currState = GameState.Menu; // default state is being in the menu
+
 	public override void _Ready()
 	{
-		Input.MouseMode = Input.MouseModeEnum.Captured; // capture the users mouse
 		_head = GetNode<Node3D>("Head"); // get the head node
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
@@ -63,6 +69,48 @@ public partial class Player : CharacterBody3D
 			_head.Rotation = newRotation;
 		}
   }
+
+  public override void _Process(double delta)
+  {
+    // logic for escaping into the menu and then either quitting the game or going back into the game
+		switch(_currState)
+		{
+			case GameState.Playing:
+				_HandleGamingState();
+				break;
+			case GameState.Menu:
+				_HandleMenuState();
+				break;
+		}
+  }
+
+	// handling ui state if they're just playing the game
+	private void _HandleGamingState()
+	{
+		if (Input.IsActionJustPressed("ui_cancel")) // we use IsActionJustPressed because it's a trigger and not a continuous input event like IsActionPressed is
+		{
+			_currState = GameState.Menu;
+			// release the mouse
+			Input.MouseMode = Input.MouseModeEnum.Visible;
+		}
+	}
+
+	// handling ui state if they're in the menu
+	private void _HandleMenuState()
+	{
+		// if they're in the menu and press escape then close the game
+		if (Input.IsActionJustPressed("ui_cancel"))
+		{
+			GetTree().Quit();
+		}
+
+		// if they press their mouse button then capture the mouse again
+		if (Input.IsMouseButtonPressed(MouseButton.Left))
+		{
+			_currState = GameState.Playing;
+			Input.MouseMode = Input.MouseModeEnum.Captured; // capture the mouse again
+		}
+	}
 
 	public override void _PhysicsProcess(double delta)
 	{
