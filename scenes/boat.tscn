@@ -55,8 +55,7 @@ size = Vector3(3.1000001, 1.8000001, 1.9)
 size = Vector3(1.6, 2.1000001, 4)
 
 [node name="Boat" type="RigidBody3D"]
-collision_layer = 2
-mass = 220.0
+mass = 200.0
 center_of_mass_mode = 1
 center_of_mass = Vector3(0, -1, 0)
 can_sleep = false
