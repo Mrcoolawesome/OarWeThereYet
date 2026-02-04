@@ -37,7 +37,7 @@ public partial class Player : CharacterBody3D
 
 	public override void _Ready()
 	{
-		// Input.MouseMode = Input.MouseModeEnum.Captured; // capture the users mouse
+		Input.MouseMode = Input.MouseModeEnum.Captured; // capture the users mouse
 		_head = GetNode<Node3D>("Head"); // get the head node
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");

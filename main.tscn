@@ -56,7 +56,6 @@ transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.675757
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 25.27345, 0.8988056, -37.420616)
 River = NodePath("../ChudRiver/RiverFloatSystem")
 FloatForce = 25.0
-LineDamp = 0.8
 RiverSpeed = 30.0
 
 [node name="ChudRiver" type="Node3D" parent="."]
