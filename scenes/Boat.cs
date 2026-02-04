@@ -6,9 +6,9 @@ using Waterways;
 public partial class Boat : RigidBody3D
 {
     [Export] public RiverFloatSystem River;
-    [Export] public float FloatForce = 1.0f;
-    [Export] public float RiverSpeed = 1.0f;
-    [Export] public float WaterDrag = 2.0f;
+    [Export] public float FloatForce = 25.0f;
+    [Export] public float RiverSpeed = 30.0f;
+    [Export] public float WaterDrag = 5.0f;
     private Node3D _probeContainer;
     private float _gravity;
 
