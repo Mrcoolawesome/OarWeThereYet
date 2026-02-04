@@ -54,6 +54,7 @@ transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.675757
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_7mycd")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 25.27345, 0.8988056, -37.420616)
+mass = 500.0
 River = NodePath("../ChudRiver/RiverFloatSystem")
 FloatForce = 25.0
 RiverSpeed = 30.0
