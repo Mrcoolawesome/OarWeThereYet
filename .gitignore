@@ -3,4 +3,4 @@
 /android/
 
 # we don't wanna mix our godot binary paths
-.vscode/settings.json
+.vscode/*
