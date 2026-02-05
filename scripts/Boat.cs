@@ -15,6 +15,10 @@ public partial class Boat : RigidBody3D
     private Node3D _probeContainer;
     private float _gravity;
 
+    // booleans to apply rowing force to specific spots on the boat
+    private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
+    private bool[] _rowingStatesDirection = new bool[4]; // direction of rowing: backward = false | forward = true
+
     /*
         front left localShapeIndex: 0
         front right localShapeIndex: 1
@@ -110,5 +114,13 @@ public partial class Boat : RigidBody3D
             SeatIndicies.BackRight  => new Vector3(0, 1, 1),
             _ => Vector3.Zero // Default fallback
         };
+    }
+
+    // getting the signals to row forward or to stop
+    public void OnRowing(int seat, bool stopStart, bool backForward)
+    {
+        // set the rowing state to be true for whichever seat is being sat in
+        _rowingStates[seat] = true;
+        _rowingStatesDirection[seat] = backForward;
     }
 }
