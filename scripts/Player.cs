@@ -24,7 +24,7 @@ public partial class Player : CharacterBody3D
 
 	// Signals for telling the boat to apply a force given a seat
 	[Signal]
-	public delegate void RowedEventHandler(Boat.SeatIndicies seat);
+	public delegate void ForwardRowingEventHandler(Boat.SeatIndicies seat);
 
 	// private variables
 	private float _currSpeed = 5.0f;
@@ -174,6 +174,8 @@ public partial class Player : CharacterBody3D
 			// apply gravity and movement logic
 			_MovementLogic(delta);
 		}
+
+		MoveAndSlide();
 	}
 
 	private void _MovementLogic(double delta)
@@ -201,7 +203,6 @@ public partial class Player : CharacterBody3D
 		velocity.X = _direction.X * _currSpeed;
 		velocity.Z = _direction.Z * _currSpeed;
 		Velocity = velocity;
-		MoveAndSlide();
 	}
 
 	private void _Gravity(double delta)
@@ -215,7 +216,6 @@ public partial class Player : CharacterBody3D
 		}
 
 		Velocity = velocity;
-		MoveAndSlide();
 	}
 
 	private void _CrouchSprintLogic(double delta)
@@ -270,6 +270,12 @@ public partial class Player : CharacterBody3D
 			Reparent(boatParent, true); // keep the global transform too ig
 			GlobalRotation = Vector3.Zero;
 		}
+
+		// if they input w, send out go forward signal
+		// if (Input.IsActionPressed("move_forward"))
+		// {
+		// 	EmitSignal(ForwardRowing)
+		// }
 	}
 
 	// input handling while they're in the seat hitbox
