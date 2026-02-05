@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Waterways;
 
@@ -121,19 +122,13 @@ public partial class Boat : RigidBody3D
                 finalForce *= RowForce;
             }
 
-            if (finalForce.LengthSquared() > 0.01f) 
+            // only apply the force if the probe (oar) is in the water
+            float riverHeight = River.GetWaterHeight(probe.GlobalPosition);
+            float depth = riverHeight - probe.GlobalPosition.Y;
+            if (depth > 0)
             {
-                // Draw an arrow starting at the Oar (probe) and pointing in the direction of the force
-                // We scale finalForce * 0.5f just to keep the arrow from being too huge on screen if RowForce is high
-                DebugDraw3D.DrawArrow(
-                    probe.GlobalPosition,                   // Start
-                    probe.GlobalPosition + finalForce,      // End (Tip of arrow)
-                    Colors.Yellow,                          // Color
-                    0.2f                                    // Arrow head size
-                );
+                ApplyForce(finalForce, relativePosition); // finally apply the force
             }
-
-            ApplyForce(finalForce, relativePosition); // finally apply the force
         }
     }
 
