@@ -71,7 +71,7 @@ public partial class Boat : RigidBody3D
             // this value is the relative position to the boat
             Vector3 relativePosition = probe.GlobalPosition - GlobalPosition; // im making this into a new variable so it's more clear on what it is
             // get the forward direction of the boat
-            Vector3 forwardDirection = GlobalBasis.Z;
+            Vector3 forwardDirection = -GlobalBasis.X;
             Vector3 finalForce = Vector3.Zero;
 
             // check if we're allowed to row this oar given their state
@@ -104,7 +104,7 @@ public partial class Boat : RigidBody3D
                 bool direction = _rowingStatesDirection[(int)SeatIndicies.FrontLeft];
                 
                 // go forward or backward
-                finalForce = direction ? forwardDirection : -forwardDirection;
+                finalForce = direction ? -forwardDirection : forwardDirection;
                 
                 // multiply it by the row force
                 finalForce *= RowForce;
@@ -115,10 +115,22 @@ public partial class Boat : RigidBody3D
                 bool direction = _rowingStatesDirection[(int)SeatIndicies.BackLeft];
                 
                 // go forward or backward
-                finalForce = direction ? forwardDirection : -forwardDirection;
+                finalForce = direction ? -forwardDirection : forwardDirection;
                 
                 // multiply it by the row force
                 finalForce *= RowForce;
+            }
+
+            if (finalForce.LengthSquared() > 0.01f) 
+            {
+                // Draw an arrow starting at the Oar (probe) and pointing in the direction of the force
+                // We scale finalForce * 0.5f just to keep the arrow from being too huge on screen if RowForce is high
+                DebugDraw3D.DrawArrow(
+                    probe.GlobalPosition,                   // Start
+                    probe.GlobalPosition + finalForce,      // End (Tip of arrow)
+                    Colors.Yellow,                          // Color
+                    0.2f                                    // Arrow head size
+                );
             }
 
             ApplyForce(finalForce, relativePosition); // finally apply the force
