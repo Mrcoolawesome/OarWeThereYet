@@ -41,3 +41,6 @@ visible = false
 [node name="PauseCanvas" type="CanvasLayer" parent="."]
 
 [node name="PauseUI" parent="PauseCanvas" instance=ExtResource("3_qhqgy")]
+
+[connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
+[connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]

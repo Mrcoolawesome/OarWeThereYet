@@ -150,18 +150,7 @@ public partial class Player : CharacterBody3D
 	// handling ui state if they're in the menu
 	private void _HandleMenuState()
 	{
-		// if they're in the menu and press escape then close the game
-		if (Input.IsActionJustPressed("ui_cancel"))
-		{
-			GetTree().Quit();
-		}
-
-		// if they press their mouse button then capture the mouse again
-		if (Input.IsMouseButtonPressed(MouseButton.Left))
-		{
-			_currGameState = GameState.Playing;
-			Input.MouseMode = Input.MouseModeEnum.Captured; // capture the mouse again
-		}
+		//Exit and resume logic has been moved to signal function at bottom
 	}
 
 	// logic for walking and everything depending on the player state
@@ -314,5 +303,24 @@ public partial class Player : CharacterBody3D
 	{
 		_inSeatHitbox = isInSeatHitbox;
 		_seat = newSeat;
+	}
+
+	private void OnPauseUIResume()
+	{
+		// if they press resume button
+		if (_currGameState == GameState.Menu)
+		{
+			_currGameState = GameState.Playing;
+			Input.MouseMode = Input.MouseModeEnum.Captured; // capture the mouse again
+		}
+	}
+
+	private void OnPauseUIExit()
+	{
+		// if they press exit button
+		if (_currGameState == GameState.Menu)
+		{
+			GetTree().Quit();
+		}
 	}
 }

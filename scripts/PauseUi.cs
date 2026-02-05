@@ -3,6 +3,9 @@ using System;
 
 public partial class PauseUi : Control
 {
+	[Signal] public delegate void ResumeEventHandler();
+	[Signal] public delegate void ExitEventHandler();
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -13,8 +16,13 @@ public partial class PauseUi : Control
 	{
 	}
 
-	private void OnButtonPressed()
+	private void OnResumeButtonPressed()
 	{
-		GD.Print("Button Pressed");
+		EmitSignal(SignalName.Resume);
+	}
+
+	private void OnExitButtonPressed()
+	{
+		EmitSignal(SignalName.Exit);
 	}
 }
