@@ -124,6 +124,18 @@ public partial class Player : CharacterBody3D
 			// release the mouse
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 		}
+
+		// handle input for sitting and standing states
+		switch(_currPlayerState)
+		{
+			case PlayerState.Standing:
+				// handle input for choosing to sit
+				_HandleInSeatHitboxState();
+				break;
+			case PlayerState.Rowing:
+				_HandleRowingState();
+				break;
+		}
 	}
 
 	// handling ui state if they're in the menu
@@ -154,11 +166,6 @@ public partial class Player : CharacterBody3D
 				_CrouchSprintLogic(delta);
 				// apply gravity and movement logic
 				_MovementLogic(delta);
-				// handle input for choosing to sit
-				_HandleInSeatHitboxState();
-				break;
-			case PlayerState.Rowing:
-				_HandleRowingState();
 				break;
 		}
 	}
