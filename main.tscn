@@ -46,8 +46,9 @@ point_count = 10
 
 [node name="Main" type="Node"]
 
-[node name="Player" parent="." instance=ExtResource("7_272bh")]
+[node name="Player" parent="." node_paths=PackedStringArray("Boat") instance=ExtResource("7_272bh")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 8.101047, 3.0904064, 0.5007105)
+Boat = NodePath("../Boat")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.67575747, 0, 5.4789433, 10.135457)
