@@ -60,6 +60,8 @@ center_of_mass_mode = 1
 center_of_mass = Vector3(0, -1, 0)
 can_sleep = false
 script = ExtResource("1_0063d")
+FloatForce = 25.0
+RiverSpeed = 3.0
 
 [node name="ProbeContainer" type="Node3D" parent="."]
 
@@ -81,12 +83,48 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
 [node name="Probe5" type="Marker3D" parent="ProbeContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 3)
 
-[node name="ChairsTriggers" type="Area3D" parent="."]
+[node name="SeatArea3D" type="Area3D" parent="."]
 collision_layer = 2
 collision_mask = 4
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ChairsTriggers"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+[node name="Front Left Collision" type="CollisionShape3D" parent="SeatArea3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, -2)
+shape = SubResource("BoxShape3D_fsggc")
+
+[node name="Front Right Collision" type="CollisionShape3D" parent="SeatArea3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 2)
+shape = SubResource("BoxShape3D_fsggc")
+
+[node name="Back Right Collision" type="CollisionShape3D" parent="SeatArea3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
+shape = SubResource("BoxShape3D_fsggc")
+
+[node name="Back Left Collisions" type="CollisionShape3D" parent="SeatArea3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
+shape = SubResource("BoxShape3D_fsggc")
+
+[node name="Front Right" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 4
+
+[node name="Front Right Collision" type="CollisionShape3D" parent="Front Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 2)
+shape = SubResource("BoxShape3D_fsggc")
+
+[node name="Back Right" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 4
+
+[node name="Back Right Collision" type="CollisionShape3D" parent="Back Right"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
+shape = SubResource("BoxShape3D_fsggc")
+
+[node name="Back Left" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 4
+
+[node name="Back Left Collisions" type="CollisionShape3D" parent="Back Left"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
 shape = SubResource("BoxShape3D_fsggc")
 
 [node name="Raft" type="MeshInstance3D" parent="."]
@@ -129,4 +167,5 @@ shape = SubResource("BoxShape3D_lw6pk")
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -6.98472, 1.7499999, -0.067233324)
 shape = SubResource("BoxShape3D_evv4r")
 
-[connection signal="body_entered" from="ChairsTriggers" to="." method="OnChairsBodyEntered"]
+[connection signal="body_shape_entered" from="SeatArea3D" to="." method="SeatAreaBodyShapeEntered"]
+[connection signal="body_shape_exited" from="SeatArea3D" to="." method="SeatAreaBodyShapeExited"]

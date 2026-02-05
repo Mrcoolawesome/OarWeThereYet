@@ -19,6 +19,8 @@ public partial class Player : CharacterBody3D
 	public float LerpSpeed = 10.0f;
 	[Export]
 	public float CrouchLerpSpeed = 10.0f;
+	[Export]
+	public Boat Boat;
 
 	// private variables
 	private float _currSpeed = 5.0f;
@@ -35,12 +37,38 @@ public partial class Player : CharacterBody3D
 
 	private float _crouchingDepth = -0.5f; // this is relative to the regular head 
 
+	// to keep track of if they're choosing to sit or not
+	private bool _inSeatHitbox = false;
+
+	// need to know which seat they're sitting in
+	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
+	/*
+		(all of this is assuming you're facing the front)
+		front left: 4, 2, -2
+		front right: 4, 2, 2
+		back left: 0, 2, -2
+		back right: 0, 2, 2
+
+		front left localShapeIndex: 0
+		front right localShapeIndex: 1
+		back right localShapeIndex: 2
+		back left localShapeIndex: 3
+	*/
+
+	// different playing states. i made this a state machine so that we could add swimming in the future
+	private enum PlayerState
+	{
+		Rowing,
+		Standing
+	}
+
 	// different states for being in the menu and just playing the game
 	private enum GameState {
-		Playing, 
+		Playing,
 		Menu
 	}
-	private GameState _currState = GameState.Menu; // default state is being in the menu
+	private GameState _currGameState = GameState.Menu; // default state is being in the menu
+	private PlayerState _currPlayerState = PlayerState.Standing; // default is walking
 
 	public override void _Ready()
 	{
@@ -49,8 +77,10 @@ public partial class Player : CharacterBody3D
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 	}
 
+	// mouse input logic 
   public override void _Input(InputEvent @event)
   {
+		// this is always done so that they can move their head, might wanna change it so that their head is always level
     if (@event is InputEventMouseMotion mouseEvent)
 		{
 			// the y rotation of the player in radians based off of the mouse sensitivity 
@@ -73,7 +103,7 @@ public partial class Player : CharacterBody3D
   public override void _Process(double delta)
   {
     // logic for escaping into the menu and then either quitting the game or going back into the game
-		switch(_currState)
+		switch(_currGameState)
 		{
 			case GameState.Playing:
 				_HandleGamingState();
@@ -87,9 +117,10 @@ public partial class Player : CharacterBody3D
 	// handling ui state if they're just playing the game
 	private void _HandleGamingState()
 	{
+		// menu logic
 		if (Input.IsActionJustPressed("ui_cancel")) // we use IsActionJustPressed because it's a trigger and not a continuous input event like IsActionPressed is
 		{
-			_currState = GameState.Menu;
+			_currGameState = GameState.Menu;
 			// release the mouse
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 		}
@@ -107,15 +138,67 @@ public partial class Player : CharacterBody3D
 		// if they press their mouse button then capture the mouse again
 		if (Input.IsMouseButtonPressed(MouseButton.Left))
 		{
-			_currState = GameState.Playing;
+			_currGameState = GameState.Playing;
 			Input.MouseMode = Input.MouseModeEnum.Captured; // capture the mouse again
 		}
 	}
 
+	// logic for walking and everything depending on the player state
 	public override void _PhysicsProcess(double delta)
+	{
+		// disable movement if they're not in the walking state, and wait for input to allow them to 'escape'
+		switch (_currPlayerState)
+		{
+			case PlayerState.Standing:
+				// apply crouching and sprinting logic
+				_CrouchSprintLogic(delta);
+				// apply gravity and movement logic
+				_MovementLogic(delta);
+				// handle input for choosing to sit
+				_HandleInSeatHitboxState();
+				break;
+			case PlayerState.Rowing:
+				_HandleRowingState();
+				break;
+		}
+	}
+
+	private void _MovementLogic(double delta)
 	{
 		Vector3 velocity = Velocity;
 
+		// Add the gravity.
+		if (!IsOnFloor())
+		{
+			velocity += GetGravity() * (float)delta;
+		}
+
+		// Handle Jump.
+		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
+		{
+			velocity.Y = JumpVelocity;
+		}
+
+		// Get the input direction and handle the movement/deceleration.
+		// As good practice, you should replace UI actions with custom gameplay actions.
+		Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
+		Vector3 targetDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+		// move towards zero vector if we're not trying to move anywhere
+		if (inputDir == Vector2.Zero)
+		{
+			targetDirection = Vector3.Zero;
+		}
+
+		// set the direction and move in that direction
+		_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
+		velocity.X = _direction.X * _currSpeed;
+		velocity.Z = _direction.Z * _currSpeed;
+		Velocity = velocity;
+		MoveAndSlide();
+	}
+
+	private void _CrouchSprintLogic(double delta)
+	{
 		// they can only be crouching or sprinting not both hence the else if
 		// if they are pressing both then the speed will be set to crouching speed just bc it's at the beginning of the if else statements
 		if (Input.IsActionPressed("crouch"))
@@ -147,37 +230,48 @@ public partial class Player : CharacterBody3D
 			else
 			{
 				_currSpeed = WalkingSpeed;
+			}
 		}
-		}
-		
+	}
 
-		// Add the gravity.
-		if (!IsOnFloor())
+	// input handling while they're in a rowing state
+	private void _HandleRowingState()
+	{	
+		// if they press the spacebar then release them
+		if (Input.IsActionJustPressed("ui_accept"))
 		{
-			velocity += GetGravity() * (float)delta;
-		}
+			_currPlayerState = PlayerState.Standing;
 
-		// Handle Jump.
-		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
+			// reset their position to the middle of the boat and then make them a sibling of the boat again\
+			// Position is in PARENT space so setting it to 0,1,0 will set it to the middle of the boat 
+			Position = new Vector3(0, 1.0f, 0);
+			Node boatParent = Boat.GetParent();
+			Reparent(boatParent, true); // keep the global transform too ig
+			GlobalRotation = Vector3.Zero;
+		}
+	}
+
+	// input handling while they're in the seat hitbox
+	private void _HandleInSeatHitboxState()
+	{
+		if (Input.IsActionPressed("action_key") && _inSeatHitbox)
 		{
-			velocity.Y = JumpVelocity;
-		}
+			_currPlayerState = PlayerState.Rowing;
 
-		// Get the input direction and handle the movement/deceleration.
-		// As good practice, you should replace UI actions with custom gameplay actions.
-		Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
-		Vector3 targetDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
-		// move towards zero vector if we're not trying to move anywhere
-		if (inputDir == Vector2.Zero)
-		{
-			targetDirection = Vector3.Zero;
-		}
+			// do the logic to make the player a child of the boat and move the player to the right position
+			// make them a child of the boat and just keep their transform so they don't loose their transformation until this point
+			Reparent(Boat, true);
 
-		// set the direction and move in that direction
-		_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
-		velocity.X = _direction.X * _currSpeed;
-		velocity.Z = _direction.Z * _currSpeed;
-		Velocity = velocity;
-		MoveAndSlide();
+			// reposition them in PARENT space (hence why we're using Position and not GlobalPosition)
+			Position = Boat.GetSeatOffset(_seat);
+			GlobalRotation = Boat.Rotation;
+		}
+	}
+
+	// used to set the isInSeatHitbox value and the seat position
+	public void SetRowingState(bool isInSeatHitbox, Boat.SeatIndicies newSeat)
+	{
+		_inSeatHitbox = isInSeatHitbox;
+		_seat = newSeat;
 	}
 }

@@ -9,8 +9,25 @@ public partial class Boat : RigidBody3D
     [Export] public float FloatForce = 1.0f;
     [Export] public float RiverSpeed = 1.0f;
     [Export] public float WaterDrag = 2.0f;
+
+    [Signal] public delegate void SeatEnteredEventHandler(Vector3 seatPosition);
+
     private Node3D _probeContainer;
     private float _gravity;
+
+    /*
+        front left localShapeIndex: 0
+        front right localShapeIndex: 1
+        back right localShapeIndex: 2
+        back left localShapeIndex: 3
+    */
+    public enum SeatIndicies
+    {
+        FrontLeft = 0,
+        FrontRight = 1,
+        BackRight = 2,
+        BackLeft = 3
+    }
 
     public override void _Ready()
     {
@@ -49,9 +66,50 @@ public partial class Boat : RigidBody3D
         return waterRight.Cross(flowDirection);
     }
 
-    // Logic for player entering a chair
-    public void OnChairsBodyEntered(PhysicsBody3D body)
-    {
-        GD.Print("GAMING");
+    /*
+        (all of this is assuming you're facing the front)
+        front left: 4, 2, -2
+        front right: 4, 2, 2
+        back left: 0, 2, -2
+        back right: 0, 2, 2
+
+        front left localShapeIndex: 0
+        front right localShapeIndex: 1
+        back right localShapeIndex: 2
+        back left localShapeIndex: 3
+    */
+
+    // Trigger player logic for player entering a chair
+    public void SeatAreaBodyShapeEntered(Rid bodyRid, Node3D body, int bodyShapeIndex, int localShapeIndex)
+	{
+		if (body is Player player)
+		{
+            SeatIndicies seat = (SeatIndicies)localShapeIndex;
+            // tell the player to run code to look for the e key and set their relative position and reparent themselves
+            player.SetRowingState(true, seat);
+		}
+	}
+
+    // Trigger player logic for player leaving a chair
+    public void SeatAreaBodyShapeExited(Rid bodyRid, Node3D body, int bodyShapeIndex, int localShapeIndex)
+	{
+		if (body is Player player)
+		{
+            SeatIndicies seat = (SeatIndicies)localShapeIndex;
+            player.SetRowingState(true, SeatIndicies.FrontLeft); // set default of FrontLeft ig
+		}
+	}
+
+    // helper function to get the relative positions of each of the seats
+    public Vector3 GetSeatOffset(SeatIndicies seat)
+{
+        return seat switch
+        {
+            SeatIndicies.FrontLeft  => new Vector3(4, 2, -2),
+            SeatIndicies.FrontRight => new Vector3(4, 2, 2),
+            SeatIndicies.BackLeft   => new Vector3(0, 2, -2),
+            SeatIndicies.BackRight  => new Vector3(0, 2, 2),
+            _ => Vector3.Zero // Default fallback
+        };
     }
 }
