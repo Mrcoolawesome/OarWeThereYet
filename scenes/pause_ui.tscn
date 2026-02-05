@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3 uid="uid://rwsu0iw4awvo"]
+
+[ext_resource type="Texture2D" uid="uid://kt83tf61prry" path="res://art/evilAssFace.jpg" id="1_uwb1u"]
+[ext_resource type="Script" uid="uid://cxiotrex7o0h5" path="res://scripts/PauseUi.cs" id="1_ypbrs"]
+
+[node name="PauseUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ypbrs")
+
+[node name="EvilAssFace" type="Sprite2D" parent="."]
+position = Vector2(962, 516)
+texture = ExtResource("1_uwb1u")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_right = 1931.0
+offset_bottom = 1077.0
+
+[connection signal="pressed" from="Button" to="." method="OnButtonPressed"]

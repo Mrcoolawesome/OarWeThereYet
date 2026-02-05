@@ -74,11 +74,14 @@ public partial class Player : CharacterBody3D
 	private GameState _currGameState = GameState.Menu; // default state is being in the menu
 	private PlayerState _currPlayerState = PlayerState.Standing; // default is walking
 
+	private CanvasLayer _pauseUI; 
+
 	public override void _Ready()
 	{
 		_head = GetNode<Node3D>("Head"); // get the head node
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
+		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 	}
 
 	// mouse input logic 
@@ -111,9 +114,11 @@ public partial class Player : CharacterBody3D
 		{
 			case GameState.Playing:
 				_HandleGamingState();
+				_pauseUI.Visible = false;
 				break;
 			case GameState.Menu:
 				_HandleMenuState();
+				_pauseUI.Visible = true;
 				break;
 		}
   }

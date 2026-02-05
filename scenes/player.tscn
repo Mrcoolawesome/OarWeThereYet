@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=6 format=3 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scripts/Player.cs" id="1_3vyb7"]
 [ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="2_g2els"]
+[ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes/pause_ui.tscn" id="3_qhqgy"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
 
@@ -36,3 +37,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 [node name="character2" parent="." instance=ExtResource("2_g2els")]
 transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 0, -1, 0)
 visible = false
+
+[node name="PauseCanvas" type="CanvasLayer" parent="."]
+
+[node name="PauseUI" parent="PauseCanvas" instance=ExtResource("3_qhqgy")]
