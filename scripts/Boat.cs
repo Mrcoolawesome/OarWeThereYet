@@ -82,7 +82,7 @@ public partial class Boat : RigidBody3D
                 bool direction = _rowingStatesDirection[(int)SeatIndicies.FrontRight];
                 
                 // go forward or backward
-                finalForce = direction ? forwardDirection : -forwardDirection;
+                finalForce = direction ? -forwardDirection : forwardDirection;
                 
                 // multiply it by the row force
                 finalForce *= RowForce;
@@ -93,7 +93,7 @@ public partial class Boat : RigidBody3D
                 bool direction = _rowingStatesDirection[(int)SeatIndicies.BackRight];
                 
                 // go forward or backward
-                finalForce = direction ? forwardDirection : -forwardDirection;
+                finalForce = direction ? -forwardDirection : forwardDirection;
                 
                 // multiply it by the row force
                 finalForce *= RowForce;

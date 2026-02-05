@@ -1,8 +1,16 @@
-[gd_scene load_steps=10 format=4 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=14 format=4 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scripts/Boat.cs" id="1_0063d"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fsggc"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_0063d"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_qyrje"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_lw6pk"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_evv4r"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xqws5"]
 resource_name = "Material"
@@ -110,14 +118,30 @@ shape = SubResource("BoxShape3D_fsggc")
 [node name="OarBackRight" type="Marker3D" parent="OarProbesContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.5)
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OarProbesContainer/OarBackRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+mesh = SubResource("BoxMesh_0063d")
+
 [node name="OarFrontRight" type="Marker3D" parent="OarProbesContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OarProbesContainer/OarFrontRight"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+mesh = SubResource("CylinderMesh_qyrje")
 
 [node name="OarBackLeft" type="Marker3D" parent="OarProbesContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.5)
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OarProbesContainer/OarBackLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+mesh = SubResource("CapsuleMesh_lw6pk")
+
 [node name="OarFrontLeft" type="Marker3D" parent="OarProbesContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2.5)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="OarProbesContainer/OarFrontLeft"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+mesh = SubResource("SphereMesh_evv4r")
 
 [node name="Raft" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
