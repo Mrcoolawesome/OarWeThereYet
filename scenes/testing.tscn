@@ -79,6 +79,7 @@ shadow_enabled = true
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("1_pcu7d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1832242, 0)
 River = NodePath("../RiverManager/RiverFloatSystem")
+RowForce = 100.0
 
 [node name="Ground" type="StaticBody3D" parent="."]
 collision_mask = 0
@@ -101,3 +102,5 @@ script = ExtResource("6_jjnc2")
 MaxDepth = -100.0
 DefaultHeight = -100.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
+
+[connection signal="Rowing" from="Player" to="Boat" method="OnPlayerRowing"]

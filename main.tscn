@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cykj32whe33ni"]
+[gd_scene load_steps=10 format=3 uid="uid://cykj32whe33ni"]
 
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="3_7mycd"]
 [ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="4_272bh"]
@@ -39,15 +39,18 @@ _selectedShader = 1
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
-"points": PackedVector3Array(0, 0, -0.25, 0, 0, 0.25, 0, 0, 0, 0, 0, -0.25, 0, 0, 0.25, -1.4852584e-07, 0, 1.9836426, 0.20245856, 0, -0.30449176, -0.20245856, 0, 0.30449176, -0.42172363, 0, 3.4048746, 0.42369828, 0, -0.12880445, -0.42369828, 0, 0.12880445, -1.86022, 3.8146973e-07, 4.7176075, 0.3620844, 0, 0.0005264282, -0.3620844, 0, -0.0005264282, -3.6957357, 0, 5.059482, 0.20993483, 0.34301034, -0.00015068559, -0.20993483, -0.34301034, 0.00015068559, -4.8069286, -1.1853027, 5.2034, 0.3862569, 0.3951547, 4.5984623e-05, -0.3862569, -0.3951547, -4.5984623e-05, -6.2740707, -2.827278, 4.818334, 0.5837458, 0.018570317, -1.3944724e-05, -0.5837458, -0.018570317, 1.3944724e-05, -8.565348, -3.2830358, 4.8183336, 0.50384516, -0.019702422, 4.903579e-06, -0.50384516, 0.019702422, -4.903579e-06, -10.581927, -3.2594483, 4.8183336, 0.81497306, 0.0058259014, -1.308964e-06, -0.81497306, -0.0058259014, 1.308964e-06, -17.46731, -3.2455766, 4.818333),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+"points": PackedVector3Array(-0.9267037, -0.30709997, -5.0322943, 0.9267037, 0.30709997, 5.0322943, -3.7068148, -1.2283999, -20.129177, 0, 0, -0.25, 0, 0, 0.25, 0, 0, 0, 0, 0, -0.25, 0, 0, 0.25, -1.4852584e-07, 0, 1.9836426, 0.20245856, 0, -0.30449176, -0.20245856, 0, 0.30449176, -0.42172363, 0, 3.4048746, 0.42369828, 0, -0.12880445, -0.42369828, 0, 0.12880445, -1.86022, 3.8146973e-07, 4.7176075, 0.3620844, 0, 0.0005264282, -0.3620844, 0, -0.0005264282, -3.6957357, 0, 5.059482, 0.20993483, 0.34301034, -0.00015068559, -0.20993483, -0.34301034, 0.00015068559, -4.8069286, -1.1853027, 5.2034, 0.3862569, 0.3951547, 4.5984623e-05, -0.3862569, -0.3951547, -4.5984623e-05, -6.2740707, -2.827278, 4.818334, 0.5837458, 0.018570317, -1.3944724e-05, -0.5837458, -0.018570317, 1.3944724e-05, -8.565348, -3.2830358, 4.8183336, 0.50384516, -0.019702422, 4.903579e-06, -0.50384516, 0.019702422, -4.903579e-06, -10.581927, -3.2594483, 4.8183336, 0.81497306, 0.0058259014, -1.308964e-06, -0.81497306, -0.0058259014, 1.308964e-06, -17.46731, -3.2455766, 4.818333),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 }
-point_count = 10
+point_count = 11
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7mycd"]
+height = 100.0
 
 [node name="Main" type="Node"]
 
 [node name="Player" parent="." node_paths=PackedStringArray("Boat") instance=ExtResource("7_272bh")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 8.101047, 3.0904064, 0.5007105)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0.10104656, 3.0904064, 57.93259)
 Boat = NodePath("../Boat")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
@@ -57,7 +60,7 @@ transform = Transform3D(1, 0, 0, 0, 0.67575747, 0.737124, 0, -0.737124, 0.675757
 transform = Transform3D(-10, 0, -1.509958e-06, 0, 10, 0, 1.509958e-06, 0, -10, -1, 0, 7)
 script = ExtResource("3_7mycd")
 ShaderSettings = SubResource("Resource_7mycd")
-PointWidths = Array[float]([1.5293229, 1.7632374, 1.818231, 2.1837888, 2.15875, 2.2947788, 2.4448407, 2.4474006, 2.4574125, 1.5686626])
+PointWidths = Array[float]([14.669181, 19.107338, 1.7632374, 1.818231, 2.1837888, 2.15875, 2.2947788, 2.4448407, 2.4474006, 2.4574125, 1.5686626])
 Curve = SubResource("Curve3D_272bh")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
@@ -68,7 +71,33 @@ DefaultHeight = -10000.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_7mycd")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 8.1947775, -3.8146973e-06, 0.75178814)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.19477749, -3.8146973e-06, 58.18367)
 River = NodePath("../ChudRiver/RiverFloatSystem")
+RiverSpeed = 0.0
+RowForce = 100.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 45, 0)
+mesh = SubResource("CylinderMesh_7mycd")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 45, 141)
+mesh = SubResource("CylinderMesh_7mycd")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81, 45, 0)
+mesh = SubResource("CylinderMesh_7mycd")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -81, 45, 141)
+mesh = SubResource("CylinderMesh_7mycd")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 45, 141)
+mesh = SubResource("CylinderMesh_7mycd")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 80, 45, 10)
+mesh = SubResource("CylinderMesh_7mycd")
 
 [connection signal="Rowing" from="Player" to="Boat" method="OnPlayerRowing"]

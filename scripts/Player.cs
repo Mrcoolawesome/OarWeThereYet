@@ -274,6 +274,11 @@ public partial class Player : CharacterBody3D
 			Node boatParent = Boat.GetParent();
 			Reparent(boatParent, true); // keep the global transform too ig
 			GlobalRotation = Vector3.Zero;
+
+			// make them stop rowing if they were rowing
+			EmitSignal(SignalName.Rowing, (int)_seat, false, false); // second boolean doesn't matter because im just making them stop rowing
+
+			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
 
 		// (Boat.SeatIndicies seat, bool stopStart, bool backForward)
@@ -291,7 +296,7 @@ public partial class Player : CharacterBody3D
 
 		// emit a signal when they're done rowing
 		// setting the direction doesn't matter in this case but i set them to be forward and backward anyways according to which direction we're canceling
-		if (Input.IsActionJustReleased("move_foward"))
+		if (Input.IsActionJustReleased("move_forward"))
 		{
 			EmitSignal(SignalName.Rowing, (int)_seat, false, true);
 		} 
