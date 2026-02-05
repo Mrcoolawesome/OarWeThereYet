@@ -95,7 +95,6 @@ public partial class Boat : RigidBody3D
 	{
 		if (body is Player player)
 		{
-            SeatIndicies seat = (SeatIndicies)localShapeIndex;
             player.SetRowingState(true, SeatIndicies.FrontLeft); // set default of FrontLeft ig
 		}
 	}
@@ -105,10 +104,10 @@ public partial class Boat : RigidBody3D
 {
         return seat switch
         {
-            SeatIndicies.FrontLeft  => new Vector3(4, 2, -2),
-            SeatIndicies.FrontRight => new Vector3(4, 2, 2),
-            SeatIndicies.BackLeft   => new Vector3(0, 2, -2),
-            SeatIndicies.BackRight  => new Vector3(0, 2, 2),
+            SeatIndicies.FrontLeft  => new Vector3(2, 1, -1),
+            SeatIndicies.FrontRight => new Vector3(2, 1, 1),
+            SeatIndicies.BackLeft   => new Vector3(0, 1, 1),
+            SeatIndicies.BackRight  => new Vector3(0, 1, -1),
             _ => Vector3.Zero // Default fallback
         };
     }

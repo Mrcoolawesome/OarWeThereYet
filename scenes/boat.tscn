@@ -61,110 +61,88 @@ center_of_mass = Vector3(0, -1, 0)
 can_sleep = false
 script = ExtResource("1_0063d")
 FloatForce = 25.0
-RiverSpeed = 3.0
+RiverSpeed = 30.0
+WaterDrag = 5.0
 
 [node name="ProbeContainer" type="Node3D" parent="."]
 
 [node name="Probe0" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0, -1.6)
 
 [node name="Probe1" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0, 1.6)
 
 [node name="Probe2" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.6)
 
 [node name="Probe3" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.6)
 
 [node name="Probe4" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, -1.6)
 
 [node name="Probe5" type="Marker3D" parent="ProbeContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 3)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, 1.6)
 
 [node name="SeatArea3D" type="Area3D" parent="."]
 collision_layer = 2
 collision_mask = 4
 
 [node name="Front Left Collision" type="CollisionShape3D" parent="SeatArea3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, -1)
 shape = SubResource("BoxShape3D_fsggc")
 
 [node name="Front Right Collision" type="CollisionShape3D" parent="SeatArea3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 1)
 shape = SubResource("BoxShape3D_fsggc")
 
 [node name="Back Right Collision" type="CollisionShape3D" parent="SeatArea3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1)
 shape = SubResource("BoxShape3D_fsggc")
 
 [node name="Back Left Collisions" type="CollisionShape3D" parent="SeatArea3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
-shape = SubResource("BoxShape3D_fsggc")
-
-[node name="Front Right" type="Area3D" parent="."]
-collision_layer = 2
-collision_mask = 4
-
-[node name="Front Right Collision" type="CollisionShape3D" parent="Front Right"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 2)
-shape = SubResource("BoxShape3D_fsggc")
-
-[node name="Back Right" type="Area3D" parent="."]
-collision_layer = 2
-collision_mask = 4
-
-[node name="Back Right Collision" type="CollisionShape3D" parent="Back Right"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
-shape = SubResource("BoxShape3D_fsggc")
-
-[node name="Back Left" type="Area3D" parent="."]
-collision_layer = 2
-collision_mask = 4
-
-[node name="Back Left Collisions" type="CollisionShape3D" parent="Back Left"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1)
 shape = SubResource("BoxShape3D_fsggc")
 
 [node name="Raft" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 mesh = SubResource("ArrayMesh_jacfy")
 skeleton = NodePath("")
 
 [node name="Floor" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0.15, 0)
 shape = SubResource("BoxShape3D_0063d")
 
 [node name="Wall1" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7683716e-07, 1.0500002, -3.1000001)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 4.7683716e-07, 0.5500002, -1.55)
 shape = SubResource("BoxShape3D_qyrje")
 
 [node name="Corner1" type="CollisionShape3D" parent="."]
-transform = Transform3D(0.76604444, 0, -0.64278764, 0, 1, 0, 0.64278764, 0, 0.76604444, 5.9652796, 1.0999999, -2.317233)
+transform = Transform3D(0.38302222, 0, -0.3213938, 0, 0.5, 0, 0.3213938, 0, 0.38302222, 2.9652796, 0.5999999, -1.2172331)
 shape = SubResource("BoxShape3D_lw6pk")
 
 [node name="Corner2" type="CollisionShape3D" parent="."]
-transform = Transform3D(0.76604444, 0, -0.64278764, -5.619428e-08, -1, -6.696973e-08, -0.64278764, 8.742278e-08, -0.76604444, 6.0652795, 1.0999999, 2.2827668)
+transform = Transform3D(0.38302222, -3.631109e-08, -0.32139382, -7.54979e-08, -0.5, -3.3484866e-08, -0.32139382, 7.4180015e-08, -0.38302222, 2.9652793, 0.5999999, 1.1827668)
 shape = SubResource("BoxShape3D_lw6pk")
 
 [node name="Wall2" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.7499999, 1.1920929e-07)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 3.5, 0.84999985, 1.1920929e-07)
 shape = SubResource("BoxShape3D_evv4r")
 
 [node name="Wall3" type="CollisionShape3D" parent="."]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0.01527977, 1.0500002, 3.0327663)
+transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 0.01527977, 0.5500002, 1.5327661)
 shape = SubResource("BoxShape3D_qyrje")
 
 [node name="Corner3" type="CollisionShape3D" parent="."]
-transform = Transform3D(-0.7660445, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, -0.7660445, -5.95, 1.0999999, 2.25)
+transform = Transform3D(-0.38302222, 0, 0.32139382, 0, 0.5, 0, -0.32139382, 0, -0.38302222, -2.9499998, 0.5999999, 1.15)
 shape = SubResource("BoxShape3D_lw6pk")
 
 [node name="Corner4" type="CollisionShape3D" parent="."]
-transform = Transform3D(-0.7660444, -7.642742e-15, 0.6427877, -5.619428e-08, -1, -6.696973e-08, 0.6427877, -8.7422784e-08, 0.7660444, -6.05, 1.0999999, -2.35)
+transform = Transform3D(-0.3830222, 3.631108e-08, 0.32139385, -7.54979e-08, -0.5, -3.348487e-08, 0.32139385, -7.4180015e-08, 0.3830222, -2.9500003, 0.5999999, -1.1499999)
 shape = SubResource("BoxShape3D_lw6pk")
 
 [node name="Wall4" type="CollisionShape3D" parent="."]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -6.98472, 1.7499999, -0.067233324)
+transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, -3.4847202, 0.84999985, -0.067233324)
 shape = SubResource("BoxShape3D_evv4r")
 
 [connection signal="body_shape_entered" from="SeatArea3D" to="." method="SeatAreaBodyShapeEntered"]
