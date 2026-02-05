@@ -22,6 +22,10 @@ public partial class Player : CharacterBody3D
 	[Export]
 	public Boat Boat;
 
+	// Signals for telling the boat to apply a force given a seat
+	[Signal]
+	public delegate void RowedEventHandler(Boat.SeatIndicies seat);
+
 	// private variables
 	private float _currSpeed = 5.0f;
 
@@ -81,7 +85,7 @@ public partial class Player : CharacterBody3D
   public override void _Input(InputEvent @event)
   {
 		// this is always done so that they can move their head, might wanna change it so that their head is always level
-    if (@event is InputEventMouseMotion mouseEvent)
+    if ((@event is InputEventMouseMotion mouseEvent) && _currGameState == GameState.Playing)
 		{
 			// the y rotation of the player in radians based off of the mouse sensitivity 
 			float yRotationChange = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
@@ -158,27 +162,23 @@ public partial class Player : CharacterBody3D
 	// logic for walking and everything depending on the player state
 	public override void _PhysicsProcess(double delta)
 	{
+
+		// always apply gravity 
+		_Gravity(delta);
+
 		// disable movement if they're not in the walking state, and wait for input to allow them to 'escape'
-		switch (_currPlayerState)
+		if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Standing)
 		{
-			case PlayerState.Standing:
-				// apply crouching and sprinting logic
-				_CrouchSprintLogic(delta);
-				// apply gravity and movement logic
-				_MovementLogic(delta);
-				break;
+			// apply crouching and sprinting logic
+			_CrouchSprintLogic(delta);
+			// apply gravity and movement logic
+			_MovementLogic(delta);
 		}
 	}
 
 	private void _MovementLogic(double delta)
 	{
 		Vector3 velocity = Velocity;
-
-		// Add the gravity.
-		if (!IsOnFloor())
-		{
-			velocity += GetGravity() * (float)delta;
-		}
 
 		// Handle Jump.
 		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
@@ -200,6 +200,20 @@ public partial class Player : CharacterBody3D
 		_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
 		velocity.X = _direction.X * _currSpeed;
 		velocity.Z = _direction.Z * _currSpeed;
+		Velocity = velocity;
+		MoveAndSlide();
+	}
+
+	private void _Gravity(double delta)
+	{
+		Vector3 velocity = Velocity;
+
+		// Add the gravity.
+		if (!IsOnFloor())
+		{
+			velocity += GetGravity() * (float)delta;
+		}
+
 		Velocity = velocity;
 		MoveAndSlide();
 	}
