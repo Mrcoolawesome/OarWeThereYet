@@ -175,7 +175,10 @@ public partial class Player : CharacterBody3D
 			_MovementLogic(delta);
 		}
 
-		MoveAndSlide();
+		if (_currPlayerState != PlayerState.Rowing)
+		{
+			MoveAndSlide();
+		}
 	}
 
 	private void _MovementLogic(double delta)
