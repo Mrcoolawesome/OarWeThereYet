@@ -22,6 +22,11 @@ public partial class Player : CharacterBody3D
 	[Export]
 	public Boat Boat;
 
+	// Signals for telling the boat to apply or stop applying a force given a seat
+	// back is false forward is true
+	[Signal]
+	public delegate void RowingEventHandler(Boat.SeatIndicies seat, bool stopStart, bool backForward);
+
 	// private variables
 	private float _currSpeed = 5.0f;
 
@@ -81,7 +86,7 @@ public partial class Player : CharacterBody3D
   public override void _Input(InputEvent @event)
   {
 		// this is always done so that they can move their head, might wanna change it so that their head is always level
-    if (@event is InputEventMouseMotion mouseEvent)
+    if ((@event is InputEventMouseMotion mouseEvent) && _currGameState == GameState.Playing)
 		{
 			// the y rotation of the player in radians based off of the mouse sensitivity 
 			float yRotationChange = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
@@ -124,6 +129,18 @@ public partial class Player : CharacterBody3D
 			// release the mouse
 			Input.MouseMode = Input.MouseModeEnum.Visible;
 		}
+
+		// handle input for sitting and standing states
+		switch(_currPlayerState)
+		{
+			case PlayerState.Standing:
+				// handle input for choosing to sit
+				_HandleInSeatHitboxState();
+				break;
+			case PlayerState.Rowing:
+				_HandleRowingState();
+				break;
+		}
 	}
 
 	// handling ui state if they're in the menu
@@ -146,32 +163,29 @@ public partial class Player : CharacterBody3D
 	// logic for walking and everything depending on the player state
 	public override void _PhysicsProcess(double delta)
 	{
+
+		// always apply gravity 
+		_Gravity(delta);
+
 		// disable movement if they're not in the walking state, and wait for input to allow them to 'escape'
-		switch (_currPlayerState)
+		if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Standing)
 		{
-			case PlayerState.Standing:
-				// apply crouching and sprinting logic
-				_CrouchSprintLogic(delta);
-				// apply gravity and movement logic
-				_MovementLogic(delta);
-				// handle input for choosing to sit
-				_HandleInSeatHitboxState();
-				break;
-			case PlayerState.Rowing:
-				_HandleRowingState();
-				break;
+			// apply crouching and sprinting logic
+			_CrouchSprintLogic(delta);
+			// apply gravity and movement logic
+			_MovementLogic(delta);
+		}
+
+		// only apply move and slide if they're not rowing
+		if (_currPlayerState != PlayerState.Rowing)
+		{
+			MoveAndSlide();
 		}
 	}
 
 	private void _MovementLogic(double delta)
 	{
 		Vector3 velocity = Velocity;
-
-		// Add the gravity.
-		if (!IsOnFloor())
-		{
-			velocity += GetGravity() * (float)delta;
-		}
 
 		// Handle Jump.
 		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
@@ -194,7 +208,19 @@ public partial class Player : CharacterBody3D
 		velocity.X = _direction.X * _currSpeed;
 		velocity.Z = _direction.Z * _currSpeed;
 		Velocity = velocity;
-		MoveAndSlide();
+	}
+
+	private void _Gravity(double delta)
+	{
+		Vector3 velocity = Velocity;
+
+		// Add the gravity.
+		if (!IsOnFloor())
+		{
+			velocity += GetGravity() * (float)delta;
+		}
+
+		Velocity = velocity;
 	}
 
 	private void _CrouchSprintLogic(double delta)
@@ -248,6 +274,35 @@ public partial class Player : CharacterBody3D
 			Node boatParent = Boat.GetParent();
 			Reparent(boatParent, true); // keep the global transform too ig
 			GlobalRotation = Vector3.Zero;
+
+			// make them stop rowing if they were rowing
+			EmitSignal(SignalName.Rowing, (int)_seat, false, false); // second boolean doesn't matter because im just making them stop rowing
+
+			return; // STOP after this we don't wanna take anymore input as if we're sitting
+		}
+
+		// (Boat.SeatIndicies seat, bool stopStart, bool backForward)
+		// if they input w, send out go forward signal
+		if (Input.IsActionPressed("move_forward"))
+		{
+			// tell them to move forward
+			EmitSignal(SignalName.Rowing, (int)_seat, true, true); // have to send it as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
+		} 
+		else if (Input.IsActionPressed("move_backward")) // don't want them to be able to do both at the same time so if they're pressing both they'll go forward
+		{
+			// tell them to move backward
+			EmitSignal(SignalName.Rowing, (int)_seat, true, false);
+		}
+
+		// emit a signal when they're done rowing
+		// setting the direction doesn't matter in this case but i set them to be forward and backward anyways according to which direction we're canceling
+		if (Input.IsActionJustReleased("move_forward"))
+		{
+			EmitSignal(SignalName.Rowing, (int)_seat, false, true);
+		} 
+		else if (Input.IsActionJustReleased("move_backward"))
+		{
+			EmitSignal(SignalName.Rowing, (int)_seat, false, false);
 		}
 	}
 
@@ -265,6 +320,12 @@ public partial class Player : CharacterBody3D
 			// reposition them in PARENT space (hence why we're using Position and not GlobalPosition)
 			Position = Boat.GetSeatOffset(_seat);
 			GlobalRotation = Boat.Rotation;
+			// if they're on the right side they need to be rotated to be facing outwards when they sit down
+			if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
+			{
+				// change the local rotation (rotation in parent space) on the y-axis to be 180
+				RotateY(Mathf.DegToRad(180));
+			}
 		}
 	}
 

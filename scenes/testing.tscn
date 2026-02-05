@@ -65,6 +65,10 @@ point_count = 2
 
 [node name="Testing" type="Node"]
 
+[node name="Player" parent="." node_paths=PackedStringArray("Boat") instance=ExtResource("2_l6grw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+Boat = NodePath("../Boat")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_3dx25")
 
@@ -75,9 +79,7 @@ shadow_enabled = true
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("1_pcu7d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1832242, 0)
 River = NodePath("../RiverManager/RiverFloatSystem")
-
-[node name="Player" parent="Boat" instance=ExtResource("2_l6grw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8167758, 0)
+RowForce = 100000.0
 
 [node name="Ground" type="StaticBody3D" parent="."]
 collision_mask = 0
@@ -90,6 +92,7 @@ mesh = SubResource("BoxMesh_nuoa6")
 skeleton = NodePath("../..")
 
 [node name="RiverManager" type="Node3D" parent="."]
+transform = Transform3D(5.3, 0, 0, 0, 1, 0, 0, 0, 10.3, 0, 7, -5)
 script = ExtResource("3_kri1i")
 ShaderSettings = SubResource("Resource_kri1i")
 Curve = SubResource("Curve3D_5qbqa")
@@ -97,6 +100,7 @@ metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
 script = ExtResource("6_jjnc2")
-MaxDepth = -100.0
 DefaultHeight = -100.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
+
+[connection signal="Rowing" from="Player" to="Boat" method="OnPlayerRowing"]
