@@ -65,6 +65,10 @@ point_count = 2
 
 [node name="Testing" type="Node"]
 
+[node name="Player" parent="." node_paths=PackedStringArray("Boat") instance=ExtResource("2_l6grw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+Boat = NodePath("../Boat")
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_3dx25")
 
@@ -75,9 +79,6 @@ shadow_enabled = true
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("1_pcu7d")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1832242, 0)
 River = NodePath("../RiverManager/RiverFloatSystem")
-
-[node name="Player" parent="Boat" instance=ExtResource("2_l6grw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8167758, 0)
 
 [node name="Ground" type="StaticBody3D" parent="."]
 collision_mask = 0

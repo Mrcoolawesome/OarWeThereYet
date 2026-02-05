@@ -106,8 +106,8 @@ public partial class Boat : RigidBody3D
         {
             SeatIndicies.FrontLeft  => new Vector3(2, 1, -1),
             SeatIndicies.FrontRight => new Vector3(2, 1, 1),
-            SeatIndicies.BackLeft   => new Vector3(0, 1, 1),
-            SeatIndicies.BackRight  => new Vector3(0, 1, -1),
+            SeatIndicies.BackLeft   => new Vector3(0, 1, -1),
+            SeatIndicies.BackRight  => new Vector3(0, 1, 1),
             _ => Vector3.Zero // Default fallback
         };
     }
