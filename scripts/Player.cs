@@ -265,7 +265,7 @@ public partial class Player : CharacterBody3D
 			// reposition them in PARENT space (hence why we're using Position and not GlobalPosition)
 			Position = Boat.GetSeatOffset(_seat);
 			GlobalRotation = Boat.Rotation;
-			// if they're on the right side they need to be rotated
+			// if they're on the right side they need to be rotated to be facing outwards when they sit down
 			if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
 			{
 				// change the local rotation (rotation in parent space) on the y-axis to be 180
