@@ -90,7 +90,7 @@ public partial class Player : CharacterBody3D
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 
 		// Get the camera reference
-    var camera = _head.GetNodeOrNull<Camera3D>("Camera3D"); 
+    var camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
 
     // MULTIPLAYER SETUP
     if (IsMultiplayerAuthority())
@@ -117,7 +117,7 @@ public partial class Player : CharacterBody3D
       // This prevents the "puppet" version of you from hijacking his screen.
       if (camera != null)
       {
-          camera.QueueFree(); 
+				camera.QueueFree(); 
       }
       
       // 3. Disable processing for non-authority
