@@ -89,37 +89,40 @@ public partial class Player : CharacterBody3D
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 
-		// MULTIPLAYER SETUP
+		// Get the camera reference
+    var camera = _head.GetNodeOrNull<Camera3D>("Camera3D"); 
+
+    // MULTIPLAYER SETUP
     if (IsMultiplayerAuthority())
     {
-			// 1. If we ARE the player, enable our camera
-			// (Assumes you have a Camera3D as a child of Head)
-			var camera = _head.GetNodeOrNull<Camera3D>("Camera3D"); 
-			if (camera != null)
-			{
-				camera.Current = true;
-			}
+      // 1. If we ARE the player, enable our camera
+      if (camera != null)
+      {
+        camera.Current = true;
+      }
 
-			// 2. Ensure the UI is properly hidden/shown based on initial state
-			_pauseUI.Visible = _currGameState == GameState.Menu;
-			
-			// 3. Capture mouse immediately if you want them to start playing, 
-			// or leave it visible if starting in Menu.
-			if (_currGameState == GameState.Menu)
-			{
-				Input.MouseMode = Input.MouseModeEnum.Visible;
-			}
+      _pauseUI.Visible = _currGameState == GameState.Menu;
+      
+      if (_currGameState == GameState.Menu)
+      {
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+      }
     }
     else
     {
-			// 1. If we are NOT the player (e.g., this is a peer's avatar on the host's screen),
-			// DELETE the UI so it doesn't clutter the screen.
-			_pauseUI.QueueFree();
-			
-			// 2. Disable processing for non-authority instances to save performance
-			// (Optional, but good practice if _Process only handles inputs)
-			SetProcess(false);
-			SetPhysicsProcess(true); // Keep physics for smooth interpolation if you add it later
+      // 1. If we are NOT the player, delete the UI.
+      _pauseUI.QueueFree();
+
+      // 2. CRITICAL FIX: Delete the Camera for other players!
+      // This prevents the "puppet" version of you from hijacking his screen.
+      if (camera != null)
+      {
+          camera.QueueFree(); 
+      }
+      
+      // 3. Disable processing for non-authority
+      SetProcess(false);
+      SetPhysicsProcess(true); 
     }
 	}
 
