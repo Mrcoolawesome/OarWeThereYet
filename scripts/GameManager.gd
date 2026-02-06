@@ -18,7 +18,7 @@ func host_lobby():
 
 func _on_lobby_created(result: int, lobby_id: int):
 	if result == Steam.Result.RESULT_OK:
-		print("Lobby created successfully")
+		print(lobby_id)
 		
 		peer = SteamMultiplayerPeer.new()
 		peer.server_relay = true
