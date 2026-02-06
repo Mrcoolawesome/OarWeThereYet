@@ -19,8 +19,6 @@ public partial class Player : CharacterBody3D
 	public float LerpSpeed = 10.0f;
 	[Export]
 	public float CrouchLerpSpeed = 10.0f;
-	[Export]
-	public Boat Boat;
 
 	// Signals for telling the boat to apply or stop applying a force given a seat
 	// back is false forward is true
@@ -44,6 +42,9 @@ public partial class Player : CharacterBody3D
 
 	// to keep track of if they're choosing to sit or not
 	private bool _inSeatHitbox = false;
+
+	// BOAT
+	private Boat _boat = new Boat();
 
 	// need to know which seat they're sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
@@ -88,6 +89,8 @@ public partial class Player : CharacterBody3D
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
+		// get the boat
+		_boat = GetParent().GetNode<Boat>("Boat");
 
 		// Get the camera reference
     var camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
@@ -306,7 +309,7 @@ public partial class Player : CharacterBody3D
 			// reset their position to the middle of the boat and then make them a sibling of the boat again\
 			// Position is in PARENT space so setting it to 0,1,0 will set it to the middle of the boat 
 			Position = new Vector3(0, 1.0f, 0);
-			Node boatParent = Boat.GetParent();
+			Node boatParent = _boat.GetParent();
 			Reparent(boatParent, true); // keep the global transform too ig
 			GlobalRotation = Vector3.Zero;
 
@@ -350,11 +353,11 @@ public partial class Player : CharacterBody3D
 
 			// do the logic to make the player a child of the boat and move the player to the right position
 			// make them a child of the boat and just keep their transform so they don't loose their transformation until this point
-			Reparent(Boat, true);
+			Reparent(_boat, true);
 
 			// reposition them in PARENT space (hence why we're using Position and not GlobalPosition)
-			Position = Boat.GetSeatOffset(_seat);
-			GlobalRotation = Boat.Rotation;
+			Position = _boat.GetSeatOffset(_seat);
+			GlobalRotation = _boat.Rotation;
 			// if they're on the right side they need to be rotated to be facing outwards when they sit down
 			if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
 			{

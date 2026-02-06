@@ -78,7 +78,7 @@ DefaultHeight = -1000.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("5_7gix3")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, -11)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, -9)
 River = NodePath("../RiverManager/RiverFloatSystem")
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
