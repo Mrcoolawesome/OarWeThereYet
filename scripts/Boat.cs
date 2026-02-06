@@ -22,6 +22,11 @@ public partial class Boat : RigidBody3D
     private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
     private bool[] _rowingStatesDirection = new bool[4]; // direction of rowing: backward = false | forward = true
 
+    private CollisionShape3D _frontLeftCollision = new CollisionShape3D();
+    private CollisionShape3D _frontRightCollision = new CollisionShape3D();
+    private CollisionShape3D _backLeftCollision = new CollisionShape3D();
+    private CollisionShape3D _backRightCollision = new CollisionShape3D();
+
     /*
         front left localShapeIndex: 0
         front right localShapeIndex: 1
@@ -41,6 +46,12 @@ public partial class Boat : RigidBody3D
         _boatFloatProbesContainer = GetNode<Node3D>("BoatFloatProbesContainer");
         _oarProbesContainer = GetNode<Node3D>("OarProbesContainer");
         _gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
+
+        // getting the collisions for the area3d for the seat detections
+        _frontLeftCollision = GetNode<CollisionShape3D>("SeatArea3D/FrontLeftCollision");
+        _frontRightCollision = GetNode<CollisionShape3D>("SeatArea3D/FrontRightCollision");
+        _backLeftCollision = GetNode<CollisionShape3D>("SeatArea3D/BackLeftCollision");
+        _backRightCollision = GetNode<CollisionShape3D>("SeatArea3D/BackRightCollision");
     }
 
     public override void _PhysicsProcess(double delta)
@@ -177,10 +188,10 @@ public partial class Boat : RigidBody3D
 {
         return seat switch
         {
-            SeatIndicies.FrontLeft  => new Vector3(2, 1, -1),
-            SeatIndicies.FrontRight => new Vector3(2, 1, 1),
-            SeatIndicies.BackLeft   => new Vector3(0, 1, -1),
-            SeatIndicies.BackRight  => new Vector3(0, 1, 1),
+            SeatIndicies.FrontLeft  => _frontLeftCollision.Position,
+            SeatIndicies.FrontRight => _frontRightCollision.Position,
+            SeatIndicies.BackLeft   => _backLeftCollision.Position,
+            SeatIndicies.BackRight  => _backRightCollision.Position,
             _ => Vector3.Zero // Default fallback
         };
     }
