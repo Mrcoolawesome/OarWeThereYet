@@ -77,6 +77,11 @@ public partial class Player : CharacterBody3D
 
 	private CanvasLayer _pauseUI;
 
+
+  public override void _EnterTree()
+  {
+    SetMultiplayerAuthority(int.Parse(Name.ToString()));
+  }
 	public override void _Ready()
 	{
 		_head = GetNode<Node3D>("Head"); // get the head node
@@ -84,7 +89,6 @@ public partial class Player : CharacterBody3D
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 
-		SetMultiplayerAuthority(int.Parse(Name.ToString()));
 		// MULTIPLAYER SETUP
     if (IsMultiplayerAuthority())
     {
