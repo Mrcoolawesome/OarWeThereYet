@@ -22,4 +22,4 @@ func _on_host_button_pressed() -> void:
 	host_requested.emit()
 
 func _on_join_button_pressed() -> void:
-	join_requested.emit(id_prompt.text)
+	join_requested.emit(int(id_prompt.text))
