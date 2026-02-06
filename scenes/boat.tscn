@@ -118,11 +118,11 @@ shape = SubResource("BoxShape3D_fsggc")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatArea3D/BackRightCollision"]
 mesh = SubResource("BoxMesh_lw6pk")
 
-[node name="BackLeftCollisions" type="CollisionShape3D" parent="SeatArea3D"]
+[node name="BackLeftCollision" type="CollisionShape3D" parent="SeatArea3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1, -0.99999994)
 shape = SubResource("BoxShape3D_fsggc")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatArea3D/BackLeftCollisions"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatArea3D/BackLeftCollision"]
 mesh = SubResource("BoxMesh_evv4r")
 
 [node name="OarProbesContainer" type="Node3D" parent="."]
