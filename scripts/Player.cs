@@ -70,12 +70,22 @@ public partial class Player : CharacterBody3D
 	// different states for being in the menu and just playing the game
 	private enum GameState {
 		Playing,
-		Menu
+		Menu,
+		NotAuthority
 	}
 	private GameState _currGameState = GameState.Menu; // default state is being in the menu
 	private PlayerState _currPlayerState = PlayerState.Standing; // default is walking
 
-	private CanvasLayer _pauseUI; 
+	private CanvasLayer _pauseUI;
+
+  public override void _EnterTree()
+  {
+    SetMultiplayerAuthority(int.Parse(Name.ToString()));
+		if (!IsMultiplayerAuthority())
+		{
+			_currGameState = GameState.NotAuthority;
+		}
+  }
 
 	public override void _Ready()
 	{
@@ -157,6 +167,10 @@ public partial class Player : CharacterBody3D
 	// logic for walking and everything depending on the player state
 	public override void _PhysicsProcess(double delta)
 	{
+		if (_currGameState == GameState.NotAuthority)
+		{
+			return;
+		}
 
 		// always apply gravity 
 		_Gravity(delta);
