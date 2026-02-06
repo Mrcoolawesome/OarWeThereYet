@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://d34pgbgxmrpd5"]
 
-[ext_resource type="Script" uid="uid://c6yprd4vlj76t" path="res://scenes/main_menu.gd" id="1_bqqt6"]
+[ext_resource type="Script" uid="uid://c6yprd4vlj76t" path="res://scripts/main_menu.gd" id="1_bqqt6"]
 [ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="1_ekxnf"]
 [ext_resource type="Texture2D" uid="uid://kt83tf61prry" path="res://art/evilAssFace.jpg" id="2_bqqt6"]
 

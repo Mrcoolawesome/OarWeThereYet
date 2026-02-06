@@ -44,28 +44,39 @@ func _on_lobby_join(lobby_id : int, permissions : int, locked : bool, response :
 	if !is_joining:
 		return
 	
-	# Check if the host ID is valid
+	self.lobby_id = lobby_id
+	
+	# 1. WAIT FOR STEAM DATA
 	var host_id = Steam.getLobbyOwner(lobby_id)
+	var attempts = 0
+	
+	# If host_id is 0, Steam hasn't synced yet. We wait and retry.
+	while host_id == 0 and attempts < 10:
+		print("Waiting for lobby owner data... (Attempt ", attempts, ")")
+		await get_tree().create_timer(0.1).timeout # Wait 0.1 seconds
+		host_id = Steam.getLobbyOwner(lobby_id)
+		attempts += 1
+	
 	if host_id == 0:
-		print("Failed to get Lobby Owner. Retrying...")
-		# Optional: Add a small timer or loop here to wait for data sync
+		print("Failed to get Lobby Owner after 10 attempts.")
 		return
 
+	# 2. SETUP PEER
 	peer = SteamMultiplayerPeer.new()
 	peer.server_relay = true
-	
-	# Try to create the client
 	var error = peer.create_client(host_id)
+	
 	if error != OK:
-		print("Failed to create Steam client: ", error)
+		print("Failed to create client: ", error)
 		return
 		
 	multiplayer.multiplayer_peer = peer
 	
-	is_joining = false
-	
-	# CLIENT ALSO NEEDS TO CHANGE SCENE
+	# 3. CHANGE SCENE
+	# We change the scene BEFORE the client starts trying to spawn players
 	get_tree().change_scene_to_packed(main_scene)
+	
+	is_joining = false
 
 func _add_player(id : int = 1):
 	var player = player_scene.instantiate()
