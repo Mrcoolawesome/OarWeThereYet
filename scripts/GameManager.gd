@@ -70,7 +70,7 @@ func _on_lobby_join(lobby_id : int, permissions : int, locked : bool, response :
 func _add_player(id : int = 1):
 	var player = player_scene.instantiate()
 	player.name = str(id)
-	get_tree().current_scene.add_child(player)
+	call_deferred("add_child", player)
 
 func _remove_player(id : int):
 	if !self.has_node(str(id)):
