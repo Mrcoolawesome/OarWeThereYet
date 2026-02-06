@@ -39,6 +39,7 @@ offset_right = 768.0
 offset_bottom = 766.0
 
 [node name="EvilAssFace" type="Sprite2D" parent="."]
+visible = false
 position = Vector2(1512, 400)
 texture = ExtResource("2_bqqt6")
 

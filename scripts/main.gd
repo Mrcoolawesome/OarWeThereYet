@@ -32,13 +32,19 @@ func _on_lobby_created(result: int, lobby_id: int):
 		
 		# Add the local host player first
 		_add_player() 
-		
-		# CHANGE SCENE LAST
-		get_tree().change_scene_to_packed(main_scene)
+
+		# instantiate the level scene
+		_add_level()
+
+		# remove the main menu
+		_remove_main_menu()
 
 func join_lobby(lobby_id : int):
 	is_joining = true
 	Steam.joinLobby(lobby_id)
+
+	# remove the main menu
+	_remove_main_menu()
 
 func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
 	if !is_joining:
@@ -71,11 +77,6 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _respons
 	multiplayer.multiplayer_peer = peer
 	
 	print("joined")
-	# 3. CHANGE SCENE
-	# We change the scene BEFORE the client starts trying to spawn players
-	get_tree().change_scene_to_packed(main_scene)
-
-	print("tried to change scene")
 	
 	is_joining = false
 
@@ -84,17 +85,26 @@ func _add_player(id : int = 1):
 	player.name = str(id)
 	call_deferred("add_child", player)
 
+func _add_level():
+	if multiplayer.is_server():
+		var newLevel = load("res://scenes/test_level.tscn")
+		$Level.add_child(newLevel.instantiate())
+
+func _remove_main_menu():
+	$MainMenu.queue_free()
+
 func _remove_player(id : int):
 	if !self.has_node(str(id)):
 		return
 		
 	self.get_node(str(id)).queue_free()
 
-
-func _on_host_button_pressed() -> void:
+func _on_main_menu_host_requested() -> void:
 	host_lobby()
 
+func _on_main_menu_join_requested(lobby_id: Variant) -> void:
+	print(lobby_id)
+	join_lobby(lobby_id)
 
-func _on_join_button_pressed(prompt: int) -> void:
-	print(prompt)
-	join_lobby(prompt)
+	# remove the main menu ui
+	$MainMenu.queue_free()

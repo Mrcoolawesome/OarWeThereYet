@@ -1,13 +1,15 @@
 extends Control
 
+signal host_requested
+signal join_requested(lobby_id)
+
 @onready var host_button: Button = $HostButton
 @onready var join_button: Button = $JoinButton
 @onready var id_prompt = $IDPrompt
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	join_button.pressed.connect(GameManager._on_join_button_pressed.bind(109775243046684832))
-	host_button.pressed.connect(GameManager._on_host_button_pressed)
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -15,3 +17,9 @@ func _process(delta: float) -> void:
 
 func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
+
+func _on_host_button_pressed() -> void:
+	host_requested.emit()
+
+func _on_join_button_pressed() -> void:
+	join_requested.emit(id_prompt.text)

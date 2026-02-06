@@ -1,86 +1,19 @@
-[gd_scene load_steps=10 format=3 uid="uid://cykj32whe33ni"]
+[gd_scene load_steps=3 format=3 uid="uid://4fedud0prf6s"]
 
-[ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="3_7mycd"]
-[ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="4_272bh"]
-[ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="5_5vw27"]
-[ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes/boat.tscn" id="6_7mycd"]
-[ext_resource type="Script" uid="uid://dw3yrisbnd4me" path="res://addons/waterways_net/RiverFloatSystem.cs" id="6_kek77"]
+[ext_resource type="Script" uid="uid://di65abnm7o6t1" path="res://scripts/main.gd" id="1_0wfyh"]
+[ext_resource type="PackedScene" uid="uid://d34pgbgxmrpd5" path="res://scenes/main_menu.tscn" id="1_o5qli"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
-size = Vector3(10, 1, 10)
+[node name="main" type="Node"]
+script = ExtResource("1_0wfyh")
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
-size = Vector3(10, 1, 10)
+[node name="Level" type="Node" parent="."]
 
-[sub_resource type="Resource" id="Resource_tbgi4"]
-script = ExtResource("5_5vw27")
-MatShaderType = 1
-mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
-mat_albedo_color_second = Color(0.25, 0.35, 0.35, 1)
-mat_albedo_depth = 10.0
-mat_albedo_depth_curve = 0.25
-mat_transparency_clarity = 10.0
-mat_transparency_depth_curve = 0.25
-mat_transparency_refraction = 0.05
-mat_normal_scale = 1.0
-mat_normal_bump_texture = ExtResource("4_272bh")
-mat_flow_speed = 1.0
-mat_flow_base = 0.0
-mat_flow_steepness = 2.0
-mat_flow_distance = 1.0
-mat_flow_pressure = 1.0
-mat_flow_max = 4.0
-mat_foam_color = Color(0.9, 0.9, 0.9, 1)
-mat_foam_amount = 2.0
-mat_foam_steepness = 2.0
-mat_foam_smoothness = 0.3
-mat_uv_scale = Vector3(1, 1, 1)
-mat_roughness = 0.2
-mat_edge_fade = 0.25
-LodLod0Distance = 50.0
-_selectedShader = 1
+[node name="LevelSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://cykj32whe33ni")
+spawn_path = NodePath("../Level")
+spawn_limit = 1
 
-[sub_resource type="Curve3D" id="Curve3D_tefeu"]
-resource_local_to_scene = true
-bake_interval = 0.05
-_data = {
-"points": PackedVector3Array(0, 0, -0.25, 0, 0, 0.25, 0, 0, 0, 0.07637652, 0, -3.5520477, -0.07637652, 0, 3.5520477, 8.104104e-07, 0, 10.27002, 5.074684, 0, 0.02335167, -5.074684, 0, -0.02335167, -8.436683, 0, 18.9893, 1.5498278, 0, -0.032145023, -1.5498278, 0, 0.032145023, -14.637327, 0, 18.989302, 2.717867, 4.6869373, 0.008178711, -2.717867, -4.6869373, -0.008178711, -17.866713, -12.976744, 18.98926, 4.5329666, -0.08801842, -0.0025634766, -4.5329666, 0.08801842, 0.0025634766, -68.759766, -14.988867, 18.989264),
-"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0)
-}
-point_count = 6
+[node name="MainMenu" parent="." instance=ExtResource("1_o5qli")]
 
-[node name="Main" type="Node"]
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-shadow_enabled = true
-
-[node name="Ground" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
-mesh = SubResource("BoxMesh_ig7tw")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
-shape = SubResource("BoxShape3D_0xm2m")
-
-[node name="RiverManager" type="Node3D" parent="."]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, -5)
-script = ExtResource("3_7mycd")
-ShaderSettings = SubResource("Resource_tbgi4")
-PointWidths = Array[float]([4.974709, 8.311261, 9.504496, 8.743373, 8.375943, 8.936057])
-Curve = SubResource("Curve3D_tefeu")
-metadata/_custom_type_script = "uid://d20js1b0dipxh"
-
-[node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
-script = ExtResource("6_kek77")
-DefaultHeight = -1000.0
-metadata/_custom_type_script = "uid://dw3yrisbnd4me"
-
-[node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_7mycd")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, -11)
-River = NodePath("../RiverManager/RiverFloatSystem")
-
-[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("uid://dmth1b1qymst1")
-spawn_path = NodePath("..")
+[connection signal="host_requested" from="MainMenu" to="." method="_on_main_menu_host_requested"]
+[connection signal="join_requested" from="MainMenu" to="." method="_on_main_menu_join_requested"]
