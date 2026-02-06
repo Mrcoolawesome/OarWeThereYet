@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=7 format=3 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scripts/Player.cs" id="1_3vyb7"]
 [ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="2_g2els"]
@@ -8,6 +8,14 @@
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_3vyb7"]
 height = 1.2
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4
@@ -41,6 +49,9 @@ visible = false
 [node name="PauseCanvas" type="CanvasLayer" parent="."]
 
 [node name="PauseUI" parent="PauseCanvas" instance=ExtResource("3_qhqgy")]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_qhqgy")
 
 [connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]

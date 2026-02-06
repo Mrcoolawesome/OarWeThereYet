@@ -30,11 +30,11 @@ func _on_lobby_created(result: int, lobby_id: int):
 		multiplayer.peer_connected.connect(_add_player)
 		multiplayer.peer_disconnected.connect(_remove_player)
 		
+		# instantiate the level scene
+		_add_level() # this MUST happen before adding the player
+
 		# Add the local host player first
 		_add_player() 
-
-		# instantiate the level scene
-		_add_level()
 
 		# remove the main menu
 		_remove_main_menu()
@@ -81,9 +81,19 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _respons
 	is_joining = false
 
 func _add_player(id : int = 1):
-	var player = player_scene.instantiate()
-	player.name = str(id)
-	call_deferred("add_child", player)
+	var level_container = get_node_or_null("Level")
+	
+	# Check if the container exists and has the map loaded inside it
+	if level_container and level_container.get_child_count() > 0:
+			# Get the actual map node (the first child of the Level container)
+			var current_map = level_container.get_child(0)
+			var player = player_scene.instantiate()
+			player.name = str(id)
+			
+			# Add the player as a child of the LOADED MAP
+			current_map.add_child(player, true)
+	else:
+			print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
 
 func _add_level():
 	if multiplayer.is_server():
