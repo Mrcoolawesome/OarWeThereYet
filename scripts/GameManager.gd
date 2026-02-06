@@ -40,11 +40,9 @@ func join_lobby(lobby_id : int):
 	is_joining = true
 	Steam.joinLobby(lobby_id)
 
-func _on_lobby_join(lobby_id : int, permissions : int, locked : bool, response : int):
+func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
 	if !is_joining:
 		return
-	
-	self.lobby_id = lobby_id
 	
 	# 1. WAIT FOR STEAM DATA
 	var host_id = Steam.getLobbyOwner(lobby_id)
@@ -72,9 +70,12 @@ func _on_lobby_join(lobby_id : int, permissions : int, locked : bool, response :
 		
 	multiplayer.multiplayer_peer = peer
 	
+	print("joined")
 	# 3. CHANGE SCENE
 	# We change the scene BEFORE the client starts trying to spawn players
 	get_tree().change_scene_to_packed(main_scene)
+
+	print("tried to change scene")
 	
 	is_joining = false
 
@@ -95,4 +96,5 @@ func _on_host_button_pressed() -> void:
 
 
 func _on_join_button_pressed(prompt: int) -> void:
+	print(prompt)
 	join_lobby(prompt)
