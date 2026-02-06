@@ -71,7 +71,6 @@ public partial class Player : CharacterBody3D
 	private enum GameState {
 		Playing,
 		Menu,
-		NotAuthority
 	}
 	private GameState _currGameState = GameState.Menu; // default state is being in the menu
 	private PlayerState _currPlayerState = PlayerState.Standing; // default is walking
@@ -81,10 +80,38 @@ public partial class Player : CharacterBody3D
   public override void _EnterTree()
   {
     SetMultiplayerAuthority(int.Parse(Name.ToString()));
-		if (!IsMultiplayerAuthority())
-		{
-			_currGameState = GameState.NotAuthority;
-		}
+		// MULTIPLAYER SETUP
+    if (IsMultiplayerAuthority())
+    {
+			// 1. If we ARE the player, enable our camera
+			// (Assumes you have a Camera3D as a child of Head)
+			var camera = _head.GetNodeOrNull<Camera3D>("Camera3D"); 
+			if (camera != null)
+			{
+				camera.Current = true;
+			}
+
+			// 2. Ensure the UI is properly hidden/shown based on initial state
+			_pauseUI.Visible = _currGameState == GameState.Menu;
+			
+			// 3. Capture mouse immediately if you want them to start playing, 
+			// or leave it visible if starting in Menu.
+			if (_currGameState == GameState.Menu)
+			{
+				Input.MouseMode = Input.MouseModeEnum.Visible;
+			}
+    }
+    else
+    {
+			// 1. If we are NOT the player (e.g., this is a peer's avatar on the host's screen),
+			// DELETE the UI so it doesn't clutter the screen.
+			_pauseUI.QueueFree();
+			
+			// 2. Disable processing for non-authority instances to save performance
+			// (Optional, but good practice if _Process only handles inputs)
+			SetProcess(false);
+			SetPhysicsProcess(true); // Keep physics for smooth interpolation if you add it later
+    }
   }
 
 	public override void _Ready()
@@ -167,10 +194,6 @@ public partial class Player : CharacterBody3D
 	// logic for walking and everything depending on the player state
 	public override void _PhysicsProcess(double delta)
 	{
-		if (_currGameState == GameState.NotAuthority)
-		{
-			return;
-		}
 
 		// always apply gravity 
 		_Gravity(delta);
