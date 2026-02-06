@@ -14,6 +14,13 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ypbrs")
 
+[node name="WavingGuy" type="Sprite2D" parent="."]
+z_index = -1
+position = Vector2(959.99994, 536)
+scale = Vector2(1.0037037, 1.0037037)
+texture = ExtResource("2_ypbrs")
+metadata/_edit_lock_ = true
+
 [node name="ResumeButton" type="Button" parent="."]
 layout_mode = 0
 offset_left = 64.0
@@ -22,22 +29,17 @@ offset_right = 576.0
 offset_bottom = 320.0
 theme = ExtResource("2_vcehk")
 text = "Resume"
+alignment = 0
 
 [node name="ExitButton" type="Button" parent="."]
 layout_mode = 0
 offset_left = 64.0
 offset_top = 320.0
-offset_right = 512.0
+offset_right = 576.0
 offset_bottom = 576.0
 theme = ExtResource("2_vcehk")
 text = "Exit"
-
-[node name="WavingGuy" type="Sprite2D" parent="."]
-z_index = -1
-position = Vector2(959.99994, 536)
-scale = Vector2(1.0037037, 1.0037037)
-texture = ExtResource("2_ypbrs")
-metadata/_edit_lock_ = true
+alignment = 0
 
 [connection signal="pressed" from="ResumeButton" to="." method="OnResumeButtonPressed"]
 [connection signal="pressed" from="ExitButton" to="." method="OnExitButtonPressed"]

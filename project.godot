@@ -11,9 +11,13 @@ config_version=5
 [application]
 
 config/name="OarWeThereYet"
-run/main_scene="uid://cykj32whe33ni"
+run/main_scene="uid://d34pgbgxmrpd5"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+GameManager="*res://scripts/GameManager.gd"
 
 [debug_draw_3d]
 
@@ -75,3 +79,10 @@ action_key={
 3d_physics/layer_1="world"
 3d_physics/layer_2="boat"
 3d_physics/layer_3="player"
+
+[steam]
+
+initialization/app_id=0
+initialization/initialize_on_startup=false
+initialization/embed_callbacks=false
+multiplayer_peer/max_channels=4

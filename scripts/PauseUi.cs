@@ -5,6 +5,8 @@ public partial class PauseUi : Control
 {
 	[Signal] public delegate void ResumeEventHandler();
 	[Signal] public delegate void ExitEventHandler();
+	[Signal] public delegate void JoinEventHandler();
+	[Signal] public delegate void HostEventHandler();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -24,5 +26,15 @@ public partial class PauseUi : Control
 	private void OnExitButtonPressed()
 	{
 		EmitSignal(SignalName.Exit);
+	}
+
+	private void OnJoinButtonPressed()
+	{
+		EmitSignal(SignalName.Join);
+	}
+
+	private void OnHostButtonPressed()
+	{
+		EmitSignal(SignalName.Host);
 	}
 }
