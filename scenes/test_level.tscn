@@ -1,5 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://cykj32whe33ni"]
+[gd_scene load_steps=11 format=3 uid="uid://cykj32whe33ni"]
 
+[ext_resource type="Script" uid="uid://5wn0wixx5y3u" path="res://scripts/Interactable.cs" id="1_qcd3b"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="1_tmr53"]
 [ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="2_qcd3b"]
 [ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="3_88ety"]
@@ -12,7 +13,7 @@ size = Vector3(10, 1, 10)
 [sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
 size = Vector3(10, 1, 10)
 
-[sub_resource type="Resource" id="Resource_tmr53"]
+[sub_resource type="Resource" id="Resource_qcd3b"]
 script = ExtResource("3_88ety")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
@@ -40,7 +41,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_qcd3b"]
+[sub_resource type="Curve3D" id="Curve3D_88ety"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -57,6 +58,8 @@ shadow_enabled = true
 
 [node name="Ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+script = ExtResource("1_qcd3b")
+PromptMessage = "Ground"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("BoxMesh_ig7tw")
@@ -67,9 +70,9 @@ shape = SubResource("BoxShape3D_0xm2m")
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, -5)
 script = ExtResource("1_tmr53")
-ShaderSettings = SubResource("Resource_tmr53")
+ShaderSettings = SubResource("Resource_qcd3b")
 PointWidths = Array[float]([4.974709, 8.311261, 9.504496, 8.743373, 8.375943, 8.936057])
-Curve = SubResource("Curve3D_qcd3b")
+Curve = SubResource("Curve3D_88ety")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
@@ -80,8 +83,18 @@ metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("5_7gix3")]
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0, 0, -9)
 River = NodePath("../RiverManager/RiverFloatSystem")
-RowForce = 200.0
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://dmth1b1qymst1")
 spawn_path = NodePath("..")
+
+[node name="Ground2" type="StaticBody3D" parent="."]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, -5, 4.5, 0)
+script = ExtResource("1_qcd3b")
+PromptMessage = "Wall"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground2"]
+mesh = SubResource("BoxMesh_ig7tw")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground2"]
+shape = SubResource("BoxShape3D_0xm2m")

@@ -11,14 +11,19 @@ public partial class InteractRay : RayCast3D
 		_prompt = GetNode<Label>("Prompt");
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
+    // Called every frame. 'delta' is the elapsed time since the previous frame.
+    public override void _PhysicsProcess(double delta)
+    {
 		_prompt.Text = "";
 
 		if (IsColliding())
 		{
-			_prompt.Text = "Something else";
+			GodotObject collider = GetCollider();
+
+			if (collider is Interactable hitObject)
+			{
+				_prompt.Text = hitObject.PromptMessage;
+			}
 		}
 	}
 }
