@@ -303,14 +303,16 @@ public partial class Player : CharacterBody3D
 		// if they press the spacebar then release them
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
+
+			GD.Print($"[Client {Name}] Requesting Row Forward for Seat {(int)_seat}");
 			// set and broadcast state change
-			Rpc(nameof(Broadcast_SetSitStandState), false, (int)_seat); // set sitting to false (so now we're standing) and update their seat (the seat number doesn't matter here)
+			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat); // set sitting to false (so now we're standing) and update their seat (the seat number doesn't matter here)
 
 			// reset their global rotation
 			GlobalRotation = Vector3.Zero;
 
 			// make them stop rowing if they were rowing
-			RpcId(1, nameof(ServerRequestRowing), 0, false, false); // the first boolean is all that matters to make them stop rowing
+			RpcId(1, MethodName.ServerRequestRowing, 0, false, false); // the first boolean is all that matters to make them stop rowing
 
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
@@ -321,12 +323,12 @@ public partial class Player : CharacterBody3D
 		{
 			// tell them to move forward
 			// have to send the seat as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
-			RpcId(1, nameof(ServerRequestRowing), (int)_seat, true, true);
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, true, true);
 		} 
 		else if (Input.IsActionPressed("move_backward")) // don't want them to be able to do both at the same time so if they're pressing both they'll go forward
 		{
 			// tell them to move backward
-			RpcId(1, nameof(ServerRequestRowing), (int)_seat, true, false);
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, true, false);
 		}
 
 		// emit a signal when they're done rowing
@@ -334,11 +336,11 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionJustReleased("move_forward"))
 		{
 			// the first boolean is all that matters to make them allowed to row or not, so just setting that to false stops them
-			RpcId(1, nameof(ServerRequestRowing), (int)_seat, false, true);
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, false, true);
 		} 
 		else if (Input.IsActionJustReleased("move_backward"))
 		{
-			RpcId(1, nameof(ServerRequestRowing), (int)_seat, false, false); 
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, false, false); 
 		}
 	}
 
@@ -462,8 +464,8 @@ public partial class Player : CharacterBody3D
     _seat = (Boat.SeatIndicies)seatIdx;
 	
 		// disable/enable player collision while sitting
-		_standingCollision.Disabled = isSitting;
-    _crouchingCollision.Disabled = isSitting;
+		// _standingCollision.Disabled = isSitting;
+    // _crouchingCollision.Disabled = isSitting;
 	}
 
 	// need to make sending the signal a synced thing between everyone
@@ -473,6 +475,8 @@ public partial class Player : CharacterBody3D
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // we don't need CallLocal i think bc we're not trying to change the local version of our game we're chainging the server which will sync to our client
 	private void ServerRequestRowing(int seatIdx, bool stopStart, bool backForward)
 	{
+
+		GD.Print($"[Server] Received Row Request from Player. Emitting Signal for Seat {seatIdx}");
 		// The Server hears this and emits the signal locally to the Boat
 		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, seatIdx, stopStart, backForward);
 	}

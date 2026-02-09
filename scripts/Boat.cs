@@ -206,6 +206,8 @@ public partial class Boat : RigidBody3D
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] 
     private void _OnPlayerRowing(int seat, bool stopStart, bool backForward)
     {
+
+        GD.Print($"[Boat] Signal Received! Moving Seat {seat}");
         // set the rowing state to be true for whichever seat is being sat in
         _rowingStates[seat] = stopStart;
         _rowingStatesDirection[seat] = backForward;
