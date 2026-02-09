@@ -8,7 +8,7 @@ public partial class GlobalSignalServer : Node
 
   // signal for rowing
   [Signal]
-	public delegate void RowingEventHandler(Boat.SeatIndicies seat, bool stopStart, bool backForward);
+	public delegate void RowingEventHandler(int seat, bool stopStart, bool backForward);
 
   public int Health { get; set; }
 
