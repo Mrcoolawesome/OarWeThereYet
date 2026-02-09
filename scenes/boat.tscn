@@ -1,6 +1,7 @@
-[gd_scene load_steps=15 format=4 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=16 format=4 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scripts/Boat.cs" id="1_0063d"]
+[ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scripts/Seat.cs" id="2_qyrje"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0063d"]
 properties/0/path = NodePath(".:linear_velocity")
@@ -117,6 +118,7 @@ collision_mask = 4
 [node name="FrontLeftCollision" type="CollisionShape3D" parent="SeatArea3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, -1)
 shape = SubResource("BoxShape3D_fsggc")
+script = ExtResource("2_qyrje")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatArea3D/FrontLeftCollision"]
 mesh = SubResource("BoxMesh_0063d")

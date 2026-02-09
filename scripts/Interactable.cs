@@ -23,5 +23,5 @@ public interface Interactable
 		return PromptMessage + "\n [" + keyName + "]";
 	}
 
-	public void Interact();
+	public void Interact(Player player);
 }
