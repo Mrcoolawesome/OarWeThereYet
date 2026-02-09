@@ -15,6 +15,10 @@ run/main_scene="uid://4fedud0prf6s"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GlobalSignalServer="*res://scripts/GlobalSignalServer.cs"
+
 [debug_draw_3d]
 
 settings/addon_root_folder="res://addons/debug_draw_3d"

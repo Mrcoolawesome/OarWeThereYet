@@ -20,11 +20,6 @@ public partial class Player : CharacterBody3D
 	[Export]
 	public float CrouchLerpSpeed = 10.0f;
 
-	// Signals for telling the boat to apply or stop applying a force given a seat
-	// back is false forward is true
-	[Signal]
-	public delegate void RowingEventHandler(Boat.SeatIndicies seat, bool stopStart, bool backForward);
-
 	// private variables
 	private float _currSpeed = 5.0f;
 
@@ -60,12 +55,6 @@ public partial class Player : CharacterBody3D
 	// need to know which seat they're sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
 	/*
-		(all of this is assuming you're facing the front)
-		front left: 4, 2, -2
-		front right: 4, 2, 2
-		back left: 0, 2, -2
-		back right: 0, 2, 2
-
 		front left localShapeIndex: 0
 		front right localShapeIndex: 1
 		back right localShapeIndex: 2
@@ -325,7 +314,7 @@ public partial class Player : CharacterBody3D
 			GlobalRotation = Vector3.Zero;
 
 			// make them stop rowing if they were rowing
-			EmitSignal(SignalName.Rowing, (int)_seat, false, false); // second boolean doesn't matter because im just making them stop rowing
+			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, false, false); // second boolean doesn't matter because im just making them stop rowing
 
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
@@ -335,23 +324,23 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionPressed("move_forward"))
 		{
 			// tell them to move forward
-			EmitSignal(SignalName.Rowing, (int)_seat, true, true); // have to send it as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
+			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, true, true); // have to send it as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
 		} 
 		else if (Input.IsActionPressed("move_backward")) // don't want them to be able to do both at the same time so if they're pressing both they'll go forward
 		{
 			// tell them to move backward
-			EmitSignal(SignalName.Rowing, (int)_seat, true, false);
+			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, true, false);
 		}
 
 		// emit a signal when they're done rowing
 		// setting the direction doesn't matter in this case but i set them to be forward and backward anyways according to which direction we're canceling
 		if (Input.IsActionJustReleased("move_forward"))
 		{
-			EmitSignal(SignalName.Rowing, (int)_seat, false, true);
+			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, false, true);
 		} 
 		else if (Input.IsActionJustReleased("move_backward"))
 		{
-			EmitSignal(SignalName.Rowing, (int)_seat, false, false);
+			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, false, false);
 		}
 	}
 

@@ -52,9 +52,12 @@ public partial class Boat : RigidBody3D
         _frontRightCollision = GetNode<CollisionShape3D>("SeatArea3D/FrontRightCollision");
         _backLeftCollision = GetNode<CollisionShape3D>("SeatArea3D/BackLeftCollision");
         _backRightCollision = GetNode<CollisionShape3D>("SeatArea3D/BackRightCollision");
+
+        // subscribe to the Rowing signal from the singleton script
+        GlobalSignalServer.Instance.Rowing += _OnPlayerRowing;
     }
 
-    public override void _PhysicsProcess(double delta)
+  public override void _PhysicsProcess(double delta)
     {
         foreach (Marker3D probe in _boatFloatProbesContainer.GetChildren().OfType<Marker3D>())
         {
@@ -197,10 +200,11 @@ public partial class Boat : RigidBody3D
     }
 
     // getting the signals to row forward or to stop
-    public void OnPlayerRowing(int seat, bool stopStart, bool backForward)
+    // the parameter types of this function MUST be identical to the Rowing signal from the singleton server/script
+    private void _OnPlayerRowing(SeatIndicies seat, bool stopStart, bool backForward)
     {
         // set the rowing state to be true for whichever seat is being sat in
-        _rowingStates[seat] = stopStart;
-        _rowingStatesDirection[seat] = backForward;
+        _rowingStates[(int)seat] = stopStart;
+        _rowingStatesDirection[(int)seat] = backForward;
     }
 }
