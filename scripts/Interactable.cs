@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class Interactable : Node3D
+public interface Interactable
 {
-	[Export] public string PromptMessage = "Interact";
+	[Export] public string PromptMessage { get; set; }
 }
