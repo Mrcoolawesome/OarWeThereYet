@@ -303,8 +303,6 @@ public partial class Player : CharacterBody3D
 		// if they press the spacebar then release them
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
-
-			GD.Print($"[Client {Name}] Requesting Row Forward for Seat {(int)_seat}");
 			// set and broadcast state change
 			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat); // set sitting to false (so now we're standing) and update their seat (the seat number doesn't matter here)
 
@@ -475,8 +473,6 @@ public partial class Player : CharacterBody3D
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // we don't need CallLocal i think bc we're not trying to change the local version of our game we're chainging the server which will sync to our client
 	private void ServerRequestRowing(int seatIdx, bool stopStart, bool backForward)
 	{
-
-		GD.Print($"[Server] Received Row Request from Player. Emitting Signal for Seat {seatIdx}");
 		// The Server hears this and emits the signal locally to the Boat
 		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, seatIdx, stopStart, backForward);
 	}
