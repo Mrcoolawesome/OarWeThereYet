@@ -22,9 +22,9 @@ public partial class InteractRay : RayCast3D
 
 			if (collider is Interactable hitObject)
 			{
-				_prompt.Text = hitObject.PromptMessage;
+				_prompt.Text = hitObject.GetMessage();
 			
-				if (Input.IsActionJustPressed("interact"))
+				if (Input.IsActionJustPressed(hitObject.PromptInput))
 				{
 					hitObject.Interact(collider);
 				}
