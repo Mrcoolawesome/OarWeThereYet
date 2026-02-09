@@ -14,9 +14,11 @@ public partial class InteractRay : RayCast3D
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		_prompt.Text = "";
+
 		if (IsColliding())
 		{
-			GD.Print("Colliding with something");
+			_prompt.Text = "Something else";
 		}
 	}
 }
