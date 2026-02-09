@@ -15,7 +15,7 @@ public partial class TestLevel : Node
 	public override void _Ready()
 	{
 		// attach the reset function to the signal from the signal server script
-		GlobalSignalServer.Instance.ResetLevel += _ResetSignalRecieved; // might be a problem to directly call an Rpc function
+		GlobalSignalServer.Instance.ResetLevel += _InitateReset; // might be a problem to directly call an Rpc function
 
 		// set the boat variable
 		_boat = GetNode<RigidBody3D>("Boat");
@@ -23,6 +23,11 @@ public partial class TestLevel : Node
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+	}
+
+	private void _InitateReset()
+	{
+		_ResetSignalRecieved();
 	}
 
 	// i think we want CallLocal to be false because we'll just update the server and it'll sync the locations of everything to their starting points

@@ -487,5 +487,6 @@ public partial class Player : CharacterBody3D
 		// set the player into the standing state and reset their position
 		_currPlayerState = PlayerState.Standing;
 		Position = Vector3.Zero;
+		Rotation = Vector3.Zero;
 	}
 }
