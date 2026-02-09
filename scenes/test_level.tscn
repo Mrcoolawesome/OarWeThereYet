@@ -88,13 +88,13 @@ River = NodePath("../RiverManager/RiverFloatSystem")
 _spawnable_scenes = PackedStringArray("uid://dmth1b1qymst1")
 spawn_path = NodePath("..")
 
-[node name="Ground2" type="StaticBody3D" parent="."]
+[node name="Wall" type="StaticBody3D" parent="."]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, -5, 4.5, 0)
 script = ExtResource("1_qcd3b")
 PromptMessage = "Wall"
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground2"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Wall"]
 mesh = SubResource("BoxMesh_ig7tw")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground2"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall"]
 shape = SubResource("BoxShape3D_0xm2m")
