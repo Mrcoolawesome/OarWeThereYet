@@ -3,5 +3,10 @@ using System;
 
 public interface Interactable
 {
-	[Export] public string PromptMessage { get; set; }
+	public string PromptMessage { get; }
+
+	public void Interact(GodotObject body)
+	{
+		GD.Print(body.GetType().Name);
+	}
 }
