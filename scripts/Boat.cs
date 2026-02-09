@@ -201,10 +201,13 @@ public partial class Boat : RigidBody3D
 
     // getting the signals to row forward or to stop
     // the parameter types of this function MUST be identical to the Rowing signal from the singleton server/script
-    private void _OnPlayerRowing(SeatIndicies seat, bool stopStart, bool backForward)
+    // needs to be an RPC call so the server knows to update the states
+    // CallLocal is false, because if it were true then the function would run on the peer and not the server, which is not what we want
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] 
+    private void _OnPlayerRowing(int seat, bool stopStart, bool backForward)
     {
         // set the rowing state to be true for whichever seat is being sat in
-        _rowingStates[(int)seat] = stopStart;
-        _rowingStatesDirection[(int)seat] = backForward;
+        _rowingStates[seat] = stopStart;
+        _rowingStatesDirection[seat] = backForward;
     }
 }

@@ -159,7 +159,6 @@ public partial class Player : CharacterBody3D
 				_pauseUI.Visible = false;
 				break;
 			case GameState.Menu:
-				_HandleMenuState();
 				_pauseUI.Visible = true;
 				break;
 		}
@@ -187,12 +186,6 @@ public partial class Player : CharacterBody3D
 				_HandleRowingState();
 				break;
 		}
-	}
-
-	// handling ui state if they're in the menu
-	private void _HandleMenuState()
-	{
-		//Exit and resume logic has been moved to signal function at bottom
 	}
 
 	// logic for walking and everything depending on the player state
@@ -303,18 +296,21 @@ public partial class Player : CharacterBody3D
 	}
 
 	// input handling while they're in a rowing state
+	// NOTE: chaning their state and initating rowing needs to be rpc calls bc then the variable for this person's player instance will be synced between clients
+	// NOTE2: to send an rpc request ONLY to the server use the RpcId function and give it the id of 1
 	private void _HandleRowingState()
 	{	
 		// if they press the spacebar then release them
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
-			_currPlayerState = PlayerState.Standing;
+			// set and broadcast state change
+			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat); // set sitting to false (so now we're standing) and update their seat (the seat number doesn't matter here)
 
 			// reset their global rotation
 			GlobalRotation = Vector3.Zero;
 
 			// make them stop rowing if they were rowing
-			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, false, false); // second boolean doesn't matter because im just making them stop rowing
+			RpcId(1, MethodName.ServerRequestRowing, 0, false, false); // the first boolean is all that matters to make them stop rowing
 
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
@@ -324,23 +320,25 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionPressed("move_forward"))
 		{
 			// tell them to move forward
-			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, true, true); // have to send it as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
+			// have to send the seat as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, true, true);
 		} 
 		else if (Input.IsActionPressed("move_backward")) // don't want them to be able to do both at the same time so if they're pressing both they'll go forward
 		{
 			// tell them to move backward
-			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, true, false);
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, true, false);
 		}
 
 		// emit a signal when they're done rowing
 		// setting the direction doesn't matter in this case but i set them to be forward and backward anyways according to which direction we're canceling
 		if (Input.IsActionJustReleased("move_forward"))
 		{
-			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, false, true);
+			// the first boolean is all that matters to make them allowed to row or not, so just setting that to false stops them
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, false, true);
 		} 
 		else if (Input.IsActionJustReleased("move_backward"))
 		{
-			GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, false, false);
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, false, false); 
 		}
 	}
 
@@ -350,6 +348,9 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionPressed("action_key") && _inSeatHitbox)
 		{
 			_currPlayerState = PlayerState.Rowing;
+
+			// set and broadcast state change
+			Rpc(nameof(Broadcast_SetSitStandState), true, (int)_seat); // set sitting to true and update their seat
 
 			// set their rotation
 			GlobalRotation = _boat.Rotation;
@@ -385,7 +386,7 @@ public partial class Player : CharacterBody3D
 		}
 
 		// set the basis of the player to the basis of the seat
-		GlobalPosition = seatCollision.GlobalPosition;
+		GlobalPosition = seatCollision.GlobalPosition; // i think this line makes it so that it has to run in the physics process funcion
 
 		// set the rotations according to mouse movement
 		_HandleSittingPlayerRotation(seatCollision);
@@ -394,11 +395,12 @@ public partial class Player : CharacterBody3D
 	private void _HandleStandingPlayerRotation()
 	{
 		// rotation logic based on mouse stuff 
-		// RotateY(_mouseMovementYaw);
 		RotateY(_mouseMovementYaw);
 
 		// set the head rotation
 		_head.RotateX(_mouseMovementPitch);
+		// clamp their head pitch
+		_head.Rotation = new Vector3(Mathf.Clamp(_head.Rotation.X, Mathf.DegToRad(-89), Mathf.DegToRad(89)), _head.Rotation.Y, _head.Rotation.Z);
 
 		// YOU ALWAYS HAVE TO RESET YAW AND PITCH MOVEMENT AFTER USING IT 
 		_mouseMovementPitch = 0.0f;
@@ -449,5 +451,29 @@ public partial class Player : CharacterBody3D
 		{
 			GetTree().Quit();
 		}
+	}
+
+	// this basically needs to exist so that the variable for setting the state is synced between everyone for THIS player
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void Broadcast_SetSitStandState(bool isSitting, int seatIdx)
+	{
+		// set the rowing state
+		_currPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
+    _seat = (Boat.SeatIndicies)seatIdx;
+	
+		// disable/enable player collision while sitting
+		// _standingCollision.Disabled = isSitting;
+    // _crouchingCollision.Disabled = isSitting;
+	}
+
+	// need to make sending the signal a synced thing between everyone
+	// CallLocal CANNOT be true for this because then for clients (non-server players) their local version could get out of sync with the server
+	// HOWEVER, we need it to be so that the server-client person can send request to themselves.
+	// THIS MEANS: we need to use RpcId given an id of 1 **ANYTIME** we run this function, so that it's only ever sent to the server
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // we don't need CallLocal i think bc we're not trying to change the local version of our game we're chainging the server which will sync to our client
+	private void ServerRequestRowing(int seatIdx, bool stopStart, bool backForward)
+	{
+		// The Server hears this and emits the signal locally to the Boat
+		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, seatIdx, stopStart, backForward);
 	}
 }
