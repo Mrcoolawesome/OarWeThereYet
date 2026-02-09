@@ -10,6 +10,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
 	public delegate void RowingEventHandler(int seat, bool stopStart, bool backForward);
 
+  // signal for reseting the game
+  [Signal]
+  public delegate void ResetLevelEventHandler();
+
   public int Health { get; set; }
 
   public override void _Ready()
