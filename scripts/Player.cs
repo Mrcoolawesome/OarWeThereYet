@@ -40,11 +40,22 @@ public partial class Player : CharacterBody3D
 
 	private float _crouchingDepth = -0.5f; // this is relative to the regular head 
 
+	// accumulated movement in the yaw and pitch in radians
+	private float _mouseMovementYaw = 0.0f;
+	private float _mouseMovementPitch = 0.0f;
+	private float _sittingYawDelta = 0.0f; // delta change specifically for sitting down
+
 	// to keep track of if they're choosing to sit or not
 	private bool _inSeatHitbox = false;
 
 	// BOAT
 	private Boat _boat = new Boat();
+
+	// seat collision objects
+	private CollisionShape3D _frontLeftSeatCollision;
+	private CollisionShape3D _frontRightSeatCollision;
+	private CollisionShape3D _backLeftSeatCollision;
+	private CollisionShape3D _backRightSeatCollision;
 
 	// need to know which seat they're sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
@@ -91,6 +102,11 @@ public partial class Player : CharacterBody3D
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 		// get the boat
 		_boat = GetParent().GetNode<Boat>("Boat");
+		// get the seat collision objects
+		_frontLeftSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/FrontLeftCollision");
+		_frontRightSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/FrontRightCollision");
+		_backLeftSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/BackLeftCollision");
+		_backRightSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/BackRightCollision");
 
 		// Get the camera reference
     var camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
@@ -136,19 +152,11 @@ public partial class Player : CharacterBody3D
     if ((@event is InputEventMouseMotion mouseEvent) && _currGameState == GameState.Playing)
 		{
 			// the y rotation of the player in radians based off of the mouse sensitivity 
-			float yRotationChange = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
-			RotateY(yRotationChange);
+			_mouseMovementYaw = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
 
 			// the head rotation
-			float xRotationChange = -Mathf.DegToRad(mouseEvent.Relative.Y * MouseSens);
-
-			// add the rotation change per tick and then clamp the rotation
-			Vector3 newRotation = _head.Rotation;
-			newRotation.X += xRotationChange;
-			newRotation.X = Mathf.Clamp(newRotation.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
-
-			// set the head rotation
-			_head.Rotation = newRotation;
+			_mouseMovementPitch = -Mathf.DegToRad(mouseEvent.Relative.Y * MouseSens);
+			_mouseMovementPitch = Mathf.Clamp(_mouseMovementPitch, Mathf.DegToRad(-89), Mathf.DegToRad(89)); // clamp it to 90 degrees up and down
 		}
   }
 
@@ -212,6 +220,10 @@ public partial class Player : CharacterBody3D
 			_CrouchSprintLogic(delta);
 			// apply gravity and movement logic
 			_MovementLogic(delta);
+		} 
+		else if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Rowing) // if they're sitting
+		{
+			_HandleRowingMovementLogic();
 		}
 
 		// only apply move and slide if they're not rowing
@@ -246,6 +258,9 @@ public partial class Player : CharacterBody3D
 		velocity.X = _direction.X * _currSpeed;
 		velocity.Z = _direction.Z * _currSpeed;
 		Velocity = velocity;
+
+		// use mouse input to rotate their head properly
+		_HandleStandingPlayerRotation();
 	}
 
 	private void _Gravity(double delta)
@@ -306,11 +321,7 @@ public partial class Player : CharacterBody3D
 		{
 			_currPlayerState = PlayerState.Standing;
 
-			// reset their position to the middle of the boat and then make them a sibling of the boat again\
-			// Position is in PARENT space so setting it to 0,1,0 will set it to the middle of the boat 
-			Position = new Vector3(0, 1.0f, 0);
-			Node boatParent = _boat.GetParent();
-			Reparent(boatParent, true); // keep the global transform too ig
+			// reset their global rotation
 			GlobalRotation = Vector3.Zero;
 
 			// make them stop rowing if they were rowing
@@ -351,12 +362,7 @@ public partial class Player : CharacterBody3D
 		{
 			_currPlayerState = PlayerState.Rowing;
 
-			// do the logic to make the player a child of the boat and move the player to the right position
-			// make them a child of the boat and just keep their transform so they don't loose their transformation until this point
-			Reparent(_boat, true);
-
-			// reposition them in PARENT space (hence why we're using Position and not GlobalPosition)
-			Position = _boat.GetSeatOffset(_seat);
+			// set their rotation
 			GlobalRotation = _boat.Rotation;
 			// if they're on the right side they need to be rotated to be facing outwards when they sit down
 			if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
@@ -365,6 +371,69 @@ public partial class Player : CharacterBody3D
 				RotateY(Mathf.DegToRad(180));
 			}
 		}
+	}
+
+	// Function that has logic to move their head while rowing
+	private void _HandleRowingMovementLogic()
+	{
+		CollisionShape3D seatCollision = new CollisionShape3D();
+		// set their global transform to be that of the boat seat they're sitting on
+		if (_seat == Boat.SeatIndicies.FrontLeft)
+		{
+			seatCollision = _frontLeftSeatCollision;
+		} 
+		else if (_seat == Boat.SeatIndicies.FrontRight)
+		{
+			seatCollision = _frontRightSeatCollision;
+		}
+		else if (_seat == Boat.SeatIndicies.BackLeft)
+		{
+			seatCollision = _backLeftSeatCollision;
+		}
+		else if (_seat == Boat.SeatIndicies.BackRight)
+		{
+			seatCollision = _backRightSeatCollision;
+		}
+
+		// set the basis of the player to the basis of the seat
+		GlobalPosition = seatCollision.GlobalPosition;
+
+		// set the rotations according to mouse movement
+		_HandleSittingPlayerRotation(seatCollision);
+	}
+
+	private void _HandleStandingPlayerRotation()
+	{
+		// rotation logic based on mouse stuff 
+		// RotateY(_mouseMovementYaw);
+		RotateY(_mouseMovementYaw);
+
+		// set the head rotation
+		_head.RotateX(_mouseMovementPitch);
+
+		// YOU ALWAYS HAVE TO RESET YAW AND PITCH MOVEMENT AFTER USING IT 
+		_mouseMovementPitch = 0.0f;
+		_mouseMovementYaw = 0.0f;
+	}
+
+	private void _HandleSittingPlayerRotation(CollisionShape3D seatCollision)
+	{
+		// directly setting the rotation of something is bad so instead we're taking the global basis, then just adding the rotation to that basis and then setting the basis
+		_sittingYawDelta += _mouseMovementYaw;
+		Basis seatGlobalBasis = seatCollision.GlobalBasis;
+		Basis swivelBasis = new Basis(Vector3.Up, _sittingYawDelta);
+		GlobalBasis = seatGlobalBasis * swivelBasis; // with matrix multiplication this works ig
+		
+		// regular head pitch rotation since the head is a child of the player
+		_head.RotateX(_mouseMovementPitch);
+		// clamp so they cant move their head all the way around
+		Vector3 headRot = _head.Rotation;
+    headRot.X = Mathf.Clamp(headRot.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
+    _head.Rotation = headRot;
+
+		// must reset these variables
+		_mouseMovementPitch = 0.0f;
+    _mouseMovementYaw = 0.0f;
 	}
 
 	// used to set the isInSeatHitbox value and the seat position
