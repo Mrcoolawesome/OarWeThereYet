@@ -16,4 +16,9 @@ public partial class Ground : StaticBody3D, Interactable
 	public override void _Process(double delta)
 	{
 	}
+
+	public void Interact()
+	{
+		Visible = !Visible;
+	}
 }

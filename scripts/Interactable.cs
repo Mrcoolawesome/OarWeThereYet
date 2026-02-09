@@ -5,6 +5,7 @@ public interface Interactable
 {
 	public string PromptMessage { get; }
 	public string PromptInput { get; }
+	[Signal] public delegate void InteractedEventHandler();
 
 	public string GetMessage()
 	{
@@ -22,8 +23,5 @@ public interface Interactable
 		return PromptMessage + "\n [" + keyName + "]";
 	}
 
-	public void Interact(GodotObject body)
-	{
-		GD.Print(body.GetType().Name);
-	}
+	public void Interact();
 }

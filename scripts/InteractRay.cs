@@ -26,7 +26,7 @@ public partial class InteractRay : RayCast3D
 			
 				if (Input.IsActionJustPressed(hitObject.PromptInput))
 				{
-					hitObject.Interact(collider);
+					hitObject.Interact();
 				}
 			}
 		}
