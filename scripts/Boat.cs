@@ -221,12 +221,12 @@ public partial class Boat : RigidBody3D
 		if (Multiplayer.IsServer())
 		{
 			// Tell EVERYONE (including the server) to run the SyncReset function
-			Rpc(nameof(SyncReset));
+			RpcId(1, nameof(SyncReset));
 		}
 	}
 
 	// reset function that gets called by the level script
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] // only update the server so the CallLocal should be false i think
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // only update the server so the CallLocal should be false i think
 	private void SyncReset()
 	{
 		// set the player into the standing state and reset their position and velocity
