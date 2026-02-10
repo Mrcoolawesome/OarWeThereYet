@@ -3,14 +3,13 @@ using System;
 
 public partial class InteractRay : RayCast3D
 {
+	[Export] Player Player { get; set; }
 	private Label _prompt;
-	private Player _player;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		_prompt = GetNode<Label>("Prompt");
-		_player = GetParent<Player>();
 	}
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -28,7 +27,7 @@ public partial class InteractRay : RayCast3D
 			
 				if (Input.IsActionJustPressed(hitObject.PromptInput))
 				{
-					hitObject.Interact(_player);
+					hitObject.Interact(Player);
 				}
 			}
 		}
