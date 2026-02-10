@@ -100,6 +100,9 @@ public partial class Player : CharacterBody3D
 		// Get the camera reference
     var camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
 
+		// add the player to the 'players' group
+		AddToGroup("players");
+
     // MULTIPLAYER SETUP
     if (IsMultiplayerAuthority())
     {
@@ -444,6 +447,7 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
+	
 	private void OnPauseUIExit()
 	{
 		// if they press exit button
@@ -475,5 +479,27 @@ public partial class Player : CharacterBody3D
 	{
 		// The Server hears this and emits the signal locally to the Boat
 		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, seatIdx, stopStart, backForward);
+	}
+
+	
+	public void Reset()
+	{
+		// Only the server should issue this command
+		if (Multiplayer.IsServer())
+		{
+			// Tell EVERYONE (including the server) to run the SyncReset function
+			Rpc(nameof(SyncReset));
+		}
+	}
+
+	// reset function that gets called by the level script
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] // only update the server so the CallLocal should be false i think
+	private void SyncReset()
+	{
+		// set the player into the standing state and reset their position and velocity
+		_currPlayerState = PlayerState.Standing;
+		Position = Vector3.Zero;
+		Rotation = Vector3.Zero;
+		Velocity = Vector3.Zero;
 	}
 }

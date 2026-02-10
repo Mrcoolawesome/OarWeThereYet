@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3 uid="uid://cykj32whe33ni"]
 
-[ext_resource type="Script" uid="uid://be4uhy3s5es8a" path="res://scripts/Ground.cs" id="1_qcd3b"]
+[ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes/TestLevel.cs" id="1_qcd3b"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="1_tmr53"]
 [ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="2_qcd3b"]
 [ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="3_88ety"]
@@ -51,6 +51,7 @@ _data = {
 point_count = 6
 
 [node name="TestLevel" type="Node"]
+script = ExtResource("1_qcd3b")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
@@ -87,3 +88,4 @@ River = NodePath("../RiverManager/RiverFloatSystem")
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://dmth1b1qymst1")
 spawn_path = NodePath("..")
+spawn_limit = 4
