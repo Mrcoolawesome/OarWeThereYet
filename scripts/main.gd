@@ -103,10 +103,15 @@ func _add_level():
 func _remove_main_menu():
 	$MainMenu.queue_free()
 
-func _remove_player(id : int):
-	print("gaming")
-		
-	self.get_node(str(id)).queue_free()
+func _remove_player(id : int):		
+	# "true" means recursive (search inside children's children)
+	# "false" means it doesn't need to be owned by this node (safer for spawned objects)
+	var player_node = self.find_child(str(id), true, false)
+	
+	if player_node:
+		player_node.queue_free()
+	else:
+		print("Could not find player with ID: ", id)
 
 func _on_main_menu_host_requested() -> void:
 	host_lobby()

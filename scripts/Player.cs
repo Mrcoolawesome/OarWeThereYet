@@ -447,15 +447,6 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	private void OnPauseUIExit()
-	{
-		// if they press exit button
-		if (_currGameState == GameState.Menu)
-		{
-			GetTree().Quit();
-		}
-	}
-
 	// this basically needs to exist so that the variable for setting the state is synced between everyone for THIS player
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void Broadcast_SetSitStandState(bool isSitting, int seatIdx)
