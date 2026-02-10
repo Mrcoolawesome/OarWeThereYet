@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=8 format=3 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scripts/Player.cs" id="1_3vyb7"]
+[ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes/interact_ray.tscn" id="2_dqkch"]
 [ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="2_g2els"]
 [ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes/pause_ui.tscn" id="3_qhqgy"]
 
@@ -39,6 +40,9 @@ disabled = true
 
 [node name="Camera3D" type="Camera3D" parent="Head/CameraContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+
+[node name="InteractRay" parent="Head/CameraContainer/Camera3D" node_paths=PackedStringArray("Player") instance=ExtResource("2_dqkch")]
+Player = NodePath("../../../..")
 
 [node name="AimLook" type="Node" parent="."]
 
