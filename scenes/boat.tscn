@@ -1,6 +1,20 @@
-[gd_scene load_steps=14 format=4 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=15 format=4 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scripts/Boat.cs" id="1_0063d"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0063d"]
+properties/0/path = NodePath(".:linear_velocity")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:angular_velocity")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:position")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath(".:rotation")
+properties/3/spawn = true
+properties/3/replication_mode = 1
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fsggc"]
 
@@ -72,6 +86,9 @@ script = ExtResource("1_0063d")
 FloatForce = 25.0
 RiverSpeed = 30.0
 WaterDrag = 5.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_0063d")
 
 [node name="BoatFloatProbesContainer" type="Node3D" parent="."]
 

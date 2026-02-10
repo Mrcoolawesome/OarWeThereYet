@@ -19,13 +19,6 @@ public partial class Player : CharacterBody3D
 	public float LerpSpeed = 10.0f;
 	[Export]
 	public float CrouchLerpSpeed = 10.0f;
-	[Export]
-	public Boat Boat;
-
-	// Signals for telling the boat to apply or stop applying a force given a seat
-	// back is false forward is true
-	[Signal]
-	public delegate void RowingEventHandler(Boat.SeatIndicies seat, bool stopStart, bool backForward);
 
 	// private variables
 	private float _currSpeed = 5.0f;
@@ -42,18 +35,26 @@ public partial class Player : CharacterBody3D
 
 	private float _crouchingDepth = -0.5f; // this is relative to the regular head 
 
+	// accumulated movement in the yaw and pitch in radians
+	private float _mouseMovementYaw = 0.0f;
+	private float _mouseMovementPitch = 0.0f;
+	private float _sittingYawDelta = 0.0f; // delta change specifically for sitting down
+
 	// to keep track of if they're choosing to sit or not
 	private bool _inSeatHitbox = false;
+
+	// BOAT
+	private Boat _boat = new Boat();
+
+	// seat collision objects
+	private CollisionShape3D _frontLeftSeatCollision;
+	private CollisionShape3D _frontRightSeatCollision;
+	private CollisionShape3D _backLeftSeatCollision;
+	private CollisionShape3D _backRightSeatCollision;
 
 	// need to know which seat they're sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
 	/*
-		(all of this is assuming you're facing the front)
-		front left: 4, 2, -2
-		front right: 4, 2, 2
-		back left: 0, 2, -2
-		back right: 0, 2, 2
-
 		front left localShapeIndex: 0
 		front right localShapeIndex: 1
 		back right localShapeIndex: 2
@@ -70,19 +71,70 @@ public partial class Player : CharacterBody3D
 	// different states for being in the menu and just playing the game
 	private enum GameState {
 		Playing,
-		Menu
+		Menu,
 	}
 	private GameState _currGameState = GameState.Menu; // default state is being in the menu
 	private PlayerState _currPlayerState = PlayerState.Standing; // default is walking
 
-	private CanvasLayer _pauseUI; 
+	private CanvasLayer _pauseUI;
 
+
+  public override void _EnterTree()
+  {
+    SetMultiplayerAuthority(int.Parse(Name.ToString()));
+  }
 	public override void _Ready()
 	{
 		_head = GetNode<Node3D>("Head"); // get the head node
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
+		// get the boat
+		_boat = GetParent().GetNode<Boat>("Boat");
+		// get the seat collision objects
+		_frontLeftSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/FrontLeftCollision");
+		_frontRightSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/FrontRightCollision");
+		_backLeftSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/BackLeftCollision");
+		_backRightSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/BackRightCollision");
+
+		// Get the camera reference
+    var camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
+
+		// add the player to the 'players' group
+		AddToGroup("players");
+
+    // MULTIPLAYER SETUP
+    if (IsMultiplayerAuthority())
+    {
+      // 1. If we ARE the player, enable our camera
+      if (camera != null)
+      {
+        camera.Current = true;
+      }
+
+      _pauseUI.Visible = _currGameState == GameState.Menu;
+      
+      if (_currGameState == GameState.Menu)
+      {
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+      }
+    }
+    else
+    {
+      // 1. If we are NOT the player, delete the UI.
+      _pauseUI.QueueFree();
+
+      // 2. CRITICAL FIX: Delete the Camera for other players!
+      // This prevents the "puppet" version of you from hijacking his screen.
+      if (camera != null)
+      {
+				camera.QueueFree(); 
+      }
+      
+      // 3. Disable processing for non-authority
+      SetProcess(false);
+      SetPhysicsProcess(true); 
+    }
 	}
 
 	// mouse input logic 
@@ -92,19 +144,11 @@ public partial class Player : CharacterBody3D
     if ((@event is InputEventMouseMotion mouseEvent) && _currGameState == GameState.Playing)
 		{
 			// the y rotation of the player in radians based off of the mouse sensitivity 
-			float yRotationChange = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
-			RotateY(yRotationChange);
+			_mouseMovementYaw = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
 
 			// the head rotation
-			float xRotationChange = -Mathf.DegToRad(mouseEvent.Relative.Y * MouseSens);
-
-			// add the rotation change per tick and then clamp the rotation
-			Vector3 newRotation = _head.Rotation;
-			newRotation.X += xRotationChange;
-			newRotation.X = Mathf.Clamp(newRotation.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
-
-			// set the head rotation
-			_head.Rotation = newRotation;
+			_mouseMovementPitch = -Mathf.DegToRad(mouseEvent.Relative.Y * MouseSens);
+			_mouseMovementPitch = Mathf.Clamp(_mouseMovementPitch, Mathf.DegToRad(-89), Mathf.DegToRad(89)); // clamp it to 90 degrees up and down
 		}
   }
 
@@ -118,7 +162,6 @@ public partial class Player : CharacterBody3D
 				_pauseUI.Visible = false;
 				break;
 			case GameState.Menu:
-				_HandleMenuState();
 				_pauseUI.Visible = true;
 				break;
 		}
@@ -148,12 +191,6 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	// handling ui state if they're in the menu
-	private void _HandleMenuState()
-	{
-		//Exit and resume logic has been moved to signal function at bottom
-	}
-
 	// logic for walking and everything depending on the player state
 	public override void _PhysicsProcess(double delta)
 	{
@@ -168,6 +205,10 @@ public partial class Player : CharacterBody3D
 			_CrouchSprintLogic(delta);
 			// apply gravity and movement logic
 			_MovementLogic(delta);
+		} 
+		else if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Rowing) // if they're sitting
+		{
+			_HandleRowingMovementLogic();
 		}
 
 		// only apply move and slide if they're not rowing
@@ -202,6 +243,9 @@ public partial class Player : CharacterBody3D
 		velocity.X = _direction.X * _currSpeed;
 		velocity.Z = _direction.Z * _currSpeed;
 		Velocity = velocity;
+
+		// use mouse input to rotate their head properly
+		_HandleStandingPlayerRotation();
 	}
 
 	private void _Gravity(double delta)
@@ -255,22 +299,21 @@ public partial class Player : CharacterBody3D
 	}
 
 	// input handling while they're in a rowing state
+	// NOTE: chaning their state and initating rowing needs to be rpc calls bc then the variable for this person's player instance will be synced between clients
+	// NOTE2: to send an rpc request ONLY to the server use the RpcId function and give it the id of 1
 	private void _HandleRowingState()
 	{	
 		// if they press the spacebar then release them
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
-			_currPlayerState = PlayerState.Standing;
+			// set and broadcast state change
+			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat); // set sitting to false (so now we're standing) and update their seat (the seat number doesn't matter here)
 
-			// reset their position to the middle of the boat and then make them a sibling of the boat again\
-			// Position is in PARENT space so setting it to 0,1,0 will set it to the middle of the boat 
-			Position = new Vector3(0, 1.0f, 0);
-			Node boatParent = Boat.GetParent();
-			Reparent(boatParent, true); // keep the global transform too ig
+			// reset their global rotation
 			GlobalRotation = Vector3.Zero;
 
 			// make them stop rowing if they were rowing
-			EmitSignal(SignalName.Rowing, (int)_seat, false, false); // second boolean doesn't matter because im just making them stop rowing
+			RpcId(1, MethodName.ServerRequestRowing, 0, false, false); // the first boolean is all that matters to make them stop rowing
 
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
@@ -280,23 +323,25 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionPressed("move_forward"))
 		{
 			// tell them to move forward
-			EmitSignal(SignalName.Rowing, (int)_seat, true, true); // have to send it as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
+			// have to send the seat as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, true, true);
 		} 
 		else if (Input.IsActionPressed("move_backward")) // don't want them to be able to do both at the same time so if they're pressing both they'll go forward
 		{
 			// tell them to move backward
-			EmitSignal(SignalName.Rowing, (int)_seat, true, false);
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, true, false);
 		}
 
 		// emit a signal when they're done rowing
 		// setting the direction doesn't matter in this case but i set them to be forward and backward anyways according to which direction we're canceling
 		if (Input.IsActionJustReleased("move_forward"))
 		{
-			EmitSignal(SignalName.Rowing, (int)_seat, false, true);
+			// the first boolean is all that matters to make them allowed to row or not, so just setting that to false stops them
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, false, true);
 		} 
 		else if (Input.IsActionJustReleased("move_backward"))
 		{
-			EmitSignal(SignalName.Rowing, (int)_seat, false, false);
+			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, false, false); 
 		}
 	}
 
@@ -307,13 +352,11 @@ public partial class Player : CharacterBody3D
 		{
 			_currPlayerState = PlayerState.Rowing;
 
-			// do the logic to make the player a child of the boat and move the player to the right position
-			// make them a child of the boat and just keep their transform so they don't loose their transformation until this point
-			Reparent(Boat, true);
+			// set and broadcast state change
+			Rpc(nameof(Broadcast_SetSitStandState), true, (int)_seat); // set sitting to true and update their seat
 
-			// reposition them in PARENT space (hence why we're using Position and not GlobalPosition)
-			Position = Boat.GetSeatOffset(_seat);
-			GlobalRotation = Boat.Rotation;
+			// set their rotation
+			GlobalRotation = _boat.Rotation;
 			// if they're on the right side they need to be rotated to be facing outwards when they sit down
 			if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
 			{
@@ -321,6 +364,70 @@ public partial class Player : CharacterBody3D
 				RotateY(Mathf.DegToRad(180));
 			}
 		}
+	}
+
+	// Function that has logic to move their head while rowing
+	private void _HandleRowingMovementLogic()
+	{
+		CollisionShape3D seatCollision = new CollisionShape3D();
+		// set their global transform to be that of the boat seat they're sitting on
+		if (_seat == Boat.SeatIndicies.FrontLeft)
+		{
+			seatCollision = _frontLeftSeatCollision;
+		} 
+		else if (_seat == Boat.SeatIndicies.FrontRight)
+		{
+			seatCollision = _frontRightSeatCollision;
+		}
+		else if (_seat == Boat.SeatIndicies.BackLeft)
+		{
+			seatCollision = _backLeftSeatCollision;
+		}
+		else if (_seat == Boat.SeatIndicies.BackRight)
+		{
+			seatCollision = _backRightSeatCollision;
+		}
+
+		// set the basis of the player to the basis of the seat
+		GlobalPosition = seatCollision.GlobalPosition; // i think this line makes it so that it has to run in the physics process funcion
+
+		// set the rotations according to mouse movement
+		_HandleSittingPlayerRotation(seatCollision);
+	}
+
+	private void _HandleStandingPlayerRotation()
+	{
+		// rotation logic based on mouse stuff 
+		RotateY(_mouseMovementYaw);
+
+		// set the head rotation
+		_head.RotateX(_mouseMovementPitch);
+		// clamp their head pitch
+		_head.Rotation = new Vector3(Mathf.Clamp(_head.Rotation.X, Mathf.DegToRad(-89), Mathf.DegToRad(89)), _head.Rotation.Y, _head.Rotation.Z);
+
+		// YOU ALWAYS HAVE TO RESET YAW AND PITCH MOVEMENT AFTER USING IT 
+		_mouseMovementPitch = 0.0f;
+		_mouseMovementYaw = 0.0f;
+	}
+
+	private void _HandleSittingPlayerRotation(CollisionShape3D seatCollision)
+	{
+		// directly setting the rotation of something is bad so instead we're taking the global basis, then just adding the rotation to that basis and then setting the basis
+		_sittingYawDelta += _mouseMovementYaw;
+		Basis seatGlobalBasis = seatCollision.GlobalBasis;
+		Basis swivelBasis = new Basis(Vector3.Up, _sittingYawDelta);
+		GlobalBasis = seatGlobalBasis * swivelBasis; // with matrix multiplication this works ig
+		
+		// regular head pitch rotation since the head is a child of the player
+		_head.RotateX(_mouseMovementPitch);
+		// clamp so they cant move their head all the way around
+		Vector3 headRot = _head.Rotation;
+    headRot.X = Mathf.Clamp(headRot.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
+    _head.Rotation = headRot;
+
+		// must reset these variables
+		_mouseMovementPitch = 0.0f;
+    _mouseMovementYaw = 0.0f;
 	}
 
 	// used to set the isInSeatHitbox value and the seat position
@@ -340,6 +447,7 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
+	
 	private void OnPauseUIExit()
 	{
 		// if they press exit button
@@ -347,5 +455,51 @@ public partial class Player : CharacterBody3D
 		{
 			GetTree().Quit();
 		}
+	}
+
+	// this basically needs to exist so that the variable for setting the state is synced between everyone for THIS player
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void Broadcast_SetSitStandState(bool isSitting, int seatIdx)
+	{
+		// set the rowing state
+		_currPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
+    _seat = (Boat.SeatIndicies)seatIdx;
+	
+		// disable/enable player collision while sitting
+		// _standingCollision.Disabled = isSitting;
+    // _crouchingCollision.Disabled = isSitting;
+	}
+
+	// need to make sending the signal a synced thing between everyone
+	// CallLocal CANNOT be true for this because then for clients (non-server players) their local version could get out of sync with the server
+	// HOWEVER, we need it to be so that the server-client person can send request to themselves.
+	// THIS MEANS: we need to use RpcId given an id of 1 **ANYTIME** we run this function, so that it's only ever sent to the server
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // we don't need CallLocal i think bc we're not trying to change the local version of our game we're chainging the server which will sync to our client
+	private void ServerRequestRowing(int seatIdx, bool stopStart, bool backForward)
+	{
+		// The Server hears this and emits the signal locally to the Boat
+		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, seatIdx, stopStart, backForward);
+	}
+
+	
+	public void Reset()
+	{
+		// Only the server should issue this command
+		if (Multiplayer.IsServer())
+		{
+			// Tell EVERYONE (including the server) to run the SyncReset function
+			Rpc(nameof(SyncReset));
+		}
+	}
+
+	// reset function that gets called by the level script
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] // only update the server so the CallLocal should be false i think
+	private void SyncReset()
+	{
+		// set the player into the standing state and reset their position and velocity
+		_currPlayerState = PlayerState.Standing;
+		Position = Vector3.Zero;
+		Rotation = Vector3.Zero;
+		Velocity = Vector3.Zero;
 	}
 }

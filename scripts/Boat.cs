@@ -22,6 +22,10 @@ public partial class Boat : RigidBody3D
     private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
     private bool[] _rowingStatesDirection = new bool[4]; // direction of rowing: backward = false | forward = true
 
+    // boat reset position and rotation
+	private Vector3 _boatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
+	private Vector3 _boatResetRotation = new Vector3(0.0f, Mathf.DegToRad(90), 0.0f);
+
     private CollisionShape3D _frontLeftCollision = new CollisionShape3D();
     private CollisionShape3D _frontRightCollision = new CollisionShape3D();
     private CollisionShape3D _backLeftCollision = new CollisionShape3D();
@@ -52,9 +56,12 @@ public partial class Boat : RigidBody3D
         _frontRightCollision = GetNode<CollisionShape3D>("SeatArea3D/FrontRightCollision");
         _backLeftCollision = GetNode<CollisionShape3D>("SeatArea3D/BackLeftCollision");
         _backRightCollision = GetNode<CollisionShape3D>("SeatArea3D/BackRightCollision");
+
+        // subscribe to the Rowing signal from the singleton script
+        GlobalSignalServer.Instance.Rowing += _OnPlayerRowing;
     }
 
-    public override void _PhysicsProcess(double delta)
+  public override void _PhysicsProcess(double delta)
     {
         foreach (Marker3D probe in _boatFloatProbesContainer.GetChildren().OfType<Marker3D>())
         {
@@ -197,10 +204,36 @@ public partial class Boat : RigidBody3D
     }
 
     // getting the signals to row forward or to stop
-    public void OnPlayerRowing(int seat, bool stopStart, bool backForward)
+    // the parameter types of this function MUST be identical to the Rowing signal from the singleton server/script
+    // needs to be an RPC call so the server knows to update the states
+    // CallLocal is false, because if it were true then the function would run on the peer and not the server, which is not what we want
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] 
+    private void _OnPlayerRowing(int seat, bool stopStart, bool backForward)
     {
         // set the rowing state to be true for whichever seat is being sat in
         _rowingStates[seat] = stopStart;
         _rowingStatesDirection[seat] = backForward;
     }
+
+    public void Reset()
+	{
+		// Only the server should issue this command
+		if (Multiplayer.IsServer())
+		{
+			// Tell EVERYONE (including the server) to run the SyncReset function
+			Rpc(nameof(SyncReset));
+		}
+	}
+
+	// reset function that gets called by the level script
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] // only update the server so the CallLocal should be false i think
+	private void SyncReset()
+	{
+		// set the player into the standing state and reset their position and velocity
+		_rowingStates = [false, false, false, false];
+		GlobalPosition = _boatResetPosition;
+		GlobalRotation = _boatResetRotation;
+		LinearVelocity = Vector3.Zero;
+        AngularVelocity = Vector3.Zero;
+	}
 }
