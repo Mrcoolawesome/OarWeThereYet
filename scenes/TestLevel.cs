@@ -4,10 +4,6 @@ using System;
 public partial class TestLevel : Node
 {
 
-	// boat reset position and rotation
-	private Vector3 _boatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
-	private Vector3 _boatResetRotation = new Vector3(0.0f, Mathf.DegToRad(90), 0.0f);
-
 	// boat object 
 	private Boat _boat = new Boat();
 
