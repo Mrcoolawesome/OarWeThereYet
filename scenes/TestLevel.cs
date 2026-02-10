@@ -9,7 +9,7 @@ public partial class TestLevel : Node
 	private Vector3 _boatResetRotation = new Vector3(0.0f, Mathf.DegToRad(90), 0.0f);
 
 	// boat object 
-	private RigidBody3D _boat = new RigidBody3D();
+	private Boat _boat = new Boat();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -18,7 +18,7 @@ public partial class TestLevel : Node
 		GlobalSignalServer.Instance.ResetLevel += _InitateReset; // might be a problem to directly call an Rpc function
 
 		// set the boat variable
-		_boat = GetNode<RigidBody3D>("Boat");
+		_boat = GetNode<Boat>("Boat");
 	}
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
@@ -45,18 +45,7 @@ public partial class TestLevel : Node
 		// extra check to make sure only the server can do this
 		if (!Multiplayer.IsServer()) return;
 
-		// actual reset logic 
-		_boat.GlobalPosition = _boatResetPosition;
-
-		_boat.Rotation = _boatResetRotation;
-
-		// reset the boat velocity
-		if (_boat is RigidBody3D rigidBoat)
-		{
-			// im pretty sure that rigidBoat is the same refrence as _boat
-			rigidBoat.LinearVelocity = Vector3.Zero;
-			rigidBoat.AngularVelocity = Vector3.Zero;
-		}
+		_boat.Reset();
 
 		// reset the players by calling the 'ResetToStart' function on all of them
 		GetTree().CallGroup("players", "Reset");

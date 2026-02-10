@@ -210,4 +210,26 @@ public partial class Boat : RigidBody3D
         _rowingStates[seat] = stopStart;
         _rowingStatesDirection[seat] = backForward;
     }
+
+    public void Reset()
+	{
+		// Only the server should issue this command
+		if (Multiplayer.IsServer())
+		{
+			// Tell EVERYONE (including the server) to run the SyncReset function
+			Rpc(nameof(SyncReset));
+		}
+	}
+
+	// reset function that gets called by the level script
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] // only update the server so the CallLocal should be false i think
+	private void SyncReset()
+	{
+		// set the player into the standing state and reset their position and velocity
+		_rowingStates = [false, false, false, false];
+		Position = Vector3.Zero;
+		Rotation = Vector3.Zero;
+		LinearVelocity = Vector3.Zero;
+        AngularVelocity = Vector3.Zero;
+	}
 }
