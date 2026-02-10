@@ -182,8 +182,6 @@ public partial class Player : CharacterBody3D
 		switch(_currPlayerState)
 		{
 			case PlayerState.Standing:
-				// handle input for choosing to sit
-				_HandleInSeatHitboxState();
 				break;
 			case PlayerState.Rowing:
 				_HandleRowingState();
@@ -346,23 +344,20 @@ public partial class Player : CharacterBody3D
 	}
 
 	// input handling while they're in the seat hitbox
-	private void _HandleInSeatHitboxState()
+	public void HandleInSeatHitboxState(int seat)
 	{
-		if (Input.IsActionPressed("action_key") && _inSeatHitbox)
+		_currPlayerState = PlayerState.Rowing;
+
+		// set and broadcast state change
+		Rpc(nameof(Broadcast_SetSitStandState), true, seat); // set sitting to true and update their seat
+
+		// set their rotation
+		GlobalRotation = _boat.Rotation;
+		// if they're on the right side they need to be rotated to be facing outwards when they sit down
+		if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
 		{
-			_currPlayerState = PlayerState.Rowing;
-
-			// set and broadcast state change
-			Rpc(nameof(Broadcast_SetSitStandState), true, (int)_seat); // set sitting to true and update their seat
-
-			// set their rotation
-			GlobalRotation = _boat.Rotation;
-			// if they're on the right side they need to be rotated to be facing outwards when they sit down
-			if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
-			{
-				// change the local rotation (rotation in parent space) on the y-axis to be 180
+			// change the local rotation (rotation in parent space) on the y-axis to be 180
 				RotateY(Mathf.DegToRad(180));
-			}
 		}
 	}
 

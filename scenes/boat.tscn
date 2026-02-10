@@ -108,6 +108,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, -1.6)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, 1.6)
 
 [node name="OarProbesContainer" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, 8.742277e-08, 0, 1, 0, -8.742277e-08, 0, -1, 0, 0, 0)
 
 [node name="OarBackRight" type="Marker3D" parent="OarProbesContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9999999, 0, 2.5)
@@ -138,6 +139,7 @@ shape = SubResource("ConcavePolygonShape3D_0063d")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1, -1.5)
 collision_layer = 2
 script = ExtResource("2_qyrje")
+seatIndex = 1
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontRightCollision"]
 mesh = SubResource("BoxMesh_0063d")
@@ -149,6 +151,7 @@ shape = SubResource("ConcavePolygonShape3D_0063d")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 1.4999998)
 collision_layer = 2
 script = ExtResource("2_qyrje")
+seatIndex = 3
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackLeftCollision"]
 mesh = SubResource("BoxMesh_0063d")
@@ -160,6 +163,7 @@ shape = SubResource("ConcavePolygonShape3D_0063d")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9999999, 1, -1.5000002)
 collision_layer = 2
 script = ExtResource("2_qyrje")
+seatIndex = 2
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackRightCollision"]
 mesh = SubResource("BoxMesh_0063d")
