@@ -104,8 +104,7 @@ func _remove_main_menu():
 	$MainMenu.queue_free()
 
 func _remove_player(id : int):
-	if !self.has_node(str(id)):
-		return
+	print("gaming")
 		
 	self.get_node(str(id)).queue_free()
 
