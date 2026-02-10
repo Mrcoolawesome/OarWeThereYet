@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=4 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=13 format=4 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scripts/Boat.cs" id="1_0063d"]
 [ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scripts/Seat.cs" id="2_qyrje"]
@@ -17,15 +17,11 @@ properties/3/path = NodePath(".:rotation")
 properties/3/spawn = true
 properties/3/replication_mode = 1
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_fsggc"]
-
 [sub_resource type="BoxMesh" id="BoxMesh_0063d"]
+size = Vector3(1, 0.25, 1)
 
-[sub_resource type="BoxMesh" id="BoxMesh_qyrje"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_lw6pk"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_evv4r"]
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_0063d"]
+data = PackedVector3Array(-0.5, 0.125, 0.5, 0.5, 0.125, 0.5, -0.5, -0.125, 0.5, 0.5, 0.125, 0.5, 0.5, -0.125, 0.5, -0.5, -0.125, 0.5, 0.5, 0.125, -0.5, -0.5, 0.125, -0.5, 0.5, -0.125, -0.5, -0.5, 0.125, -0.5, -0.5, -0.125, -0.5, 0.5, -0.125, -0.5, 0.5, 0.125, 0.5, 0.5, 0.125, -0.5, 0.5, -0.125, 0.5, 0.5, 0.125, -0.5, 0.5, -0.125, -0.5, 0.5, -0.125, 0.5, -0.5, 0.125, -0.5, -0.5, 0.125, 0.5, -0.5, -0.125, -0.5, -0.5, 0.125, 0.5, -0.5, -0.125, 0.5, -0.5, -0.125, -0.5, 0.5, 0.125, 0.5, -0.5, 0.125, 0.5, 0.5, 0.125, -0.5, -0.5, 0.125, 0.5, -0.5, 0.125, -0.5, 0.5, 0.125, -0.5, -0.5, -0.125, 0.5, 0.5, -0.125, 0.5, -0.5, -0.125, -0.5, 0.5, -0.125, 0.5, 0.5, -0.125, -0.5, -0.5, -0.125, -0.5)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xqws5"]
 resource_name = "Material"
@@ -111,39 +107,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, -1.6)
 [node name="Probe5" type="Marker3D" parent="BoatFloatProbesContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, 1.6)
 
-[node name="SeatArea3D" type="Area3D" parent="."]
-collision_layer = 2
-collision_mask = 4
-
-[node name="FrontLeftCollision" type="CollisionShape3D" parent="SeatArea3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, -1)
-shape = SubResource("BoxShape3D_fsggc")
-script = ExtResource("2_qyrje")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatArea3D/FrontLeftCollision"]
-mesh = SubResource("BoxMesh_0063d")
-
-[node name="FrontRightCollision" type="CollisionShape3D" parent="SeatArea3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 1)
-shape = SubResource("BoxShape3D_fsggc")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatArea3D/FrontRightCollision"]
-mesh = SubResource("BoxMesh_qyrje")
-
-[node name="BackRightCollision" type="CollisionShape3D" parent="SeatArea3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1, 1.0000001)
-shape = SubResource("BoxShape3D_fsggc")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatArea3D/BackRightCollision"]
-mesh = SubResource("BoxMesh_lw6pk")
-
-[node name="BackLeftCollision" type="CollisionShape3D" parent="SeatArea3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1, -0.99999994)
-shape = SubResource("BoxShape3D_fsggc")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatArea3D/BackLeftCollision"]
-mesh = SubResource("BoxMesh_evv4r")
-
 [node name="OarProbesContainer" type="Node3D" parent="."]
 
 [node name="OarBackRight" type="Marker3D" parent="OarProbesContainer"]
@@ -157,6 +120,52 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2.5)
 
 [node name="OarFrontLeft" type="Marker3D" parent="OarProbesContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2.5)
+
+[node name="SeatContainer" type="Node3D" parent="."]
+
+[node name="FrontLeftCollision" type="StaticBody3D" parent="SeatContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9999999, 1, 1.5)
+collision_layer = 2
+script = ExtResource("2_qyrje")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontLeftCollision"]
+mesh = SubResource("BoxMesh_0063d")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatContainer/FrontLeftCollision"]
+shape = SubResource("ConcavePolygonShape3D_0063d")
+
+[node name="FrontRightCollision" type="StaticBody3D" parent="SeatContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1, -1.5)
+collision_layer = 2
+script = ExtResource("2_qyrje")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontRightCollision"]
+mesh = SubResource("BoxMesh_0063d")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatContainer/FrontRightCollision"]
+shape = SubResource("ConcavePolygonShape3D_0063d")
+
+[node name="BackLeftCollision" type="StaticBody3D" parent="SeatContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 1.4999998)
+collision_layer = 2
+script = ExtResource("2_qyrje")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackLeftCollision"]
+mesh = SubResource("BoxMesh_0063d")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatContainer/BackLeftCollision"]
+shape = SubResource("ConcavePolygonShape3D_0063d")
+
+[node name="BackRightCollision" type="StaticBody3D" parent="SeatContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9999999, 1, -1.5000002)
+collision_layer = 2
+script = ExtResource("2_qyrje")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackRightCollision"]
+mesh = SubResource("BoxMesh_0063d")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatContainer/BackRightCollision"]
+shape = SubResource("ConcavePolygonShape3D_0063d")
 
 [node name="Raft" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
@@ -198,6 +207,3 @@ shape = SubResource("BoxShape3D_lw6pk")
 [node name="Wall4" type="CollisionShape3D" parent="."]
 transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, -3.4847202, 0.84999985, -0.067233324)
 shape = SubResource("BoxShape3D_evv4r")
-
-[connection signal="body_shape_entered" from="SeatArea3D" to="." method="SeatAreaBodyShapeEntered"]
-[connection signal="body_shape_exited" from="SeatArea3D" to="." method="SeatAreaBodyShapeExited"]
