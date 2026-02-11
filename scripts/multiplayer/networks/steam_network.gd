@@ -55,7 +55,7 @@ func _add_level():
 	if multiplayer.is_server():
 		# load the level
 		var test_level = load("res://scenes/test_level.tscn")
-		level_container.add_child(test_level)
+		level_container.add_child(test_level.instantiate())
 
 '''
 	this just prints their lobby id and then also sets the lobby metadata
