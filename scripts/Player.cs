@@ -488,7 +488,7 @@ public partial class Player : CharacterBody3D
 		if (Multiplayer.IsServer())
 		{
 			// Tell EVERYONE (including the server) to run the SyncReset function
-			RpcId(1, nameof(SyncReset));
+			Rpc(nameof(SyncReset));
 		}
 	}
 
