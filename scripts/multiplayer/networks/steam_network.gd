@@ -16,6 +16,9 @@ var test_level_scene = preload("res://scenes/test_level.tscn")
 @onready var main_root_scene = get_tree().current_scene
 @onready var level_container = get_tree().current_scene.get_node_or_null("Level")
 
+# we DO NEED THIS to make sure that only clients can join servers
+var is_client = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# initalize steam
@@ -48,6 +51,7 @@ func become_host():
 
 func join_as_client(lobby_id):
 	# connect the current instance's peer to the lobby given the lobbies id
+	is_client = true
 	Steam.joinLobby(lobby_id)
 
 func _add_level():
@@ -75,11 +79,9 @@ func _on_lobby_created(result: int, lobby_id):
 		Steam.setLobbyData(_hosted_lobby_id, "mode", LOBBY_MODE)
 
 func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
-	# the server owner shouldn't do this 
-	if multiplayer.is_server():
+	# if they 
+	if !is_client:
 		return
-
-	print("i was technically able to join")
 	
 	# get the lobby id
 	var host_id = Steam.getLobbyOwner(lobby_id)
@@ -96,6 +98,9 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _respons
 	
 	# if all goes well connect the peer to godot's internal multiplayer api
 	multiplayer.multiplayer_peer = multiplayer_peer
+
+	# reset this 
+	is_client = false
 
 func list_lobbies():
 	# filter the lobby by distance
