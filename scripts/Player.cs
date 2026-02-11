@@ -191,13 +191,15 @@ public partial class Player : CharacterBody3D
 		// Release player if they press space
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
-			//TODO: Make player jump out of seat so they don't get shoved off boat
+			//TODO: Make players head rotation consistent between sitting and rowing
 
 			// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
 			RpcId(1, MethodName.ServerRequestRowing, 0, false, false);
 
-			// reset their global rotation
+			// Reset their global rotation and position
 			GlobalRotation = Vector3.Zero;
+			StaticBody3D seatCollision = GetCurrentSeat();
+			GlobalPosition = seatCollision.GlobalPosition + new Vector3(0, 1, 0); 
 
 			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
 			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
@@ -336,26 +338,8 @@ public partial class Player : CharacterBody3D
 
 	private void RowingStatePhysicsProcess()
 	{
-		StaticBody3D seatCollision = new StaticBody3D();
-
 		// Set their global transform to be that of the boat seat they're sitting on
-		if (_seat == Boat.SeatIndicies.FrontLeft)
-		{
-			seatCollision = _frontLeftSeatCollision;
-		} 
-		else if (_seat == Boat.SeatIndicies.FrontRight)
-		{
-			seatCollision = _frontRightSeatCollision;
-		}
-		else if (_seat == Boat.SeatIndicies.BackLeft)
-		{
-			seatCollision = _backLeftSeatCollision;
-		}
-		else if (_seat == Boat.SeatIndicies.BackRight)
-		{
-			seatCollision = _backRightSeatCollision;
-		}
-
+		StaticBody3D seatCollision = GetCurrentSeat();
 		GlobalPosition = seatCollision.GlobalPosition;
 
 		// Handle mouse input while sitting
@@ -476,5 +460,31 @@ public partial class Player : CharacterBody3D
 		Position = Vector3.Zero;
 		Rotation = Vector3.Zero;
 		Velocity = Vector3.Zero;
+	}
+
+	// Helper functions
+	private StaticBody3D GetCurrentSeat()
+	{
+		if (_seat == Boat.SeatIndicies.FrontLeft)
+		{
+			return _frontLeftSeatCollision;
+		} 
+		else if (_seat == Boat.SeatIndicies.FrontRight)
+		{
+			return _frontRightSeatCollision;
+		}
+		else if (_seat == Boat.SeatIndicies.BackLeft)
+		{
+			return _backLeftSeatCollision;
+		}
+		else if (_seat == Boat.SeatIndicies.BackRight)
+		{
+			return _backRightSeatCollision;
+		}
+		else
+		{
+			GD.Print("Error: Failed to get seat");
+			return null;
+		}
 	}
 }
