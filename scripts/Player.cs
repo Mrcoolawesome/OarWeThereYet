@@ -4,7 +4,6 @@ using System.Net.Http;
 
 public partial class Player : CharacterBody3D
 {
-	//TODO: remove underscores from private methods
 	// Exported variables
 	[Export] public float JumpVelocity = 4.5f;
 	[Export] public float WalkingSpeed = 5.0f;
@@ -151,7 +150,7 @@ public partial class Player : CharacterBody3D
 		switch(_currGameState)
 		{
 			case GameState.Playing:
-				_PlayingStateProcess();
+				PlayingStateProcess();
 				_pauseUI.Visible = false;
 				break;
 			case GameState.Menu:
@@ -160,7 +159,7 @@ public partial class Player : CharacterBody3D
 		}
   }
 
-	private void _PlayingStateProcess()
+	private void PlayingStateProcess()
 	{
 		// Menu logic
 		// We use IsActionJustPressed because it's a trigger and not a continuous input event
@@ -176,7 +175,7 @@ public partial class Player : CharacterBody3D
 			case PlayerState.Standing:
 				break;
 			case PlayerState.Rowing:
-				_RowingStateProcess();
+				RowingStateProcess();
 				break;
 		}
 	}
@@ -187,19 +186,21 @@ public partial class Player : CharacterBody3D
 	this person's player instance will be synced between clients.
 	To send an rpc request ONLY to the server use the RpcId function and give it the id of 1
 	*/
-	private void _RowingStateProcess()
+	private void RowingStateProcess()
 	{	
 		// Release player if they press space
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
-			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
-			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
+			//TODO: Make player jump out of seat so they don't get shoved off boat
+
+			// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
+			RpcId(1, MethodName.ServerRequestRowing, 0, false, false);
 
 			// reset their global rotation
 			GlobalRotation = Vector3.Zero;
 
-			// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
-			RpcId(1, MethodName.ServerRequestRowing, 0, false, false);
+			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
+			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
 
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
@@ -235,16 +236,16 @@ public partial class Player : CharacterBody3D
 	public override void _PhysicsProcess(double delta)
 	{
 		// Always apply gravity 
-		_Gravity(delta);
+		Gravity(delta);
 
 		if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Standing)
 		{
-			_StandingStatePhysicsProcess(delta);
-			_CrouchSprintPhysicsProcess(delta);
+			StandingStatePhysicsProcess(delta);
+			CrouchSprintPhysicsProcess(delta);
 		} 
 		else if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Rowing)
 		{
-			_RowingStatePhysicsProcess();
+			RowingStatePhysicsProcess();
 		}
 
 		// Always apply MoveAndSlide unless they're rowing
@@ -254,7 +255,7 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	private void _Gravity(double delta)
+	private void Gravity(double delta)
 	{
 		Vector3 velocity = Velocity;
 
@@ -266,7 +267,7 @@ public partial class Player : CharacterBody3D
 		Velocity = velocity;
 	}
 
-	private void _StandingStatePhysicsProcess(double delta)
+	private void StandingStatePhysicsProcess(double delta)
 	{
 		Vector3 velocity = Velocity;
 
@@ -293,10 +294,10 @@ public partial class Player : CharacterBody3D
 		Velocity = velocity;
 
 		// Handle mouse input while standing
-		_StandingStatePlayerRotation();
+		StandingStatePlayerRotation();
 	}
 
-	private void _CrouchSprintPhysicsProcess(double delta)
+	private void CrouchSprintPhysicsProcess(double delta)
 	{
 		// They can only be crouching or sprinting not both hence the else if
 		// If they are pressing both then the speed will be set to crouching speed
@@ -333,7 +334,7 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	private void _RowingStatePhysicsProcess()
+	private void RowingStatePhysicsProcess()
 	{
 		StaticBody3D seatCollision = new StaticBody3D();
 
@@ -358,10 +359,10 @@ public partial class Player : CharacterBody3D
 		GlobalPosition = seatCollision.GlobalPosition;
 
 		// Handle mouse input while sitting
-		_RowingStatePlayerRotation(seatCollision);
+		RowingStatePlayerRotation(seatCollision);
 	}
 
-	private void _StandingStatePlayerRotation()
+	private void StandingStatePlayerRotation()
 	{
 		RotateY(_mouseMovementYaw);
 
@@ -374,7 +375,7 @@ public partial class Player : CharacterBody3D
 		_mouseMovementYaw = 0.0f;
 	}
 
-	private void _RowingStatePlayerRotation(StaticBody3D seatCollision)
+	private void RowingStatePlayerRotation(StaticBody3D seatCollision)
 	{
 		/* 
 		Directly setting the rotation is bad so we take the global basis,
