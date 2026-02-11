@@ -78,6 +78,8 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _respons
 	# the server owner shouldn't do this 
 	if multiplayer.is_server():
 		return
+
+	print("i was technically able to join")
 	
 	# get the lobby id
 	var host_id = Steam.getLobbyOwner(lobby_id)
