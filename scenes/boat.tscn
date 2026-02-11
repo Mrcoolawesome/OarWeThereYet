@@ -1,7 +1,8 @@
-[gd_scene load_steps=13 format=4 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=14 format=4 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scripts/Boat.cs" id="1_0063d"]
 [ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scripts/Seat.cs" id="2_qyrje"]
+[ext_resource type="PackedScene" uid="uid://danavscflb0ck" path="res://scenes/dry_box.tscn" id="3_lw6pk"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0063d"]
 properties/0/path = NodePath(".:linear_velocity")
@@ -211,3 +212,6 @@ shape = SubResource("BoxShape3D_lw6pk")
 [node name="Wall4" type="CollisionShape3D" parent="."]
 transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, -3.4847202, 0.84999985, -0.067233324)
 shape = SubResource("BoxShape3D_evv4r")
+
+[node name="DryBox" parent="." instance=ExtResource("3_lw6pk")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2.1000001, 0.6, 9.179392e-08)

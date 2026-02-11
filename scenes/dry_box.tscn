@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://danavscflb0ck"]
+
+[ext_resource type="Script" uid="uid://beshkpn7hsow" path="res://scripts/DryBox.cs" id="1_4amak"]
+[ext_resource type="PackedScene" uid="uid://cegj4xdw5ihm0" path="res://art/models/drybox.blend" id="1_ymuao"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ymuao"]
+size = Vector3(2, 1, 1)
+
+[node name="DryBox" type="StaticBody3D"]
+collision_layer = 2
+script = ExtResource("1_4amak")
+
+[node name="drybox" parent="." instance=ExtResource("1_ymuao")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_ymuao")
