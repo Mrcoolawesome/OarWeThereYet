@@ -388,16 +388,6 @@ public partial class Player : CharacterBody3D
 
 		// Broadcast sitting to true and update their seat
 		Rpc(nameof(Broadcast_SetSitStandState), true, seat);
-
-		//TODO: do we need to set rotation?
-		// Set their rotation
-		GlobalRotation = _boat.Rotation;
-		// if they're on the right side they need to be rotated to be facing outwards when they sit down
-		if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
-		{
-			// change the local rotation (rotation in parent space) on the y-axis to be 180
-				RotateY(Mathf.DegToRad(180));
-		}
 	}
 
 	//Signals recieved from Pause Menu UI
