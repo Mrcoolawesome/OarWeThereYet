@@ -39,7 +39,7 @@ func _build_active_network(active_network_scene):
 
 func become_host():
 	_set_active_network() # set the active network and 'build' it
-	active_network._become_host() # run the '_become_host()' function on the given network type
+	active_network.become_host() # run the '_become_host()' function on the given network type
 
 func join_as_client(lobby_id = 0):
 	_set_active_network() # set the active network and built it

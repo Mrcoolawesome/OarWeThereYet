@@ -5,6 +5,11 @@ const SERVER_IP = "127.0.0.1"
 
 var multiplayer_peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var player_scene = preload("res://scenes/player.tscn")
+var test_level_scene = preload("res://scenes/test_level.tscn")
+
+# this gets the main scene and then get's the node named 'Level' under that main scene
+@onready var main_root_scene = get_tree().current_scene
+@onready var level_container = get_tree().current_scene.get_node_or_null("Level")
 
 # become host for ENet server
 func become_host():
@@ -16,6 +21,9 @@ func become_host():
 	multiplayer.peer_connected.connect(_add_player_to_game)
 	multiplayer.peer_disconnected.connect(_remove_player)
 
+	# add the level first
+	_add_level()
+
 	# add the server host's player and set its id to 1
 	_add_player_to_game(1)
 
@@ -25,10 +33,15 @@ func join_as_client(lobby_id):
 	multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
 
+func _add_level():
+	# only add the level if the current instance is the server
+	if multiplayer.is_server():
+		# load the level
+		var test_level = test_level_scene.instantiate()
+		level_container.add_child(test_level)
+
 func _add_player_to_game(id: int):
-	# this is where we have to add them properly to the level
-	var level_container = get_node_or_null("Level")
-	
+	# this is where we have to add them properly to the level	
 	# the Level container should always be there, just need to check if it has a level actually loaded (as a child) in it
 	if level_container.get_child_count() > 0:
 			# Get the actual map node (the first child of the Level container)
