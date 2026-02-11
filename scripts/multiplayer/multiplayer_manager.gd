@@ -11,10 +11,10 @@ We just have two multiplayer scenes - Steam and Enet which is the built-in godot
 enum MULTIPLAYER_NETWORK_TYPE {ENET, STEAM}
 
 # default network type is the built-in one
-var active_network_type: MULTIPLAYER_NETWORK_TYPE = MULTIPLAYER_NETWORK_TYPE.ENET;
+var active_network_type: MULTIPLAYER_NETWORK_TYPE = MULTIPLAYER_NETWORK_TYPE.STEAM;
 # we have to make these scenes not scripts so that we can interact with them properly or something ig
 var enet_network_scene := preload("res://scenes/multiplayer/networks/enet_network.tscn")
-var steam_network_scene := preload("res://scenes/multiplayer/networks/enet_network.tscn")
+var steam_network_scene := preload("res://scenes/multiplayer/networks/steam_network.tscn")
 
 # the network we're using
 var active_network
