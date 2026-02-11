@@ -137,13 +137,14 @@ public partial class Player : CharacterBody3D
 		}
   }
 
+  //PROCESS CODE AND ALL ASSOCIATED FUNCTIONS
   public override void _Process(double delta)
   {
     // logic for escaping into the menu and then either quitting the game or going back into the game
 		switch(_currGameState)
 		{
 			case GameState.Playing:
-				_HandleGamingState();
+				_PlayingStateProcess();
 				_pauseUI.Visible = false;
 				break;
 			case GameState.Menu:
@@ -153,10 +154,11 @@ public partial class Player : CharacterBody3D
   }
 
 	// handling ui state if they're just playing the game
-	private void _HandleGamingState()
+	private void _PlayingStateProcess()
 	{
 		// menu logic
-		if (Input.IsActionJustPressed("ui_cancel")) // we use IsActionJustPressed because it's a trigger and not a continuous input event like IsActionPressed is
+		// we use IsActionJustPressed because it's a trigger and not a continuous input event
+		if (Input.IsActionJustPressed("ui_cancel")) 
 		{
 			_currGameState = GameState.Menu;
 			// release the mouse
@@ -169,122 +171,15 @@ public partial class Player : CharacterBody3D
 			case PlayerState.Standing:
 				break;
 			case PlayerState.Rowing:
-				_HandleRowingState();
+				_RowingStateProcess();
 				break;
-		}
-	}
-
-	// logic for walking and everything depending on the player state
-	public override void _PhysicsProcess(double delta)
-	{
-
-		// always apply gravity 
-		_Gravity(delta);
-
-		// disable movement if they're not in the walking state, and wait for input to allow them to 'escape'
-		if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Standing)
-		{
-			// apply crouching and sprinting logic
-			_CrouchSprintLogic(delta);
-			// apply gravity and movement logic
-			_MovementLogic(delta);
-		} 
-		else if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Rowing) // if they're sitting
-		{
-			_HandleRowingMovementLogic();
-		}
-
-		// only apply move and slide if they're not rowing
-		if (_currPlayerState != PlayerState.Rowing)
-		{
-			MoveAndSlide();
-		}
-	}
-
-	private void _MovementLogic(double delta)
-	{
-		Vector3 velocity = Velocity;
-
-		// Handle Jump.
-		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
-		{
-			velocity.Y = JumpVelocity;
-		}
-
-		// Get the input direction and handle the movement/deceleration.
-		// As good practice, you should replace UI actions with custom gameplay actions.
-		Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
-		Vector3 targetDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
-		// move towards zero vector if we're not trying to move anywhere
-		if (inputDir == Vector2.Zero)
-		{
-			targetDirection = Vector3.Zero;
-		}
-
-		// set the direction and move in that direction
-		_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
-		velocity.X = _direction.X * _currSpeed;
-		velocity.Z = _direction.Z * _currSpeed;
-		Velocity = velocity;
-
-		// use mouse input to rotate their head properly
-		_HandleStandingPlayerRotation();
-	}
-
-	private void _Gravity(double delta)
-	{
-		Vector3 velocity = Velocity;
-
-		// Add the gravity.
-		if (!IsOnFloor())
-		{
-			velocity += GetGravity() * (float)delta;
-		}
-
-		Velocity = velocity;
-	}
-
-	private void _CrouchSprintLogic(double delta)
-	{
-		// they can only be crouching or sprinting not both hence the else if
-		// if they are pressing both then the speed will be set to crouching speed just bc it's at the beginning of the if else statements
-		if (Input.IsActionPressed("crouch"))
-		{
-			_currSpeed = CrouchingSpeed;
-
-			// set the head height to be offset by the crouching depth
-			Vector3 targetHeadPosition = new Vector3(_head.Position.X, _crouchingDepth, _head.Position.Z);
-			_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
-
-			// disable the staning collision shape
-			_standingCollision.Disabled = true;
-			_crouchingCollision.Disabled = false;
-		} 
-		else
-		{
-			// set head position to be default in all other scenarios other than crouching
-			Vector3 targetHeadPosition = new Vector3(_head.Position.X, 0.0f, _head.Position.Z);
-			_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
-
-			// enable the standing collision shape
-			_standingCollision.Disabled = false;
-			_crouchingCollision.Disabled = true;
-
-			if (Input.IsActionPressed("sprint"))
-			{
-				_currSpeed = SprintSpeed;
-			}
-			else
-			{
-				_currSpeed = WalkingSpeed;
-			}
 		}
 	}
 
 	// input handling while they're in a rowing state
 	// NOTE: chaning their state and initating rowing needs to be rpc calls bc then the variable for this person's player instance will be synced between clients
 	// NOTE2: to send an rpc request ONLY to the server use the RpcId function and give it the id of 1
-	private void _HandleRowingState()
+	private void _RowingStateProcess()
 	{	
 		// if they press the spacebar then release them
 		if (Input.IsActionJustPressed("ui_accept"))
@@ -328,26 +223,116 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	// input handling while they're in the seat hitbox
-	public void HandleInSeatHitboxState(int seat)
+  //PHYSICS PROCESS CODE AND ALL ASSOCIATED FUNCTIONS
+	// logic for walking and everything depending on the player state
+	public override void _PhysicsProcess(double delta)
 	{
-		_currPlayerState = PlayerState.Rowing;
 
-		// set and broadcast state change
-		Rpc(nameof(Broadcast_SetSitStandState), true, seat); // set sitting to true and update their seat
+		// always apply gravity 
+		_Gravity(delta);
 
-		// set their rotation
-		GlobalRotation = _boat.Rotation;
-		// if they're on the right side they need to be rotated to be facing outwards when they sit down
-		if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
+		// disable movement if they're not in the walking state, and wait for input to allow them to 'escape'
+		if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Standing)
 		{
-			// change the local rotation (rotation in parent space) on the y-axis to be 180
-				RotateY(Mathf.DegToRad(180));
+			// apply movement logic
+			_StandingStatePhysicsProcess(delta);
+			// apply crouching and sprinting logic
+			_CrouchSprintPhysicsProcess(delta);
+		} 
+		else if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Rowing) // if they're sitting
+		{
+			_RowingStatePhysicsProcess();
+		}
+
+		// only apply move and slide if they're not rowing
+		if (_currPlayerState != PlayerState.Rowing)
+		{
+			MoveAndSlide();
+		}
+	}
+
+	private void _Gravity(double delta)
+	{
+		Vector3 velocity = Velocity;
+
+		// Add the gravity.
+		if (!IsOnFloor())
+		{
+			velocity += GetGravity() * (float)delta;
+		}
+
+		Velocity = velocity;
+	}
+
+	private void _StandingStatePhysicsProcess(double delta)
+	{
+		Vector3 velocity = Velocity;
+
+		// Handle Jump.
+		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
+		{
+			velocity.Y = JumpVelocity;
+		}
+
+		// Get the input direction and handle the movement/deceleration.
+		// As good practice, you should replace UI actions with custom gameplay actions.
+		Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
+		Vector3 targetDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+		// move towards zero vector if we're not trying to move anywhere
+		if (inputDir == Vector2.Zero)
+		{
+			targetDirection = Vector3.Zero;
+		}
+
+		// set the direction and move in that direction
+		_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
+		velocity.X = _direction.X * _currSpeed;
+		velocity.Z = _direction.Z * _currSpeed;
+		Velocity = velocity;
+
+		// use mouse input to rotate their head properly
+		_StandingStatePlayerRotation();
+	}
+
+	private void _CrouchSprintPhysicsProcess(double delta)
+	{
+		// they can only be crouching or sprinting not both hence the else if
+		// if they are pressing both then the speed will be set to crouching speed just bc it's at the beginning of the if else statements
+		if (Input.IsActionPressed("crouch"))
+		{
+			_currSpeed = CrouchingSpeed;
+
+			// set the head height to be offset by the crouching depth
+			Vector3 targetHeadPosition = new Vector3(_head.Position.X, _crouchingDepth, _head.Position.Z);
+			_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
+
+			// disable the staning collision shape
+			_standingCollision.Disabled = true;
+			_crouchingCollision.Disabled = false;
+		} 
+		else
+		{
+			// set head position to be default in all other scenarios other than crouching
+			Vector3 targetHeadPosition = new Vector3(_head.Position.X, 0.0f, _head.Position.Z);
+			_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
+
+			// enable the standing collision shape
+			_standingCollision.Disabled = false;
+			_crouchingCollision.Disabled = true;
+
+			if (Input.IsActionPressed("sprint"))
+			{
+				_currSpeed = SprintSpeed;
+			}
+			else
+			{
+				_currSpeed = WalkingSpeed;
+			}
 		}
 	}
 
 	// Function that has logic to move their head while rowing
-	private void _HandleRowingMovementLogic()
+	private void _RowingStatePhysicsProcess()
 	{
 		StaticBody3D seatCollision = new StaticBody3D();
 		// set their global transform to be that of the boat seat they're sitting on
@@ -372,10 +357,10 @@ public partial class Player : CharacterBody3D
 		GlobalPosition = seatCollision.GlobalPosition; // i think this line makes it so that it has to run in the physics process funcion
 
 		// set the rotations according to mouse movement
-		_HandleSittingPlayerRotation(seatCollision);
+		_SittingStatePlayerRotation(seatCollision);
 	}
 
-	private void _HandleStandingPlayerRotation()
+	private void _StandingStatePlayerRotation()
 	{
 		// rotation logic based on mouse stuff 
 		RotateY(_mouseMovementYaw);
@@ -390,7 +375,7 @@ public partial class Player : CharacterBody3D
 		_mouseMovementYaw = 0.0f;
 	}
 
-	private void _HandleSittingPlayerRotation(StaticBody3D seatCollision)
+	private void _SittingStatePlayerRotation(StaticBody3D seatCollision)
 	{
 		// directly setting the rotation of something is bad so instead we're taking the global basis, then just adding the rotation to that basis and then setting the basis
 		_sittingYawDelta += _mouseMovementYaw;
@@ -410,6 +395,24 @@ public partial class Player : CharacterBody3D
     _mouseMovementYaw = 0.0f;
 	}
 
+	public void SitInSeat(int seat)
+	{
+		_currPlayerState = PlayerState.Rowing;
+
+		// set and broadcast state change
+		Rpc(nameof(Broadcast_SetSitStandState), true, seat); // set sitting to true and update their seat
+
+		// set their rotation
+		GlobalRotation = _boat.Rotation;
+		// if they're on the right side they need to be rotated to be facing outwards when they sit down
+		if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
+		{
+			// change the local rotation (rotation in parent space) on the y-axis to be 180
+				RotateY(Mathf.DegToRad(180));
+		}
+	}
+
+	//Signals recieved from Pause Menu UI
 	private void OnPauseUIResume()
 	{
 		// if they press resume button
@@ -420,7 +423,6 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
-	
 	private void OnPauseUIExit()
 	{
 		// if they press exit button
@@ -430,6 +432,7 @@ public partial class Player : CharacterBody3D
 		}
 	}
 
+	//RPC Functions
 	// this basically needs to exist so that the variable for setting the state is synced between everyone for THIS player
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void Broadcast_SetSitStandState(bool isSitting, int seatIdx)
