@@ -26,10 +26,6 @@ public partial class Boat : RigidBody3D
 	private Vector3 _boatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
 	private Vector3 _boatResetRotation = new Vector3(0.0f, Mathf.DegToRad(90), 0.0f);
 
-    private CollisionShape3D _frontLeftCollision = new CollisionShape3D();
-    private CollisionShape3D _frontRightCollision = new CollisionShape3D();
-    private CollisionShape3D _backLeftCollision = new CollisionShape3D();
-    private CollisionShape3D _backRightCollision = new CollisionShape3D();
 
     /*
         front left localShapeIndex: 0
@@ -50,12 +46,6 @@ public partial class Boat : RigidBody3D
         _boatFloatProbesContainer = GetNode<Node3D>("BoatFloatProbesContainer");
         _oarProbesContainer = GetNode<Node3D>("OarProbesContainer");
         _gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
-
-        // getting the collisions for the area3d for the seat detections
-        _frontLeftCollision = GetNode<CollisionShape3D>("SeatArea3D/FrontLeftCollision");
-        _frontRightCollision = GetNode<CollisionShape3D>("SeatArea3D/FrontRightCollision");
-        _backLeftCollision = GetNode<CollisionShape3D>("SeatArea3D/BackLeftCollision");
-        _backRightCollision = GetNode<CollisionShape3D>("SeatArea3D/BackRightCollision");
 
         // subscribe to the Rowing signal from the singleton script
         GlobalSignalServer.Instance.Rowing += _OnPlayerRowing;
@@ -169,39 +159,6 @@ public partial class Boat : RigidBody3D
         back right localShapeIndex: 2
         back left localShapeIndex: 3
     */
-
-    // Trigger player logic for player entering a chair
-    public void SeatAreaBodyShapeEntered(Rid bodyRid, Node3D body, int bodyShapeIndex, int localShapeIndex)
-	{
-		if (body is Player player)
-		{
-            SeatIndicies seat = (SeatIndicies)localShapeIndex;
-            // tell the player to run code to look for the e key and set their relative position and reparent themselves
-            player.SetRowingState(true, seat);
-		}
-	}
-
-    // Trigger player logic for player leaving a chair
-    public void SeatAreaBodyShapeExited(Rid bodyRid, Node3D body, int bodyShapeIndex, int localShapeIndex)
-	{
-		if (body is Player player)
-		{
-            player.SetRowingState(true, SeatIndicies.FrontLeft); // set default of FrontLeft ig
-		}
-	}
-
-    // helper function to get the relative positions of each of the seats
-    public Vector3 GetSeatOffset(SeatIndicies seat)
-{
-        return seat switch
-        {
-            SeatIndicies.FrontLeft  => _frontLeftCollision.Position,
-            SeatIndicies.FrontRight => _frontRightCollision.Position,
-            SeatIndicies.BackLeft   => _backLeftCollision.Position,
-            SeatIndicies.BackRight  => _backRightCollision.Position,
-            _ => Vector3.Zero // Default fallback
-        };
-    }
 
     // getting the signals to row forward or to stop
     // the parameter types of this function MUST be identical to the Rowing signal from the singleton server/script

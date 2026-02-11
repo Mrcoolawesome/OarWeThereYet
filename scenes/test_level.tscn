@@ -14,7 +14,7 @@ size = Vector3(10, 1, 10)
 [sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
 size = Vector3(10, 1, 10)
 
-[sub_resource type="Resource" id="Resource_ahbqi"]
+[sub_resource type="Resource" id="Resource_88ety"]
 script = ExtResource("3_88ety")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
@@ -42,7 +42,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_7gix3"]
+[sub_resource type="Curve3D" id="Curve3D_ahbqi"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -72,9 +72,9 @@ shape = SubResource("BoxShape3D_0xm2m")
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, -5)
 script = ExtResource("1_tmr53")
-ShaderSettings = SubResource("Resource_ahbqi")
+ShaderSettings = SubResource("Resource_88ety")
 PointWidths = Array[float]([4.974709, 8.311261, 9.504496, 8.743373, 8.375943, 8.936057])
-Curve = SubResource("Curve3D_7gix3")
+Curve = SubResource("Curve3D_ahbqi")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]

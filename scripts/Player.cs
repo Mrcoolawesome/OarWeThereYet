@@ -47,10 +47,10 @@ public partial class Player : CharacterBody3D
 	private Boat _boat = new Boat();
 
 	// seat collision objects
-	private CollisionShape3D _frontLeftSeatCollision;
-	private CollisionShape3D _frontRightSeatCollision;
-	private CollisionShape3D _backLeftSeatCollision;
-	private CollisionShape3D _backRightSeatCollision;
+	private StaticBody3D _frontLeftSeatCollision;
+	private StaticBody3D _frontRightSeatCollision;
+	private StaticBody3D _backLeftSeatCollision;
+	private StaticBody3D _backRightSeatCollision;
 
 	// need to know which seat they're sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
@@ -92,10 +92,10 @@ public partial class Player : CharacterBody3D
 		// get the boat
 		_boat = GetParent().GetNode<Boat>("Boat");
 		// get the seat collision objects
-		_frontLeftSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/FrontLeftCollision");
-		_frontRightSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/FrontRightCollision");
-		_backLeftSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/BackLeftCollision");
-		_backRightSeatCollision = _boat.GetNode<CollisionShape3D>("SeatArea3D/BackRightCollision");
+		_frontLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontLeftCollision");
+		_frontRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontRightCollision");
+		_backLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackLeftCollision");
+		_backRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackRightCollision");
 
 		// Get the camera reference
     var camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
@@ -182,8 +182,6 @@ public partial class Player : CharacterBody3D
 		switch(_currPlayerState)
 		{
 			case PlayerState.Standing:
-				// handle input for choosing to sit
-				_HandleInSeatHitboxState();
 				break;
 			case PlayerState.Rowing:
 				_HandleRowingState();
@@ -346,30 +344,27 @@ public partial class Player : CharacterBody3D
 	}
 
 	// input handling while they're in the seat hitbox
-	private void _HandleInSeatHitboxState()
+	public void HandleInSeatHitboxState(int seat)
 	{
-		if (Input.IsActionPressed("action_key") && _inSeatHitbox)
+		_currPlayerState = PlayerState.Rowing;
+
+		// set and broadcast state change
+		Rpc(nameof(Broadcast_SetSitStandState), true, seat); // set sitting to true and update their seat
+
+		// set their rotation
+		GlobalRotation = _boat.Rotation;
+		// if they're on the right side they need to be rotated to be facing outwards when they sit down
+		if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
 		{
-			_currPlayerState = PlayerState.Rowing;
-
-			// set and broadcast state change
-			Rpc(nameof(Broadcast_SetSitStandState), true, (int)_seat); // set sitting to true and update their seat
-
-			// set their rotation
-			GlobalRotation = _boat.Rotation;
-			// if they're on the right side they need to be rotated to be facing outwards when they sit down
-			if (_seat == Boat.SeatIndicies.BackRight || _seat == Boat.SeatIndicies.FrontRight)
-			{
-				// change the local rotation (rotation in parent space) on the y-axis to be 180
+			// change the local rotation (rotation in parent space) on the y-axis to be 180
 				RotateY(Mathf.DegToRad(180));
-			}
 		}
 	}
 
 	// Function that has logic to move their head while rowing
 	private void _HandleRowingMovementLogic()
 	{
-		CollisionShape3D seatCollision = new CollisionShape3D();
+		StaticBody3D seatCollision = new StaticBody3D();
 		// set their global transform to be that of the boat seat they're sitting on
 		if (_seat == Boat.SeatIndicies.FrontLeft)
 		{
@@ -410,7 +405,7 @@ public partial class Player : CharacterBody3D
 		_mouseMovementYaw = 0.0f;
 	}
 
-	private void _HandleSittingPlayerRotation(CollisionShape3D seatCollision)
+	private void _HandleSittingPlayerRotation(StaticBody3D seatCollision)
 	{
 		// directly setting the rotation of something is bad so instead we're taking the global basis, then just adding the rotation to that basis and then setting the basis
 		_sittingYawDelta += _mouseMovementYaw;
