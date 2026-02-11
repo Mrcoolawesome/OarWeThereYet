@@ -5,34 +5,21 @@ using System.Net.Http;
 public partial class Player : CharacterBody3D
 {
 	// exported variables
-	[Export]
-	public float JumpVelocity = 4.5f;
-	[Export]
-	public float WalkingSpeed = 5.0f;
-	[Export]
-	public float SprintSpeed = 8.0f;
-	[Export]
-	public float CrouchingSpeed = 3.0f;
-	[Export]
-	public float MouseSens = 0.4f;
-	[Export]
-	public float LerpSpeed = 10.0f;
-	[Export]
-	public float CrouchLerpSpeed = 10.0f;
+	[Export] public float JumpVelocity = 4.5f;
+	[Export] public float WalkingSpeed = 5.0f;
+	[Export] public float SprintSpeed = 8.0f;
+	[Export] public float CrouchingSpeed = 3.0f;
+	[Export] public float MouseSens = 0.4f;
+	[Export] public float LerpSpeed = 10.0f;
+	[Export] public float CrouchLerpSpeed = 10.0f;
 
 	// private variables
 	private float _currSpeed = 5.0f;
-
 	private float _gravity = 9.8f;
-
 	private Vector3 _direction = Vector3.Zero;
-
 	private Node3D _head;
-
 	private CollisionShape3D _crouchingCollision;
-
 	private CollisionShape3D _standingCollision;
-
 	private float _crouchingDepth = -0.5f; // this is relative to the regular head 
 
 	// accumulated movement in the yaw and pitch in radians
@@ -40,11 +27,11 @@ public partial class Player : CharacterBody3D
 	private float _mouseMovementPitch = 0.0f;
 	private float _sittingYawDelta = 0.0f; // delta change specifically for sitting down
 
-	// to keep track of if they're choosing to sit or not
-	private bool _inSeatHitbox = false;
-
 	// BOAT
 	private Boat _boat = new Boat();
+
+	//Pause Menu
+	private CanvasLayer _pauseUI;
 
 	// seat collision objects
 	private StaticBody3D _frontLeftSeatCollision;
@@ -76,13 +63,11 @@ public partial class Player : CharacterBody3D
 	private GameState _currGameState = GameState.Menu; // default state is being in the menu
 	private PlayerState _currPlayerState = PlayerState.Standing; // default is walking
 
-	private CanvasLayer _pauseUI;
+	public override void _EnterTree()
+	{
+		SetMultiplayerAuthority(int.Parse(Name.ToString()));
+	}
 
-
-  public override void _EnterTree()
-  {
-    SetMultiplayerAuthority(int.Parse(Name.ToString()));
-  }
 	public override void _Ready()
 	{
 		_head = GetNode<Node3D>("Head"); // get the head node
@@ -98,49 +83,49 @@ public partial class Player : CharacterBody3D
 		_backRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackRightCollision");
 
 		// Get the camera reference
-    var camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
+		var camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
 
 		// add the player to the 'players' group
 		AddToGroup("players");
 
-    // MULTIPLAYER SETUP
-    if (IsMultiplayerAuthority())
-    {
-      // 1. If we ARE the player, enable our camera
-      if (camera != null)
-      {
-        camera.Current = true;
-      }
+		// MULTIPLAYER SETUP
+		if (IsMultiplayerAuthority())
+		{
+			// 1. If we ARE the player, enable our camera
+			if (camera != null)
+			{
+				camera.Current = true;
+			}
 
-      _pauseUI.Visible = _currGameState == GameState.Menu;
-      
-      if (_currGameState == GameState.Menu)
-      {
-        Input.MouseMode = Input.MouseModeEnum.Visible;
-      }
-    }
-    else
-    {
-      // 1. If we are NOT the player, delete the UI.
-      _pauseUI.QueueFree();
+			_pauseUI.Visible = _currGameState == GameState.Menu;
+			
+			if (_currGameState == GameState.Menu)
+			{
+				Input.MouseMode = Input.MouseModeEnum.Visible;
+			}
+		}
+		else
+		{
+			// 1. If we are NOT the player, delete the UI.
+			_pauseUI.QueueFree();
 
-      // 2. CRITICAL FIX: Delete the Camera for other players!
-      // This prevents the "puppet" version of you from hijacking his screen.
-      if (camera != null)
-      {
+			// 2. CRITICAL FIX: Delete the Camera for other players!
+			// This prevents the "puppet" version of you from hijacking his screen.
+			if (camera != null)
+			{
 				camera.QueueFree(); 
-      }
-      
-      // 3. Disable processing for non-authority
-      SetProcess(false);
-      SetPhysicsProcess(true); 
-    }
+			}
+			
+			// 3. Disable processing for non-authority
+			SetProcess(false);
+			SetPhysicsProcess(true); 
+		}
 	}
 
 	// mouse input logic 
   public override void _Input(InputEvent @event)
   {
-		// this is always done so that they can move their head, might wanna change it so that their head is always level
+	// this is always done so that they can move their head, might wanna change it so that their head is always level
     if ((@event is InputEventMouseMotion mouseEvent) && _currGameState == GameState.Playing)
 		{
 			// the y rotation of the player in radians based off of the mouse sensitivity 
@@ -425,13 +410,6 @@ public partial class Player : CharacterBody3D
     _mouseMovementYaw = 0.0f;
 	}
 
-	// used to set the isInSeatHitbox value and the seat position
-	public void SetRowingState(bool isInSeatHitbox, Boat.SeatIndicies newSeat)
-	{
-		_inSeatHitbox = isInSeatHitbox;
-		_seat = newSeat;
-	}
-
 	private void OnPauseUIResume()
 	{
 		// if they press resume button
@@ -458,7 +436,7 @@ public partial class Player : CharacterBody3D
 	{
 		// set the rowing state
 		_currPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
-    _seat = (Boat.SeatIndicies)seatIdx;
+		_seat = (Boat.SeatIndicies)seatIdx;
 	
 		// disable/enable player collision while sitting
 		// _standingCollision.Disabled = isSitting;
