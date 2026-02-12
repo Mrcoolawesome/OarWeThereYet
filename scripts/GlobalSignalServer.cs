@@ -30,6 +30,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void UpdateBoatHealthEventHandler(int newHealth);
 
+  // signal for saying the boat died
+  [Signal]
+  public delegate void BoatDeathEventHandler();
+
   public int Health { get; set; }
 
   public override void _Ready()

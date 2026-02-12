@@ -64,6 +64,9 @@ public partial class Boat : RigidBody3D
         // listen to the health changed signal sent from the health component
         // AnnounceHealthUpdate will send a signal to the server that updates the ui to show the new health
         _healthComponent.HealthChanged += AnnounceHealthUpdate;
+
+        // announce if the boat died
+        _healthComponent.Die += AnnounceDeath;
     }
 
   public override void _PhysicsProcess(double delta)
@@ -225,5 +228,13 @@ public partial class Boat : RigidBody3D
     {
         // announce this update to the signal server to update the ui
         GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.UpdateBoatHealth), newHealth);
+    }
+
+    // announces to the signal server that the boat died so the ui can update
+    // this is triggered by a signal sent from the health component that's connected in the _Ready function of this code
+    public void AnnounceDeath()
+    {
+        // announce the death to the global signal server
+        GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.BoatDeath));
     }
 }
