@@ -222,9 +222,15 @@ public partial class Boat : RigidBody3D
     }
 
     // Emitted when the health changes. triggered by the health component's signal
-    // TODO: this should prolly be an rpc call so the health updates for everyone
     // this is just to update the ui, the health component already updates everyone's local health variables automatically
     public void AnnounceHealthUpdate(int newHealth)
+    {
+        SyncHealthUpdate(newHealth);
+    }
+
+    // make the signal get sent on all clients
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    private void SyncHealthUpdate(int newHealth)
     {
         // announce this update to the signal server to update the ui
         GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.UpdateBoatHealth), newHealth);
@@ -234,7 +240,14 @@ public partial class Boat : RigidBody3D
     // this is triggered by a signal sent from the health component that's connected in the _Ready function of this code
     public void AnnounceDeath()
     {
+        SyncAnnounceDeath();
+    }
+
+    // sync the death announcement across clients
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    private void SyncAnnounceDeath()
+    {
         // announce the death to the global signal server
         GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.BoatDeath));
-    }
+    } 
 }
