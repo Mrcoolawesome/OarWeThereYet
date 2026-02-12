@@ -191,15 +191,11 @@ public partial class Player : CharacterBody3D
 		// Release player if they press space
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
-			//TODO: Make players head rotation consistent between sitting and rowing
-
 			// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
 			RpcId(1, MethodName.ServerRequestRowing, 0, false, false);
 
-			// Reset their global rotation and position
-			GlobalRotation = Vector3.Zero;
-			StaticBody3D seatCollision = GetCurrentSeat();
-			GlobalPosition = seatCollision.GlobalPosition + new Vector3(0, 1, 0); 
+			// Reset their global position
+			GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 1, 0); 
 
 			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
 			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
@@ -385,6 +381,9 @@ public partial class Player : CharacterBody3D
 	public void SitInSeat(int seat)
 	{
 		_currPlayerState = PlayerState.Rowing;
+
+		// Set players sitting yaw equal to where they were looking
+		_sittingYawDelta = GlobalRotation.Y;
 
 		// Broadcast sitting to true and update their seat
 		Rpc(nameof(Broadcast_SetSitStandState), true, seat);
