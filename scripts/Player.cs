@@ -192,7 +192,7 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
 			// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
-			RpcId(1, MethodName.ServerRequestRowing, 0, false, false);
+			RequestRowing(0, false, false);
 
 			// Reset their global position
 			GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 1, 0); 
@@ -208,24 +208,24 @@ public partial class Player : CharacterBody3D
 		{
 			// Broadcast move forward
 			// have to send the seat as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
-			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, true, true);
+			RequestRowing((int)_seat, true, true);
 		} 
 		// If user pressing forward and backward they'll go forward
 		else if (Input.IsActionPressed("move_backward"))
 		{
 			// Broadcast move backward
-			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, true, false);
+			RequestRowing((int)_seat, true, false);
 		}
 
 		// Emit a signal when they're done rowing
 		// Setting the direction doesn't matter in this case
 		if (Input.IsActionJustReleased("move_forward"))
 		{
-			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, false, true);
+			RequestRowing((int)_seat, false, true);
 		} 
 		else if (Input.IsActionJustReleased("move_backward"))
 		{
-			RpcId(1, MethodName.ServerRequestRowing, (int)_seat, false, false); 
+			RequestRowing((int)_seat, false, false); 
 		}
 	}
 
@@ -420,23 +420,30 @@ public partial class Player : CharacterBody3D
 		_seat = (Boat.SeatIndicies)seatIdx;
 	}
 
-	//TODO: add safeguards to functions that should only be called on the server
-	// We need to use RpcId = 1 ANYTIME we run this function, so that it's only ever sent to the server
+	// Wrapper for ServerRequestRowing RPC function
+	public void RequestRowing(int seatIdx, bool stopStart, bool backForward)
+	{
+		RpcId(1, MethodName.ServerRequestRowing, seatIdx, stopStart, backForward);
+	}
+
+	// THIS FUNCTION SHOULDN'T BE CALLED DIRECTLY
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void ServerRequestRowing(int seatIdx, bool stopStart, bool backForward)
 	{
+		// Extra safeguard to make sure function only runs on server
+		if(!Multiplayer.IsServer()) return;
+
 		// The Server hears this and emits the signal locally to the Boat
 		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, seatIdx, stopStart, backForward);
 	}
 
-	
 	public void Reset()
 	{
 		// Only the server should issue this command
 		if (Multiplayer.IsServer())
 		{
 			// Tell EVERYONE (including the server) to run the SyncReset function
-			RpcId(1, nameof(SyncReset));
+			Rpc(nameof(SyncReset));
 		}
 	}
 
