@@ -43,6 +43,25 @@ visible = false
 position = Vector2(1512, 400)
 texture = ExtResource("2_bqqt6")
 
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_left = 768.0
+offset_top = 64.0
+offset_right = 1193.0
+offset_bottom = 209.0
+theme = ExtResource("1_ekxnf")
+text = "Toggle Steam"
+fit_content = true
+
+[node name="ToggleSteam" type="CheckButton" parent="."]
+layout_mode = 0
+offset_left = 1189.0
+offset_top = 84.0
+offset_right = 1233.0
+offset_bottom = 108.0
+scale = Vector2(4.5, 4.5)
+
 [connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
 [connection signal="text_changed" from="IDPrompt" to="." method="_on_id_prompt_text_changed"]
+[connection signal="toggled" from="ToggleSteam" to="." method="_on_toggle_steam_toggled"]

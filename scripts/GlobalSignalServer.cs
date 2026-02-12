@@ -14,6 +14,18 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void ResetLevelEventHandler();
 
+  // signal for hosting game
+  [Signal]
+  public delegate void HostGameEventHandler();
+
+  // signal for using steam or using local ENet multiplayer
+  [Signal]
+  public delegate void SelectSteamNetworkEventHandler(bool steamSelected);
+
+  // signal for joining game
+  [Signal]
+  public delegate void JoinGameEventHandler(int lobbyId);
+
   public int Health { get; set; }
 
   public override void _Ready()

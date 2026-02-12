@@ -1,8 +1,5 @@
 extends Control
 
-signal host_requested
-signal join_requested(lobby_id)
-
 @onready var host_button: Button = $HostButton
 @onready var join_button: Button = $JoinButton
 @onready var id_prompt = $IDPrompt
@@ -15,7 +12,13 @@ func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
 
 func _on_host_button_pressed() -> void:
-	host_requested.emit()
+	# send the signal via the global signal server so the network manager can access it
+	GlobalSignalServer.emit_signal("HostGame")
 
 func _on_join_button_pressed() -> void:
-	join_requested.emit(int(id_prompt.text))
+	# send the signal via the global signal server
+	GlobalSignalServer.emit_signal("JoinGame", int(id_prompt.text))
+
+func _on_toggle_steam_toggled(toggled_on: bool) -> void:
+	# send the signal to select the steam network via the signal server
+	GlobalSignalServer.emit_signal("SelectSteamNetwork", toggled_on)
