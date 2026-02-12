@@ -38,7 +38,7 @@ project/assembly_name="OarWeThereYet"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/waterways_net/plugin.cfg")
+enabled=PackedStringArray("res://addons/terrain_3d/plugin.cfg", "res://addons/waterways_net/plugin.cfg")
 
 [input]
 
