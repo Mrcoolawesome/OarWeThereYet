@@ -26,6 +26,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void JoinGameEventHandler(int lobbyId);
 
+  // signal for updating the boat health ui
+  [Signal]
+  public delegate void UpdateBoatHealthEventHandler(int newHealth);
+
   public int Health { get; set; }
 
   public override void _Ready()
