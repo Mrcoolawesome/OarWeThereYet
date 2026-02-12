@@ -32,6 +32,8 @@ public partial class Player : CharacterBody3D
 
 	//Pause Menu
 	private CanvasLayer _pauseUI;
+	// HUD
+	private CanvasLayer _hud;
 
 	// Seat collision objects
 	private StaticBody3D _frontLeftSeatCollision;
@@ -80,6 +82,7 @@ public partial class Player : CharacterBody3D
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 		_boat = GetParent().GetNode<Boat>("Boat");
+		_hud = GetNode<CanvasLayer>("HUD");
 
 		_frontLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontLeftCollision");
 		_frontRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontRightCollision");
@@ -168,6 +171,9 @@ public partial class Player : CharacterBody3D
 			_currGameState = GameState.Menu;
 			// Release the mouse
 			Input.MouseMode = Input.MouseModeEnum.Visible;
+
+			// hide the hud
+			_hud.Visible = false;
 		}
 
 		switch(_currPlayerState)
@@ -398,6 +404,9 @@ public partial class Player : CharacterBody3D
 			_currGameState = GameState.Playing;
 		// Capture mouse
 			Input.MouseMode = Input.MouseModeEnum.Captured;
+
+			// unhide the hud
+			_hud.Visible = true;
 		}
 	}
 
