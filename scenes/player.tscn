@@ -59,6 +59,7 @@ visible = false
 replication_config = SubResource("SceneReplicationConfig_qhqgy")
 
 [node name="HUD" parent="." instance=ExtResource("5_qlg0r")]
+visible = false
 
 [connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]

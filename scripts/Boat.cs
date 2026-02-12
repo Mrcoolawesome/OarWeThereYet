@@ -67,6 +67,10 @@ public partial class Boat : RigidBody3D
 
         // announce if the boat died
         _healthComponent.Die += AnnounceDeath;
+
+        // need to enable these things to enable collision detection
+        ContactMonitor = true;
+        MaxContactsReported = 5;
     }
 
   public override void _PhysicsProcess(double delta)
@@ -175,10 +179,6 @@ public partial class Boat : RigidBody3D
         // set the rowing state to be true for whichever seat is being sat in
         _rowingStates[seat] = stopStart;
         _rowingStatesDirection[seat] = backForward;
-
-        // need to enable these things to enable collision detection
-        ContactMonitor = true;
-        MaxContactsReported = 5;
     }
 
     public void Reset()
