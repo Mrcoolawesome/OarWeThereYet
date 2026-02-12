@@ -18,6 +18,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void HostGameEventHandler();
 
+  // signal for using steam or using local ENet multiplayer
+  [Signal]
+  public delegate void SelectSteamNetworkEventHandler(bool steamSelected);
+
   // signal for joining game
   [Signal]
   public delegate void JoinGameEventHandler(int lobbyId);
