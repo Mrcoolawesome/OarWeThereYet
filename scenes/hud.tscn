@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://dyjf8cl7dhrr5"]
+
+[ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="1_ahhtf"]
+[ext_resource type="Script" uid="uid://bu8lx7h5m8frd" path="res://scripts/Hud.cs" id="1_oo0fn"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_oo0fn")
+
+[node name="BoatHealthLabel" type="Label" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme = ExtResource("1_ahhtf")
+text = "Boat Health: 100"
