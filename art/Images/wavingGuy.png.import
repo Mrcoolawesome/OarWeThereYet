@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b35cxhrmciek6"
-path="res://.godot/imported/wavingGuy.png-53cddd511909347d9dabf2d8d5058601.ctex"
+path="res://.godot/imported/wavingGuy.png-5acb1263f96d2193c154c47f7f7f7fc2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/wavingGuy.png"
-dest_files=["res://.godot/imported/wavingGuy.png-53cddd511909347d9dabf2d8d5058601.ctex"]
+source_file="res://art/Images/wavingGuy.png"
+dest_files=["res://.godot/imported/wavingGuy.png-5acb1263f96d2193c154c47f7f7f7fc2.ctex"]
 
 [params]
 

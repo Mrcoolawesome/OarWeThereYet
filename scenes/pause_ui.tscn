@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cxiotrex7o0h5" path="res://scripts/PauseUi.cs" id="1_ypbrs"]
 [ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="2_vcehk"]
-[ext_resource type="Texture2D" uid="uid://b35cxhrmciek6" path="res://art/wavingGuy.png" id="2_ypbrs"]
+[ext_resource type="Texture2D" uid="uid://b35cxhrmciek6" path="res://art/Images/wavingGuy.png" id="2_ypbrs"]
 
 [node name="PauseUI" type="Control"]
 process_mode = 3

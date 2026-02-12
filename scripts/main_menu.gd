@@ -3,6 +3,7 @@ extends Control
 @onready var host_button: Button = $HostButton
 @onready var join_button: Button = $JoinButton
 @onready var id_prompt = $IDPrompt
+@onready var steam = $Steam
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -22,3 +23,4 @@ func _on_join_button_pressed() -> void:
 func _on_toggle_steam_toggled(toggled_on: bool) -> void:
 	# send the signal to select the steam network via the signal server
 	GlobalSignalServer.emit_signal("SelectSteamNetwork", toggled_on)
+	steam.visible = toggled_on
