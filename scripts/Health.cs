@@ -28,11 +28,11 @@ public partial class Health : Node
 	// this can take a + or - value to change their health
 	public void UpdateHealth(int healthChange)
 	{
-		SyncUpdateHealth(healthChange);
+		Rpc(nameof(SyncUpdateHealth), healthChange);
 	}
 
-	// want this to sync everywhere
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	// want this to sync everywhere, but only the server can do it hence why we set the mode to 'RpcMode.Authority'
+	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
 	private void SyncUpdateHealth(int healthChange)
 	{
 		// update their health
