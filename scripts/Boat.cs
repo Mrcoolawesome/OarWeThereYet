@@ -6,6 +6,7 @@ using Waterways;
 
 public partial class Boat : RigidBody3D
 {
+    //TODO: Change boat to face negative Z direction
     [Export] public RiverFloatSystem River;
     [Export] public float FloatForce = 1.0f;
     [Export] public float RiverSpeed = 1.0f;

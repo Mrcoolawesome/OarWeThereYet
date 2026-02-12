@@ -9,6 +9,6 @@ public partial class Seat : StaticBody3D, Interactable
 
 	public void Interact(Player player)
 	{
-			player.HandleInSeatHitboxState(seatIndex);
+			player.SitInSeat(seatIndex);
 	}
 }

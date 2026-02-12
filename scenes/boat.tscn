@@ -126,7 +126,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2.5)
 [node name="SeatContainer" type="Node3D" parent="."]
 
 [node name="FrontLeftCollision" type="StaticBody3D" parent="SeatContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.9999999, 1, 1.5)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.9999999, 1, 1.5)
 collision_layer = 2
 script = ExtResource("2_qyrje")
 
@@ -137,7 +137,7 @@ mesh = SubResource("BoxMesh_0063d")
 shape = SubResource("ConcavePolygonShape3D_0063d")
 
 [node name="FrontRightCollision" type="StaticBody3D" parent="SeatContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1, -1.5)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -2, 1, -1.5)
 collision_layer = 2
 script = ExtResource("2_qyrje")
 seatIndex = 1
@@ -149,7 +149,7 @@ mesh = SubResource("BoxMesh_0063d")
 shape = SubResource("ConcavePolygonShape3D_0063d")
 
 [node name="BackLeftCollision" type="StaticBody3D" parent="SeatContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1, 1.4999998)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 2, 1, 1.4999998)
 collision_layer = 2
 script = ExtResource("2_qyrje")
 seatIndex = 3
@@ -161,7 +161,7 @@ mesh = SubResource("BoxMesh_0063d")
 shape = SubResource("ConcavePolygonShape3D_0063d")
 
 [node name="BackRightCollision" type="StaticBody3D" parent="SeatContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9999999, 1, -1.5000002)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.9999999, 1, -1.5000002)
 collision_layer = 2
 script = ExtResource("2_qyrje")
 seatIndex = 2
