@@ -192,7 +192,7 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
 			// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
-			RequestRowing(0, false, false);
+			RequestRowing((int)_seat, false, false);
 
 			// Reset their global position
 			GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 1, 0); 
