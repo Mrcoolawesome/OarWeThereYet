@@ -200,6 +200,9 @@ public partial class Player : CharacterBody3D
 			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
 			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
 
+			_sittingYawDelta = 0;
+			GlobalRotation = new Vector3(0, GlobalRotation.Y, 0);
+
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
 

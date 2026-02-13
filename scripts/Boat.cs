@@ -81,7 +81,7 @@ public partial class Boat : RigidBody3D
             // this value is the relative position to the boat
             Vector3 relativePosition = probe.GlobalPosition - GlobalPosition; // im making this into a new variable so it's more clear on what it is
             // get the forward direction of the boat
-            Vector3 forwardDirection = -GlobalBasis.X;
+            Vector3 forwardDirection = GlobalBasis.X;
             Vector3 finalForce = Vector3.Zero;
 
             // check if we're allowed to row this oar given their state
