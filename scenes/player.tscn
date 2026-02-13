@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=9 format=3 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scripts/Player.cs" id="1_3vyb7"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes/interact_ray.tscn" id="2_dqkch"]
 [ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="2_g2els"]
 [ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes/pause_ui.tscn" id="3_qhqgy"]
+[ext_resource type="PackedScene" uid="uid://dyjf8cl7dhrr5" path="res://scenes/hud.tscn" id="5_qlg0r"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
 
@@ -56,6 +57,9 @@ visible = false
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_qhqgy")
+
+[node name="HUD" parent="." instance=ExtResource("5_qlg0r")]
+visible = false
 
 [connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]
