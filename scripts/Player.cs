@@ -41,6 +41,13 @@ public partial class Player : CharacterBody3D
 	private StaticBody3D _backLeftSeatCollision;
 	private StaticBody3D _backRightSeatCollision;
 
+	// Different player models
+	private MeshInstance3D _localPlayerModel;
+	private Node3D _fullPlayerModel;
+	private MeshInstance3D _fullPlayerModelBody;
+	private MeshInstance3D _fullPlayerModelHead;
+	private MeshInstance3D _fullPlayerModelVest;
+
 	// Global variable for seat player is sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
 	/*
@@ -72,6 +79,10 @@ public partial class Player : CharacterBody3D
 
 	public override void _EnterTree()
 	{
+		// THIS IS VERY IMPORTANT
+		// this sets the multiplayer authority of THIS NODE to be the player with the specified id.
+		// we made the id of the player we want to be in charge of this node to be the name of the node, so we just use that
+		// name to get the id of the client we want to make the authority.
 		SetMultiplayerAuthority(int.Parse(Name.ToString()));
 	}
 
@@ -83,6 +94,11 @@ public partial class Player : CharacterBody3D
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 		_boat = GetParent().GetNode<Boat>("Boat");
 		_hud = GetNode<CanvasLayer>("HUD");
+		_fullPlayerModelHead = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/head");
+		_fullPlayerModelBody = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/body");
+		_fullPlayerModelVest = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/life vest");
+		_localPlayerModel = GetNode<MeshInstance3D>("LocalPlayerModel/Armature/Skeleton3D/body");
+		_fullPlayerModel = GetNode<Node3D>("FullPlayerModel");
 
 		_frontLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontLeftCollision");
 		_frontRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontRightCollision");
@@ -95,8 +111,9 @@ public partial class Player : CharacterBody3D
 		// Add the player to the 'players' group
 		AddToGroup("players");
 
-		// MULTIPLAYER SETUP
-		// If we are the player
+		// client code for when setting up their camera and stuff
+		// if we are the player, then use the camera for this player
+		// IsMultiplayerAuthority checks if the current client is the multiplayer authority of THIS current NODE 
 		if (IsMultiplayerAuthority())
 		{
 			// Enable our camera
@@ -105,12 +122,23 @@ public partial class Player : CharacterBody3D
 				camera.Current = true;
 			}
 
-			_pauseUI.Visible = _currGameState == GameState.Menu;
-			
+			// set the current game state to be the menu state	
 			if (_currGameState == GameState.Menu)
 			{
 				Input.MouseMode = Input.MouseModeEnum.Visible;
 			}
+
+			// then set the local player model to visible, the regular one also needs to be visible but the meshes will be set to only cast shadows in the code below
+			_localPlayerModel.Visible = true;
+			_fullPlayerModel.Visible = true;
+
+			// then set the shadows for all the mesh instances of the real model to be casted and the local model shouldn't cast any shadows
+			_fullPlayerModelBody.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_fullPlayerModelHead.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_fullPlayerModelVest.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+
+			// the shadow of the local shoudn't be cast
+			_localPlayerModel.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
 		}
 		// If we are not the player
 		else
