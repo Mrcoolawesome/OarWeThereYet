@@ -34,6 +34,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void BoatDeathEventHandler();
 
+  // signal for triggering the oar rowing animation for a specific oar
+  [Signal]
+  public delegate void AnimateOarEventHandler(int seat, int direction, bool startStop);
+
   public int Health { get; set; }
 
   public override void _Ready()

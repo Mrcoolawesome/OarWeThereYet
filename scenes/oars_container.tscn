@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://di8o6ioxtkr2c"]
+
+[ext_resource type="PackedScene" uid="uid://di51rmms48nsb" path="res://scenes/oar.tscn" id="1_ghe3o"]
+[ext_resource type="Script" uid="uid://cwpemyimd6t6a" path="res://scripts/OarsContainer.cs" id="1_mmxoc"]
+
+[node name="OarsContainer" type="Node3D"]
+script = ExtResource("1_mmxoc")
+
+[node name="OarBackLeft" parent="." instance=ExtResource("1_ghe3o")]
+transform = Transform3D(2, 6.181724e-08, -2.5605537e-08, -6.181724e-08, 1.4142135, -1.4142135, -2.5605537e-08, 1.4142135, 1.4142135, -2.0000002, 0, -3)
+
+[node name="OarFrontLeft" parent="." instance=ExtResource("1_ghe3o")]
+transform = Transform3D(2, 6.181724e-08, -2.5605537e-08, -6.181724e-08, 1.4142135, -1.4142135, -2.5605537e-08, 1.4142135, 1.4142135, 1.9999999, 0, -3)
+
+[node name="OarFrontRight" parent="." instance=ExtResource("1_ghe3o")]
+transform = Transform3D(-2, -1.8545171e-07, -9.8028934e-08, -6.181723e-08, 1.4142135, -1.4142135, 2.004511e-07, -1.4142135, -1.4142135, 2.0000002, 0, 2.9999998)
+
+[node name="OarBackRight" parent="." instance=ExtResource("1_ghe3o")]
+transform = Transform3D(-2, -1.8545171e-07, -9.8028934e-08, -6.181723e-08, 1.4142135, -1.4142135, 2.004511e-07, -1.4142135, -1.4142135, -1.9999999, 0, 3.0000002)
