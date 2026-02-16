@@ -25,7 +25,6 @@ public partial class Player : CharacterBody3D
 	// Accumulated movement in the yaw and pitch in radians
 	private float _mouseMovementYaw = 0.0f;
 	private float _mouseMovementPitch = 0.0f;
-	private float _sittingYawDelta = 0.0f; // delta change specifically for sitting down
 
 	// BOAT
 	private Boat _boat = new Boat();
@@ -236,9 +235,6 @@ public partial class Player : CharacterBody3D
 
 			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 
-			_sittingYawDelta = 0;
-			GlobalRotation = new Vector3(0, GlobalRotation.Y, 0);
-
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
 
@@ -343,7 +339,7 @@ public partial class Player : CharacterBody3D
 		Velocity = velocity;
 
 		// Handle mouse input while standing
-		StandingStatePlayerRotation();
+		PlayerRotation();
 	}
 
 	private void CrouchSprintPhysicsProcess(double delta)
@@ -390,10 +386,10 @@ public partial class Player : CharacterBody3D
 		GlobalPosition = seatCollision.GlobalPosition;
 
 		// Handle mouse input while sitting
-		StandingStatePlayerRotation();
+		PlayerRotation();
 	}
 
-	private void StandingStatePlayerRotation()
+	private void PlayerRotation()
 	{
 		RotateY(_mouseMovementYaw);
 
@@ -406,35 +402,9 @@ public partial class Player : CharacterBody3D
 		_mouseMovementYaw = 0.0f;
 	}
 
-	private void RowingStatePlayerRotation(StaticBody3D seatCollision)
-	{
-		/* 
-		Directly setting the rotation is bad so we take the global basis,
-		add the rotation to that basis, and then set the basis
-		*/
-		_sittingYawDelta += _mouseMovementYaw;
-		Basis seatGlobalBasis = seatCollision.GlobalBasis;
-		Basis swivelBasis = new Basis(Vector3.Up, _sittingYawDelta);
-		GlobalBasis = seatGlobalBasis * swivelBasis;
-		
-		// Regular head pitch rotation since the head is a child of the player
-		_head.RotateX(_mouseMovementPitch);
-		// Clamp so they cant move their head all the way around
-		Vector3 headRot = _head.Rotation;
-    headRot.X = Mathf.Clamp(headRot.X, Mathf.DegToRad(-89), Mathf.DegToRad(89));
-    _head.Rotation = headRot;
-
-		// YOU ALWAYS HAVE TO RESET YAW AND PITCH MOVEMENT AFTER USING IT 
-		_mouseMovementPitch = 0.0f;
-    _mouseMovementYaw = 0.0f;
-	}
-
 	public void SitInSeat(int seat)
 	{
 		_currPlayerState = PlayerState.Rowing;
-
-		// Set players sitting yaw equal to where they were looking
-		_sittingYawDelta = GlobalRotation.Y;
 
 		// Broadcast sitting to true and update their seat
 		Rpc(nameof(Broadcast_SetSitStandState), true, seat);
