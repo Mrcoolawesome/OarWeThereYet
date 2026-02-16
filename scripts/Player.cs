@@ -245,7 +245,7 @@ public partial class Player : CharacterBody3D
 			RequestRowing((int)_seat, true, true);
 
 			// trigger the oar animation as well
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), (int)_seat, 1, true);
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, true);
 		} 
 		// If user pressing forward and backward they'll go forward
 		else if (Input.IsActionPressed("move_backward"))
@@ -254,7 +254,7 @@ public partial class Player : CharacterBody3D
 			RequestRowing((int)_seat, true, false);
 
 			// trigger the oar animation as well
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), (int)_seat, -1, true);
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, -1, true);
 		}
 
 		// Emit a signal when they're done rowing
@@ -264,14 +264,14 @@ public partial class Player : CharacterBody3D
 			RequestRowing((int)_seat, false, true);
 
 			// stop the rowing animation too
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), (int)_seat, 1, false);
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 		} 
 		else if (Input.IsActionJustReleased("move_backward"))
 		{
 			RequestRowing((int)_seat, false, false); 
 
-			// stop the rowing animation too
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), (int)_seat, 1, false);
+			// stop the rowing animation too (direction doesn't actually matter here since we're just stopping the animation)
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, -1, false);
 		}
 	}
 
@@ -484,6 +484,13 @@ public partial class Player : CharacterBody3D
 
 		// The Server hears this and emits the signal locally to the Boat
 		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, seatIdx, stopStart, backForward);
+	}
+
+	// this will have everyone else's animations for the oars play when this client triggers or un-triggers it
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void BroadcastOarAnimation(int seat, int direction, bool startStop)
+	{
+		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), seat, direction, startStop);
 	}
 
 	public void Reset()
