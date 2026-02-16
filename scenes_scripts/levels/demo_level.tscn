@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://bhjy2n3qwlbxi"]
+[gd_scene load_steps=25 format=3 uid="uid://bhjy2n3qwlbxi"]
 
 [ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes_scripts/levels/TestLevel.cs" id="1_rahni"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="2_lih0g"]
@@ -10,6 +10,19 @@
 [ext_resource type="Texture2D" uid="uid://dtghvaxasn2b0" path="res://art/textures/rocks16_nrm_rgh.dds" id="8_qipp6"]
 [ext_resource type="Texture2D" uid="uid://0fs6ostl5fy7" path="res://art/textures/Rocks002_alb_ht.dds" id="9_yglcq"]
 [ext_resource type="Texture2D" uid="uid://dbifmkbrn7p4j" path="res://art/textures/Rocks002_nrm_rgh.dds" id="10_65fa2"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_my7xx"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_to0o3"]
+sky_material = SubResource("ProceduralSkyMaterial_my7xx")
+
+[sub_resource type="Environment" id="Environment_phog2"]
+background_mode = 2
+sky = SubResource("Sky_to0o3")
+tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="Resource" id="Resource_my7xx"]
 script = ExtResource("4_dvlyx")
@@ -130,6 +143,9 @@ texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_
 
 [node name="DemoLevel" type="Node"]
 script = ExtResource("1_rahni")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_phog2")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 1, 0)
