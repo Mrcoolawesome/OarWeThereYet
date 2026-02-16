@@ -1,0 +1,65 @@
+[gd_scene load_steps=6 format=3 uid="uid://di51rmms48nsb"]
+
+[ext_resource type="PackedScene" uid="uid://ce012vktvhu1r" path="res://art/models/oar.blend" id="1_2s4kg"]
+[ext_resource type="Animation" uid="uid://dwe2ky3x8ta6m" path="res://art/animations/oar_rowing.res" id="2_3f467"]
+
+[sub_resource type="Animation" id="Animation_3f467"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Cube:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_vdvjr"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Cube:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.78246486),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Cube:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.78246486),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vdvjr"]
+_data = {
+&"RESET": SubResource("Animation_3f467"),
+&"idle": SubResource("Animation_vdvjr"),
+&"oar_rowing": ExtResource("2_3f467")
+}
+
+[node name="Oar" instance=ExtResource("1_2s4kg")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." index="0"]
+libraries = {
+&"": SubResource("AnimationLibrary_vdvjr")
+}
+autoplay = "idle"
+
+[node name="Cube" parent="." index="1"]
+transform = Transform3D(0.077437356, 0, 0, 0, 0.077437356, 0, 0, 0, 0.07743735, 0, 0, 0)

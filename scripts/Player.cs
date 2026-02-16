@@ -243,12 +243,18 @@ public partial class Player : CharacterBody3D
 			// Broadcast move forward
 			// have to send the seat as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
 			RequestRowing((int)_seat, true, true);
+
+			// trigger the oar animation as well
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), (int)_seat, 1, true);
 		} 
 		// If user pressing forward and backward they'll go forward
 		else if (Input.IsActionPressed("move_backward"))
 		{
 			// Broadcast move backward
 			RequestRowing((int)_seat, true, false);
+
+			// trigger the oar animation as well
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), (int)_seat, -1, true);
 		}
 
 		// Emit a signal when they're done rowing
@@ -256,10 +262,16 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionJustReleased("move_forward"))
 		{
 			RequestRowing((int)_seat, false, true);
+
+			// stop the rowing animation too
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), (int)_seat, 1, false);
 		} 
 		else if (Input.IsActionJustReleased("move_backward"))
 		{
 			RequestRowing((int)_seat, false, false); 
+
+			// stop the rowing animation too
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), (int)_seat, 1, false);
 		}
 	}
 
