@@ -216,3 +216,6 @@ shape = SubResource("BoxShape3D_evv4r")
 
 [node name="DryBox" parent="." instance=ExtResource("3_lw6pk")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.1, 0.6884266, 0)
+
+[node name="OarsContainer" parent="." instance=ExtResource("4_evv4r")]
+transform = Transform3D(-1, 0, 8.742277e-08, 0, 1, 0, -8.742277e-08, 0, -1, 0, 0, 0)
