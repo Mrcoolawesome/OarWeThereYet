@@ -1,8 +1,9 @@
-[gd_scene load_steps=14 format=4 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=15 format=4 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scripts/Boat.cs" id="1_0063d"]
 [ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scripts/Seat.cs" id="2_qyrje"]
 [ext_resource type="PackedScene" uid="uid://danavscflb0ck" path="res://scenes/dry_box.tscn" id="3_lw6pk"]
+[ext_resource type="PackedScene" uid="uid://ce012vktvhu1r" path="res://art/models/oar.blend" id="4_evv4r"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0063d"]
 properties/0/path = NodePath(".:linear_velocity")
@@ -221,3 +222,17 @@ shape = SubResource("BoxShape3D_evv4r")
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2.1000001, 0.6, 9.179392e-08)
 collision_layer = 8
 collision_mask = 0
+
+[node name="OarsContainer" type="Node3D" parent="."]
+
+[node name="OarBackLeft" parent="OarsContainer" instance=ExtResource("4_evv4r")]
+transform = Transform3D(2, 6.181724e-08, -2.5605537e-08, -6.181724e-08, 1.4142135, -1.4142135, -2.5605537e-08, 1.4142135, 1.4142135, -2.0000002, 0, -3)
+
+[node name="OarFrontLeft" parent="OarsContainer" instance=ExtResource("4_evv4r")]
+transform = Transform3D(2, 6.181724e-08, -2.5605537e-08, -6.181724e-08, 1.4142135, -1.4142135, -2.5605537e-08, 1.4142135, 1.4142135, 1.9999999, 0, -3)
+
+[node name="OarFrontRight" parent="OarsContainer" instance=ExtResource("4_evv4r")]
+transform = Transform3D(-2, 6.181725e-08, 1.4924001e-07, -6.181723e-08, 1.4142135, -1.4142135, -1.4924e-07, -1.4142135, -1.4142135, 2.0000002, 0, 3.0000002)
+
+[node name="OarBackRight" parent="OarsContainer" instance=ExtResource("4_evv4r")]
+transform = Transform3D(-2, 6.181725e-08, 1.4924001e-07, -6.181723e-08, 1.4142135, -1.4142135, -1.4924e-07, -1.4142135, -1.4142135, -1.9999999, 0, 2.9999998)

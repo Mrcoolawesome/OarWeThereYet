@@ -1,8 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=10 format=3 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scripts/Player.cs" id="1_3vyb7"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes/interact_ray.tscn" id="2_dqkch"]
-[ext_resource type="PackedScene" uid="uid://ce012vktvhu1r" path="res://art/models/oar.blend" id="2_fjrip"]
 [ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="2_g2els"]
 [ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes/pause_ui.tscn" id="3_qhqgy"]
 [ext_resource type="PackedScene" uid="uid://b2yilq5mplalt" path="res://art/models/character-local.blend" id="4_tuyoq"]
@@ -28,9 +27,6 @@ script = ExtResource("1_3vyb7")
 MouseSens = 0.5
 LerpSpeed = 5.0
 CrouchLerpSpeed = 7.5
-
-[node name="oar" parent="." instance=ExtResource("2_fjrip")]
-transform = Transform3D(-4.371139e-08, 4.371139e-08, 1, 1, 1.9106855e-15, 4.371139e-08, 0, 1, -4.371139e-08, 0, 0, -1)
 
 [node name="StandingCollision" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_u8vuu")

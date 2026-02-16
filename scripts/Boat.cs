@@ -58,7 +58,7 @@ public partial class Boat : RigidBody3D
         AddChild(_healthComponent);
 
         // subscribe to the Rowing signal from the singleton script
-        GlobalSignalServer.Instance.Rowing += _OnPlayerRowing;
+        GlobalSignalServer.Instance.Rowing += OnPlayerRowing;
 
         // initalize the health stuff
         _healthComponent.Initalize(MaxHealth); // initalize with 100 health
@@ -75,7 +75,18 @@ public partial class Boat : RigidBody3D
         MaxContactsReported = 5;
     }
 
-  public override void _PhysicsProcess(double delta)
+    // physics process along with all its associated functions
+    public override void _PhysicsProcess(double delta)
+    {
+        // do the math to make the probes float
+        ProbeBouyancyPhysicsProcess();
+
+        // apply the rowing forces if the player is rowing
+        ApplyRowingForcePhysicsProcess();
+    }
+
+    // does the bouyancy stuff for the probes
+    private void ProbeBouyancyPhysicsProcess()
     {
         foreach (Marker3D probe in _boatFloatProbesContainer.GetChildren().OfType<Marker3D>())
         {
@@ -86,7 +97,7 @@ public partial class Boat : RigidBody3D
             float waterHeight = River.GetWaterHeight(globalPos);
             float depth = waterHeight - globalPos.Y;
             float buoyancyMultiplier = 2 - Mathf.Exp(-depth + 0.6f);
-            Vector3 buoyancyForce = waterNormal(globalPos) * _gravity * FloatForce * buoyancyMultiplier;
+            Vector3 buoyancyForce = WaterNormal(globalPos) * _gravity * FloatForce * buoyancyMultiplier;
 
             Vector3 currentVelocity = LinearVelocity + AngularVelocity.Cross(relativePos);
             Vector3 frictionForce = -currentVelocity * depth * WaterDrag;
@@ -97,7 +108,19 @@ public partial class Boat : RigidBody3D
                 ApplyForce(flowDirection * RiverSpeed, relativePos);
             }
         }
+    }
 
+    // function to get the normal vector of the water at a given point
+    private Vector3 WaterNormal(Vector3 globalPos)
+    {
+        Vector3 flowDirection = River.GetWaterFlowDirection(globalPos);
+        Vector3 waterRight = flowDirection.Cross(Vector3.Up);
+        return waterRight.Cross(flowDirection);
+    }
+
+    // does all the rowing force stuff for when a player is rowing
+    private void ApplyRowingForcePhysicsProcess()
+    {
         // i don't think we need all that OfType stuff as so long as we don't add anything that isn't a marker3d in this container which we shouldn't
         foreach (Marker3D probe in _oarProbesContainer.GetChildren().OfType<Marker3D>())
         {
@@ -164,11 +187,10 @@ public partial class Boat : RigidBody3D
         }
     }
 
-    private Vector3 waterNormal(Vector3 globalPos)
+    // all the code associated with doing anything not needed to be done on the physics time
+    public override void _Process(double delta)
     {
-        Vector3 flowDirection = River.GetWaterFlowDirection(globalPos);
-        Vector3 waterRight = flowDirection.Cross(Vector3.Up);
-        return waterRight.Cross(flowDirection);
+        base._Process(delta);
     }
 
     // getting the signals to row forward or to stop
@@ -176,7 +198,7 @@ public partial class Boat : RigidBody3D
     // needs to be an RPC call so the server knows to update the states
     // CallLocal is false, because if it were true then the function would run on the peer and not the server, which is not what we want
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)] 
-    private void _OnPlayerRowing(int seat, bool stopStart, bool backForward)
+    private void OnPlayerRowing(int seat, bool stopStart, bool backForward)
     {
         // set the rowing state to be true for whichever seat is being sat in
         _rowingStates[seat] = stopStart;
