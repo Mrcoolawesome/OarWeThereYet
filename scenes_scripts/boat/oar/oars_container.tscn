@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://di8o6ioxtkr2c"]
 
-[ext_resource type="PackedScene" uid="uid://di51rmms48nsb" path="res://scenes/oar.tscn" id="1_ghe3o"]
-[ext_resource type="Script" uid="uid://cwpemyimd6t6a" path="res://scripts/OarsContainer.cs" id="1_mmxoc"]
+[ext_resource type="PackedScene" uid="uid://di51rmms48nsb" path="res://scenes_scripts/boat/oar/oar.tscn" id="1_ghe3o"]
+[ext_resource type="Script" uid="uid://cwpemyimd6t6a" path="res://scenes_scripts/boat/oar/OarsContainer.cs" id="1_mmxoc"]
 
 [node name="OarsContainer" type="Node3D"]
 script = ExtResource("1_mmxoc")

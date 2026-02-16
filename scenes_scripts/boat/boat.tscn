@@ -1,9 +1,9 @@
 [gd_scene load_steps=15 format=4 uid="uid://bchwofjewsivn"]
 
-[ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scripts/Boat.cs" id="1_0063d"]
-[ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scripts/Seat.cs" id="2_qyrje"]
-[ext_resource type="PackedScene" uid="uid://danavscflb0ck" path="res://scenes/dry_box.tscn" id="3_lw6pk"]
-[ext_resource type="PackedScene" uid="uid://di8o6ioxtkr2c" path="res://scenes/oars_container.tscn" id="4_evv4r"]
+[ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scenes_scripts/boat/Boat.cs" id="1_vvssr"]
+[ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scenes_scripts/boat/seat/Seat.cs" id="2_kgk83"]
+[ext_resource type="PackedScene" uid="uid://danavscflb0ck" path="res://scenes_scripts/boat/dry_box/dry_box.tscn" id="3_ltyy5"]
+[ext_resource type="PackedScene" uid="uid://di8o6ioxtkr2c" path="res://scenes_scripts/boat/oar/oars_container.tscn" id="4_li7rg"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0063d"]
 properties/0/path = NodePath(".:linear_velocity")
@@ -81,10 +81,11 @@ mass = 200.0
 center_of_mass_mode = 1
 center_of_mass = Vector3(0, -1, 0)
 can_sleep = false
-script = ExtResource("1_0063d")
+script = ExtResource("1_vvssr")
 FloatForce = 25.0
 RiverSpeed = 30.0
 WaterDrag = 5.0
+ImpactVelocityThreshold = 35.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_0063d")
@@ -129,7 +130,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2.5)
 [node name="FrontLeftCollision" type="StaticBody3D" parent="SeatContainer"]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.9999999, 1, 1.5)
 collision_layer = 2
-script = ExtResource("2_qyrje")
+script = ExtResource("2_kgk83")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontLeftCollision"]
 mesh = SubResource("BoxMesh_0063d")
@@ -140,7 +141,7 @@ shape = SubResource("ConcavePolygonShape3D_0063d")
 [node name="FrontRightCollision" type="StaticBody3D" parent="SeatContainer"]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2, 1, -1.5)
 collision_layer = 2
-script = ExtResource("2_qyrje")
+script = ExtResource("2_kgk83")
 seatIndex = 1
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontRightCollision"]
@@ -152,7 +153,7 @@ shape = SubResource("ConcavePolygonShape3D_0063d")
 [node name="BackLeftCollision" type="StaticBody3D" parent="SeatContainer"]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 1, 1.4999998)
 collision_layer = 2
-script = ExtResource("2_qyrje")
+script = ExtResource("2_kgk83")
 seatIndex = 3
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackLeftCollision"]
@@ -164,7 +165,7 @@ shape = SubResource("ConcavePolygonShape3D_0063d")
 [node name="BackRightCollision" type="StaticBody3D" parent="SeatContainer"]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.9999999, 1, -1.5000002)
 collision_layer = 2
-script = ExtResource("2_qyrje")
+script = ExtResource("2_kgk83")
 seatIndex = 2
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackRightCollision"]
@@ -214,8 +215,8 @@ shape = SubResource("BoxShape3D_lw6pk")
 transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, -3.4847202, 0.84999985, -0.067233324)
 shape = SubResource("BoxShape3D_evv4r")
 
-[node name="DryBox" parent="." instance=ExtResource("3_lw6pk")]
+[node name="DryBox" parent="." instance=ExtResource("3_ltyy5")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.1, 0.6884266, 0)
 
-[node name="OarsContainer" parent="." instance=ExtResource("4_evv4r")]
+[node name="OarsContainer" parent="." instance=ExtResource("4_li7rg")]
 transform = Transform3D(-1, 0, 8.742277e-08, 0, 1, 0, -8.742277e-08, 0, -1, 0, 1, 0)

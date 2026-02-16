@@ -1,12 +1,12 @@
 [gd_scene load_steps=12 format=3 uid="uid://cykj32whe33ni"]
 
-[ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scripts/TestLevel.cs" id="1_88ety"]
+[ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes_scripts/levels/TestLevel.cs" id="1_88ety"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="1_tmr53"]
-[ext_resource type="Script" uid="uid://be4uhy3s5es8a" path="res://scripts/Ground.cs" id="2_88ety"]
+[ext_resource type="Script" uid="uid://be4uhy3s5es8a" path="res://scenes_scripts/levels/Ground.cs" id="2_88ety"]
 [ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="2_qcd3b"]
 [ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="3_88ety"]
 [ext_resource type="Script" uid="uid://dw3yrisbnd4me" path="res://addons/waterways_net/RiverFloatSystem.cs" id="4_ahbqi"]
-[ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes/boat.tscn" id="5_7gix3"]
+[ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes_scripts/boat/boat.tscn" id="5_7gix3"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_ig7tw"]
 size = Vector3(10, 1, 10)

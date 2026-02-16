@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dyjf8cl7dhrr5"]
 
 [ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="1_ahhtf"]
-[ext_resource type="Script" uid="uid://bu8lx7h5m8frd" path="res://scripts/Hud.cs" id="1_oo0fn"]
+[ext_resource type="Script" uid="uid://bu8lx7h5m8frd" path="res://scenes_scripts/UI/hud/Hud.cs" id="1_oo0fn"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_oo0fn")

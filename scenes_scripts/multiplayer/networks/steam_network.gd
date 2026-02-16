@@ -9,8 +9,8 @@ const LOBBY_NAME = "BAD"
 const LOBBY_MODE = "CoOP"
 
 # player scene and test level scene
-var player_scene = preload("res://scenes/player.tscn")
-var test_level_scene = preload("res://scenes/demo_level.tscn")
+var player_scene = preload("res://scenes_scripts/player/player.tscn")
+var test_level_scene = preload("res://scenes_scripts/levels/demo_level.tscn")
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
 @onready var main_root_scene = get_tree().current_scene

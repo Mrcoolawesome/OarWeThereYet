@@ -1,11 +1,11 @@
 [gd_scene load_steps=10 format=3 uid="uid://dmth1b1qymst1"]
 
-[ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scripts/Player.cs" id="1_3vyb7"]
-[ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes/interact_ray.tscn" id="2_dqkch"]
-[ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="2_g2els"]
-[ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes/pause_ui.tscn" id="3_qhqgy"]
-[ext_resource type="PackedScene" uid="uid://b2yilq5mplalt" path="res://art/models/character-local.blend" id="4_tuyoq"]
-[ext_resource type="PackedScene" uid="uid://dyjf8cl7dhrr5" path="res://scenes/hud.tscn" id="5_qlg0r"]
+[ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
+[ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
+[ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="3_rgyib"]
+[ext_resource type="PackedScene" uid="uid://b2yilq5mplalt" path="res://art/models/character-local.blend" id="4_hg6s5"]
+[ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes_scripts/UI/pause_ui/pause_ui.tscn" id="5_8t03j"]
+[ext_resource type="PackedScene" uid="uid://dyjf8cl7dhrr5" path="res://scenes_scripts/UI/hud/hud.tscn" id="6_2ieo8"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
 
@@ -23,7 +23,7 @@ properties/1/replication_mode = 1
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4
 collision_mask = 3
-script = ExtResource("1_3vyb7")
+script = ExtResource("1_g6k8r")
 MouseSens = 0.5
 LerpSpeed = 5.0
 CrouchLerpSpeed = 7.5
@@ -43,26 +43,26 @@ disabled = true
 [node name="Camera3D" type="Camera3D" parent="Head/CameraContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
-[node name="InteractRay" parent="Head/CameraContainer/Camera3D" node_paths=PackedStringArray("Player") instance=ExtResource("2_dqkch")]
+[node name="InteractRay" parent="Head/CameraContainer/Camera3D" node_paths=PackedStringArray("Player") instance=ExtResource("2_boad6")]
 Player = NodePath("../../../..")
 
 [node name="AimLook" type="Node" parent="."]
 
-[node name="FullPlayerModel" parent="." instance=ExtResource("2_g2els")]
+[node name="FullPlayerModel" parent="." instance=ExtResource("3_rgyib")]
 transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 0, -1, 0)
 
-[node name="LocalPlayerModel" parent="." instance=ExtResource("4_tuyoq")]
+[node name="LocalPlayerModel" parent="." instance=ExtResource("4_hg6s5")]
 transform = Transform3D(-0.5, 0, 4.371139e-08, 0, 0.5, 0, -4.371139e-08, 0, -0.5, 0, -1, 0)
 visible = false
 
 [node name="PauseCanvas" type="CanvasLayer" parent="."]
 
-[node name="PauseUI" parent="PauseCanvas" instance=ExtResource("3_qhqgy")]
+[node name="PauseUI" parent="PauseCanvas" instance=ExtResource("5_8t03j")]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_qhqgy")
 
-[node name="HUD" parent="." instance=ExtResource("5_qlg0r")]
+[node name="HUD" parent="." instance=ExtResource("6_2ieo8")]
 visible = false
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
