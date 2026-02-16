@@ -85,6 +85,7 @@ script = ExtResource("1_0063d")
 FloatForce = 25.0
 RiverSpeed = 30.0
 WaterDrag = 5.0
+ImpactVelocityThreshold = 35.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_0063d")

@@ -11,7 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://0fs6ostl5fy7" path="res://art/textures/Rocks002_alb_ht.dds" id="9_6wx8f"]
 [ext_resource type="Texture2D" uid="uid://dbifmkbrn7p4j" path="res://art/textures/Rocks002_nrm_rgh.dds" id="10_r34ug"]
 
-[sub_resource type="Resource" id="Resource_grs8q"]
+[sub_resource type="Resource" id="Resource_6wx8f"]
 script = ExtResource("5_r34ug")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
@@ -39,7 +39,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_8ie3e"]
+[sub_resource type="Curve3D" id="Curve3D_r34ug"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -138,9 +138,9 @@ shadow_enabled = true
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1, -3, -5)
 script = ExtResource("3_88xa8")
-ShaderSettings = SubResource("Resource_grs8q")
+ShaderSettings = SubResource("Resource_6wx8f")
 PointWidths = Array[float]([9.738645, 11.79303, 17.322895, 14.258924, 19.230875, 19.230875, 19.230875, 19.230875, 27.431053, 34.830986, 27.622408, 24.90232, 34.700542, 27.715273, 35.96378, 37.959026, 60.54432, 161.6149, 69.5427])
-Curve = SubResource("Curve3D_8ie3e")
+Curve = SubResource("Curve3D_r34ug")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
@@ -164,3 +164,5 @@ material = SubResource("Terrain3DMaterial_6wx8f")
 assets = SubResource("Terrain3DAssets_8ie3e")
 top_level = true
 metadata/_edit_lock_ = true
+
+[node name="Rock Container" type="Node3D" parent="."]
