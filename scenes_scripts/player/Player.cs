@@ -388,7 +388,7 @@ public partial class Player : CharacterBody3D
 		GlobalPosition = seatCollision.GlobalPosition;
 
 		// Handle mouse input while sitting
-		RowingStatePlayerRotation(seatCollision);
+		StandingStatePlayerRotation();
 	}
 
 	private void StandingStatePlayerRotation()
