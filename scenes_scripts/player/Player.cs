@@ -234,6 +234,8 @@ public partial class Player : CharacterBody3D
 			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
 			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
 
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
+
 			_sittingYawDelta = 0;
 			GlobalRotation = new Vector3(0, GlobalRotation.Y, 0);
 
