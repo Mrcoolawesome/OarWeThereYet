@@ -1,0 +1,166 @@
+[gd_scene load_steps=22 format=3 uid="uid://bhjy2n3qwlbxi"]
+
+[ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scripts/TestLevel.cs" id="1_i46ye"]
+[ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="3_88xa8"]
+[ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="4_6wx8f"]
+[ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="5_r34ug"]
+[ext_resource type="Script" uid="uid://dw3yrisbnd4me" path="res://addons/waterways_net/RiverFloatSystem.cs" id="6_grs8q"]
+[ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes/boat.tscn" id="7_8ie3e"]
+[ext_resource type="Texture2D" uid="uid://cah11bis1j2yl" path="res://art/textures/rocks16_alb_ht.dds" id="7_freo2"]
+[ext_resource type="Texture2D" uid="uid://dtghvaxasn2b0" path="res://art/textures/rocks16_nrm_rgh.dds" id="8_88xa8"]
+[ext_resource type="Texture2D" uid="uid://0fs6ostl5fy7" path="res://art/textures/Rocks002_alb_ht.dds" id="9_6wx8f"]
+[ext_resource type="Texture2D" uid="uid://dbifmkbrn7p4j" path="res://art/textures/Rocks002_nrm_rgh.dds" id="10_r34ug"]
+
+[sub_resource type="Resource" id="Resource_grs8q"]
+script = ExtResource("5_r34ug")
+MatShaderType = 1
+mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
+mat_albedo_color_second = Color(0.25, 0.35, 0.35, 1)
+mat_albedo_depth = 10.0
+mat_albedo_depth_curve = 0.25
+mat_transparency_clarity = 10.0
+mat_transparency_depth_curve = 0.25
+mat_transparency_refraction = 0.05
+mat_normal_scale = 1.0
+mat_normal_bump_texture = ExtResource("4_6wx8f")
+mat_flow_speed = 1.0
+mat_flow_base = 0.0
+mat_flow_steepness = 2.0
+mat_flow_distance = 1.0
+mat_flow_pressure = 1.0
+mat_flow_max = 4.0
+mat_foam_color = Color(0.9, 0.9, 0.9, 1)
+mat_foam_amount = 2.0
+mat_foam_steepness = 2.0
+mat_foam_smoothness = 0.3
+mat_uv_scale = Vector3(1, 1, 1)
+mat_roughness = 0.2
+mat_edge_fade = 0.25
+LodLod0Distance = 50.0
+_selectedShader = 1
+
+[sub_resource type="Curve3D" id="Curve3D_8ie3e"]
+resource_local_to_scene = true
+bake_interval = 0.05
+_data = {
+"points": PackedVector3Array(0, 0, -0.25, 0, 0, 0.25, 0, 0, 0, 0.07637652, 0, -3.5520477, -0.07637652, 0, 3.5520477, 8.104104e-07, 0, 10.27002, 1.3603715, 0, -6.3352776, -1.3603715, 0, 6.3352776, -4.7835593, 0, 35.74352, 7.60968, 1.9073486e-06, -7.004364, -7.60968, -1.9073486e-06, 7.004364, -27.357452, 0, 69.567635, 10.3757515, 3.0633469, -3.2842102, -10.3757515, -3.0633469, 3.2842102, -47.492764, -15.766102, 83.42081, 7.27507, -0.1381836, -0.49801636, -7.27507, 0.1381836, 0.49801636, -77.21894, -19.943726, 87.47697, 7.5635557, 0.85978717, 2.4483485, -7.5635557, -0.85978717, -2.4483485, -108.37574, -21.07483, 80.244385, 3.8106492, -0.25624275, 8.242612, -3.8106492, 0.25624275, -8.242612, -128.7254, -21.71582, 50.13909, 7.1915903, 0.07654767, 11.825843, -7.1915903, -0.07654767, -11.825843, -156.60985, -21.71582, 2.3095584, 9.0155945, -0.025619507, 10.649864, -9.0155945, 0.025619507, -10.649864, -183.59431, -21.71582, -42.162155, 6.6926727, 0.010902405, 1.5774841, -6.6926727, -0.010902405, -1.5774841, -210.4251, -21.71582, -61.935932, 5.790039, -0.0034103394, -4.293232, -5.790039, 0.0034103394, 4.293232, -238.92326, -21.71582, -53.07189, 0.7460327, 0.001045227, -10.588133, -0.7460327, -0.001045227, 10.588133, -255.75092, -21.71582, -27.20409, -4.7573547, -0.0002975464, -7.3377085, 4.7573547, 0.0002975464, 7.3377085, -248.1766, -21.71582, 2.3107557, -6.718111, 9.2979055e-05, -8.685863, 6.718111, -9.2979055e-05, 8.685863, -222.22746, -21.71582, 37.74912, -7.6729584, -3.0517578e-05, -14.42083, 7.6729584, 3.0517578e-05, 14.42083, -188.5854, -21.71582, 82.75371, -7.8395386, 17.59314, -16.24952, 7.8395386, -17.59314, 16.24952, -176.65808, -110.911865, 115.79522, -10.6089325, 0.76049805, -27.134003, 10.6089325, -0.76049805, 27.134003, -159.08786, -126.213745, 175.48845, -18.62748, -0.3170166, -26.916718, 18.62748, 0.3170166, 26.916718, -43.641083, -125.68945, 349.27863),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 19
+
+[sub_resource type="Gradient" id="Gradient_i46ye"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_freo2"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_88xa8"]
+noise = SubResource("FastNoiseLite_freo2")
+color_ramp = SubResource("Gradient_i46ye")
+seamless = true
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_6wx8f"]
+_shader_parameters = {
+&"bias_distance": 512.0,
+&"blend_sharpness": 0.5,
+&"depth_blur": 0.0,
+&"enable_macro_variation": true,
+&"enable_projection": true,
+&"flat_terrain_normals": false,
+&"macro_variation1": Color(1, 1, 1, 1),
+&"macro_variation2": Color(1, 1, 1, 1),
+&"macro_variation_slope": 0.333,
+&"mipmap_bias": 1.0,
+&"noise1_angle": 0.0,
+&"noise1_offset": Vector2(0.5, 0.5),
+&"noise1_scale": 0.04,
+&"noise2_scale": 0.076,
+&"noise_texture": SubResource("NoiseTexture2D_88xa8"),
+&"projection_threshold": 0.8
+}
+world_background = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r34ug"]
+transparency = 4
+cull_mode = 2
+vertex_color_use_as_albedo = true
+backlight_enabled = true
+backlight = Color(0.5, 0.5, 0.5, 1)
+distance_fade_mode = 1
+distance_fade_min_distance = 128.0
+distance_fade_max_distance = 96.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_grs8q"]
+generated_type = 1
+height_offset = 0.5
+material_override = SubResource("StandardMaterial3D_r34ug")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_6wx8f"]
+name = "rocks16_alb_ht"
+albedo_texture = ExtResource("7_freo2")
+normal_texture = ExtResource("8_88xa8")
+detiling_rotation = 0.1
+detiling_shift = 0.1
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_nkx1i"]
+name = "RiverRocks"
+id = 1
+albedo_texture = ExtResource("9_6wx8f")
+normal_texture = ExtResource("10_r34ug")
+uv_scale = 0.38
+detiling_rotation = 0.1
+detiling_shift = 0.1
+
+[sub_resource type="Terrain3DAssets" id="Terrain3DAssets_8ie3e"]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_grs8q")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_6wx8f"), SubResource("Terrain3DTextureAsset_nkx1i")])
+
+[node name="DemoLevel" type="Node"]
+script = ExtResource("1_i46ye")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 1, 0)
+shadow_enabled = true
+
+[node name="RiverManager" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1, -3, -5)
+script = ExtResource("3_88xa8")
+ShaderSettings = SubResource("Resource_grs8q")
+PointWidths = Array[float]([9.738645, 11.79303, 17.322895, 14.258924, 19.230875, 19.230875, 19.230875, 19.230875, 27.431053, 34.830986, 27.622408, 24.90232, 34.700542, 27.715273, 35.96378, 37.959026, 60.54432, 161.6149, 69.5427])
+Curve = SubResource("Curve3D_8ie3e")
+metadata/_custom_type_script = "uid://d20js1b0dipxh"
+
+[node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
+script = ExtResource("6_grs8q")
+DefaultHeight = -1000.0
+metadata/_custom_type_script = "uid://dw3yrisbnd4me"
+
+[node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("7_8ie3e")]
+transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -2, -9)
+River = NodePath("../RiverManager/RiverFloatSystem")
+RowForce = 200.0
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://dmth1b1qymst1")
+spawn_path = NodePath("..")
+spawn_limit = 4
+
+[node name="Terrain3D" type="Terrain3D" parent="."]
+data_directory = "res://terrain_data"
+material = SubResource("Terrain3DMaterial_6wx8f")
+assets = SubResource("Terrain3DAssets_8ie3e")
+top_level = true
+metadata/_edit_lock_ = true
