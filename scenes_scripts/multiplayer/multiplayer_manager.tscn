@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://d18tnr8wt38pv"]
 
-[ext_resource type="Script" uid="uid://bnn8vtotn6tm5" path="res://scripts/multiplayer/multiplayer_manager.gd" id="1_en7kx"]
+[ext_resource type="Script" uid="uid://bnn8vtotn6tm5" path="res://scenes_scripts/multiplayer/multiplayer_manager.gd" id="1_en7kx"]
 
 [node name="MultiplayerManager" type="Node"]
 script = ExtResource("1_en7kx")

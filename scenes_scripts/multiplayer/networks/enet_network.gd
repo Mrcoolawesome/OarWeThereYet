@@ -4,8 +4,8 @@ const SERVER_PORT = 8080
 const SERVER_IP = "127.0.0.1"
 
 var multiplayer_peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
-var player_scene = preload("res://scenes/player.tscn")
-var test_level_scene = preload("res://scenes/demo_level.tscn")
+var player_scene = preload("res://scenes_scripts/player/player.tscn")
+var test_level_scene = preload("res://scenes_scripts/levels/demo_level.tscn")
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
 @onready var main_root_scene = get_tree().current_scene

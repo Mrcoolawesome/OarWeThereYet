@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://danavscflb0ck"]
 
-[ext_resource type="Script" uid="uid://beshkpn7hsow" path="res://scripts/DryBox.cs" id="1_4amak"]
+[ext_resource type="Script" uid="uid://beshkpn7hsow" path="res://scenes_scripts/boat/dry_box/DryBox.cs" id="1_4amak"]
 [ext_resource type="PackedScene" uid="uid://cegj4xdw5ihm0" path="res://art/models/drybox.blend" id="1_ymuao"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ymuao"]
