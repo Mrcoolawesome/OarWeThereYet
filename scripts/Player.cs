@@ -226,13 +226,16 @@ public partial class Player : CharacterBody3D
 		if (Input.IsActionJustPressed("ui_accept"))
 		{
 			// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
-			RequestRowing(0, false, false);
+			RequestRowing((int)_seat, false, false);
 
 			// Reset their global position
 			GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 1, 0); 
 
 			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
 			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
+
+			_sittingYawDelta = 0;
+			GlobalRotation = new Vector3(0, GlobalRotation.Y, 0);
 
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
