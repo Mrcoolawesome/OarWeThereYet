@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bhjy2n3qwlbxi"]
+[gd_scene load_steps=19 format=3 uid="uid://bhjy2n3qwlbxi"]
 
 [ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scripts/TestLevel.cs" id="1_i46ye"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="3_88xa8"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="5_r34ug"]
 [ext_resource type="Script" uid="uid://dw3yrisbnd4me" path="res://addons/waterways_net/RiverFloatSystem.cs" id="6_grs8q"]
 [ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes/boat.tscn" id="7_8ie3e"]
+[ext_resource type="Texture2D" uid="uid://cah11bis1j2yl" path="res://art/textures/rocks16_alb_ht.dds" id="7_freo2"]
+[ext_resource type="Texture2D" uid="uid://dtghvaxasn2b0" path="res://art/textures/rocks16_nrm_rgh.dds" id="8_88xa8"]
 
 [sub_resource type="Resource" id="Resource_fmty4"]
 script = ExtResource("5_r34ug")
@@ -85,7 +87,6 @@ _shader_parameters = {
 &"projection_threshold": 0.8
 }
 world_background = 0
-show_checkered = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r34ug"]
 transparency = 4
@@ -105,8 +106,16 @@ last_lod = 0
 last_shadow_lod = 0
 lod0_range = 128.0
 
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_6wx8f"]
+name = "rocks16_alb_ht"
+albedo_texture = ExtResource("7_freo2")
+normal_texture = ExtResource("8_88xa8")
+detiling_rotation = 0.1
+detiling_shift = 0.1
+
 [sub_resource type="Terrain3DAssets" id="Terrain3DAssets_8ie3e"]
 mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_grs8q")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_6wx8f")])
 
 [node name="DemoLevel" type="Node"]
 script = ExtResource("1_i46ye")
@@ -142,6 +151,5 @@ spawn_limit = 4
 data_directory = "res://terrain_data"
 material = SubResource("Terrain3DMaterial_6wx8f")
 assets = SubResource("Terrain3DAssets_8ie3e")
-show_checkered = true
 top_level = true
 metadata/_edit_lock_ = true
