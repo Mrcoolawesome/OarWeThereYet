@@ -12,12 +12,19 @@ public partial class Boat : RigidBody3D
     [Export] public float RiverSpeed = 1.0f;
     [Export] public float WaterDrag = 2.0f;
     [Export] public float RowForce = 10.0f;
+    [Export] public float ImpactVelocityThreshold = 10.0f;
+    [Export] public int MaxHealth = 100;
+    [Export] public int ImpactDamage = 10;
 
     [Signal] public delegate void SeatEnteredEventHandler(Vector3 seatPosition);
 
     private Node3D _boatFloatProbesContainer;
     private Node3D _oarProbesContainer;
     private float _gravity;
+    private Vector3 _collisionObjectPosition; // position of the object that is colliding with us
+    private Node _expectedCollisionObject; // collision object given when an object enters our collision
+    // THIS NEVER GETS RESET WHICH IS PROBABLY BAD
+    private Health _healthComponent = new Health();
 
     // booleans to apply rowing force to specific spots on the boat
     private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
@@ -47,9 +54,25 @@ public partial class Boat : RigidBody3D
         _boatFloatProbesContainer = GetNode<Node3D>("BoatFloatProbesContainer");
         _oarProbesContainer = GetNode<Node3D>("OarProbesContainer");
         _gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
+        _healthComponent.Name = "HealthComponent"; 
+        AddChild(_healthComponent);
 
         // subscribe to the Rowing signal from the singleton script
         GlobalSignalServer.Instance.Rowing += _OnPlayerRowing;
+
+        // initalize the health stuff
+        _healthComponent.Initalize(MaxHealth); // initalize with 100 health
+
+        // listen to the health changed signal sent from the health component
+        // AnnounceHealthUpdate will send a signal to the server that updates the ui to show the new health
+        _healthComponent.HealthChanged += AnnounceHealthUpdate;
+
+        // announce if the boat died
+        _healthComponent.Die += AnnounceDeath;
+
+        // need to enable these things to enable collision detection
+        ContactMonitor = true;
+        MaxContactsReported = 5;
     }
 
   public override void _PhysicsProcess(double delta)
@@ -148,19 +171,6 @@ public partial class Boat : RigidBody3D
         return waterRight.Cross(flowDirection);
     }
 
-    /*
-        (all of this is assuming you're facing the front)
-        front left: 4, 2, -2
-        front right: 4, 2, 2
-        back left: 0, 2, -2
-        back right: 0, 2, 2
-
-        front left localShapeIndex: 0
-        front right localShapeIndex: 1
-        back right localShapeIndex: 2
-        back left localShapeIndex: 3
-    */
-
     // getting the signals to row forward or to stop
     // the parameter types of this function MUST be identical to the Rowing signal from the singleton server/script
     // needs to be an RPC call so the server knows to update the states
@@ -194,4 +204,41 @@ public partial class Boat : RigidBody3D
 		LinearVelocity = Vector3.Zero;
         AngularVelocity = Vector3.Zero;
 	}
+
+    // we need to use integrate forces to get the exact position of the colliding object 
+    public override void _IntegrateForces(PhysicsDirectBodyState3D state)
+    {
+        // only the server can do boat health stuff 
+        if (Multiplayer.IsServer())
+        {
+            // get the position of the object that just entered
+            for (int i = 0; i < state.GetContactCount(); i++)
+            {
+                // get the impact velocity at the collision point
+                float impactVelocity = state.GetContactLocalVelocityAtPosition(i).Length();
+
+                // if the impact velocity at that point is greater than the threshold then remove health points from the boat health
+                if (impactVelocity > ImpactVelocityThreshold)
+                {
+                    // update our health, this automatically sends out a signal that the health has been updated
+                    _healthComponent.UpdateHealth(-ImpactDamage);
+                }
+            }
+        }
+    }
+    // Emitted when the health changes. triggered by the health component's signal
+    // this is just to update the ui, the health component already updates everyone's local health variables automatically
+    public void AnnounceHealthUpdate(int newHealth)
+    {
+        // announce this update to the signal server to update the ui
+        GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.UpdateBoatHealth), newHealth);
+    }
+
+    // announces to the signal server that the boat died so the ui can update
+    // this is triggered by a signal sent from the health component that's connected in the _Ready function of this code
+    public void AnnounceDeath()
+    {
+        // announce the death to the global signal server
+        GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.BoatDeath));
+    }
 }
