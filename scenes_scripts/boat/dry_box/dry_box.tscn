@@ -7,7 +7,8 @@
 size = Vector3(2, 1, 1)
 
 [node name="DryBox" type="StaticBody3D"]
-collision_layer = 2
+collision_layer = 8
+collision_mask = 0
 script = ExtResource("1_4amak")
 
 [node name="drybox" parent="." instance=ExtResource("1_ymuao")]

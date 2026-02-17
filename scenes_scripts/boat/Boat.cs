@@ -236,6 +236,12 @@ public partial class Boat : RigidBody3D
             // get the position of the object that just entered
             for (int i = 0; i < state.GetContactCount(); i++)
             {
+                // if we're colliding with a player, ignore them
+                if (state.GetContactColliderObject(i) is CharacterBody3D)
+                {
+                    continue;
+                }
+
                 // get the impact velocity at the collision point
                 float impactVelocity = state.GetContactLocalVelocityAtPosition(i).Length();
 
