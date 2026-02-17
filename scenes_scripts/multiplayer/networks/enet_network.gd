@@ -8,7 +8,6 @@ var player_scene = preload("res://scenes_scripts/player/player.tscn")
 var test_level_scene = preload("res://scenes_scripts/levels/demo_level.tscn")
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
-@onready var main_root_scene = get_tree().current_scene
 @onready var level_container = get_tree().current_scene.get_node_or_null("Level")
 
 # become host for ENet server
