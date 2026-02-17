@@ -1,0 +1,10 @@
+[gd_resource type="BoxMesh" load_steps=3 format=3 uid="uid://2og28wq6h1da"]
+
+[ext_resource type="Texture2D" uid="uid://kt83tf61prry" path="res://art/Images/evilAssFace.jpg" id="1_7mq0f"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0cs1l"]
+albedo_texture = ExtResource("1_7mq0f")
+
+[resource]
+material = SubResource("StandardMaterial3D_0cs1l")
+size = Vector3(0.5, 0.5, 0.5)

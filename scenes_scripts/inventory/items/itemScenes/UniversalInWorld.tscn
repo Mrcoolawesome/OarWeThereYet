@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://ce4hm33fw8if5"]
+
+[ext_resource type="Script" uid="uid://b0wnlc5rujto1" path="res://inventory/items/itemScenes/UniversalInWorld.cs" id="1_81w8m"]
+
+[node name="UniversalInWorld" type="RigidBody3D"]
+script = ExtResource("1_81w8m")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
