@@ -31,26 +31,37 @@ theme = ExtResource("2_vcehk")
 text = "Resume"
 alignment = 0
 
-[node name="ResetButton" type="Button" parent="."]
+[node name="ResetGameButton" type="Button" parent="."]
 layout_mode = 0
 offset_left = 64.0
 offset_top = 320.0
 offset_right = 576.0
 offset_bottom = 576.0
 theme = ExtResource("2_vcehk")
-text = "Reset"
+text = "Reset Game"
 alignment = 0
 
-[node name="ExitButton" type="Button" parent="."]
+[node name="RespawnPlayerButton" type="Button" parent="."]
 layout_mode = 0
 offset_left = 64.0
 offset_top = 576.0
 offset_right = 576.0
 offset_bottom = 832.0
 theme = ExtResource("2_vcehk")
+text = "Respawn"
+alignment = 0
+
+[node name="ExitButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 832.0
+offset_right = 576.0
+offset_bottom = 1088.0
+theme = ExtResource("2_vcehk")
 text = "Exit"
 alignment = 0
 
 [connection signal="pressed" from="ResumeButton" to="." method="OnResumeButtonPressed"]
-[connection signal="pressed" from="ResetButton" to="." method="OnResetButtonPressed"]
+[connection signal="pressed" from="ResetGameButton" to="." method="OnResetButtonPressed"]
+[connection signal="pressed" from="RespawnPlayerButton" to="." method="OnRespawnPlayerButtonPressed"]
 [connection signal="pressed" from="ExitButton" to="." method="OnExitButtonPressed"]

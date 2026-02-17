@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Net.Http;
+using System.Runtime.InteropServices.Marshalling;
 
 public partial class Player : CharacterBody3D
 {
@@ -432,6 +433,13 @@ public partial class Player : CharacterBody3D
 		{
 			GetTree().Quit();
 		}
+	}
+
+	private void OnPauseUIRespawnPlayer()
+	{
+		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
+		// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
+		Position = new Vector3(_boat.Position.X, _boat.Position.Y + 2, _boat.Position.Z);
 	}
 
 	//RPC Functions
