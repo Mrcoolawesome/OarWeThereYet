@@ -7,6 +7,7 @@ public partial class PauseUi : Control
 	[Signal] public delegate void ExitEventHandler();
 	[Signal] public delegate void JoinEventHandler();
 	[Signal] public delegate void HostEventHandler();
+	[Signal] public delegate void RespawnPlayerEventHandler();
 	
 	// get the button
 	private Button _resetButton = new Button();
@@ -15,15 +16,10 @@ public partial class PauseUi : Control
 	public override void _Ready()
 	{
 		// get the button from the tree
-		_resetButton = GetNode<Button>("ResetButton");
+		_resetButton = GetNode<Button>("ResetGameButton");
 
 		// if the user isn't the server they shouldn't be able to reset the game
 		_resetButton.Visible = Multiplayer.IsServer();
-	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
 	}
 
 	private void OnResumeButtonPressed()
@@ -50,5 +46,10 @@ public partial class PauseUi : Control
 	{
 		// call the signal on the signal server don't locally emit a signal
 		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.ResetLevel);
+	}
+
+	private void OnRespawnPlayerButtonPressed()
+	{
+		EmitSignal(SignalName.RespawnPlayer);
 	}
 }

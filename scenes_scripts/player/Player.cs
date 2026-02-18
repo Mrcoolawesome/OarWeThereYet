@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Net.Http;
+using System.Runtime.InteropServices.Marshalling;
 
 public partial class Player : CharacterBody3D
 {
@@ -315,10 +316,11 @@ public partial class Player : CharacterBody3D
 	private void StandingStatePhysicsProcess(double delta)
 	{
 		Vector3 velocity = Velocity;
-
+		
 		// Handle Jump.
 		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
 		{
+			// actually make them jump
 			velocity.Y = JumpVelocity;
 		}
 
@@ -332,14 +334,18 @@ public partial class Player : CharacterBody3D
 			targetDirection = Vector3.Zero;
 		}
 
-		// Set direction and move in that direction
-		_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
-		velocity.X = _direction.X * _currSpeed;
-		velocity.Z = _direction.Z * _currSpeed;
-		Velocity = velocity;
+		if (IsOnFloor())
+		{
+			// Set direction and move in that direction
+			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
+			velocity.X = _direction.X * _currSpeed;
+			velocity.Z = _direction.Z * _currSpeed;
+		} 
 
 		// Handle mouse input while standing
 		PlayerRotation();
+
+		Velocity = velocity;
 	}
 
 	private void CrouchSprintPhysicsProcess(double delta)
@@ -432,6 +438,13 @@ public partial class Player : CharacterBody3D
 		{
 			GetTree().Quit();
 		}
+	}
+
+	private void OnPauseUIRespawnPlayer()
+	{
+		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
+		// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
+		Position = new Vector3(_boat.Position.X, _boat.Position.Y + 2, _boat.Position.Z);
 	}
 
 	//RPC Functions
