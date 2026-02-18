@@ -316,10 +316,11 @@ public partial class Player : CharacterBody3D
 	private void StandingStatePhysicsProcess(double delta)
 	{
 		Vector3 velocity = Velocity;
-
+		
 		// Handle Jump.
 		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
 		{
+			// actually make them jump
 			velocity.Y = JumpVelocity;
 		}
 
@@ -333,14 +334,18 @@ public partial class Player : CharacterBody3D
 			targetDirection = Vector3.Zero;
 		}
 
-		// Set direction and move in that direction
-		_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
-		velocity.X = _direction.X * _currSpeed;
-		velocity.Z = _direction.Z * _currSpeed;
-		Velocity = velocity;
+		if (IsOnFloor())
+		{
+			// Set direction and move in that direction
+			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
+			velocity.X = _direction.X * _currSpeed;
+			velocity.Z = _direction.Z * _currSpeed;
+		} 
 
 		// Handle mouse input while standing
 		PlayerRotation();
+
+		Velocity = velocity;
 	}
 
 	private void CrouchSprintPhysicsProcess(double delta)
