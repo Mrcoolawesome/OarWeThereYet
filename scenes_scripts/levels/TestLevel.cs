@@ -12,23 +12,13 @@ public partial class TestLevel : Node
 	{
 		// attach the reset function to the signal from the signal server script
 		GlobalSignalServer.Instance.ResetLevel += _InitateReset; // might be a problem to directly call an Rpc function
+		GlobalSignalServer.Instance.BoatDeath += _InitateReset;
 
 		// set the boat variable
 		_boat = GetNode<Boat>("Boat");
 	}
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
 
 	private void _InitateReset()
-	{
-		_ResetSignalRecieved();
-	}
-
-	// i think we want CallLocal to be false because we'll just update the server and it'll sync the locations of everything to their starting points
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
-	private void _ResetSignalRecieved()
 	{
 		RpcId(1, MethodName._Reset);
 	}

@@ -15,7 +15,9 @@ public partial class Boat : RigidBody3D
     [Export] public float ImpactVelocityThreshold = 10.0f;
     [Export] public int MaxHealth = 100;
     [Export] public int ImpactDamage = 10;
-
+    [Export] private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
+    [Export(PropertyHint.None, "suffix:°")] public Vector3 BoatResetRotation = new Vector3(0.0f, 90.0f, 0.0f);
+    
     [Signal] public delegate void SeatEnteredEventHandler(Vector3 seatPosition);
 
     private Node3D _boatFloatProbesContainer;
@@ -29,11 +31,6 @@ public partial class Boat : RigidBody3D
     // booleans to apply rowing force to specific spots on the boat
     private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
     private bool[] _rowingStatesDirection = new bool[4]; // direction of rowing: backward = false | forward = true
-
-    // boat reset position and rotation
-	private Vector3 _boatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
-	private Vector3 _boatResetRotation = new Vector3(0.0f, Mathf.DegToRad(90), 0.0f);
-
 
     /*
         front left localShapeIndex: 0
@@ -73,6 +70,13 @@ public partial class Boat : RigidBody3D
         // need to enable these things to enable collision detection
         ContactMonitor = true;
         MaxContactsReported = 5;
+
+        // make the boat reset rotation in radians
+        BoatResetRotation = new Vector3(
+            Mathf.DegToRad(BoatResetRotation.X),
+            Mathf.DegToRad(BoatResetRotation.Y),
+            Mathf.DegToRad(BoatResetRotation.Z)
+        );
     }
 
     // physics process along with all its associated functions
@@ -221,10 +225,13 @@ public partial class Boat : RigidBody3D
 	{
 		// set the player into the standing state and reset their position and velocity
 		_rowingStates = [false, false, false, false];
-		GlobalPosition = _boatResetPosition;
-		GlobalRotation = _boatResetRotation;
+		GlobalPosition = BoatResetPosition;
+		GlobalRotation = BoatResetRotation;
 		LinearVelocity = Vector3.Zero;
         AngularVelocity = Vector3.Zero;
+
+        // reset the boat health
+        _healthComponent.ResetHealth();
 	}
 
     // we need to use integrate forces to get the exact position of the colliding object 
