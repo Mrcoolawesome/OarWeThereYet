@@ -15,7 +15,7 @@ public partial class Boat : RigidBody3D
     [Export] public float ImpactVelocityThreshold = 10.0f;
     [Export] public int MaxHealth = 100;
     [Export] public int ImpactDamage = 10;
-    [Export] private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
+    [Export(PropertyHint.None, "suffix:m")] private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
     [Export(PropertyHint.None, "suffix:°")] public Vector3 BoatResetRotation = new Vector3(0.0f, 90.0f, 0.0f);
     
     [Signal] public delegate void SeatEnteredEventHandler(Vector3 seatPosition);
@@ -31,6 +31,9 @@ public partial class Boat : RigidBody3D
     // booleans to apply rowing force to specific spots on the boat
     private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
     private bool[] _rowingStatesDirection = new bool[4]; // direction of rowing: backward = false | forward = true
+
+    // boolean for checking if a reset is pending
+    private bool _resetPending = false;
 
     /*
         front left localShapeIndex: 0
@@ -189,12 +192,6 @@ public partial class Boat : RigidBody3D
                 ApplyForce(finalForce, relativePosition); // finally apply the force
             }
         }
-    }
-
-    // all the code associated with doing anything not needed to be done on the physics time
-    public override void _Process(double delta)
-    {
-        base._Process(delta);
     }
 
     // getting the signals to row forward or to stop

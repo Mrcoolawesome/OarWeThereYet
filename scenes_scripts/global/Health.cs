@@ -100,12 +100,19 @@ public partial class Health : Node
 
 	public void ResetHealth()
 	{
-		Rpc(nameof(SyncResetHealth));
+		// only allow the host to update the resetted health
+		if (Multiplayer.IsServer())
+		{
+			Rpc(nameof(SyncResetHealth));
+		}
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
 	private void SyncResetHealth()
 	{
 		_currHealth = _maxHealth;
+
+		// sync it across everyone's ui
+		EmitSignal(nameof(HealthChanged), _currHealth);
 	}
 }
