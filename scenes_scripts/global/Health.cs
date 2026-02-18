@@ -66,8 +66,8 @@ public partial class Health : Node
     // Check if the boat was already dead before they joined
     if (_currHealth <= 0)
     {
-        _currHealth = 0;
-        EmitSignal(nameof(Die));
+			_currHealth = 0;
+			EmitSignal(nameof(Die));
     }
 
     // Force their local UI to update immediately
@@ -90,11 +90,29 @@ public partial class Health : Node
 		// check if they're out of health
 		if (_currHealth <= 0)
 		{
-			EmitSignal(nameof(Die));
 			_currHealth = 0; // just set their health to zero so it doesn't show up as negative in the ui
+			EmitSignal(nameof(Die));
 		}
 		
 		// send out the signal to say that their health has changed with their new health amount
+		EmitSignal(nameof(HealthChanged), _currHealth);
+	}
+
+	public void ResetHealth()
+	{
+		// only allow the host to update the resetted health
+		if (Multiplayer.IsServer())
+		{
+			Rpc(nameof(SyncResetHealth));
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
+	private void SyncResetHealth()
+	{
+		_currHealth = _maxHealth;
+
+		// sync it across everyone's ui
 		EmitSignal(nameof(HealthChanged), _currHealth);
 	}
 }
