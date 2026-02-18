@@ -488,6 +488,9 @@ public partial class Player : CharacterBody3D
 		{
 			// Tell EVERYONE (including the server) to run the SyncReset function
 			Rpc(nameof(SyncReset));
+
+			// stop the rowing animation too
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 		}
 	}
 
