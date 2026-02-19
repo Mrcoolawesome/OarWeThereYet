@@ -10,6 +10,7 @@ public partial class Player : CharacterBody3D
 	[Export] public float WalkingSpeed = 5.0f;
 	[Export] public float SprintSpeed = 8.0f;
 	[Export] public float CrouchingSpeed = 3.0f;
+	[Export] public float AirSpeed = 3.0f;
 	[Export] public float MouseSens = 0.4f;
 	[Export] public float LerpSpeed = 10.0f;
 	[Export] public float CrouchLerpSpeed = 10.0f;
@@ -77,7 +78,9 @@ public partial class Player : CharacterBody3D
 	// Player state default is standing
 	private PlayerState _currPlayerState = PlayerState.Standing;
 
-	private Vector3 _platformVelocity;
+	// Stuff for player keeping momentum while in the air
+	private Vector3 _initialVelocity;
+	private bool _isOnGround;
 
 	public override void _EnterTree()
 	{
@@ -336,60 +339,75 @@ public partial class Player : CharacterBody3D
 			targetDirection = Vector3.Zero;
 		}
 
+		// Frame when player leaves ground
+		if (!IsOnFloor() && _isOnGround)
+		{
+			_initialVelocity = GetPlatformVelocity() + velocity;
+		}
+
 		if (IsOnFloor())
 		{
 			// Set direction and move in that direction
 			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
 			velocity.X = _direction.X * _currSpeed;
 			velocity.Z = _direction.Z * _currSpeed;
-			_platformVelocity = GetPlatformVelocity();
 		} 
 		else 
 		{
 			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
-			velocity.X = _direction.X * _currSpeed + _platformVelocity.X;
-			velocity.Z = _direction.Z * _currSpeed + _platformVelocity.Z;
+			velocity.X = _direction.X * _currSpeed + _initialVelocity.X;
+			velocity.Z = _direction.Z * _currSpeed + _initialVelocity.Z;
 		}
 
 		// Handle mouse input while standing
 		PlayerRotation();
+
+		_isOnGround = IsOnFloor();
 
 		Velocity = velocity;
 	}
 
 	private void CrouchSprintPhysicsProcess(double delta)
 	{
-		// They can only be crouching or sprinting not both hence the else if
-		// If they are pressing both then the speed will be set to crouching speed
-		if (Input.IsActionPressed("crouch"))
+		// If player is not on the floor ignore all other logic
+		if (!IsOnFloor())
 		{
-			_currSpeed = CrouchingSpeed;
-
-			// Set the head height to be offset by the crouching depth
-			Vector3 targetHeadPosition = new Vector3(_head.Position.X, _crouchingDepth, _head.Position.Z);
-			_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
-
-			// Disable the staning collision shape
-			_standingCollision.Disabled = true;
-			_crouchingCollision.Disabled = false;
-		} 
+			_currSpeed = AirSpeed;
+		}
 		else
 		{
-			// Set head position to be default when not crouching
-			Vector3 targetHeadPosition = new Vector3(_head.Position.X, 0.0f, _head.Position.Z);
-			_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
-
-			// Enable the standing collision shape
-			_standingCollision.Disabled = false;
-			_crouchingCollision.Disabled = true;
-
-			if (Input.IsActionPressed("sprint"))
+			// They can only be crouching or sprinting not both hence the else if
+			// If they are pressing both then the speed will be set to crouching speed
+			if (Input.IsActionPressed("crouch"))
 			{
-				_currSpeed = SprintSpeed;
-			}
+				_currSpeed = CrouchingSpeed;
+
+				// Set the head height to be offset by the crouching depth
+				Vector3 targetHeadPosition = new Vector3(_head.Position.X, _crouchingDepth, _head.Position.Z);
+				_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
+
+				// Disable the staning collision shape
+				_standingCollision.Disabled = true;
+				_crouchingCollision.Disabled = false;
+			} 
 			else
 			{
-				_currSpeed = WalkingSpeed;
+				// Set head position to be default when not crouching
+				Vector3 targetHeadPosition = new Vector3(_head.Position.X, 0.0f, _head.Position.Z);
+				_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
+
+				// Enable the standing collision shape
+				_standingCollision.Disabled = false;
+				_crouchingCollision.Disabled = true;
+
+				if (Input.IsActionPressed("sprint"))
+				{
+					_currSpeed = SprintSpeed;
+				}
+				else
+				{
+					_currSpeed = WalkingSpeed;
+				}
 			}
 		}
 	}
