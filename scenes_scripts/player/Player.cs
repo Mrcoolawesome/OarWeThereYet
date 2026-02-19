@@ -77,6 +77,8 @@ public partial class Player : CharacterBody3D
 	// Player state default is standing
 	private PlayerState _currPlayerState = PlayerState.Standing;
 
+	private Vector3 _platformVelocity;
+
 	public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -340,7 +342,14 @@ public partial class Player : CharacterBody3D
 			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
 			velocity.X = _direction.X * _currSpeed;
 			velocity.Z = _direction.Z * _currSpeed;
+			_platformVelocity = GetPlatformVelocity();
 		} 
+		else 
+		{
+			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
+			velocity.X = _direction.X * _currSpeed + _platformVelocity.X;
+			velocity.Z = _direction.Z * _currSpeed + _platformVelocity.Z;
+		}
 
 		// Handle mouse input while standing
 		PlayerRotation();
