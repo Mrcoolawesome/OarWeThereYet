@@ -172,6 +172,7 @@ RowForce = 200.0
 ImpactVelocityThreshold = 2.0
 BoatResetPosition = Vector3(0, -3, -9)
 BoatResetRotation = Vector3(0, -90, 0)
+LerpSpeed = 10.0
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://dmth1b1qymst1")

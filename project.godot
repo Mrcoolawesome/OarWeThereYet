@@ -87,11 +87,6 @@ action_key={
 3d_physics/layer_3="player"
 3d_physics/layer_4="interact"
 
-[physics]
-
-common/physics_jitter_fix=0.0
-common/physics_interpolation=true
-
 [steam]
 
 initialization/app_id=0

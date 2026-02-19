@@ -1,10 +1,12 @@
 using Godot;
+using Godot.Collections;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Dynamic;
 using System.Linq;
 using Waterways;
 
-public partial class Boat : RigidBody3D
+public partial class Boat : RigidBody3D, ISyncBuffer
 {
     //TODO: Change boat to face negative Z direction
     [Export] public RiverFloatSystem River;
@@ -17,6 +19,8 @@ public partial class Boat : RigidBody3D
     [Export] public int ImpactDamage = 10;
     [Export(PropertyHint.None, "suffix:m")] private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
     [Export(PropertyHint.None, "suffix:°")] public Vector3 BoatResetRotation = new Vector3(0.0f, 90.0f, 0.0f);
+    [Export] public Array<Variant> State {get; set;}
+    [Export] public float LerpSpeed = 1.0f;
     
     [Signal] public delegate void SeatEnteredEventHandler(Vector3 seatPosition);
 
@@ -35,13 +39,16 @@ public partial class Boat : RigidBody3D
     // boolean for checking if a reset is pending
     private bool _resetPending = false;
 
-    /*
-        front left localShapeIndex: 0
-        front right localShapeIndex: 1
-        back right localShapeIndex: 2
-        back left localShapeIndex: 3
-    */
-    public enum SeatIndicies
+    // current physics frame count
+    public int PhysicsFrameCount {get; set;} = 0;
+
+  /*
+      front left localShapeIndex: 0
+      front right localShapeIndex: 1
+      back right localShapeIndex: 2
+      back left localShapeIndex: 3
+  */
+  public enum SeatIndicies
     {
         FrontLeft = 0,
         FrontRight = 1,
@@ -80,6 +87,18 @@ public partial class Boat : RigidBody3D
             Mathf.DegToRad(BoatResetRotation.Y),
             Mathf.DegToRad(BoatResetRotation.Z)
         );
+
+        // set the state if we're the server
+        if (Multiplayer.IsServer())
+        {
+            State = [PhysicsFrameCount, Position, Quaternion, LinearVelocity, AngularVelocity];
+        }
+
+        // disable physics simulation if we're the client because we don't want our stuff and the server to fight
+        if (!Multiplayer.IsServer())
+        {
+            Freeze = true;            
+        }
     }
 
     // physics process along with all its associated functions
@@ -90,6 +109,10 @@ public partial class Boat : RigidBody3D
 
         // apply the rowing forces if the player is rowing
         ApplyRowingForcePhysicsProcess();
+
+        // run the network stuff
+        SetStateArray();
+        MoveAndLerp(delta);
     }
 
     // does the bouyancy stuff for the probes
@@ -273,4 +296,39 @@ public partial class Boat : RigidBody3D
         // announce the death to the global signal server
         GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.BoatDeath));
     }
+
+    // this should only be ran on the server
+    public void SetStateArray()
+    {
+        if (Multiplayer.IsServer())
+        {
+            State = [PhysicsFrameCount, Position, Quaternion, LinearVelocity, AngularVelocity];
+        }
+    }
+
+    public void ApplyStateArray()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void MaintainBuffer()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void MoveAndLerp(double delta)
+    {
+        if (!Multiplayer.IsServer())
+        {
+            Position = Position.MoveToward((Vector3)State[1], LinearVelocity.Length());
+            Quaternion = Quaternion.Slerp((Quaternion)State[2], (float)delta * LerpSpeed);
+            LinearVelocity = LinearVelocity.MoveToward((Vector3)State[3], (float)delta * LerpSpeed);
+            AngularVelocity = AngularVelocity.MoveToward((Vector3)State[4], (float)delta * LerpSpeed);
+        }
+    }
+
+  public void MoveAndLerp()
+  {
+    throw new NotImplementedException();
+  }
 }
