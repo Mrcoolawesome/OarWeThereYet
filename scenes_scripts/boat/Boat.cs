@@ -19,7 +19,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     [Export] public int ImpactDamage = 10;
     [Export(PropertyHint.None, "suffix:m")] private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
     [Export(PropertyHint.None, "suffix:°")] public Vector3 BoatResetRotation = new Vector3(0.0f, 90.0f, 0.0f);
-    [Export] public Array<Variant> State {get; set;}
+    [Export] public Array<Variant> State {get; set;} // position, quaternionRotation, LinearVelocity, AngularVelocity
     [Export] public float LerpSpeed = 1.0f;
     
     [Signal] public delegate void SeatEnteredEventHandler(Vector3 seatPosition);
@@ -39,8 +39,15 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     // boolean for checking if a reset is pending
     private bool _resetPending = false;
 
-    // current physics frame count
-    public int PhysicsFrameCount {get; set;} = 0;
+    // new state that the boat should be set to
+    private Transform3D _newPositionState;
+    // new rotation state
+    private Basis _newRotationState;
+
+    // boolean for making sure we only apply the new state once
+    private bool _applyNewPositionState = false;
+    private bool _applyNewRotationState = false;
+    private bool _applyNewVelocityState = false;
 
   /*
       front left localShapeIndex: 0
@@ -89,10 +96,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         );
 
         // set the state if we're the server
-        if (Multiplayer.IsServer())
-        {
-            State = [PhysicsFrameCount, Position, Quaternion, LinearVelocity, AngularVelocity];
-        }
+        SetStateArray();
     }
 
     // physics process along with all its associated functions
@@ -103,9 +107,6 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
         // apply the rowing forces if the player is rowing
         ApplyRowingForcePhysicsProcess();
-        
-        // update the physics frame count
-        PhysicsFrameCount++;
     }
 
     // does the bouyancy stuff for the probes
@@ -277,9 +278,52 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         } 
         else // otherwise do client syncing stuff
         {
-            // run the network stuff
-            SyncVelocities(state);
-            SyncPosIfNeeded(state);
+            // get the 'speed' at which we lerp at 
+            float weight = state.Step * LerpSpeed; // state.Step is like the 'delta' parameters given from Process
+            // apply the updated state variable if any changes were made
+            if (_applyNewPositionState)
+            {
+                // interpolate to the new position
+                state.Transform = state.Transform.InterpolateWith(_newPositionState, weight);
+                
+                // Only turn off the flag once we are practically touching the target
+                // we have to do this because lerping won't instantly snap us to the target postition, so we need to keep going until we're basically right next to it
+                if (state.Transform.Origin.DistanceTo(_newPositionState.Origin) < 0.05f)
+                {
+                    // state.Transform = _newPositionState; // Snaps the final microscopic distance - i don't like this becuase it makes it look like jitter is happening, within 0.05m of the host is close enough
+                    _applyNewPositionState = false;      // NOW we stop lerping
+                }
+            }
+
+            // apply the updated/corrected rotation state if needed
+            if (_applyNewRotationState)
+            {
+                // interpolate to the new rotation (this was written by gemini but it's prolly fine)
+                Quaternion currentRot = state.Transform.Basis.GetRotationQuaternion();
+                Quaternion targetRot = _newRotationState.GetRotationQuaternion(); // Assuming _newRotationState is a Basis
+                
+                // Slerp (Spherical Linear Interpolation) calculates the smooth rotation
+                Quaternion smoothRot = currentRot.Slerp(targetRot, weight);
+                
+                Vector3 currentPosition = state.Transform.Origin;
+                state.Transform = new Transform3D(new Basis(smoothRot), currentPosition);
+                
+                
+                // Only turn off the flag once the rotational difference is tiny
+                if (Mathf.Abs(currentRot.AngleTo(targetRot)) < 0.01f)
+                {
+                    _applyNewRotationState = false;
+                }
+            }
+
+            // apply the velocity state if needed
+            // don't really need to lerp velocity since it doesn't change a significant enough amount i think
+            if (_applyNewVelocityState)
+            {
+                state.LinearVelocity = (Vector3)State[2];
+                state.AngularVelocity = (Vector3)State[3];
+                _applyNewVelocityState = false;
+            }
         }
     }
     // Emitted when the health changes. triggered by the health component's signal
@@ -303,34 +347,13 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     {
         if (Multiplayer.IsServer())
         {
-            State = [PhysicsFrameCount, Position, Quaternion, LinearVelocity, AngularVelocity];
+            State = [Position, Quaternion, LinearVelocity, AngularVelocity];
         }
     }
 
-    public void MaintainBuffer()
-    {
-        // // just putting the given frame count into a variable for readability
-        // int stateFrameCount = (int)State[0];
-
-        // if 
-    }
-
-    public void SyncVelocities(PhysicsDirectBodyState3D state)
-    {
-        if (!Multiplayer.IsServer())
-        {
-            // Position = Position.MoveToward((Vector3)State[1], LinearVelocity.Length());
-            // Quaternion = Quaternion.Slerp((Quaternion)State[2], (float)delta * LerpSpeed);
-            // LinearVelocity = LinearVelocity.MoveToward((Vector3)State[3], (float)delta * LerpSpeed);
-            // AngularVelocity = AngularVelocity.MoveToward((Vector3)State[4], (float)delta * LerpSpeed);
-
-            // we don't actually need to lerp the velocities because it's just gonna look nice because the physics engine will 
-            state.LinearVelocity = (Vector3)State[3];
-            state.AngularVelocity = (Vector3)State[4];
-        }
-    }
-
-    public void SyncPosIfNeeded(PhysicsDirectBodyState3D state)
+    // this is only ever called when the 'delta_synchronize()' call comes from the multiplayer spawner
+    // we use the 'delta_synchronize()' function because we set the synchronizer to synchronize the State array only on change, if we switched it to update 'always' we'd have to use the 'synchronize()' signal
+    public void SyncPosIfNeeded()
     {
         // only ran client side
         if (!Multiplayer.IsServer())
@@ -338,31 +361,33 @@ public partial class Boat : RigidBody3D, ISyncBuffer
             // Syncing the rotation:
             // make a new basis to use to transform the boat position
             // set to the current rotation by default because we only wanna change it if we're within a threshold
-            Basis targetBasis = state.Transform.Basis;
             // get synced rotation and curr rotation
-            Quaternion syncedRotation = (Quaternion)State[2];
-            Quaternion currRotation = state.Transform.Basis.GetRotationQuaternion();
+            Quaternion syncedRotation = (Quaternion)State[1];
+            Quaternion currRotation = Quaternion;
             // if the difference is greater than some threshold then lerp
-            // NOTE: i have no idea what the length of a quaternion is so i don't really know what to make the threshold
             if (Mathf.Abs(currRotation.AngleTo(syncedRotation)) > Mathf.DegToRad(1.0f)) // if the difference is greater than a degree than sync
             {
-                targetBasis = new Basis(syncedRotation);
+                // 'return' the rotation state
+                _newRotationState = new Basis(syncedRotation);
+                _applyNewRotationState = true;
             }
 
             // Syncing the position:
             // get the synced position
-            Vector3 syncedPosition = (Vector3)State[1];
+            Vector3 syncedPosition = (Vector3)State[0];
             // difference between our client side position and the host's position
-            float posDiff = state.Transform.Origin.DistanceTo(syncedPosition);
+            float posDiff = (syncedPosition - Position).Length();
             // make a new transform, that just uses our current position by default and the synced position if we've deviated too far
-            Transform3D targetTransform = state.Transform;
             // if it's greater than 0.5 meters apart then lerp ours to the hosts' position
             if (posDiff > 0.5f)
             {
-                targetTransform = new Transform3D(targetBasis, syncedPosition);
+                // this is where the new transformation is 'returned'
+                _newPositionState = new Transform3D(Basis, syncedPosition);
+                _applyNewPositionState = true;
             }
 
-            state.Transform = targetTransform;
+            // we want this to just always happen when we're updated
+            _applyNewVelocityState = true;
         }
     }
 }

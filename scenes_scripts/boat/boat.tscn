@@ -218,3 +218,5 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.1,
 
 [node name="OarsContainer" parent="." instance=ExtResource("4_li7rg")]
 transform = Transform3D(-1, 0, 8.742277e-08, 0, 1, 0, -8.742277e-08, 0, -1, 0, 1, 0)
+
+[connection signal="delta_synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
