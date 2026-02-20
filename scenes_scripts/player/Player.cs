@@ -324,12 +324,27 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				MoveAndSlide();
 			}
 		}
-		else // if we're not the owner of this instance, then we're just gonna sync their position and stuff
+		else // if we're not the owner of this instance, then we're just gonna sync their position and stuff (this is for 'network puppets')
 		{
-			// always sync their position and stuff with the client
-			SyncAndLerpClientDataProcess(delta);
+			// Do client side processing 
+      Gravity(delta);
+
+			// do local movement for the puppet while in the boat
+			if (_currPlayerState == PlayerState.Rowing)
+      {
+        // 1. Force them to the seat perfectly. The boat is already handling movement.
+        RowingStatePhysicsProcess();
+      }
+      else
+      {
+        // 2. If they are standing, simulate their gravity and movement locally
+        Gravity(delta);
+        MoveAndSlide();
+      }
+
+      // 3. Sync network data 
+      SyncAndLerpClientDataProcess(delta); // this deals with the sitting state
 		}
-		
 	}
 
 	private void Gravity(double delta)
@@ -594,7 +609,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
   }
 
-	// ran when the 'delta_synchronized()' signal is sent out
+	// ran when the 'synchronized()' signal is sent out so that it's ALWAYS updating
   public void SyncPosIfNeeded()
   {
     // only ran client side
@@ -607,7 +622,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			Quaternion syncedRotation = (Quaternion)State[1];
 			Quaternion currRotation = Quaternion;
 			// if the difference is greater than some threshold then lerp
-			if (Mathf.Abs(currRotation.AngleTo(syncedRotation)) > Mathf.DegToRad(1.0f)) // if the difference is greater than a degree than sync
+			if (Mathf.Abs(currRotation.AngleTo(syncedRotation)) > Mathf.DegToRad(0.1f)) // if the difference is greater than 0.1 of a degree than sync
 			{
 				// 'return' the rotation state
 				_newRotationState = new Basis(syncedRotation);
@@ -621,7 +636,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			float posDiff = (syncedPosition - Position).Length();
 			// make a new transform, that just uses our current position by default and the synced position if we've deviated too far
 			// if it's greater than 0.5 meters apart then lerp ours to the hosts' position
-			if (posDiff > 0.5f)
+			if (posDiff > 0.05f) // we want them to be very close
 			{
 				// this is where the new transformation is 'returned'
 				_newPositionState = new Transform3D(Basis, syncedPosition);
@@ -638,20 +653,32 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// get the 'speed' at which we lerp at 
 		float weight = (float)delta * NetworkLerpSpeed; // state.Step is like the 'delta' parameters given from Process
 		// apply the updated state variable if any changes were made
-		if (_applyNewPositionState)
-		{
-			// interpolate to the new position
-			Transform = Transform.InterpolateWith(_newPositionState, weight);
-			
-			// Only turn off the flag once we are practically touching the target
-			// we have to do this because lerping won't instantly snap us to the target postition, so we need to keep going until we're basically right next to it
-			if (Transform.Origin.DistanceTo(_newPositionState.Origin) < 0.05f)
+		// ONLY correct position and velocity if they are walking around normally
+    if (_currPlayerState != PlayerState.Rowing)
+    {
+			if (_applyNewPositionState)
 			{
-				// state.Transform = _newPositionState; // Snaps the final microscopic distance - i don't like this becuase it makes it look like jitter is happening, within 0.05m of the host is close enough
-				_applyNewPositionState = false;      // NOW we stop lerping
+				// interpolate to the new position
+				Transform = Transform.InterpolateWith(_newPositionState, weight);
+				
+				// Only turn off the flag once we are practically touching the target
+				// we have to do this because lerping won't instantly snap us to the target postition, so we need to keep going until we're basically right next to it
+				if (Transform.Origin.DistanceTo(_newPositionState.Origin) < 0.01f)
+				{
+					// state.Transform = _newPositionState; // Snaps the final microscopic distance - i don't like this becuase it makes it look like jitter is happening, within 0.05m of the host is close enough
+					_applyNewPositionState = false;      // NOW we stop lerping
+				}
+			}
+			// apply the velocity state if needed
+			// don't really need to lerp velocity since it doesn't change a significant enough amount i think
+			if (_applyNewVelocityState)
+			{
+				Velocity = (Vector3)State[2];
+				_applyNewVelocityState = false;
 			}
 		}
 
+		// ALWAYS apply rotation sync so that clients always know where someone is looking (since we want that even when they're sitting)
 		// apply the updated/corrected rotation state if needed
 		if (_applyNewRotationState)
 		{
@@ -671,14 +698,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			{
 				_applyNewRotationState = false;
 			}
-		}
-
-		// apply the velocity state if needed
-		// don't really need to lerp velocity since it doesn't change a significant enough amount i think
-		if (_applyNewVelocityState)
-		{
-			Velocity = (Vector3)State[2];
-			_applyNewVelocityState = false;
 		}
 	}
 }
