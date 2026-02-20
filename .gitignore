@@ -1,6 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+/exports/
 
 # we don't wanna mix our godot binary paths
 .vscode/*
