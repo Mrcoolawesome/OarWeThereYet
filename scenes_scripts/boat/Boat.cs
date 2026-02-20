@@ -17,8 +17,6 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     [Export] public float ImpactVelocityThreshold = 10.0f;
     [Export] public int MaxHealth = 100;
     [Export] public int ImpactDamage = 10;
-    [Export(PropertyHint.None, "suffix:m")] private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
-    [Export(PropertyHint.None, "suffix:°")] public Vector3 BoatResetRotation = new Vector3(0.0f, 90.0f, 0.0f);
     [Export] public Array<Variant> State {get; set;} // position, quaternionRotation, LinearVelocity, AngularVelocity
     [Export] public float LerpSpeed = 1.0f;
     
@@ -48,6 +46,10 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private bool _applyNewPositionState = false;
     private bool _applyNewRotationState = false;
     private bool _applyNewVelocityState = false;
+
+    // the reset position and rotation for the boat
+    private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, 0.0f);
+    private Vector3 BoatResetRotation = new Vector3(0.0f, 0.0f, 0.0f);
 
   /*
       front left localShapeIndex: 0
@@ -94,6 +96,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
             Mathf.DegToRad(BoatResetRotation.Y),
             Mathf.DegToRad(BoatResetRotation.Z)
         );
+
+        // set the boat reset position
+        BoatResetPosition = Position;
 
         // set the state if we're the server
         SetStateArray();
@@ -225,11 +230,12 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
     public void Reset()
 	{
+        GD.Print("IS THIS EVEN HAPPENING");
 		// Only the server should issue this command
 		if (Multiplayer.IsServer())
 		{
 			// Tell EVERYONE (including the server) to run the SyncReset function
-			RpcId(1, nameof(SyncReset));
+			Rpc(nameof(SyncReset));
 		}
 	}
 
@@ -239,18 +245,43 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 	{
 		// set the player into the standing state and reset their position and velocity
 		_rowingStates = [false, false, false, false];
-		GlobalPosition = BoatResetPosition;
-		GlobalRotation = BoatResetRotation;
-		LinearVelocity = Vector3.Zero;
-        AngularVelocity = Vector3.Zero;
 
         // reset the boat health
         _healthComponent.ResetHealth();
+
+        _resetPending = true; // need to do the reset in the integrate forces function so that you don't have to spam the reset button to get the boat to respawn
 	}
 
     // we need to use integrate forces to get the exact position of the colliding object 
     public override void _IntegrateForces(PhysicsDirectBodyState3D state)
     {
+        // Process Pending Resets FIRST
+        if (_resetPending)
+        {
+            // Force the velocities to zero
+            state.LinearVelocity = Vector3.Zero;
+            state.AngularVelocity = Vector3.Zero;
+
+            // Force the transform to the spawn point
+            Basis resetBasis = new Basis(Quaternion.FromEuler(BoatResetRotation));
+            state.Transform = new Transform3D(resetBasis, BoatResetPosition);
+
+            // Turn off all active network lerping so the boat doesn't try to slide back
+            _applyNewPositionState = false;
+            _applyNewRotationState = false;
+            _applyNewVelocityState = false;
+
+            _resetPending = false;
+            
+            // If we are the server, immediately update the array with the new 0,0,0 data
+            if (Multiplayer.IsServer())
+            {
+                SetStateArray(); 
+            }
+            
+            return; // Skip the rest of the physics step for this frame
+        }
+        
         // only the server can do boat health stuff 
         if (Multiplayer.IsServer())
         {

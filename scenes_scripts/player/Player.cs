@@ -605,7 +605,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   {
     if (IsMultiplayerAuthority())
 		{
-			State = [Position, Quaternion, Velocity];
+			State = [Position, Quaternion, Velocity, (int)_currPlayerState, (int)_seat];
 		}
   }
 
@@ -650,6 +650,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	private void SyncAndLerpClientDataProcess(double delta)
 	{
+		// Read and apply the state and seat from the authority
+    _currPlayerState = (PlayerState)(int)State[3];
+    _seat = (Boat.SeatIndicies)(int)State[4];
 		// get the 'speed' at which we lerp at 
 		float weight = (float)delta * NetworkLerpSpeed; // state.Step is like the 'delta' parameters given from Process
 		// apply the updated state variable if any changes were made
