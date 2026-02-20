@@ -332,17 +332,17 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			// do local movement for the puppet while in the boat
 			if (_currPlayerState == PlayerState.Rowing)
       {
-        // 1. Force them to the seat perfectly. The boat is already handling movement.
+        // Force them to the seat perfectly. The boat is already handling movement.
         RowingStatePhysicsProcess();
       }
       else
       {
-        // 2. If they are standing, simulate their gravity and movement locally
+        // If they are standing, simulate their gravity and movement locally
         Gravity(delta);
         MoveAndSlide();
       }
 
-      // 3. Sync network data 
+      // Sync network data 
       SyncAndLerpClientDataProcess(delta); // this deals with the sitting state
 		}
 	}
