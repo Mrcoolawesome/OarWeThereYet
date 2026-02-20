@@ -166,7 +166,7 @@ DefaultHeight = -1000.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_t3n8c")]
-transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -3, -7)
+transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -3, -8)
 River = NodePath("../RiverManager/RiverFloatSystem")
 RowForce = 200.0
 ImpactVelocityThreshold = 7.0
