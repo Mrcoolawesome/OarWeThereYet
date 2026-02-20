@@ -8,7 +8,7 @@
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0063d"]
 properties/0/path = NodePath(".:State")
 properties/0/spawn = true
-properties/0/replication_mode = 1
+properties/0/replication_mode = 2
 
 [sub_resource type="BoxMesh" id="BoxMesh_0063d"]
 size = Vector3(1, 0.25, 1)
@@ -81,6 +81,7 @@ ImpactVelocityThreshold = 1.0
 ImpactDamage = 15
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+delta_interval = 1.0
 replication_config = SubResource("SceneReplicationConfig_0063d")
 
 [node name="BoatFloatProbesContainer" type="Node3D" parent="."]

@@ -93,12 +93,6 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         {
             State = [PhysicsFrameCount, Position, Quaternion, LinearVelocity, AngularVelocity];
         }
-
-        // disable physics simulation if we're the client because we don't want our stuff and the server to fight
-        if (!Multiplayer.IsServer())
-        {
-            Freeze = true;            
-        }
     }
 
     // physics process along with all its associated functions
@@ -109,10 +103,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
         // apply the rowing forces if the player is rowing
         ApplyRowingForcePhysicsProcess();
-
-        // run the network stuff
-        SetStateArray();
-        MoveAndLerp(delta);
+        
+        // update the physics frame count
+        PhysicsFrameCount++;
     }
 
     // does the bouyancy stuff for the probes
@@ -260,6 +253,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         // only the server can do boat health stuff 
         if (Multiplayer.IsServer())
         {
+            // update the state table
+            SetStateArray();
             // get the position of the object that just entered
             for (int i = 0; i < state.GetContactCount(); i++)
             {
@@ -279,6 +274,12 @@ public partial class Boat : RigidBody3D, ISyncBuffer
                     _healthComponent.UpdateHealth(-ImpactDamage);
                 }
             }
+        } 
+        else // otherwise do client syncing stuff
+        {
+            // run the network stuff
+            SyncVelocities(state);
+            SyncPosIfNeeded(state);
         }
     }
     // Emitted when the health changes. triggered by the health component's signal
@@ -306,29 +307,62 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         }
     }
 
-    public void ApplyStateArray()
-    {
-        throw new NotImplementedException();
-    }
-
     public void MaintainBuffer()
     {
-        throw new NotImplementedException();
+        // // just putting the given frame count into a variable for readability
+        // int stateFrameCount = (int)State[0];
+
+        // if 
     }
 
-    public void MoveAndLerp(double delta)
+    public void SyncVelocities(PhysicsDirectBodyState3D state)
     {
         if (!Multiplayer.IsServer())
         {
-            Position = Position.MoveToward((Vector3)State[1], LinearVelocity.Length());
-            Quaternion = Quaternion.Slerp((Quaternion)State[2], (float)delta * LerpSpeed);
-            LinearVelocity = LinearVelocity.MoveToward((Vector3)State[3], (float)delta * LerpSpeed);
-            AngularVelocity = AngularVelocity.MoveToward((Vector3)State[4], (float)delta * LerpSpeed);
+            // Position = Position.MoveToward((Vector3)State[1], LinearVelocity.Length());
+            // Quaternion = Quaternion.Slerp((Quaternion)State[2], (float)delta * LerpSpeed);
+            // LinearVelocity = LinearVelocity.MoveToward((Vector3)State[3], (float)delta * LerpSpeed);
+            // AngularVelocity = AngularVelocity.MoveToward((Vector3)State[4], (float)delta * LerpSpeed);
+
+            // we don't actually need to lerp the velocities because it's just gonna look nice because the physics engine will 
+            state.LinearVelocity = (Vector3)State[3];
+            state.AngularVelocity = (Vector3)State[4];
         }
     }
 
-  public void MoveAndLerp()
-  {
-    throw new NotImplementedException();
-  }
+    public void SyncPosIfNeeded(PhysicsDirectBodyState3D state)
+    {
+        // only ran client side
+        if (!Multiplayer.IsServer())
+        {
+            // Syncing the rotation:
+            // make a new basis to use to transform the boat position
+            // set to the current rotation by default because we only wanna change it if we're within a threshold
+            Basis targetBasis = state.Transform.Basis;
+            // get synced rotation and curr rotation
+            Quaternion syncedRotation = (Quaternion)State[2];
+            Quaternion currRotation = state.Transform.Basis.GetRotationQuaternion();
+            // if the difference is greater than some threshold then lerp
+            // NOTE: i have no idea what the length of a quaternion is so i don't really know what to make the threshold
+            if (Mathf.Abs(currRotation.AngleTo(syncedRotation)) > Mathf.DegToRad(1.0f)) // if the difference is greater than a degree than sync
+            {
+                targetBasis = new Basis(syncedRotation);
+            }
+
+            // Syncing the position:
+            // get the synced position
+            Vector3 syncedPosition = (Vector3)State[1];
+            // difference between our client side position and the host's position
+            float posDiff = state.Transform.Origin.DistanceTo(syncedPosition);
+            // make a new transform, that just uses our current position by default and the synced position if we've deviated too far
+            Transform3D targetTransform = state.Transform;
+            // if it's greater than 0.5 meters apart then lerp ours to the hosts' position
+            if (posDiff > 0.5f)
+            {
+                targetTransform = new Transform3D(targetBasis, syncedPosition);
+            }
+
+            state.Transform = targetTransform;
+        }
+    }
 }

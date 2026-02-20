@@ -17,14 +17,13 @@ public interface ISyncBuffer
   // set the state array if you are the host
   void SetStateArray();
 
-  // apply the state array if you're a client
-  void ApplyStateArray();
-
   // make sure there's at least two states in the buffer at a time
   void MaintainBuffer();
 
   // do the movement for client side
-  void MoveAndLerp();
+  void SyncVelocities(PhysicsDirectBodyState3D state);
 
-  // is on the same frame 
+  // this is actually not connected to the 'synchronize()' signal that gets sent by the multiplayer synchronizer
+  // this is because it HAS to be used in the IntegrateForces function so that it can get the state variable
+  void SyncPosIfNeeded(PhysicsDirectBodyState3D state);
 }
