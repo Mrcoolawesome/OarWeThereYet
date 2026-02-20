@@ -169,7 +169,7 @@ metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -3, -8)
 River = NodePath("../RiverManager/RiverFloatSystem")
 RowForce = 200.0
-ImpactVelocityThreshold = 2.0
+ImpactVelocityThreshold = 5.0
 BoatResetPosition = Vector3(0, -3, -9)
 BoatResetRotation = Vector3(0, -90, 0)
 
