@@ -44,7 +44,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     // new rotation state
     private Basis _newRotationState;
 
-    // boolean for making sure we only apply the new state once
+    // booleans for making sure we only apply the new state once for client side stuff
     private bool _applyNewPositionState = false;
     private bool _applyNewRotationState = false;
     private bool _applyNewVelocityState = false;

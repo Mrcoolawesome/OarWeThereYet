@@ -9,7 +9,8 @@ public interface ISyncBuffer
   // Define the property signature. 
   // We use Godot.Collections.Array holding Variants to allow mixed data types.
   // this will contain things in this order:
-  // position, quaternionRotation, LinearVelocity, AngularVelocity
+  // position, quaternionRotation, LinearVelocity, AngularVelocity - for boat
+  // position, quaternionRotation, Velocity - for player character
   Godot.Collections.Array<Variant> State { get; set; } // THIS NEEDS TO BE AN EXPORTED VARIABLE THAT'S SYNCED WITH A SYNCHRONIZER
 
   // set the state array if you are the host
