@@ -19,6 +19,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     [Export] public int ImpactDamage = 10;
     [Export] public Array<Variant> State {get; set;} // position, quaternionRotation, LinearVelocity, AngularVelocity
     [Export] public float LerpSpeed = 1.0f;
+    // the reset position and rotation for the boat
+    [Export] public Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, 0.0f);
+    [Export] public Vector3 BoatResetRotation = new Vector3(0.0f, 0.0f, 0.0f);
     
     [Signal] public delegate void SeatEnteredEventHandler(Vector3 seatPosition);
 
@@ -47,9 +50,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private bool _applyNewRotationState = false;
     private bool _applyNewVelocityState = false;
 
-    // the reset position and rotation for the boat
-    private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, 0.0f);
-    private Vector3 BoatResetRotation = new Vector3(0.0f, 0.0f, 0.0f);
+    // boolean for checking if 
 
   /*
       front left localShapeIndex: 0
@@ -57,7 +58,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
       back right localShapeIndex: 2
       back left localShapeIndex: 3
   */
-  public enum SeatIndicies
+    public enum SeatIndicies
     {
         FrontLeft = 0,
         FrontRight = 1,
@@ -96,9 +97,6 @@ public partial class Boat : RigidBody3D, ISyncBuffer
             Mathf.DegToRad(BoatResetRotation.Y),
             Mathf.DegToRad(BoatResetRotation.Z)
         );
-
-        // set the boat reset position
-        BoatResetPosition = Position;
 
         // set the state if we're the server
         SetStateArray();
@@ -230,7 +228,6 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
     public void Reset()
 	{
-        GD.Print("IS THIS EVEN HAPPENING");
 		// Only the server should issue this command
 		if (Multiplayer.IsServer())
 		{
