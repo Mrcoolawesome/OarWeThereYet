@@ -50,7 +50,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private bool _applyNewRotationState = false;
     private bool _applyNewVelocityState = false;
 
-    // boolean for checking if 
+    // boolean for checking if the person spawning this instance is a client or the host
+    private bool _clientSpawning = false;
 
   /*
       front left localShapeIndex: 0
@@ -100,6 +101,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
         // set the state if we're the server
         SetStateArray();
+
+        // set if this instance is being made by a client
+        _clientSpawning = !Multiplayer.IsServer(); 
     }
 
     // physics process along with all its associated functions
@@ -306,6 +310,13 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         } 
         else // otherwise do client syncing stuff
         {
+            // first check if the client is awaiting the first known position given by the server to spawn the boat at
+            if (_clientSpawning && _applyNewPositionState) // position is the most important thing, the others will sync
+            {
+                // teleport to inital position given by the host
+                state.Transform = _newPositionState;
+                _clientSpawning = false; // we're done with the inital spawn of the boat
+            }
             // get the 'speed' at which we lerp at 
             float weight = state.Step * LerpSpeed; // state.Step is like the 'delta' parameters given from Process
             // apply the updated state variable if any changes were made
