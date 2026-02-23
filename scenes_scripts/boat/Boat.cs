@@ -1,10 +1,12 @@
 using Godot;
+using Godot.Collections;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Dynamic;
 using System.Linq;
 using Waterways;
 
-public partial class Boat : RigidBody3D
+public partial class Boat : RigidBody3D, ISyncBuffer
 {
     //TODO: Change boat to face negative Z direction
     [Export] public RiverFloatSystem River;
@@ -15,8 +17,11 @@ public partial class Boat : RigidBody3D
     [Export] public float ImpactVelocityThreshold = 10.0f;
     [Export] public int MaxHealth = 100;
     [Export] public int ImpactDamage = 10;
-    [Export(PropertyHint.None, "suffix:m")] private Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, -8.0f);
-    [Export(PropertyHint.None, "suffix:°")] public Vector3 BoatResetRotation = new Vector3(0.0f, 90.0f, 0.0f);
+    [Export] public Array<Variant> State {get; set;} // position, quaternionRotation, LinearVelocity, AngularVelocity
+    [Export] public float LerpSpeed = 1.0f;
+    // the reset position and rotation for the boat
+    [Export] public Vector3 BoatResetPosition = new Vector3(0.0f, 0.0f, 0.0f);
+    [Export] public Vector3 BoatResetRotation = new Vector3(0.0f, 0.0f, 0.0f);
     
     [Signal] public delegate void SeatEnteredEventHandler(Vector3 seatPosition);
 
@@ -35,12 +40,30 @@ public partial class Boat : RigidBody3D
     // boolean for checking if a reset is pending
     private bool _resetPending = false;
 
-    /*
-        front left localShapeIndex: 0
-        front right localShapeIndex: 1
-        back right localShapeIndex: 2
-        back left localShapeIndex: 3
-    */
+    // new state that the boat should be set to
+    private Transform3D _newPositionState;
+    // new rotation state
+    private Basis _newRotationState;
+
+    // booleans for making sure we only apply the new state once for client side stuff
+    private bool _applyNewPositionState = false;
+    private bool _applyNewRotationState = false;
+    private bool _applyNewVelocityState = false;
+
+    // boolean for checking if the person spawning this instance is a client or the host
+    private bool _clientSpawning = false;
+
+    // timer for not letting the boat take damage for a specified amount of time after getting hit
+    private Timer _damageDelayTimer = new Timer();
+    // boolean to act as a gate to allow for more damage to be taken
+    private bool _damageAllowed = true;
+
+  /*
+      front left localShapeIndex: 0
+      front right localShapeIndex: 1
+      back right localShapeIndex: 2
+      back left localShapeIndex: 3
+  */
     public enum SeatIndicies
     {
         FrontLeft = 0,
@@ -55,6 +78,7 @@ public partial class Boat : RigidBody3D
         _oarProbesContainer = GetNode<Node3D>("OarProbesContainer");
         _gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
         _healthComponent.Name = "HealthComponent"; 
+        _damageDelayTimer = GetNode<Timer>("DamageDelayTimer");
         AddChild(_healthComponent);
 
         // subscribe to the Rowing signal from the singleton script
@@ -80,6 +104,12 @@ public partial class Boat : RigidBody3D
             Mathf.DegToRad(BoatResetRotation.Y),
             Mathf.DegToRad(BoatResetRotation.Z)
         );
+
+        // set the state if we're the server
+        SetStateArray();
+
+        // set if this instance is being made by a client
+        _clientSpawning = !Multiplayer.IsServer(); 
     }
 
     // physics process along with all its associated functions
@@ -212,7 +242,7 @@ public partial class Boat : RigidBody3D
 		if (Multiplayer.IsServer())
 		{
 			// Tell EVERYONE (including the server) to run the SyncReset function
-			RpcId(1, nameof(SyncReset));
+			Rpc(nameof(SyncReset));
 		}
 	}
 
@@ -222,21 +252,48 @@ public partial class Boat : RigidBody3D
 	{
 		// set the player into the standing state and reset their position and velocity
 		_rowingStates = [false, false, false, false];
-		GlobalPosition = BoatResetPosition;
-		GlobalRotation = BoatResetRotation;
-		LinearVelocity = Vector3.Zero;
-        AngularVelocity = Vector3.Zero;
 
         // reset the boat health
         _healthComponent.ResetHealth();
+
+        _resetPending = true; // need to do the reset in the integrate forces function so that you don't have to spam the reset button to get the boat to respawn
 	}
 
     // we need to use integrate forces to get the exact position of the colliding object 
     public override void _IntegrateForces(PhysicsDirectBodyState3D state)
     {
+        // Process Pending Resets FIRST
+        if (_resetPending)
+        {
+            // Force the velocities to zero
+            state.LinearVelocity = Vector3.Zero;
+            state.AngularVelocity = Vector3.Zero;
+
+            // Force the transform to the spawn point
+            Basis resetBasis = new Basis(Quaternion.FromEuler(BoatResetRotation));
+            state.Transform = new Transform3D(resetBasis, BoatResetPosition);
+
+            // Turn off all active network lerping so the boat doesn't try to slide back
+            _applyNewPositionState = false;
+            _applyNewRotationState = false;
+            _applyNewVelocityState = false;
+
+            _resetPending = false;
+            
+            // If we are the server, immediately update the array with the new 0,0,0 data
+            if (Multiplayer.IsServer())
+            {
+                SetStateArray(); 
+            }
+            
+            return; // Skip the rest of the physics step for this frame
+        }
+        
         // only the server can do boat health stuff 
         if (Multiplayer.IsServer())
         {
+            // update the state table
+            SetStateArray();
             // get the position of the object that just entered
             for (int i = 0; i < state.GetContactCount(); i++)
             {
@@ -250,11 +307,73 @@ public partial class Boat : RigidBody3D
                 float impactVelocity = state.GetContactLocalVelocityAtPosition(i).Length();
 
                 // if the impact velocity at that point is greater than the threshold then remove health points from the boat health
-                if (impactVelocity > ImpactVelocityThreshold)
+                if (impactVelocity > ImpactVelocityThreshold && _damageAllowed) // damageAllowed is switched to true when the _damageDelayTimer is done
                 {
                     // update our health, this automatically sends out a signal that the health has been updated
                     _healthComponent.UpdateHealth(-ImpactDamage);
+
+                    // damage is no longer allowed until the timer ends
+                    _damageAllowed = false;
+
+                    // also start the delay timer so they don't take damage during this time
+                    _damageDelayTimer.Start(); // the delay time is set in the timer node in godot (you can also set it (the time delay) here but i didn't)
                 }
+            }
+        } 
+        else // otherwise do client syncing stuff
+        {
+            // first check if the client is awaiting the first known position given by the server to spawn the boat at
+            if (_clientSpawning && _applyNewPositionState) // position is the most important thing, the others will sync
+            {
+                // teleport to inital position given by the host
+                state.Transform = _newPositionState;
+                _clientSpawning = false; // we're done with the inital spawn of the boat
+            }
+            // get the 'speed' at which we lerp at 
+            float weight = state.Step * LerpSpeed; // state.Step is like the 'delta' parameters given from Process
+            // apply the updated state variable if any changes were made
+            if (_applyNewPositionState)
+            {
+                // interpolate to the new position
+                state.Transform = state.Transform.InterpolateWith(_newPositionState, weight);
+                
+                // Only turn off the flag once we are practically touching the target
+                // we have to do this because lerping won't instantly snap us to the target postition, so we need to keep going until we're basically right next to it
+                if (state.Transform.Origin.DistanceTo(_newPositionState.Origin) < 0.05f)
+                {
+                    // state.Transform = _newPositionState; // Snaps the final microscopic distance - i don't like this becuase it makes it look like jitter is happening, within 0.05m of the host is close enough
+                    _applyNewPositionState = false;      // NOW we stop lerping
+                }
+            }
+
+            // apply the updated/corrected rotation state if needed
+            if (_applyNewRotationState)
+            {
+                // interpolate to the new rotation (this was written by gemini but it's prolly fine)
+                Quaternion currentRot = state.Transform.Basis.GetRotationQuaternion();
+                Quaternion targetRot = _newRotationState.GetRotationQuaternion(); // Assuming _newRotationState is a Basis
+                
+                // Slerp (Spherical Linear Interpolation) calculates the smooth rotation
+                Quaternion smoothRot = currentRot.Slerp(targetRot, weight);
+                
+                Vector3 currentPosition = state.Transform.Origin;
+                state.Transform = new Transform3D(new Basis(smoothRot), currentPosition);
+                
+                
+                // Only turn off the flag once the rotational difference is tiny
+                if (Mathf.Abs(currentRot.AngleTo(targetRot)) < 0.01f)
+                {
+                    _applyNewRotationState = false;
+                }
+            }
+
+            // apply the velocity state if needed
+            // don't really need to lerp velocity since it doesn't change a significant enough amount i think
+            if (_applyNewVelocityState)
+            {
+                state.LinearVelocity = (Vector3)State[2];
+                state.AngularVelocity = (Vector3)State[3];
+                _applyNewVelocityState = false;
             }
         }
     }
@@ -272,5 +391,61 @@ public partial class Boat : RigidBody3D
     {
         // announce the death to the global signal server
         GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.BoatDeath));
+    }
+
+    // this should only be ran on the server
+    public void SetStateArray()
+    {
+        if (Multiplayer.IsServer())
+        {
+            State = [Position, Quaternion, LinearVelocity, AngularVelocity];
+        }
+    }
+
+    // this is only ever called when the 'delta_synchronize()' call comes from the multiplayer spawner
+    // we use the 'delta_synchronize()' function because we set the synchronizer to synchronize the State array only on change, if we switched it to update 'always' we'd have to use the 'synchronize()' signal
+    public void SyncPosIfNeeded()
+    {
+        // only ran client side
+        if (!Multiplayer.IsServer())
+        {
+            // Syncing the rotation:
+            // make a new basis to use to transform the boat position
+            // set to the current rotation by default because we only wanna change it if we're within a threshold
+            // get synced rotation and curr rotation
+            Quaternion syncedRotation = (Quaternion)State[1];
+            Quaternion currRotation = Quaternion;
+            // if the difference is greater than some threshold then lerp
+            if (Mathf.Abs(currRotation.AngleTo(syncedRotation)) > Mathf.DegToRad(1.0f)) // if the difference is greater than a degree than sync
+            {
+                // 'return' the rotation state
+                _newRotationState = new Basis(syncedRotation);
+                _applyNewRotationState = true;
+            }
+
+            // Syncing the position:
+            // get the synced position
+            Vector3 syncedPosition = (Vector3)State[0];
+            // difference between our client side position and the host's position
+            float posDiff = (syncedPosition - Position).Length();
+            // make a new transform, that just uses our current position by default and the synced position if we've deviated too far
+            // if it's greater than 0.5 meters apart then lerp ours to the hosts' position
+            if (posDiff > 0.5f)
+            {
+                // this is where the new transformation is 'returned'
+                _newPositionState = new Transform3D(Basis, syncedPosition);
+                _applyNewPositionState = true;
+            }
+
+            // we want this to just always happen when we're updated
+            _applyNewVelocityState = true;
+        }
+    }
+
+    // triggered when the damage delay timer ends
+    public void DamageTimerEnded()
+    {
+        // allow for damage to be taken again
+        _damageAllowed = true;
     }
 }

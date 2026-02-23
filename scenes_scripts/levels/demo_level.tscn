@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://bhjy2n3qwlbxi"]
+[gd_scene load_steps=28 format=3 uid="uid://bhjy2n3qwlbxi"]
 
 [ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes_scripts/levels/TestLevel.cs" id="1_rahni"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="2_lih0g"]
@@ -11,6 +11,8 @@
 [ext_resource type="Texture2D" uid="uid://0fs6ostl5fy7" path="res://art/textures/Rocks002_alb_ht.dds" id="9_yglcq"]
 [ext_resource type="Texture2D" uid="uid://dbifmkbrn7p4j" path="res://art/textures/Rocks002_nrm_rgh.dds" id="10_65fa2"]
 [ext_resource type="PackedScene" uid="uid://p1gq126hb7ur" path="res://scenes_scripts/environment/rock/rock.tscn" id="11_to0o3"]
+[ext_resource type="PackedScene" uid="uid://bspwtetc0fejm" path="res://art/models/fish.blend" id="12_phog2"]
+[ext_resource type="PackedScene" uid="uid://cywagagtgqt2c" path="res://scenes_scripts/beer/staticbeer.tscn" id="14_xhv4w"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_my7xx"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -25,7 +27,7 @@ sky = SubResource("Sky_to0o3")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Resource" id="Resource_to0o3"]
+[sub_resource type="Resource" id="Resource_xhv4w"]
 script = ExtResource("4_dvlyx")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
@@ -53,7 +55,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_phog2"]
+[sub_resource type="Curve3D" id="Curve3D_g7cjw"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -155,9 +157,9 @@ shadow_enabled = true
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1, -3, -5)
 script = ExtResource("2_lih0g")
-ShaderSettings = SubResource("Resource_to0o3")
+ShaderSettings = SubResource("Resource_xhv4w")
 PointWidths = Array[float]([9.738645, 11.79303, 17.322895, 14.258924, 19.230875, 19.230875, 19.230875, 19.230875, 27.431053, 34.830986, 27.622408, 24.90232, 34.700542, 27.715273, 35.96378, 37.959026, 60.54432, 161.6149, 69.5427])
-Curve = SubResource("Curve3D_phog2")
+Curve = SubResource("Curve3D_g7cjw")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
@@ -169,8 +171,8 @@ metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -3, -8)
 River = NodePath("../RiverManager/RiverFloatSystem")
 RowForce = 200.0
-ImpactVelocityThreshold = 5.0
-BoatResetPosition = Vector3(0, -3, -9)
+ImpactVelocityThreshold = 2.0
+BoatResetPosition = Vector3(0, -3, -8)
 BoatResetRotation = Vector3(0, -90, 0)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
@@ -204,3 +206,35 @@ transform = Transform3D(-0.07811577, 5.369721, -3.0883713, 2.4210038, 2.8694208,
 
 [node name="Rock5" parent="Rock Container" instance=ExtResource("11_to0o3")]
 transform = Transform3D(3.188996, -11.901494, 12.321333, 16.831257, 4.509922, -2.2486584e-07, -3.1889963, 11.901496, 12.321334, 215, -32, -49)
+
+[node name="fish" parent="." instance=ExtResource("12_phog2")]
+transform = Transform3D(2000, 0, 0, 0, 2000, 0, 0, 0, 2000, 530.76843, 370, -1375.0807)
+
+[node name="Beers" type="Node3D" parent="."]
+
+[node name="RigidBody3D" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -52)
+
+[node name="RigidBody3D5" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 0, -52)
+
+[node name="RigidBody3D9" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 230, -18, -68)
+
+[node name="RigidBody3D10" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 191, -32, 60)
+
+[node name="RigidBody3D11" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 209, -18, 36)
+
+[node name="RigidBody3D13" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 268, -18, 23)
+
+[node name="RigidBody3D12" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(1, 0, 0, 0, 0.9659258, -0.25881904, 0, 0.25881904, 0.9659258, 193, -8, 68)
+
+[node name="RigidBody3D6" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, -0.5, 0, 0.5, 0.8660254, 77, 0, -102)
+
+[node name="RigidBody3D7" parent="Beers" instance=ExtResource("14_xhv4w")]
+transform = Transform3D(-0.9659258, 0.12940957, 0.22414394, 0, 0.8660254, -0.5, -0.25881913, -0.4829629, -0.83651626, 77, 0, -87)
