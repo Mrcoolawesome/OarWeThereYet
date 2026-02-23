@@ -53,6 +53,11 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     // boolean for checking if the person spawning this instance is a client or the host
     private bool _clientSpawning = false;
 
+    // timer for not letting the boat take damage for a specified amount of time after getting hit
+    private Timer _damageDelayTimer = new Timer();
+    // boolean to act as a gate to allow for more damage to be taken
+    private bool _damageAllowed = true;
+
   /*
       front left localShapeIndex: 0
       front right localShapeIndex: 1
@@ -73,6 +78,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         _oarProbesContainer = GetNode<Node3D>("OarProbesContainer");
         _gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
         _healthComponent.Name = "HealthComponent"; 
+        _damageDelayTimer = GetNode<Timer>("DamageDelayTimer");
         AddChild(_healthComponent);
 
         // subscribe to the Rowing signal from the singleton script
@@ -301,10 +307,16 @@ public partial class Boat : RigidBody3D, ISyncBuffer
                 float impactVelocity = state.GetContactLocalVelocityAtPosition(i).Length();
 
                 // if the impact velocity at that point is greater than the threshold then remove health points from the boat health
-                if (impactVelocity > ImpactVelocityThreshold)
+                if (impactVelocity > ImpactVelocityThreshold && _damageAllowed) // damageAllowed is switched to true when the _damageDelayTimer is done
                 {
                     // update our health, this automatically sends out a signal that the health has been updated
                     _healthComponent.UpdateHealth(-ImpactDamage);
+
+                    // damage is no longer allowed until the timer ends
+                    _damageAllowed = false;
+
+                    // also start the delay timer so they don't take damage during this time
+                    _damageDelayTimer.Start(); // the delay time is set in the timer node in godot (you can also set it (the time delay) here but i didn't)
                 }
             }
         } 
@@ -428,5 +440,12 @@ public partial class Boat : RigidBody3D, ISyncBuffer
             // we want this to just always happen when we're updated
             _applyNewVelocityState = true;
         }
+    }
+
+    // triggered when the damage delay timer ends
+    public void DamageTimerEnded()
+    {
+        // allow for damage to be taken again
+        _damageAllowed = true;
     }
 }
