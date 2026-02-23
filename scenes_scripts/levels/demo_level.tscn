@@ -27,7 +27,7 @@ sky = SubResource("Sky_to0o3")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Resource" id="Resource_xhv4w"]
+[sub_resource type="Resource" id="Resource_dn8cs"]
 script = ExtResource("4_dvlyx")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
@@ -55,7 +55,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_g7cjw"]
+[sub_resource type="Curve3D" id="Curve3D_xhv4w"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -157,9 +157,9 @@ shadow_enabled = true
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1, -3, -5)
 script = ExtResource("2_lih0g")
-ShaderSettings = SubResource("Resource_xhv4w")
+ShaderSettings = SubResource("Resource_dn8cs")
 PointWidths = Array[float]([9.738645, 11.79303, 17.322895, 14.258924, 19.230875, 19.230875, 19.230875, 19.230875, 27.431053, 34.830986, 27.622408, 24.90232, 34.700542, 27.715273, 35.96378, 37.959026, 60.54432, 161.6149, 69.5427])
-Curve = SubResource("Curve3D_g7cjw")
+Curve = SubResource("Curve3D_xhv4w")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
