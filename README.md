@@ -27,10 +27,11 @@
 - Players movement is very limited when in water
 - Players have a limited amount of time they can be in water before they die
 
-#### Falling Out/Helping Into Raft
+#### Falling Out/Helping Into Raft/Dying
 
 - Players have a chance of falling out raft when it collides too hard
-- **Item** Life Preserver: Physics based throwable object. If you throw it onto a player in water, you can pull them back into the raft
+- **Item** Life Preserver: Physics based throwable object. If you throw it onto a player in water, you can quickly pull them back into the raft
+- If a player dies, they spawn attached to the raft at a very far distance. They can be revived if you pull them back in but it takes a long time
 
 #### Checkpoints
 
