@@ -1,9 +1,10 @@
 extends Node
 
 var current_sample_rate: int = 48000
-@export var use_recommended_sample_rate: bool = false
+var use_recommended_sample_rate: bool = true
 var voice_buffer: PackedByteArray = PackedByteArray()
-@export var local_playback: bool = false
+var playback: AudioStreamGeneratorPlayback = null
+var local_playback: bool = true
 
 
 func _ready() -> void:
@@ -36,7 +37,27 @@ func process_voice(voice_data: PackedByteArray, player: int):
 		# Get player's audiostream Node
 		var player_stream: AudioStreamPlayer3D = get_node("/root/GameManager/Level/DemoLevel/" + str(player) + "/AudioStreamPlayer3D")
 		var playback: AudioStreamGeneratorPlayback = player_stream.get_stream_playback()
-		playback.push_buffer(decompressed_voice['uncompressed'])
+		
+		# Create array of vector2
+		var raw_bytes: PackedByteArray = decompressed_voice['uncompressed']
+		var audio_frames: PackedVector2Array = PackedVector2Array()
+
+		# Step through the raw bytes 2 at a time (since 16-bit = 2 bytes per sample)
+		for i in range(0, raw_bytes.size(), 2):
+			# Grab the 16-bit integer from the byte array
+			var sample_int: int = raw_bytes.decode_s16(i)
+			
+			# A 16-bit integer has a max value of 32768. 
+			# We divide by 32768.0 to convert it into a float between -1.0 and 1.0
+			var float_sample: float = sample_int / 32768.0
+			
+			# Create the Vector2 (Left ear, Right ear) and add it to our new array
+			audio_frames.append(Vector2(float_sample, float_sample))
+
+			# NOW we check our buffer capacity and push the correctly formatted frames!
+			# (Notice I included the () after .size this time so Godot executes the method!)
+			if playback.can_push_buffer(audio_frames.size()):
+				playback.push_buffer(audio_frames)
 
 
 # Get steam's recommended sample rate if you want
