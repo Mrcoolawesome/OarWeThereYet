@@ -41,13 +41,8 @@ func process_voice(voice_data: PackedByteArray, player: int):
 		var audio_frames: PackedVector2Array = PackedVector2Array()
 		
 		for i in range(0,voice_buffer.size(), 2):
-			# Steam's audio data is represented as 16-bit single channel PCM audio, so we need to convert it to amplitudes
-			# Combine the low and high bits to get full 16-bit value
-			var raw_value: int = voice_buffer[i] | (voice_buffer[i+1] << 8)
-			# Make it a 16-bit signed integer
-			raw_value = (raw_value + 32768) & 0xffff
-			# Convert the 16-bit integer to a float on from -1 to 1
-			var amplitude: float = float(raw_value - 32768) / 32768.0
+			var raw_value: int = voice_buffer.decode_s16(i)
+			var amplitude: float = float(raw_value) / 32768.0
 
 			# push_frame() takes a Vector2. The x represents the left channel and the y represents the right channel
 			audio_frames.append(Vector2(amplitude, amplitude))
