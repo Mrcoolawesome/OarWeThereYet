@@ -1,8 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://d34pgbgxmrpd5"]
+[gd_scene load_steps=9 format=3 uid="uid://d34pgbgxmrpd5"]
 
 [ext_resource type="Script" uid="uid://c6yprd4vlj76t" path="res://scenes_scripts/UI/main_menu/main_menu.gd" id="1_4cwpn"]
 [ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="2_f40uw"]
-[ext_resource type="Texture2D" uid="uid://kt83tf61prry" path="res://art/Images/evilAssFace.jpg" id="3_8ctay"]
 [ext_resource type="Texture2D" uid="uid://clw8cwtrtug24" path="res://art/Images/steam.webp" id="4_ev3b6"]
 [ext_resource type="Theme" uid="uid://dc6y5w6xbhfo7" path="res://art/themes/checkbox.tres" id="5_rps2o"]
 [ext_resource type="Texture2D" uid="uid://bpn5ktwj4flev" path="res://art/icons/checkbox/Checkbox Checked.svg" id="6_h7afs"]
@@ -19,11 +18,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_4cwpn")
-
-[node name="EvilAssFace" type="Sprite2D" parent="."]
-visible = false
-position = Vector2(1512, 400)
-texture = ExtResource("3_8ctay")
 
 [node name="Steam" type="TextureRect" parent="."]
 visible = false
@@ -44,9 +38,12 @@ layout_mode = 1
 anchors_preset = 9
 anchor_bottom = 1.0
 grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 50
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+size_flags_vertical = 4
 
 [node name="HostButton" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -58,6 +55,11 @@ layout_mode = 2
 theme = ExtResource("2_f40uw")
 theme_override_constants/outline_size = 35
 text = "Join"
+
+[node name="IDPrompt" type="LineEdit" parent="MarginContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(100, 200)
+layout_mode = 2
 
 [node name="EnableSteam" type="CheckBox" parent="MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 50)
@@ -76,11 +78,7 @@ theme_override_icons/checked = ExtResource("6_h7afs")
 theme_override_icons/unchecked = ExtResource("7_s46lk")
 text = "Enable Steam"
 
-[node name="IDPrompt" type="LineEdit" parent="MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(100, 200)
-layout_mode = 2
-
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]
-[connection signal="toggled" from="MarginContainer/VBoxContainer/EnableSteam" to="." method="_on_toggle_steam_toggled"]
 [connection signal="text_changed" from="MarginContainer/VBoxContainer/IDPrompt" to="." method="_on_id_prompt_text_changed"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/EnableSteam" to="." method="_on_toggle_steam_toggled"]

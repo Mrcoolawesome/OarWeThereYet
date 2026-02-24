@@ -1,0 +1,74 @@
+[gd_scene load_steps=3 format=3 uid="uid://8btpactq3nb5"]
+
+[ext_resource type="Theme" uid="uid://dujaq66w8tdw7" path="res://art/themes/dongleFont.tres" id="1_ukmmk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ukmmk"]
+bg_color = Color(0, 0, 0, 0.45882353)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="PopUpMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_right = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ukmmk")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer"]
+layout_mode = 2
+
+[node name="Header" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_ukmmk")
+theme_type_variation = &"WithOutline"
+theme_override_constants/outline_size = 35
+text = "Create A Game"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_right = 25
+
+[node name="LobbyName" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+theme = ExtResource("1_ukmmk")
+theme_type_variation = &"LabelHeaderMedium"
+text = "LobbyName:"
+
+[node name="LineEdit" type="LineEdit" parent="MarginContainer/PanelContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme = ExtResource("1_ukmmk")
+theme_override_constants/minimum_character_width = 10
+placeholder_text = "Gaming"
+alignment = 2
+emoji_menu_enabled = false
