@@ -7,9 +7,14 @@ var voice_buffer: PackedByteArray = PackedByteArray()
 
 
 func _ready() -> void:
+	set_process(false)
+
+
+func initialize_voice():
 	# Start recording when player loads in, could make an option for push to talk later
 	Steam.startVoiceRecording()
 	get_sample_rate()
+	set_process(true)
 
 
 # Get voice data, compress it, and send it
