@@ -1,9 +1,7 @@
 extends Node
 
 var current_sample_rate: int = 48000
-var use_recommended_sample_rate: bool = true
-var voice_buffer: PackedByteArray = PackedByteArray()
-var playback: AudioStreamGeneratorPlayback = null
+var use_recommended_sample_rate: bool = false
 var local_playback: bool = true
 
 
@@ -34,30 +32,22 @@ func process_voice(voice_data: PackedByteArray, player: int):
 	var decompressed_voice: Dictionary = Steam.decompressVoice(voice_data, current_sample_rate)
 
 	if decompressed_voice['result'] == Steam.VOICE_RESULT_OK and decompressed_voice['size'] > 0:
+		var voice_buffer: PackedByteArray = decompressed_voice['uncompressed']
 		# Get player's audiostream Node
 		var player_stream: AudioStreamPlayer3D = get_node("/root/GameManager/Level/DemoLevel/" + str(player) + "/AudioStreamPlayer3D")
 		var playback: AudioStreamGeneratorPlayback = player_stream.get_stream_playback()
 		
-		# Create array of vector2
-		var raw_bytes: PackedByteArray = decompressed_voice['uncompressed']
-		var audio_frames: PackedVector2Array = PackedVector2Array()
+		for i in range(0,voice_buffer.size(), 2):
+			# Steam's audio data is represented as 16-bit single channel PCM audio, so we need to convert it to amplitudes
+			# Combine the low and high bits to get full 16-bit value
+			var raw_value: int = voice_buffer[i] | (voice_buffer[i+1] << 8)
+			# Make it a 16-bit signed integer
+			raw_value = (raw_value + 32768) & 0xffff
+			# Convert the 16-bit integer to a float on from -1 to 1
+			var amplitude: float = float(raw_value - 32768) / 32768.0
 
-		# Step through the raw bytes 2 at a time (since 16-bit = 2 bytes per sample)
-		for i in range(0, raw_bytes.size(), 2):
-			# Grab the 16-bit integer from the byte array
-			var sample_int: int = raw_bytes.decode_s16(i)
-			
-			# A 16-bit integer has a max value of 32768. 
-			# We divide by 32768.0 to convert it into a float between -1.0 and 1.0
-			var float_sample: float = sample_int / 32768.0
-			
-			# Create the Vector2 (Left ear, Right ear) and add it to our new array
-			audio_frames.append(Vector2(float_sample, float_sample))
-
-			# NOW we check our buffer capacity and push the correctly formatted frames!
-			# (Notice I included the () after .size this time so Godot executes the method!)
-			if playback.can_push_buffer(audio_frames.size()):
-				playback.push_buffer(audio_frames)
+			# push_frame() takes a Vector2. The x represents the left channel and the y represents the right channel
+			playback.push_frame(Vector2(amplitude, amplitude))
 
 
 # Get steam's recommended sample rate if you want
