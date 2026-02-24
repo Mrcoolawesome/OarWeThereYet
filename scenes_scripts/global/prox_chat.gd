@@ -1,7 +1,7 @@
 extends Node
 
 var current_sample_rate: int = 48000
-var use_recommended_sample_rate: bool = false
+var use_recommended_sample_rate: bool = true
 var local_playback: bool = true
 
 
@@ -35,7 +35,10 @@ func process_voice(voice_data: PackedByteArray, player: int):
 		var voice_buffer: PackedByteArray = decompressed_voice['uncompressed']
 		# Get player's audiostream Node
 		var player_stream: AudioStreamPlayer3D = get_node("/root/GameManager/Level/DemoLevel/" + str(player) + "/AudioStreamPlayer3D")
+		player_stream.stream.mix_rate = current_sample_rate
 		var playback: AudioStreamGeneratorPlayback = player_stream.get_stream_playback()
+
+		var audio_frames: PackedVector2Array = PackedVector2Array()
 		
 		for i in range(0,voice_buffer.size(), 2):
 			# Steam's audio data is represented as 16-bit single channel PCM audio, so we need to convert it to amplitudes
@@ -47,7 +50,10 @@ func process_voice(voice_data: PackedByteArray, player: int):
 			var amplitude: float = float(raw_value - 32768) / 32768.0
 
 			# push_frame() takes a Vector2. The x represents the left channel and the y represents the right channel
-			playback.push_frame(Vector2(amplitude, amplitude))
+			audio_frames.append(Vector2(amplitude, amplitude))
+
+		if playback.can_push_buffer(audio_frames.size()):
+			playback.push_buffer(audio_frames)
 
 
 # Get steam's recommended sample rate if you want
