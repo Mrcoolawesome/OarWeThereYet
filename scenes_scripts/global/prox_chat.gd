@@ -51,9 +51,10 @@ func process_voice(voice_data: PackedByteArray, player: int):
 
 			# push_frame() takes a Vector2. The x represents the left channel and the y represents the right channel
 			audio_frames.append(Vector2(amplitude, amplitude))
+			playback.push_frame(Vector2(amplitude, amplitude))
 
-		if playback.can_push_buffer(audio_frames.size()):
-			playback.push_buffer(audio_frames)
+		#if playback.can_push_buffer(audio_frames.size()):
+			#playback.push_buffer(audio_frames)
 
 
 # Get steam's recommended sample rate if you want
