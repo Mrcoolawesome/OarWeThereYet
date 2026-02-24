@@ -1,9 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://d34pgbgxmrpd5"]
+[gd_scene load_steps=10 format=3 uid="uid://d34pgbgxmrpd5"]
 
 [ext_resource type="Script" uid="uid://c6yprd4vlj76t" path="res://scenes_scripts/UI/main_menu/main_menu.gd" id="1_4cwpn"]
 [ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="2_f40uw"]
 [ext_resource type="Texture2D" uid="uid://kt83tf61prry" path="res://art/Images/evilAssFace.jpg" id="3_8ctay"]
 [ext_resource type="Texture2D" uid="uid://clw8cwtrtug24" path="res://art/Images/steam.webp" id="4_ev3b6"]
+[ext_resource type="Theme" uid="uid://dc6y5w6xbhfo7" path="res://art/themes/checkbox.tres" id="5_rps2o"]
+[ext_resource type="Texture2D" uid="uid://bpn5ktwj4flev" path="res://art/icons/checkbox/Checkbox Checked.svg" id="6_h7afs"]
+[ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="6_s46lk"]
+[ext_resource type="Texture2D" uid="uid://c1yij37hp2pqx" path="res://art/icons/checkbox/Checkbox Normal.svg" id="7_s46lk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_h7afs"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -14,53 +20,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_4cwpn")
 
-[node name="HostButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 69.0
-offset_top = 64.0
-offset_right = 768.0
-offset_bottom = 320.0
-theme = ExtResource("2_f40uw")
-text = "Host"
-
-[node name="JoinButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 64.0
-offset_top = 320.0
-offset_right = 768.0
-offset_bottom = 576.0
-theme = ExtResource("2_f40uw")
-text = "Join"
-
-[node name="IDPrompt" type="LineEdit" parent="."]
-layout_mode = 0
-offset_left = 64.0
-offset_top = 576.0
-offset_right = 768.0
-offset_bottom = 766.0
-
 [node name="EvilAssFace" type="Sprite2D" parent="."]
 visible = false
 position = Vector2(1512, 400)
 texture = ExtResource("3_8ctay")
-
-[node name="RichTextLabel" type="RichTextLabel" parent="."]
-layout_mode = 0
-offset_left = 768.0
-offset_top = 64.0
-offset_right = 1193.0
-offset_bottom = 209.0
-theme = ExtResource("2_f40uw")
-text = "Toggle Steam"
-fit_content = true
-
-[node name="ToggleSteam" type="CheckButton" parent="."]
-layout_mode = 0
-offset_left = 1189.0
-offset_top = 84.0
-offset_right = 1233.0
-offset_bottom = 108.0
-scale = Vector2(4.5, 4.5)
 
 [node name="Steam" type="TextureRect" parent="."]
 visible = false
@@ -75,7 +38,49 @@ mouse_filter = 2
 texture = ExtResource("4_ev3b6")
 expand_mode = 1
 
-[connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
-[connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
-[connection signal="text_changed" from="IDPrompt" to="." method="_on_id_prompt_text_changed"]
-[connection signal="toggled" from="ToggleSteam" to="." method="_on_toggle_steam_toggled"]
+[node name="MarginContainer" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(1000, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="HostButton" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_f40uw")
+text = "Host"
+
+[node name="JoinButton" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_f40uw")
+theme_override_constants/outline_size = 35
+text = "Join"
+
+[node name="EnableSteam" type="CheckBox" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("5_rps2o")
+theme_override_colors/icon_hover_color = Color(0.5689727, 0.56897277, 0.5689727, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0.5686275, 0.5686275, 0.5686275, 1)
+theme_override_constants/outline_size = 35
+theme_override_fonts/font = ExtResource("6_s46lk")
+theme_override_font_sizes/font_size = 150
+theme_override_styles/focus = SubResource("StyleBoxEmpty_h7afs")
+theme_override_constants/check_v_offset = -10
+theme_override_icons/checked = ExtResource("6_h7afs")
+theme_override_icons/unchecked = ExtResource("7_s46lk")
+text = "Enable Steam"
+
+[node name="IDPrompt" type="LineEdit" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(100, 200)
+layout_mode = 2
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]
+[connection signal="toggled" from="MarginContainer/VBoxContainer/EnableSteam" to="." method="_on_toggle_steam_toggled"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/IDPrompt" to="." method="_on_id_prompt_text_changed"]
