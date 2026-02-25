@@ -3,6 +3,9 @@ using System;
 
 public partial class PopUpMenu : Control
 {
+	// signal for telling the main menu to close out of the pop up menu
+	[Signal] public delegate void GoBackButtonPressedEventHandler();
+
 	// we need to get the textbox container so we can hide and unhide it depending on if they made it public or not
 	private MarginContainer _textBoxContainer = new MarginContainer(); 
 
