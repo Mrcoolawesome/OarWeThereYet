@@ -36,6 +36,7 @@ func process_voice(voice_data: PackedByteArray, player: int):
 		# Get player's audiostream Node
 		var player_stream: AudioStreamPlayer3D = get_node("/root/GameManager/Level/DemoLevel/" + str(player) + "/AudioStreamPlayer3D")
 		player_stream.stream.mix_rate = current_sample_rate
+		player_stream.play()
 		var playback: AudioStreamGeneratorPlayback = player_stream.get_stream_playback()
 
 		var audio_frames: PackedVector2Array = PackedVector2Array()
@@ -46,10 +47,9 @@ func process_voice(voice_data: PackedByteArray, player: int):
 
 			# push_frame() takes a Vector2. The x represents the left channel and the y represents the right channel
 			audio_frames.append(Vector2(amplitude, amplitude))
-			playback.push_frame(Vector2(amplitude, amplitude))
 
-		#if playback.can_push_buffer(audio_frames.size()):
-			#playback.push_buffer(audio_frames)
+		if playback.can_push_buffer(audio_frames.size()):
+			playback.push_buffer(audio_frames)
 
 
 # Get steam's recommended sample rate if you want
