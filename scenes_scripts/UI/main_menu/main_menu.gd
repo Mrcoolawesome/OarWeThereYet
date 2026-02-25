@@ -1,23 +1,23 @@
 extends Control
 
-@onready var host_button: Button = $HostButton
-@onready var join_button: Button = $JoinButton
-@onready var id_prompt: LineEdit = $IDPrompt
+@onready var host_button: Button = $MainMenuContainer/VBoxContainer/HostButton
+@onready var join_button: Button = $MainMenuContainer/VBoxContainer/JoinButton
+@onready var id_prompt: LineEdit = $MainMenuContainer/VBoxContainer/IDPrompt
 @onready var steam = $Steam
+@onready var main_menu_container: MarginContainer = $MainMenuContainer
+const popup_menu = preload("res://scenes_scripts/UI/pop_up_menu/pop_up_menu.tscn")
 
 # boolean to keep track of wether the steam toggle was pressed or not
 var steam_mode = false
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass
 
 func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
 
 func _on_host_button_pressed() -> void:
-	# send the signal via the global signal server so the network manager can access it
-	GlobalSignalServer.emit_signal("HostGame")
+	# instantiate the pop up menu and hide the main menu
+	var popup_menu_instance = popup_menu.instantiate()
+	add_child(popup_menu_instance)
+	main_menu_container.visible = false
 
 func _on_join_button_pressed() -> void:
 	# only send the signal if there's an id in the text box and we're in steam mode or just let them bypass the box if we're not in steam mode
