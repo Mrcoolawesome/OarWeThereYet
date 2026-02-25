@@ -5,7 +5,7 @@ extends Control
 @onready var id_prompt: LineEdit = $MainMenuContainer/VBoxContainer/IDPrompt
 @onready var steam = $Steam
 @onready var main_menu_container: MarginContainer = $MainMenuContainer
-@onready var popup_menu: Control = $PopUpMenu
+@onready var popup_menu: Control = $HostGamePopUpMenu
 
 # boolean to keep track of wether the steam toggle was pressed or not
 var steam_mode = false
