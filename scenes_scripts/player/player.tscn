@@ -71,7 +71,6 @@ visible = false
 
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="."]
 stream = SubResource("AudioStreamGenerator_0fxne")
-autoplay = true
 bus = &"Voice Chat"
 
 [connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
