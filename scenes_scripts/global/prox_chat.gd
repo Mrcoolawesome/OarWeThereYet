@@ -61,7 +61,7 @@ func _process(_delta: float) -> void:
 		# Calculate total capacity of this specific generator bucket
 		var total_capacity: int = int(stream.stream.buffer_length * current_sample_rate)
 		var empty_space: int = playback.get_frames_available()
-		
+		print("capacity: %d space: %d" % [total_capacity, empty_space])		
 		# If the empty space is equal to or greater than capacity, the bucket is completely dry
 		if empty_space >= total_capacity:
 			stream.stop()
@@ -96,6 +96,7 @@ func process_voice(voice_data: PackedByteArray, player: int):
 		var playback: AudioStreamGeneratorPlayback = p_data.stream.get_stream_playback()
 
 		if playback.can_push_buffer(audio_frames.size()):
+			print("Audio too big")
 			playback.push_buffer(audio_frames)
 
 	# Else push to our own temp buffer
