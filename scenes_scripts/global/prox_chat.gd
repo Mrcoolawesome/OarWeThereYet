@@ -65,6 +65,7 @@ func _process(_delta: float) -> void:
 		# If the empty space is equal to or greater than capacity, the bucket is completely dry
 		if empty_space >= total_capacity:
 			stream.stop()
+			print("stopping stream")
 			p_data.is_buffering = true
 
 
@@ -100,11 +101,13 @@ func process_voice(voice_data: PackedByteArray, player: int):
 	# Else push to our own temp buffer
 	else:
 		p_data.buffer.append_array(audio_frames)
+		print(p_data.buffer.size())
 
 		# If our temp buffer is big enough, start playback
 		if p_data.buffer.size() >= frames_to_buffer:
 			p_data.is_buffering = false
 			p_data.stream.play()
+			print("starting and playing stream")
 			var playback: AudioStreamGeneratorPlayback = p_data.stream.get_stream_playback()
 			playback.push_buffer(p_data.buffer)
 			p_data.buffer.clear()
