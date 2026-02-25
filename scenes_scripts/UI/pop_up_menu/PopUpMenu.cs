@@ -37,4 +37,11 @@ public partial class PopUpMenu : Control
 		// emit via the global signal server
 		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.HostGame));
 	}
+
+	// triggered when the back button is pressed 
+	public void OnBackButtonPressed()
+	{
+		// emit the signal so the parent knows that the menu should be removed
+		EmitSignal(nameof(GoBackButtonPressed));
+	}
 }

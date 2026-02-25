@@ -5,7 +5,7 @@ extends Control
 @onready var id_prompt: LineEdit = $MainMenuContainer/VBoxContainer/IDPrompt
 @onready var steam = $Steam
 @onready var main_menu_container: MarginContainer = $MainMenuContainer
-const popup_menu = preload("res://scenes_scripts/UI/pop_up_menu/pop_up_menu.tscn")
+@onready var popup_menu: Control = $PopUpMenu
 
 # boolean to keep track of wether the steam toggle was pressed or not
 var steam_mode = false
@@ -14,9 +14,8 @@ func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
 
 func _on_host_button_pressed() -> void:
-	# instantiate the pop up menu and hide the main menu
-	var popup_menu_instance = popup_menu.instantiate()
-	add_child(popup_menu_instance)
+	# show the pop up menu and hide the main menu
+	popup_menu.visible = true
 	main_menu_container.visible = false
 
 func _on_join_button_pressed() -> void:
@@ -30,3 +29,8 @@ func _on_toggle_steam_toggled(toggled_on: bool) -> void:
 	GlobalSignalServer.emit_signal("SelectSteamNetwork", toggled_on)
 	steam.visible = toggled_on
 	steam_mode = toggled_on
+
+func _on_pop_up_menu_go_back_button_pressed() -> void:
+	# hide the pop up menu and show the main menu
+	popup_menu.visible = false
+	main_menu_container.visible = true

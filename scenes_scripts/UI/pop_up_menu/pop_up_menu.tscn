@@ -312,3 +312,4 @@ theme_type_variation = &"ExitButton"
 [connection signal="toggled" from="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer/CheckBox" to="." method="OnCheckBoxToggled"]
 [connection signal="text_changed" from="PanelContainer/VBoxContainer/LobbyNameContainer/LineEdit" to="." method="OnLineEditTextChanged"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer3/HostButton" to="." method="OnHostButtonPressed"]
+[connection signal="pressed" from="PanelContainer/ExitButtonControl/ExitButton" to="." method="OnBackButtonPressed"]

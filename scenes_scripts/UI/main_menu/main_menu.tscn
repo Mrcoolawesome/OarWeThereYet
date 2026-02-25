@@ -1,9 +1,10 @@
-[gd_scene load_steps=23 format=3 uid="uid://d34pgbgxmrpd5"]
+[gd_scene load_steps=24 format=3 uid="uid://d34pgbgxmrpd5"]
 
 [ext_resource type="Script" uid="uid://c6yprd4vlj76t" path="res://scenes_scripts/UI/main_menu/main_menu.gd" id="1_4cwpn"]
 [ext_resource type="FontFile" uid="uid://c2spru0tbvbyi" path="res://art/fonts/Dongle/Dongle-Bold.ttf" id="4_16wdt"]
 [ext_resource type="Texture2D" uid="uid://clw8cwtrtug24" path="res://art/Images/steam.webp" id="4_ev3b6"]
 [ext_resource type="Theme" uid="uid://b2bjemh6aq227" path="res://art/themes/buttons.tres" id="5_f877t"]
+[ext_resource type="PackedScene" uid="uid://8btpactq3nb5" path="res://scenes_scripts/UI/pop_up_menu/pop_up_menu.tscn" id="6_f877t"]
 [ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="6_s46lk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8pc20"]
@@ -263,7 +264,12 @@ theme_override_styles/focus = SubResource("StyleBoxEmpty_h7afs")
 theme_override_constants/check_v_offset = -10
 text = "Enable Steam"
 
+[node name="PopUpMenu" parent="." instance=ExtResource("6_f877t")]
+visible = false
+layout_mode = 1
+
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]
 [connection signal="text_changed" from="MainMenuContainer/VBoxContainer/IDPrompt" to="." method="_on_id_prompt_text_changed"]
 [connection signal="toggled" from="MainMenuContainer/VBoxContainer/EnableSteam" to="." method="_on_toggle_steam_toggled"]
+[connection signal="GoBackButtonPressed" from="PopUpMenu" to="." method="_on_pop_up_menu_go_back_button_pressed"]
