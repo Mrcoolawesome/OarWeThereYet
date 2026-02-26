@@ -7,18 +7,15 @@
 [ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes_scripts/UI/pause_ui/pause_ui.tscn" id="5_8t03j"]
 [ext_resource type="PackedScene" uid="uid://dyjf8cl7dhrr5" path="res://scenes_scripts/UI/hud/hud.tscn" id="6_2ieo8"]
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
+properties/0/path = NodePath(".:State")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_3vyb7"]
 height = 1.2
-
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
-properties/0/path = NodePath(".:position")
-properties/0/spawn = true
-properties/0/replication_mode = 1
-properties/1/path = NodePath(".:rotation")
-properties/1/spawn = true
-properties/1/replication_mode = 1
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_0fxne"]
 
@@ -29,6 +26,10 @@ script = ExtResource("1_g6k8r")
 MouseSens = 0.5
 LerpSpeed = 5.0
 CrouchLerpSpeed = 7.5
+NetworkLerpSpeed = 25.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_qhqgy")
 
 [node name="StandingCollision" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_u8vuu")
@@ -61,9 +62,6 @@ visible = false
 
 [node name="PauseUI" parent="PauseCanvas" instance=ExtResource("5_8t03j")]
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_qhqgy")
-
 [node name="HUD" parent="." instance=ExtResource("6_2ieo8")]
 visible = false
 
@@ -75,6 +73,7 @@ attenuation_model = 2
 bus = &"Voice Chat"
 doppler_tracking = 1
 
+[connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
 [connection signal="RespawnPlayer" from="PauseCanvas/PauseUI" to="." method="OnPauseUIRespawnPlayer"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]

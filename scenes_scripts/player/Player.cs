@@ -1,9 +1,8 @@
 using Godot;
+using Godot.Collections;
 using System;
-using System.Net.Http;
-using System.Runtime.InteropServices.Marshalling;
 
-public partial class Player : CharacterBody3D
+public partial class Player : CharacterBody3D, ISyncBuffer
 {
 	// Exported variables
 	[Export] public float JumpVelocity = 4.5f;
@@ -14,6 +13,8 @@ public partial class Player : CharacterBody3D
 	[Export] public float MouseSens = 0.4f;
 	[Export] public float LerpSpeed = 10.0f;
 	[Export] public float CrouchLerpSpeed = 10.0f;
+	[Export] public float NetworkLerpSpeed = 10.0f;
+	[Export] public Array<Variant> State { get; set; }
 
 	// Private variables
 	private float _currSpeed = 5.0f;
@@ -82,7 +83,16 @@ public partial class Player : CharacterBody3D
 	private Vector3 _initialVelocity;
 	private bool _isOnGround;
 
-	public override void _EnterTree()
+	// booleans for making sure we only apply the new state once for client side stuff
+	private bool _applyNewPositionState = false;
+	private bool _applyNewRotationState = false;
+	private bool _applyNewVelocityState = false;
+	// new state that the boat should be set to
+	private Transform3D _newPositionState;
+	// new rotation state
+	private Basis _newRotationState;
+
+  public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
 		// this sets the multiplayer authority of THIS NODE to be the player with the specified id.
@@ -115,6 +125,9 @@ public partial class Player : CharacterBody3D
 
 		// Add the player to the 'players' group
 		AddToGroup("players");
+
+		// set the state array from the server's perspective
+		SetStateArray();
 
 		// client code for when setting up their camera and stuff
 		// if we are the player, then use the camera for this player
@@ -286,23 +299,51 @@ public partial class Player : CharacterBody3D
 	// Logic for movement depending on player state
 	public override void _PhysicsProcess(double delta)
 	{
-		// Always apply gravity 
-		Gravity(delta);
+		// do all the movement and stuff if we're the owner of this instance, we'll sync it to the clients 
+		if (IsMultiplayerAuthority())
+		{
+			// Always apply gravity 
+			Gravity(delta);
 
-		if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Standing)
-		{
-			StandingStatePhysicsProcess(delta);
-			CrouchSprintPhysicsProcess(delta);
-		} 
-		else if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Rowing)
-		{
-			RowingStatePhysicsProcess();
+			// always set the state array as often as possible AS THE CLIENT
+			SetStateArray();
+
+			if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Standing)
+			{
+				StandingStatePhysicsProcess(delta);
+				CrouchSprintPhysicsProcess(delta);
+			} 
+			else if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Rowing)
+			{
+				RowingStatePhysicsProcess();
+			}
+
+			// Always apply MoveAndSlide unless they're rowing
+			if (_currPlayerState != PlayerState.Rowing)
+			{
+				MoveAndSlide();
+			}
 		}
-
-		// Always apply MoveAndSlide unless they're rowing
-		if (_currPlayerState != PlayerState.Rowing)
+		else // if we're not the owner of this instance, then we're just gonna sync their position and stuff (this is for 'network puppets')
 		{
-			MoveAndSlide();
+			// Do client side processing 
+      Gravity(delta);
+
+			// do local movement for the puppet while in the boat
+			if (_currPlayerState == PlayerState.Rowing)
+      {
+        // Force them to the seat perfectly. The boat is already handling movement.
+        RowingStatePhysicsProcess();
+      }
+      else
+      {
+        // If they are standing, simulate their gravity and movement locally
+        Gravity(delta);
+        MoveAndSlide();
+      }
+
+      // Sync network data 
+      SyncAndLerpClientDataProcess(delta); // this deals with the sitting state
 		}
 	}
 
@@ -555,6 +596,111 @@ public partial class Player : CharacterBody3D
 		{
 			GD.Print("Error: Failed to get seat");
 			return null;
+		}
+	}
+
+	// LOGIC FOR CLIENT SYNCING POSITION AND ROTATION INFORMATION
+	// client updates their position ig
+  public void SetStateArray()
+  {
+    if (IsMultiplayerAuthority())
+		{
+			State = [Position, Quaternion, Velocity, (int)_currPlayerState, (int)_seat];
+		}
+  }
+
+	// ran when the 'synchronized()' signal is sent out so that it's ALWAYS updating
+  public void SyncPosIfNeeded()
+  {
+    // only ran client side
+		if (!IsMultiplayerAuthority()) // this is kinda redundant since we already check this before we call this function but whatever
+		{
+			// Syncing the rotation:
+			// make a new basis to use to transform the boat position
+			// set to the current rotation by default because we only wanna change it if we're within a threshold
+			// get synced rotation and curr rotation
+			Quaternion syncedRotation = (Quaternion)State[1];
+			Quaternion currRotation = Quaternion;
+			// if the difference is greater than some threshold then lerp
+			if (Mathf.Abs(currRotation.AngleTo(syncedRotation)) > Mathf.DegToRad(0.1f)) // if the difference is greater than 0.1 of a degree than sync
+			{
+				// 'return' the rotation state
+				_newRotationState = new Basis(syncedRotation);
+				_applyNewRotationState = true;
+			}
+
+			// Syncing the position:
+			// get the synced position
+			Vector3 syncedPosition = (Vector3)State[0];
+			// difference between our client side position and the host's position
+			float posDiff = (syncedPosition - Position).Length();
+			// make a new transform, that just uses our current position by default and the synced position if we've deviated too far
+			// if it's greater than 0.5 meters apart then lerp ours to the hosts' position
+			if (posDiff > 0.05f) // we want them to be very close
+			{
+				// this is where the new transformation is 'returned'
+				_newPositionState = new Transform3D(Basis, syncedPosition);
+				_applyNewPositionState = true;
+			}
+
+			// we want this to just always happen when we're updated
+			_applyNewVelocityState = true;
+		}
+  }
+
+	private void SyncAndLerpClientDataProcess(double delta)
+	{
+		// Read and apply the state and seat from the authority
+    _currPlayerState = (PlayerState)(int)State[3];
+    _seat = (Boat.SeatIndicies)(int)State[4];
+		// get the 'speed' at which we lerp at 
+		float weight = (float)delta * NetworkLerpSpeed; // state.Step is like the 'delta' parameters given from Process
+		// apply the updated state variable if any changes were made
+		// ONLY correct position and velocity if they are walking around normally
+    if (_currPlayerState != PlayerState.Rowing)
+    {
+			if (_applyNewPositionState)
+			{
+				// interpolate to the new position
+				Transform = Transform.InterpolateWith(_newPositionState, weight);
+				
+				// Only turn off the flag once we are practically touching the target
+				// we have to do this because lerping won't instantly snap us to the target postition, so we need to keep going until we're basically right next to it
+				if (Transform.Origin.DistanceTo(_newPositionState.Origin) < 0.01f)
+				{
+					// state.Transform = _newPositionState; // Snaps the final microscopic distance - i don't like this becuase it makes it look like jitter is happening, within 0.05m of the host is close enough
+					_applyNewPositionState = false;      // NOW we stop lerping
+				}
+			}
+			// apply the velocity state if needed
+			// don't really need to lerp velocity since it doesn't change a significant enough amount i think
+			if (_applyNewVelocityState)
+			{
+				Velocity = (Vector3)State[2];
+				_applyNewVelocityState = false;
+			}
+		}
+
+		// ALWAYS apply rotation sync so that clients always know where someone is looking (since we want that even when they're sitting)
+		// apply the updated/corrected rotation state if needed
+		if (_applyNewRotationState)
+		{
+			// interpolate to the new rotation (this was written by gemini but it's prolly fine)
+			Quaternion currentRot = Transform.Basis.GetRotationQuaternion();
+			Quaternion targetRot = _newRotationState.GetRotationQuaternion(); // Assuming _newRotationState is a Basis
+			
+			// Slerp (Spherical Linear Interpolation) calculates the smooth rotation
+			Quaternion smoothRot = currentRot.Slerp(targetRot, weight);
+			
+			Vector3 currentPosition = Transform.Origin;
+			Transform = new Transform3D(new Basis(smoothRot), currentPosition);
+			
+			
+			// Only turn off the flag once the rotational difference is tiny
+			if (Mathf.Abs(currentRot.AngleTo(targetRot)) < 0.01f)
+			{
+				_applyNewRotationState = false;
+			}
 		}
 	}
 }
