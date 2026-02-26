@@ -28,7 +28,6 @@ func initialize_voice():
     get_sample_rate()
     frames_to_buffer = int(current_sample_rate * buffer_target_seconds)
     set_process(true)
-    print("Voice Initialized. Target frames to buffer: ", frames_to_buffer)
 
 
 func get_sample_rate():
@@ -36,7 +35,6 @@ func get_sample_rate():
         current_sample_rate = Steam.getVoiceOptimalSampleRate()
     else:
         current_sample_rate = 48000
-    print("Current sample rate: %s" % current_sample_rate)
 
 
 func _process(_delta: float) -> void:
@@ -60,7 +58,6 @@ func _process(_delta: float) -> void:
             if p_data.buffer.size() >= frames_to_buffer:
                 stream.play()
                 p_data.unplayed_frames = 0.0 # Reset our custom tracker
-                print("--- Stream Started ---")
                 
         else:
             var playback: AudioStreamGeneratorPlayback = stream.get_stream_playback()
@@ -86,7 +83,6 @@ func _process(_delta: float) -> void:
             # We only stop if our custom buffer is empty AND our math says Godot has finished playing everything
             if p_data.buffer.is_empty() and p_data.unplayed_frames <= 0.0:
                 stream.stop()
-                print("--- Stream Stopped (Naturally ran out of frames) ---")
 
 
 func process_voice(raw_buffer: PackedByteArray, player: int):
@@ -124,7 +120,6 @@ func setup_player_audio(player_id: int):
         
         var player_data = PlayerAudioData.new(stream_node)
         active_players[player_id] = player_data
-        print("Setup audio for player: ", player_id)
     else:
         push_error("Could not find AudioStreamPlayer3D for player %s" % player_id)
 
