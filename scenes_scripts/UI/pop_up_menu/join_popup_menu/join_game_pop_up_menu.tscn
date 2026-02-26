@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://caadborm3nbjt"]
+
+[ext_resource type="PackedScene" uid="uid://c6n6ct037x4n2" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.tscn" id="1_jmygw"]
+
+[node name="JoinGamePopUpMenu" instance=ExtResource("1_jmygw")]
