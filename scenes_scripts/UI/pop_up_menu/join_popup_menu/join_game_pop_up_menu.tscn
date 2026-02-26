@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://caadborm3nbjt"]
+[gd_scene load_steps=4 format=3 uid="uid://caadborm3nbjt"]
 
 [ext_resource type="PackedScene" uid="uid://c6n6ct037x4n2" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.tscn" id="1_jmygw"]
 [ext_resource type="Script" uid="uid://x4c0c5hpvtos" path="res://scenes_scripts/UI/pop_up_menu/join_popup_menu/join_game_pop_up_menu.gd" id="2_73o6y"]
+[ext_resource type="Theme" uid="uid://b2bjemh6aq227" path="res://art/themes/buttons.tres" id="3_1hspj"]
 
 [node name="JoinGamePopUpMenu" instance=ExtResource("1_jmygw")]
 script = ExtResource("2_73o6y")
@@ -36,6 +37,10 @@ layout_mode = 2
 
 [node name="LobbyName" type="Label" parent="PanelContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer/Lobby" index="0"]
 layout_mode = 2
+theme = ExtResource("3_1hspj")
+text = "Placeholder"
 
 [node name="JoinLobbyButton" type="Button" parent="PanelContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer/Lobby" index="1"]
 layout_mode = 2
+text = "Join"
+alignment = 2
