@@ -15,9 +15,14 @@ run/main_scene="uid://4fedud0prf6s"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[audio]
+
+driver/enable_input=true
+
 [autoload]
 
 GlobalSignalServer="*res://scenes_scripts/global/GlobalSignalServer.cs"
+ProxChat="*res://scenes_scripts/global/prox_chat.gd"
 
 [debug]
 
