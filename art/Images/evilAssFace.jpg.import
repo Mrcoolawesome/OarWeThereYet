@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://kt83tf61prry"
 path.s3tc="res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.s3tc.ctex"
+path.etc2="res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://art/Images/evilAssFace.jpg"
-dest_files=["res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.s3tc.ctex"]
+dest_files=["res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.s3tc.ctex", "res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.etc2.ctex"]
 
 [params]
 
