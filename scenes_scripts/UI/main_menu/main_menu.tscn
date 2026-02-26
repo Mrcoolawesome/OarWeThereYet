@@ -272,4 +272,4 @@ layout_mode = 1
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]
 [connection signal="text_changed" from="MainMenuContainer/VBoxContainer/IDPrompt" to="." method="_on_id_prompt_text_changed"]
 [connection signal="toggled" from="MainMenuContainer/VBoxContainer/EnableSteam" to="." method="_on_toggle_steam_toggled"]
-[connection signal="GoBackButtonPressed" from="HostGamePopUpMenu" to="." method="_on_pop_up_menu_go_back_button_pressed"]
+[connection signal="go_back_button_pressed" from="HostGamePopUpMenu" to="." method="_on_pop_up_menu_go_back_button_pressed"]

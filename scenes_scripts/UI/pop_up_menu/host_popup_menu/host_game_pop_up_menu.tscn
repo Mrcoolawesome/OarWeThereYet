@@ -1,8 +1,8 @@
 [gd_scene load_steps=22 format=3 uid="uid://657bxsni64f3"]
 
 [ext_resource type="PackedScene" uid="uid://c6n6ct037x4n2" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.tscn" id="1_teee5"]
-[ext_resource type="Script" uid="uid://cnos2ipmugqvb" path="res://scenes_scripts/UI/pop_up_menu/host_popup_menu/HostGamePopUpMenu.cs" id="2_67ijm"]
 [ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="2_bftid"]
+[ext_resource type="Script" uid="uid://dphvpqnr087pj" path="res://scenes_scripts/UI/pop_up_menu/host_popup_menu/host_game_pop_up_menu.gd" id="2_lyev8"]
 [ext_resource type="FontFile" uid="uid://c2spru0tbvbyi" path="res://art/fonts/Dongle/Dongle-Bold.ttf" id="3_1bcoc"]
 [ext_resource type="Theme" uid="uid://b2bjemh6aq227" path="res://art/themes/buttons.tres" id="4_v2hjm"]
 
@@ -197,7 +197,7 @@ LineEditMedium/base_type = &"LineEdit"
 LineEditMedium/font_sizes/font_size = 20
 
 [node name="HostGamePopUpMenu" instance=ExtResource("1_teee5")]
-script = ExtResource("2_67ijm")
+script = ExtResource("2_lyev8")
 
 [node name="Header" parent="PanelContainer/VBoxContainer" index="0"]
 text = "Host A Game"
@@ -261,6 +261,6 @@ theme = SubResource("Theme_itoyq")
 theme_type_variation = &"FlatButton"
 text = "Host"
 
-[connection signal="toggled" from="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer/CheckBox" to="." method="OnCheckBoxToggled"]
-[connection signal="text_changed" from="PanelContainer/VBoxContainer/LobbyNameContainer/LineEdit" to="." method="OnLineEditTextChanged"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer3/HostButton" to="." method="OnHostButtonPressed"]
+[connection signal="toggled" from="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer/CheckBox" to="." method="on_check_box_toggled"]
+[connection signal="text_changed" from="PanelContainer/VBoxContainer/LobbyNameContainer/LineEdit" to="." method="on_line_edit_text_changed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer3/HostButton" to="." method="on_host_button_pressed"]

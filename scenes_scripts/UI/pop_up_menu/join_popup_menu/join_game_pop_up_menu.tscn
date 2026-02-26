@@ -1,5 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://caadborm3nbjt"]
+[gd_scene load_steps=3 format=3 uid="uid://caadborm3nbjt"]
 
 [ext_resource type="PackedScene" uid="uid://c6n6ct037x4n2" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.tscn" id="1_jmygw"]
+[ext_resource type="Script" uid="uid://x4c0c5hpvtos" path="res://scenes_scripts/UI/pop_up_menu/join_popup_menu/join_game_pop_up_menu.gd" id="2_73o6y"]
 
 [node name="JoinGamePopUpMenu" instance=ExtResource("1_jmygw")]
+script = ExtResource("2_73o6y")
+
+[node name="Header" parent="PanelContainer/VBoxContainer" index="0"]
+text = "Join A Game"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer" index="1"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer/ScrollContainer" index="0"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

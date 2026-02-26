@@ -1,6 +1,6 @@
 [gd_scene load_steps=22 format=3 uid="uid://c6n6ct037x4n2"]
 
-[ext_resource type="Script" uid="uid://cusyo1rt4yo5t" path="res://scenes_scripts/UI/pop_up_menu/BasePopUpMenu.cs" id="1_kub2d"]
+[ext_resource type="Script" uid="uid://civ2wueslyjti" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.gd" id="1_kub2d"]
 [ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="2_jgv1y"]
 [ext_resource type="FontFile" uid="uid://c2spru0tbvbyi" path="res://art/fonts/Dongle/Dongle-Bold.ttf" id="3_dboef"]
 [ext_resource type="Theme" uid="uid://b2bjemh6aq227" path="res://art/themes/buttons.tres" id="4_a7w36"]
@@ -250,4 +250,4 @@ size_flags_vertical = 0
 theme = ExtResource("4_a7w36")
 theme_type_variation = &"ExitButton"
 
-[connection signal="pressed" from="PanelContainer/ExitButtonControl/ExitButton" to="." method="OnBackButtonPressed"]
+[connection signal="pressed" from="PanelContainer/ExitButtonControl/ExitButton" to="." method="on_back_button_pressed"]
