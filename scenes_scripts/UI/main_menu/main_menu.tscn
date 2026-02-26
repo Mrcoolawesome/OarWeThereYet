@@ -62,12 +62,18 @@ offset_right = 1233.0
 offset_bottom = 108.0
 scale = Vector2(4.5, 4.5)
 
-[node name="Steam" type="Sprite2D" parent="."]
+[node name="Steam" type="TextureRect" parent="."]
 visible = false
 z_index = -1
-position = Vector2(963.9999, 545)
-scale = Vector2(0.9719999, 0.36733332)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("4_ev3b6")
+expand_mode = 1
 
 [connection signal="pressed" from="HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="JoinButton" to="." method="_on_join_button_pressed"]
