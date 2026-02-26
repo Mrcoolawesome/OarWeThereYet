@@ -11,7 +11,7 @@ class PlayerAudioData:
 
 var current_sample_rate: int = 48000
 var use_recommended_sample_rate: bool = true
-var local_playback: bool = true
+var local_playback: bool = false
 
 var buffer_target_seconds: float = 0.1
 var frames_to_buffer: int = 0
