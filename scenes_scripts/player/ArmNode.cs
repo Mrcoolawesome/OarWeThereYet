@@ -23,7 +23,7 @@ public partial class ArmNode : MeshInstance3D
 			Mesh = null;
 		}
 
-		if (Input.IsActionPressed("right_click"))
+		if (Input.IsActionPressed("right_click") && GetParent().GetParent<Node>().IsMultiplayerAuthority())
 		{
 			RequestDropItem();
 		}
@@ -32,8 +32,14 @@ public partial class ArmNode : MeshInstance3D
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void SetItem(string itemPath)
 	{
-		InvItem item = GD.Load<InvItem>(itemPath);
-		Item = item;
+		if (string.IsNullOrEmpty(itemPath))
+		{
+			Item = null;
+		}
+		else
+		{
+			Item = GD.Load<InvItem>(itemPath);
+		}
 	}
 
 	private void RequestDropItem()
@@ -41,7 +47,7 @@ public partial class ArmNode : MeshInstance3D
 		RpcId(1, MethodName.DropItem);
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void DropItem()
 	{
 		if (Item != null)
