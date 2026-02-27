@@ -40,9 +40,7 @@ func become_host(is_public: bool, lobby_name: String):
 		Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, _max_lobby_members)
 
 	# set the attribute for the lobby name
-	lobby_name = lobby_name if lobby_name != null else Steam.getPersonaName()
-	# setting metadata is just setting your own variables for the lobby, there's no specific parameters
-	Steam.setLobbyData(_hosted_lobby_id, "name", lobby_name)
+	LOBBY_NAME = lobby_name if lobby_name != null else Steam.getPersonaName()
 	# set SERVER relay to be enabled
 	multiplayer_peer.server_relay = true
 	multiplayer_peer.create_host()
@@ -81,6 +79,9 @@ func _on_lobby_created(result: int, lobby_id):
 
 		# make the lobby joinable (this is enabled by default)
 		Steam.setLobbyJoinable(_hosted_lobby_id, true)
+
+		# setting metadata is just setting your own variables for the lobby, there's no specific parameters
+		Steam.setLobbyData(_hosted_lobby_id, "name", LOBBY_NAME)
 
 func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
 	# if they 

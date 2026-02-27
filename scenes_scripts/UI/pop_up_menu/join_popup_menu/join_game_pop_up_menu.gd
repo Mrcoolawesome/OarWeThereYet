@@ -25,6 +25,7 @@ func _on_lobby_match_list(lobbies: Array) -> void:
   
   # go through each lobby found by steam
   for lobby_id in lobbies:
+    Steam.requestLobbyData(lobby_id)
     var lobby_name: String = Steam.getLobbyData(lobby_id, "name") # oarLobbyName attribute we set the name to be in the steam_network.gd script
 
     if lobby_name != "":
