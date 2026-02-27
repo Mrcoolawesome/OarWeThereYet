@@ -17,10 +17,10 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
   public void Interact(Player player)
   {
-    RequestItemPickup(player);
+    RequestItemPickup();
   }
 
-  private void RequestItemPickup(Player player)
+  private void RequestItemPickup()
   {
     RpcId(1, MethodName.ItemPickup);
   }
@@ -28,7 +28,15 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void ItemPickup()
   {
-    //give player item
+    // Get player
+    int playerID = Multiplayer.GetRemoteSenderId();
+    ArmNode playerArm = GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
+
+    // Give player item
+    string itemPath = Item.ResourcePath;
+    playerArm.Rpc(nameof(playerArm.SetItem), itemPath);
+
+    // Delete item in world
     Rpc(nameof(DeleteItem));
   }
 

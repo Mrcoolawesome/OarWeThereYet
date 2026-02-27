@@ -50,6 +50,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 [node name="InteractRay" parent="Head/CameraContainer/Camera3D" node_paths=PackedStringArray("Player") instance=ExtResource("2_boad6")]
 Player = NodePath("../../../..")
 
+[node name="ArmNode" type="MeshInstance3D" parent="Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39999998, -1.4)
+skeleton = NodePath("../..")
+script = ExtResource("7_csk1d")
+
 [node name="AimLook" type="Node" parent="."]
 
 [node name="FullPlayerModel" parent="." instance=ExtResource("3_rgyib")]
@@ -73,10 +78,6 @@ stream = SubResource("AudioStreamGenerator_0fxne")
 attenuation_model = 2
 bus = &"Voice Chat"
 doppler_tracking = 1
-
-[node name="ArmNode" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -1)
-script = ExtResource("7_csk1d")
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
