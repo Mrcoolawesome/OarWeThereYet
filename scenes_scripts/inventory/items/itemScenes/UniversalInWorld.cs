@@ -19,4 +19,15 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   {
 
   }
+
+  private void RequestItemPickup(Player player)
+  {
+    
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void RequestItemPickup()
+  {
+    
+  }
 }

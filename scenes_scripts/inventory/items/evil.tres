@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="InvItem" load_steps=5 format=3 uid="uid://dnhur17ilku5e"]
 
 [ext_resource type="Texture2D" uid="uid://kt83tf61prry" path="res://art/Images/evilAssFace.jpg" id="1_qupqt"]
-[ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://inventory/InvItem.cs" id="2_0bhkq"]
-[ext_resource type="Shape3D" uid="uid://cena74pk08yxq" path="res://inventory/items/item3DResources/evilCollider.tres" id="2_p7m1e"]
-[ext_resource type="BoxMesh" uid="uid://2og28wq6h1da" path="res://inventory/items/item3DResources/evilMesh.tres" id="3_6iebx"]
+[ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="2_0bhkq"]
+[ext_resource type="Shape3D" uid="uid://cena74pk08yxq" path="res://scenes_scripts/inventory/items/item3DResources/evilCollider.tres" id="2_p7m1e"]
+[ext_resource type="BoxMesh" uid="uid://2og28wq6h1da" path="res://scenes_scripts/inventory/items/item3DResources/evilMesh.tres" id="3_6iebx"]
 
 [resource]
 script = ExtResource("2_0bhkq")
