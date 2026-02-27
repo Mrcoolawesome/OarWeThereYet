@@ -28,16 +28,20 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void ItemPickup()
   {
-    // Get player
+    // Get player and their arm
     int playerID = Multiplayer.GetRemoteSenderId();
     ArmNode playerArm = GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
 
-    // Give player item
-    string itemPath = Item.ResourcePath;
-    playerArm.Rpc(nameof(playerArm.SetItem), itemPath);
+    // If player isn't holding an item
+    if (playerArm.Item == null)
+    {
+      // Give player item
+      string itemPath = Item.ResourcePath;
+      playerArm.Rpc(nameof(playerArm.SetItem), itemPath);
 
-    // Delete item in world
-    Rpc(nameof(DeleteItem));
+      // Delete item in world
+      Rpc(nameof(DeleteItem));
+    }
   }
 
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]

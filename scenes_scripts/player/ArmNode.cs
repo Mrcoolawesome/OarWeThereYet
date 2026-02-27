@@ -22,6 +22,11 @@ public partial class ArmNode : MeshInstance3D
 		{
 			Mesh = null;
 		}
+
+		if (Input.IsActionPressed("right_click"))
+		{
+			RequestDropItem();
+		}
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -31,4 +36,34 @@ public partial class ArmNode : MeshInstance3D
 		Item = item;
 	}
 
+	private void RequestDropItem()
+	{
+		RpcId(1, MethodName.DropItem);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
+	public void DropItem()
+	{
+		if (Item != null)
+		{
+			string itemPath = Item.ResourcePath;
+			Vector3 dropPosition = GlobalPosition;
+
+			// Tell all peers to spawn the item and clear the arm
+			Rpc(nameof(SpawnDroppedItem), itemPath, dropPosition);
+			Rpc(nameof(SetItem), "");
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void SpawnDroppedItem(string itemPath, Vector3 position)
+	{
+		PackedScene inWorldScene = GD.Load<PackedScene>("res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn");
+		UniversalInWorld inWorldNode = inWorldScene.Instantiate<UniversalInWorld>();
+
+		inWorldNode.Item = GD.Load<InvItem>(itemPath);
+		inWorldNode.Position = position;
+
+		GetNode("/root/GameManager/Level/DemoLevel").AddChild(inWorldNode);
+	}
 }

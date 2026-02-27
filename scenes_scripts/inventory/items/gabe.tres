@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="InvItem" load_steps=5 format=3 uid="uid://kq6ftwk7tuff"]
 
-[ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://inventory/InvItem.cs" id="1_43a45"]
+[ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_43a45"]
 [ext_resource type="Texture2D" uid="uid://clw8cwtrtug24" path="res://art/Images/steam.webp" id="1_av4mp"]
-[ext_resource type="Shape3D" uid="uid://dcmohndxegy5p" path="res://inventory/items/item3DResources/gabeCollider.tres" id="2_1x0a1"]
-[ext_resource type="BoxMesh" uid="uid://yqgkynijlkcr" path="res://inventory/items/item3DResources/gabeMesh.tres" id="3_yrge7"]
+[ext_resource type="Shape3D" uid="uid://dcmohndxegy5p" path="res://scenes_scripts/inventory/items/item3DResources/gabeCollider.tres" id="2_1x0a1"]
+[ext_resource type="BoxMesh" uid="uid://yqgkynijlkcr" path="res://scenes_scripts/inventory/items/item3DResources/gabeMesh.tres" id="3_yrge7"]
 
 [resource]
 script = ExtResource("1_43a45")
