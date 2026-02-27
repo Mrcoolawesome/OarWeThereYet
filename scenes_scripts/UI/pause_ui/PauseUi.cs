@@ -16,7 +16,7 @@ public partial class PauseUi : Control
 	public override void _Ready()
 	{
 		// get the button from the tree
-		_resetButton = GetNode<Button>("ResetGameButton");
+		_resetButton = GetNode<Button>("MarginContainer/VBoxContainer/ResetGameButton");
 
 		// if the user isn't the server they shouldn't be able to reset the game
 		_resetButton.Visible = Multiplayer.IsServer();

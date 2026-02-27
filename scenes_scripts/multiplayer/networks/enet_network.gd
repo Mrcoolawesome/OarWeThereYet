@@ -28,7 +28,7 @@ func become_host():
 	_add_player_to_game(1)
 
 # this is the function that's called by the multiplayer manager
-func join_as_client(lobby_id):
+func join_as_client(_lobby_id):
 	# set the peer of the current instance to be a peer
 	multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer

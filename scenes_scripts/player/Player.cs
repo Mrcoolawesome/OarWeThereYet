@@ -650,6 +650,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	private void SyncAndLerpClientDataProcess(double delta)
 	{
+		// to account for not having any state at the very beginning
+		if (State == null)
+		{
+			return;
+		}
 		// Read and apply the state and seat from the authority
     _currPlayerState = (PlayerState)(int)State[3];
     _seat = (Boat.SeatIndicies)(int)State[4];
