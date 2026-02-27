@@ -23,7 +23,7 @@ func _on_join_button_pressed() -> void:
 	# hide the main ui and put the pop up ui
 	join_menu_container.visible = true
 	main_menu_container.visible = false
-	join_menu_container._look_for_lobbies() # looks for the lobbies
+	join_menu_container._look_for_lobbies(0) # looks for the lobbies, 0 is the default which is friends lobbies
 
 func _on_toggle_steam_toggled(toggled_on: bool) -> void:
 	# send the signal to select the steam network via the signal server

@@ -30,3 +30,5 @@ size_flags_vertical = 3
 
 [node name="LobbiesContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/ScrollContainer/MarginContainer" index="0"]
 layout_mode = 2
+
+[connection signal="item_selected" from="PanelContainer/VBoxContainer/OptionButton" to="." method="_look_for_lobbies"]

@@ -24,7 +24,6 @@ func _ready() -> void:
 	# initalize steam
 	Steam.steamInit(480, true)
 	Steam.initRelayNetworkAccess() # start steam relay
-	print("steam init")
 
 	# connect the 'on_lobby_created' function to the lobby created signal
 	Steam.lobby_created.connect(_on_lobby_created)
