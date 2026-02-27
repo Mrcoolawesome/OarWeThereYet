@@ -8,9 +8,6 @@ extends Control
 @onready var popup_menu: Control = $HostGamePopUpMenu
 @onready var join_menu_container: Control = $JoinGamePopUpMenu
 
-# boolean to keep track of wether the steam toggle was pressed or not
-var steam_mode = false
-
 func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
 
@@ -20,16 +17,13 @@ func _on_host_button_pressed() -> void:
 	main_menu_container.visible = false
 
 func _on_join_button_pressed() -> void:
-	# hide the main ui and put the pop up ui
-	join_menu_container.visible = true
-	main_menu_container.visible = false
-	join_menu_container._look_for_lobbies(0) # looks for the lobbies, 0 is the default which is friends lobbies
-
-func _on_toggle_steam_toggled(toggled_on: bool) -> void:
-	# send the signal to select the steam network via the signal server
-	GlobalSignalServer.emit_signal("SelectSteamNetwork", toggled_on)
-	steam.visible = toggled_on
-	steam_mode = toggled_on
+	if GlobalVariables.active_network_type == GlobalVariables.MULTIPLAYER_NETWORK_TYPE.STEAM:
+		# hide the main ui and put the pop up ui
+		join_menu_container.visible = true
+		main_menu_container.visible = false
+		join_menu_container._look_for_lobbies(0) # looks for the lobbies, 0 is the default which is friends lobbies
+	else:
+		GlobalSignalServer.emit_signal("JoinGame", 0) # lobby id doesn't matter for ENet network
 
 func _on_host_pop_up_menu_go_back_button_pressed() -> void:
 	# hide the pop up menu and show the main menu
