@@ -5,8 +5,8 @@ extends Node
 # i want to make them the server host if they press the host button
 
 func _ready() -> void:
-  GlobalSignalServer.HostGameSteamEventHandler.connect(become_host_steam)
-  GlobalSignalServer.HostGameEnetEventHandler.connect(become_host_enet)
+  GlobalSignalServer.HostGameSteam.connect(become_host_steam)
+  GlobalSignalServer.HostGameEnet.connect(become_host_enet)
   GlobalSignalServer.JoinGame.connect(join_lobby)
 
 func become_host_steam(is_public: bool, lobbyName: String):

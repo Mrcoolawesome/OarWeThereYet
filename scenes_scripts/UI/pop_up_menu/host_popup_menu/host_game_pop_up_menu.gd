@@ -23,4 +23,4 @@ func on_line_edit_text_changed(new_text: String) -> void:
 func on_host_button_pressed() -> void:
 	# Emit via the global signal server
 	# Assuming GlobalSignalServer is set up as an Autoload (Singleton) in your project settings
-	GlobalSignalServer.emit_signal("HostGame", is_public, lobby_name)
+	GlobalSignalServer.emit_signal("HostGameSteam", is_public, lobby_name)

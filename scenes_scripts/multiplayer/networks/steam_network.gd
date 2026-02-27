@@ -5,8 +5,7 @@ var _hosted_lobby_id = 0
 var _max_lobby_members = 4
 
 # we're just gonna hardcode the lobby name for now
-const LOBBY_NAME = "BAD"
-const LOBBY_MODE = "CoOP"
+var LOBBY_NAME = "BAD"
 
 # player scene and test level scene
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
@@ -31,15 +30,18 @@ func _ready() -> void:
 	Steam.lobby_created.connect(_on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_join)
 
-func become_host(is_public: bool, name: String):
+func _process(_delta: float) -> void:
+	Steam.run_callbacks() # this is so that i can run stuff outside of this with steam
+
+func become_host(is_public: bool, lobby_name: String):
 	# create a public or private lobby with a max player count of 4
 	if is_public:
 		Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, _max_lobby_members)
 	else:
 		Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, _max_lobby_members)
 
-	# set the attribute for the lobby
-	Steam.setLobbyData(_hosted_lobby_id, "oarLobbyName", name)
+	# set the attribute for the lobby name
+	LOBBY_NAME = lobby_name
 	# set SERVER relay to be enabled
 	multiplayer_peer.server_relay = true
 	multiplayer_peer.create_host()
@@ -83,7 +85,6 @@ func _on_lobby_created(result: int, lobby_id):
 		# set lobby data parameters
 		# setting metadata is just setting your own variables for the lobby, there's no specific parameters
 		Steam.setLobbyData(_hosted_lobby_id, "name", LOBBY_NAME)
-		Steam.setLobbyData(_hosted_lobby_id, "mode", LOBBY_MODE)
 
 func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
 	# if they 
