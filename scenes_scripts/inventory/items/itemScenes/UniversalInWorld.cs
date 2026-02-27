@@ -17,17 +17,24 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
   public void Interact(Player player)
   {
-
+    RequestItemPickup(player);
   }
 
   private void RequestItemPickup(Player player)
   {
-    
+    RpcId(1, MethodName.ItemPickup);
   }
 
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void RequestItemPickup()
+	private void ItemPickup()
   {
-    
+    //give player item
+    Rpc(nameof(DeleteItem));
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void DeleteItem()
+  {
+    QueueFree();
   }
 }
