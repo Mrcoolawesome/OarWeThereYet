@@ -11,7 +11,7 @@ We just have two multiplayer scenes - Steam and Enet which is the built-in godot
 enum MULTIPLAYER_NETWORK_TYPE {ENET, STEAM}
 
 # default network type is the built-in one
-var active_network_type: MULTIPLAYER_NETWORK_TYPE = MULTIPLAYER_NETWORK_TYPE.ENET;
+var active_network_type: MULTIPLAYER_NETWORK_TYPE = MULTIPLAYER_NETWORK_TYPE.STEAM;
 # we have to make these scenes not scripts so that we can interact with them properly or something ig
 var enet_network_scene := preload("res://scenes_scripts/multiplayer/networks/enet_network.tscn")
 var steam_network_scene := preload("res://scenes_scripts/multiplayer/networks/steam_network.tscn")
@@ -22,6 +22,9 @@ var active_network
 func _ready():
 	# check if the steam version of multiplayer was selected
 	GlobalSignalServer.SelectSteamNetwork.connect(_set_network)
+	# just initalize steam upon opening the game if that's what we've chosen
+	if active_network_type == MULTIPLAYER_NETWORK_TYPE.STEAM:
+		_set_active_network()
 
 # set the network type according to the toggle in the main menu
 func _set_network(_steam_toggled: bool):
@@ -46,6 +49,10 @@ func _build_active_network(active_network_scene):
 	# run the player spawn thing here
 	# add the network to the level
 	add_child(active_network)
+
+func become_host_steam(is_public: bool, lobbyName: String):
+	_set_active_network() # set the active network and 'build' it
+	active_network.become_host(is_public, lobbyName) # run the '_become_host()' function on the given network type
 
 func become_host():
 	_set_active_network() # set the active network and 'build' it

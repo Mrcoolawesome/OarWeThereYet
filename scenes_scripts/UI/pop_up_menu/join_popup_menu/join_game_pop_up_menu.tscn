@@ -34,13 +34,16 @@ layout_mode = 2
 
 [node name="Lobby" type="MarginContainer" parent="PanelContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer" index="0"]
 layout_mode = 2
+size_flags_vertical = 4
 
 [node name="LobbyName" type="Label" parent="PanelContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer/Lobby" index="0"]
 layout_mode = 2
+size_flags_horizontal = 0
 theme = ExtResource("3_1hspj")
 text = "Placeholder"
 
 [node name="JoinLobbyButton" type="Button" parent="PanelContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer/Lobby" index="1"]
 layout_mode = 2
+size_flags_horizontal = 8
 text = "Join"
 alignment = 2

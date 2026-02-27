@@ -25,14 +25,21 @@ func _ready() -> void:
 	# initalize steam
 	Steam.steamInit(480, true)
 	Steam.initRelayNetworkAccess() # start steam relay
+	print("steam init")
 
 	# connect the 'on_lobby_created' function to the lobby created signal
 	Steam.lobby_created.connect(_on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_join)
 
-func become_host():
-	# create a public lobby with a max player count of 4
-	Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, _max_lobby_members)
+func become_host(is_public: bool, name: String):
+	# create a public or private lobby with a max player count of 4
+	if is_public:
+		Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, _max_lobby_members)
+	else:
+		Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, _max_lobby_members)
+
+	# set the attribute for the lobby
+	Steam.setLobbyData(_hosted_lobby_id, "oarLobbyName", name)
 	# set SERVER relay to be enabled
 	multiplayer_peer.server_relay = true
 	multiplayer_peer.create_host()

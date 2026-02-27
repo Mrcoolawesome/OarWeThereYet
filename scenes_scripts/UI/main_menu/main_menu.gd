@@ -6,6 +6,7 @@ extends Control
 @onready var steam = $Steam
 @onready var main_menu_container: MarginContainer = $MainMenuContainer
 @onready var popup_menu: Control = $HostGamePopUpMenu
+@onready var join_menu_container: Control = $JoinGamePopUpMenu
 
 # boolean to keep track of wether the steam toggle was pressed or not
 var steam_mode = false
@@ -19,10 +20,9 @@ func _on_host_button_pressed() -> void:
 	main_menu_container.visible = false
 
 func _on_join_button_pressed() -> void:
-	# only send the signal if there's an id in the text box and we're in steam mode or just let them bypass the box if we're not in steam mode
-	if (id_prompt.text != "" && steam_mode) || !steam_mode: 
-		# send the signal via the global signal server
-		GlobalSignalServer.emit_signal("JoinGame", int(id_prompt.text))
+	# hide the main ui and put the pop up ui
+	join_menu_container.visible = true
+	main_menu_container.visible = false
 
 func _on_toggle_steam_toggled(toggled_on: bool) -> void:
 	# send the signal to select the steam network via the signal server
@@ -30,7 +30,12 @@ func _on_toggle_steam_toggled(toggled_on: bool) -> void:
 	steam.visible = toggled_on
 	steam_mode = toggled_on
 
-func _on_pop_up_menu_go_back_button_pressed() -> void:
+func _on_host_pop_up_menu_go_back_button_pressed() -> void:
 	# hide the pop up menu and show the main menu
 	popup_menu.visible = false
+	main_menu_container.visible = true
+
+func _on_join_game_pop_up_menu_go_back_button_pressed() -> void:
+	# hide the main menu and show the join menu
+	join_menu_container.visible = false
 	main_menu_container.visible = true
