@@ -4,4 +4,4 @@ extends Node
 enum MULTIPLAYER_NETWORK_TYPE {ENET, STEAM}
 
 # default network type is the built-in one
-var active_network_type: MULTIPLAYER_NETWORK_TYPE = MULTIPLAYER_NETWORK_TYPE.ENET;
+var active_network_type: MULTIPLAYER_NETWORK_TYPE = MULTIPLAYER_NETWORK_TYPE.STEAM;
