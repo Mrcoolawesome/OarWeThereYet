@@ -5,7 +5,7 @@ var _hosted_lobby_id = 0
 var _max_lobby_members = 4
 
 # we're just gonna hardcode the lobby name for now
-var LOBBY_NAME = "BAD"
+var LOBBY_NAME = "gaming"
 
 # player scene and test level scene
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
@@ -108,14 +108,6 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _respons
 
 	# reset this 
 	is_client = false
-
-func list_lobbies():
-	# filter the lobby by distance
-	Steam.addRequestLobbyListDistanceFilter(Steam.LOBBY_DISTANCE_FILTER_WORLDWIDE)
-
-	# filter by the name parameter we set so we don't see a flood of servers that are hosted on the test server
-	Steam.addRequestLobbyListStringFilter("name", "BAD", Steam.LOBBY_COMPARISON_EQUAL)
-	Steam.requestLobbyList()
 
 func _add_player_to_game(id: int):	
 	# the Level container should always be there, just need to check if it has a level actually loaded (as a child) in it
