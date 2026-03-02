@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://cwoh3ayn5hlr1"]
+[gd_scene load_steps=5 format=3 uid="uid://cwoh3ayn5hlr1"]
 
 [ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="1_823ys"]
+[ext_resource type="Script" uid="uid://s8jk2ds0vhpi" path="res://scenes_scripts/UI/settings_menu/settings_menu.gd" id="1_wykvw"]
+[ext_resource type="PackedScene" uid="uid://b2o60fgelttrd" path="res://art/icons/audio_menu.tscn" id="2_mjx27"]
+[ext_resource type="PackedScene" uid="uid://dh5qqy16oj1fx" path="res://scenes_scripts/UI/settings_menu/reset_menu/reset_menu.tscn" id="4_yjekq"]
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -9,34 +12,51 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_wykvw")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
-anchors_preset = 9
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 253.0
+grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 0
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_right = 20
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
 alignment = 1
 
-[node name="AudioMenuButton" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="AudioMenuButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_823ys")
 theme_type_variation = &"SubMenuSelectionButtons"
 text = "Audio"
 
-[node name="ResetMenuButton" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="ResetMenuButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_823ys")
 theme_type_variation = &"SubMenuSelectionButtons"
 text = "Reset"
 
-[node name="GraphicsMenuButton" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="GraphicsMenuButton" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_823ys")
 theme_type_variation = &"SubMenuSelectionButtons"
 text = "Graphics"
+
+[node name="AudioMenu" parent="MarginContainer/HBoxContainer" instance=ExtResource("2_mjx27")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResetMenu" parent="MarginContainer/HBoxContainer" instance=ExtResource("4_yjekq")]
+visible = false
+layout_mode = 2
+
+[connection signal="pressed" from="MarginContainer/HBoxContainer/VBoxContainer/AudioMenuButton" to="." method="_on_audio_menu_button_pressed"]

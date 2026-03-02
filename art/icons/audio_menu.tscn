@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://b2o60fgelttrd"]
 
-[ext_resource type="Theme" uid="uid://cigii7bnewsen" path="res://scenes_scripts/UI/settings_menu/themes/audio_menu.tres" id="1_t3ptl"]
-[ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="2_08ngt"]
+[ext_resource type="Script" uid="uid://mo3uybp5bb24" path="res://scenes_scripts/UI/settings_menu/audio_menu/audio_menu.gd" id="1_08ngt"]
+[ext_resource type="PackedScene" uid="uid://0fqe1khyldg5" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/setting_slider.tscn" id="2_t3ptl"]
 
 [node name="AudioMenu" type="Control"]
 layout_mode = 3
@@ -10,6 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_08ngt")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -18,32 +19,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
 
-[node name="VoiceChatSliderContainer" type="MarginContainer" parent="MarginContainer"]
+[node name="VoicechatVolumeSlider" parent="MarginContainer" instance=ExtResource("2_t3ptl")]
 layout_mode = 2
-size_flags_vertical = 4
+StartingValue = 100.0
+SliderLabelText = "Voicechat Volume"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VoiceChatSliderContainer"]
-layout_mode = 2
-theme_override_constants/separation = 29
-alignment = 1
-
-[node name="VoiceChatSliderNameTag" type="Label" parent="MarginContainer/VoiceChatSliderContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme = ExtResource("1_t3ptl")
-theme_type_variation = &"SliderTags"
-text = "Voicechat Volume"
-
-[node name="VoiceChatVolumeAmt" type="Label" parent="MarginContainer/VoiceChatSliderContainer/HBoxContainer"]
-layout_mode = 2
-theme = ExtResource("1_t3ptl")
-theme_type_variation = &"SliderTags"
-text = "100"
-
-[node name="VoiceChatVolumeSlider" type="HSlider" parent="MarginContainer/VoiceChatSliderContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("2_08ngt")
-value = 100.0
-rounded = true
+[connection signal="slider_changed" from="MarginContainer/VoicechatVolumeSlider" to="." method="_on_voice_chat_volume_slider_value_changed"]
