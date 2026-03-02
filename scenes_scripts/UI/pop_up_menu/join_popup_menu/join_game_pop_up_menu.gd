@@ -46,7 +46,6 @@ func _get_friends_lobbies() -> void:
   # 2. Loop through every single friend
   for i in range(num_friends):
     var friend_steam_id: int = Steam.getFriendByIndex(i, Steam.FRIEND_FLAG_IMMEDIATE)
-    var friend_name: String = Steam.getFriendPersonaName(friend_steam_id)
 
     # 3. Get the details of whatever game they are currently playing
     var game_info: Dictionary = Steam.getFriendGamePlayed(friend_steam_id)
@@ -55,13 +54,10 @@ func _get_friends_lobbies() -> void:
     if game_info.has("lobby") and game_info["lobby"] != 0:
       # We use Steam.getAppID() or 480 if you are still testing with Spacewar
       if game_info.has("id") and game_info["id"] == 480:
-          print(">> SUCCESS: Found lobby for ", friend_name, " | ID: ", game_info["lobby"])
           friends_lobbies.append(game_info["lobby"])
       else:
           print("   (Friend is in a lobby, but for a different AppID: ", game_info.get("id", "Unknown"), ")")
     elif game_info.has("id"):
       print("   (Friend is playing our game, but is NOT currently in a lobby)")
     
-  # 5. Send this custom list directly to your UI function!
-  print(friends_lobbies)
   _on_lobby_match_list(friends_lobbies)

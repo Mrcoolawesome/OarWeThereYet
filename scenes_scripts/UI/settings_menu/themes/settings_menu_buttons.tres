@@ -1,0 +1,14 @@
+[gd_resource type="Theme" load_steps=4 format=3 uid="uid://chyq2g3h1geyf"]
+
+[ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="1_fmctm"]
+[ext_resource type="Texture2D" uid="uid://dqhmmg3mvvcnx" path="res://art/icons/settings_menu_icons/PillShapedGrabber.svg" id="1_oqrf6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fmctm"]
+
+[resource]
+HSlider/icons/grabber = ExtResource("1_oqrf6")
+SubMenuSelectionButtons/base_type = &"Button"
+SubMenuSelectionButtons/constants/outline_size = 25
+SubMenuSelectionButtons/font_sizes/font_size = 100
+SubMenuSelectionButtons/fonts/font = ExtResource("1_fmctm")
+SubMenuSelectionButtons/styles/normal = SubResource("StyleBoxEmpty_fmctm")

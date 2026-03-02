@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://b2o60fgelttrd"]
+
+[ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="1_so3b1"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_s3qvy"]
+thickness = 66
+
+[node name="AudioMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VCSliderContainer" type="MarginContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HSlider" type="HSlider" parent="MarginContainer/VCSliderContainer"]
+layout_mode = 2
+theme = ExtResource("1_so3b1")
+theme_override_styles/slider = SubResource("StyleBoxLine_s3qvy")

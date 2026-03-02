@@ -43,6 +43,15 @@ project/assembly_name="OarWeThereYet"
 
 enabled=PackedStringArray("res://addons/terrain_3d/plugin.cfg", "res://addons/waterways_net/plugin.cfg")
 
+[file_customization]
+
+folder_colors={
+"res://scenes_scripts/UI/": "teal",
+"res://scenes_scripts/boat/": "blue",
+"res://scenes_scripts/environment/": "orange",
+"res://scenes_scripts/player/": "yellow"
+}
+
 [input]
 
 move_forward={

@@ -2,7 +2,6 @@ extends Control
 
 @onready var host_button: Button = $MainMenuContainer/VBoxContainer/HostButton
 @onready var join_button: Button = $MainMenuContainer/VBoxContainer/JoinButton
-@onready var id_prompt: LineEdit = $MainMenuContainer/VBoxContainer/IDPrompt
 @onready var steam = $Steam
 @onready var main_menu_container: MarginContainer = $MainMenuContainer
 @onready var popup_menu: Control = $HostGamePopUpMenu
