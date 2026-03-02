@@ -25,6 +25,9 @@ func _ready() -> void:
 	Steam.steamInit(480, true)
 	Steam.initRelayNetworkAccess() # start steam relay
 
+	# initialize voice
+	ProxChat.initialize_voice()
+
 	# connect the 'on_lobby_created' function to the lobby created signal
 	Steam.lobby_created.connect(_on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_join)
