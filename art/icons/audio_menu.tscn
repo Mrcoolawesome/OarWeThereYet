@@ -41,7 +41,7 @@ theme = ExtResource("1_t3ptl")
 theme_type_variation = &"SliderTags"
 text = "100"
 
-[node name="HSlider" type="HSlider" parent="MarginContainer/VoiceChatSliderContainer/HBoxContainer"]
+[node name="VoiceChatVolumeSlider" type="HSlider" parent="MarginContainer/VoiceChatSliderContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("2_08ngt")
