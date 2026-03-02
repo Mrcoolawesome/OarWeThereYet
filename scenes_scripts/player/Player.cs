@@ -36,6 +36,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private CanvasLayer _pauseUI;
 	// HUD
 	private CanvasLayer _hud;
+	// Inventory Menu
+	private InventoryUi _invUI;
 
 	// Seat collision objects
 	private StaticBody3D _frontLeftSeatCollision;
@@ -109,6 +111,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 		_boat = GetParent().GetNode<Boat>("Boat");
 		_hud = GetNode<CanvasLayer>("HUD");
+		_invUI = GetNode<InventoryUi>("InventoryUI");
 		_fullPlayerModelHead = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/head");
 		_fullPlayerModelBody = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/body");
 		_fullPlayerModelVest = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/life vest");
@@ -201,9 +204,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			case GameState.Playing:
 				PlayingStateProcess();
 				_pauseUI.Visible = false;
+				_hud.Visible = true;
+				Input.MouseMode = Input.MouseModeEnum.Captured;
 				break;
 			case GameState.Menu:
+				MenuStateProcess();
 				_pauseUI.Visible = true;
+				_hud.Visible = false;
+				Input.MouseMode = Input.MouseModeEnum.Visible;
 				break;
 		}
   }
@@ -215,11 +223,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		if (Input.IsActionJustPressed("ui_cancel")) 
 		{
 			_currGameState = GameState.Menu;
-			// Release the mouse
-			Input.MouseMode = Input.MouseModeEnum.Visible;
-
-			// hide the hud
-			_hud.Visible = false;
 		}
 
 		switch(_currPlayerState)
@@ -229,6 +232,17 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			case PlayerState.Rowing:
 				RowingStateProcess();
 				break;
+		}
+	}
+
+	private void MenuStateProcess()
+	{
+		if (Input.IsActionJustPressed("ui_cancel")) 
+		{
+			_currGameState = GameState.Playing;
+
+			// Hide Inventory if open
+			_invUI.Close();
 		}
 	}
 
@@ -571,6 +585,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		Position = Vector3.Zero;
 		Rotation = Vector3.Zero;
 		Velocity = Vector3.Zero;
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void OpenInventory(Inventory inventory)
+	{
+		_invUI.Open(inventory);
+		_currGameState = GameState.Menu;
 	}
 
 	// Helper functions

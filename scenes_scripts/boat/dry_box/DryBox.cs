@@ -5,9 +5,16 @@ public partial class DryBox : StaticBody3D, Interactable
 {
   [Export] public string PromptMessage { get; set; } = "Open Drybox";
 	public string PromptInput { get; set; } = "action_key";
+	public Inventory Inventory;
 
-	public void Interact(Player _player)
+  public override void _Ready()
+  {
+    Inventory = GetNode<Inventory>("Inventory");
+  }
+
+
+	public void Interact(Player player)
 	{
-		GD.Print("Opened/Closed Drybox");
+		player.OpenInventory(Inventory);
 	}
 }

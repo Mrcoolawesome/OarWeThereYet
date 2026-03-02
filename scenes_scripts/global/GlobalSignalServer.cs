@@ -38,6 +38,9 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void AnimateOarEventHandler(int seat, int direction, bool startStop);
 
+  [Signal]
+  public delegate void OpenInventoryEventHandler(int playerID);
+
   public int Health { get; set; }
 
   public override void _Ready()

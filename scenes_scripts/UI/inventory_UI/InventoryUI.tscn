@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://c5qyjwmlp4xyw"]
+
+[ext_resource type="Script" uid="uid://6u6tlqxoqk1" path="res://scenes_scripts/UI/inventory_UI/InventoryUi.cs" id="1_0ers6"]
+[ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="2_dwdbm"]
+
+[node name="InventoryUi" type="CanvasLayer"]
+script = ExtResource("1_0ers6")
+
+[node name="TextEdit" type="TextEdit" parent="."]
+offset_left = 247.0
+offset_top = 254.0
+offset_right = 1553.0
+offset_bottom = 923.0
+theme = ExtResource("2_dwdbm")
+theme_override_font_sizes/font_size = 365
+text = "INVENTORY"
