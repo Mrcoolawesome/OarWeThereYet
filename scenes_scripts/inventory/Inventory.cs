@@ -84,50 +84,23 @@ public partial class Inventory : Node
   }
 
 
-  public void RequestAddItem(InvItem item, int amount)
+  public void RequestSwapItem(int slot)
   {
-    RpcId(1, MethodName.AddItem, item.ResourcePath, amount);
+    RpcId(1, MethodName.SwapItem, slot);
   }
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-  private void AddItem(string itemPath, int amount)
+  private void SwapItem(int slot)
   {
-    InvItem item = GD.Load<InvItem>(itemPath);
+    // Get player and their arm
+    int playerID = Multiplayer.GetRemoteSenderId();
+    ArmNode playerArm = GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
+    InvItem item = playerArm.Item;
 
-    if (item == null)
+    // If it's a valid slot
+    if (slot < Capacity)
     {
-        GD.PrintErr($"Server could not load item at: {itemPath}");
-        return;
+      // Swap inventory slot for player's item
     }
-    
-    // Look for stackable slots
-    for (int i = 0; i < Slots.Count; i++)
-    {
-      if (!Slots[i].IsEmpty())
-      {
-        if (item == Slots[i].Data)
-        {
-          if (Slots[i].Amount + amount <= Slots[i].Data.MaxStackSize)
-          {
-            Slots[i].Amount += amount;
-            return;
-          }
-        }
-      }
-    }
-
-    // Look for empty slots
-    for (int i = 0; i < Slots.Count; i++)
-    {
-      if (Slots[i].IsEmpty())
-      {
-        Slots[i] = new InvSlot(item, amount);
-        GD.Print($"Added {item.ResourceName} to slot {i}");
-        return;
-      }
-    }
-
-    GD.Print("Inventory Full");
-    return;
   }
 }
