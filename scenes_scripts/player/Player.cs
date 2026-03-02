@@ -239,10 +239,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		if (Input.IsActionJustPressed("ui_cancel")) 
 		{
-			_currGameState = GameState.Playing;
-
 			// Hide Inventory if open
 			_invUI.Close();
+
+			_currGameState = GameState.Playing;			
 		}
 	}
 

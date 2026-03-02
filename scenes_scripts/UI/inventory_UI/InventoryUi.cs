@@ -17,6 +17,11 @@ public partial class InventoryUi : CanvasLayer
 	public void Open(Inventory inventory)
 	{
 		Visible = true;
+
+		foreach (InvSlot slot in inventory.Slots)
+		{
+			
+		}
 	}
 
 	public void Close()
