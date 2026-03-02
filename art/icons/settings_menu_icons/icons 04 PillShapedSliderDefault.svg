@@ -9,8 +9,9 @@
 	.st3{fill:#FFFFFF;stroke:#000000;stroke-width:4;stroke-miterlimit:10;}
 	.st4{fill:#FFFFFF;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 	.st5{fill:#FFFFFF;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-miterlimit:10;}
-	.st6{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st6{fill:#BDBDBD;}
+	.st7{fill:#FFFFFF;}
 </style>
-<path class="st6" d="M5,60l0-30C5,16.19,16.19,5,30,5h0c13.81,0,25,11.19,25,25v30c0,13.81-11.19,25-25,25h0C16.19,85,5,73.81,5,60z
-	"/>
+<path class="st6" d="M19.5,74.5v-59C19.5,9.7,24.2,5,30,5h0c5.8,0,10.5,4.7,10.5,10.5v59C40.5,80.3,35.8,85,30,85h0
+	C24.2,85,19.5,80.3,19.5,74.5z"/>
 </svg>

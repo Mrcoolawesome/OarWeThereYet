@@ -1,0 +1,9 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://cigii7bnewsen"]
+
+[ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="1_xv4ed"]
+
+[resource]
+Label/fonts/font = ExtResource("1_xv4ed")
+SliderTags/base_type = &"Label"
+SliderTags/constants/outline_size = 15
+SliderTags/font_sizes/font_size = 64

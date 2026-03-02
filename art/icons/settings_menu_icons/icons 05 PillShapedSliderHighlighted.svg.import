@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dqhmmg3mvvcnx"
-path="res://.godot/imported/PillShapedGrabber.svg-bd7db0d90464c4bb3cbb472c2d28f18a.ctex"
+uid="uid://bjofehlqovj45"
+path="res://.godot/imported/icons 05 PillShapedSliderHighlighted.svg-8013b793d26ecdf26d919bbe55677bbd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/icons/settings_menu_icons/PillShapedGrabber.svg"
-dest_files=["res://.godot/imported/PillShapedGrabber.svg-bd7db0d90464c4bb3cbb472c2d28f18a.ctex"]
+source_file="res://art/icons/settings_menu_icons/icons 05 PillShapedSliderHighlighted.svg"
+dest_files=["res://.godot/imported/icons 05 PillShapedSliderHighlighted.svg-8013b793d26ecdf26d919bbe55677bbd.ctex"]
 
 [params]
 
