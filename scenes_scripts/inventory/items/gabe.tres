@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="InvItem" load_steps=5 format=3 uid="uid://kq6ftwk7tuff"]
 
-[ext_resource type="Texture2D" uid="uid://b31jvbqbgoor" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeTexture.webp" id="1_3eoww"]
+[ext_resource type="Texture2D" uid="uid://dhv6rqnsgaabd" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeTexture.jpg" id="1_3eoww"]
 [ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_43a45"]
 [ext_resource type="Shape3D" uid="uid://dcmohndxegy5p" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeCollider.tres" id="2_g303d"]
 [ext_resource type="BoxMesh" uid="uid://yqgkynijlkcr" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeMesh.tres" id="3_sqpos"]
