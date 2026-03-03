@@ -113,7 +113,4 @@ textures/vram_compression/import_etc2_astc=true
 
 [steam]
 
-initialization/app_id=0
-initialization/initialize_on_startup=false
-initialization/embed_callbacks=false
 multiplayer_peer/max_channels=4

@@ -42,6 +42,19 @@ signal slider_changed(new_value: float)
 		if is_node_ready() and slider_label:
 			slider_label.text = value
 
+@export var TickCount: int = 0:
+	set(value):
+		TickCount = value
+		if is_node_ready() and slider:
+			slider.tick_count = value
+
+@export var SliderLabelAppendedText: String = "":
+	set(value):
+		SliderLabelAppendedText = value
+		if is_node_ready() and value != "":
+			number_tag.text += value
+		elif value == "":
+			_change_number_display_tag(StartingValue) # make it use the starting value if the appended string is blank
 
 @onready var slider: Slider = $MarginContainer/HBoxContainer/Slider
 @onready var number_tag: Label = $MarginContainer/HBoxContainer/SliderNumberLabel
@@ -55,6 +68,7 @@ func _ready() -> void:
 	slider.step = Step
 	slider.value = StartingValue
 	slider_label.text = SliderLabelText
+	slider.tick_count = TickCount
 	_change_number_display_tag(StartingValue)
 
 func _on_slider_value_changed(value: float) -> void:
@@ -65,6 +79,6 @@ func _on_slider_value_changed(value: float) -> void:
 func _change_number_display_tag(value: float) -> void:
 	if number_tag: # Good practice to check if it exists first
 		if WholeNumbers:
-			number_tag.text = "%.0f" % value
+			number_tag.text = "%.0f" % value + SliderLabelAppendedText
 		else:
-			number_tag.text = "%.1f" % value
+			number_tag.text = "%.1f" % value + SliderLabelAppendedText
