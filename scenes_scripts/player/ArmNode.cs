@@ -3,7 +3,7 @@ using System;
 
 public partial class ArmNode : MeshInstance3D
 {
-	public InvItem Item { get; set; }
+	public InvSlot Item { get; set; }
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -16,7 +16,7 @@ public partial class ArmNode : MeshInstance3D
 	{
 		if (Item != null)
 		{
-			Mesh = Item.ItemMesh;
+			Mesh = Item.Data.ItemMesh;
 		}
 		else
 		{
@@ -30,7 +30,7 @@ public partial class ArmNode : MeshInstance3D
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	public void SetItem(string itemPath)
+	public void SetItem(string itemPath, int itemCount)
 	{
 		if (string.IsNullOrEmpty(itemPath))
 		{
@@ -38,7 +38,7 @@ public partial class ArmNode : MeshInstance3D
 		}
 		else
 		{
-			Item = GD.Load<InvItem>(itemPath);
+			Item = new InvSlot(GD.Load<InvItem>(itemPath), itemCount);
 		}
 	}
 
@@ -52,22 +52,24 @@ public partial class ArmNode : MeshInstance3D
 	{
 		if (Item != null)
 		{
-			string itemPath = Item.ResourcePath;
+			string itemPath = Item.Data.ResourcePath;
+			int itemCount = Item.Amount;
 			Vector3 dropPosition = GlobalPosition;
 
 			// Tell all peers to spawn the item and clear the arm
-			Rpc(nameof(SpawnDroppedItem), itemPath, dropPosition);
-			Rpc(nameof(SetItem), "");
+			Rpc(nameof(SpawnDroppedItem), itemPath, itemCount, dropPosition);
+			Rpc(nameof(SetItem), "", 0);
 		}
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void SpawnDroppedItem(string itemPath, Vector3 position)
+	private void SpawnDroppedItem(string itemPath, int itemCount, Vector3 position)
 	{
 		PackedScene inWorldScene = GD.Load<PackedScene>("res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn");
 		UniversalInWorld inWorldNode = inWorldScene.Instantiate<UniversalInWorld>();
 
-		inWorldNode.Item = GD.Load<InvItem>(itemPath);
+		inWorldNode.ItemObject = GD.Load<InvItem>(itemPath);
+		inWorldNode.ItemCount = itemCount;
 		inWorldNode.Position = position;
 
 		GetNode("/root/GameManager/Level/DemoLevel").AddChild(inWorldNode);

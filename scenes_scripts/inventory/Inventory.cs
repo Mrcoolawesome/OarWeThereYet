@@ -95,7 +95,7 @@ public partial class Inventory : Node
     // Get player and their arm
     int playerID = Multiplayer.GetRemoteSenderId();
     ArmNode playerArm = GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
-    InvItem playerItem = playerArm.Item;
+    InvSlot playerSlot = playerArm.Item;
 
     // If it's a valid slot
     if (slot < Capacity)
