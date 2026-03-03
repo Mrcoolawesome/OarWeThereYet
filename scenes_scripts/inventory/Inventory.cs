@@ -101,11 +101,20 @@ public partial class Inventory : Node
     // If it's a valid slot
     if (slot < Capacity)
     {
-      Slots[slot] = playerSlot;
-      playerArm.SetItem(
-        invSlot.Data.ResourcePath,
-        invSlot.Amount
-      );
+      // Store player's held item into the inventory slot (use empty InvSlot if null)
+      Slots[slot] = playerSlot ?? new InvSlot(null, 0);
+
+      if (invSlot != null && invSlot.Data != null)
+      {
+        playerArm.SetItem(
+          invSlot.Data.ResourcePath,
+          invSlot.Amount
+        );
+      }
+      else
+      {
+        playerArm.SetItem("", 0);
+      }
     }
   }
 }

@@ -30,6 +30,7 @@ public partial class InventoryUi : CanvasLayer
 			InvSlotUi slotInstance = InvSlotUI.Instantiate<InvSlotUi>();
 
 			slotInstance.SlotNum = counter;
+			slotInstance.Inventory = inventory;
 
 			GridContainer.AddChild(slotInstance);
 

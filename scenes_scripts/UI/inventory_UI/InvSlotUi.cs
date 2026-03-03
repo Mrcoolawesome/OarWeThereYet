@@ -6,6 +6,7 @@ public partial class InvSlotUi : Panel
 	public InvSlot Item = null;
 	public Sprite2D ItemDisplay;
 	public int SlotNum;
+	public Inventory Inventory;
 	
 	public override void _Ready()
 	{
@@ -39,6 +40,6 @@ public partial class InvSlotUi : Panel
 
 	private void OnSlotClicked()
 	{
-		GD.Print($"Slot {SlotNum} clicked!");
+		Inventory.RequestSwapItem(SlotNum);
 	}
 }
