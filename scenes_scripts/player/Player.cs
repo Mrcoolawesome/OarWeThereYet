@@ -203,21 +203,19 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		{
 			case GameState.Playing:
 				PlayingStateProcess();
-				_pauseUI.Visible = false;
-				_hud.Visible = true;
-				Input.MouseMode = Input.MouseModeEnum.Captured;
 				break;
 			case GameState.Menu:
 				MenuStateProcess();
-				_pauseUI.Visible = true;
-				_hud.Visible = false;
-				Input.MouseMode = Input.MouseModeEnum.Visible;
 				break;
 		}
   }
 
 	private void PlayingStateProcess()
 	{
+		_pauseUI.Visible = false;
+		_hud.Visible = true;
+		Input.MouseMode = Input.MouseModeEnum.Captured;
+
 		// Menu logic
 		// We use IsActionJustPressed because it's a trigger and not a continuous input event
 		if (Input.IsActionJustPressed("ui_cancel")) 
@@ -239,11 +237,19 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		if (Input.IsActionJustPressed("ui_cancel")) 
 		{
-			// Hide Inventory if open
-			_invUI.Close();
-
 			_currGameState = GameState.Playing;			
+
+			// Hide Inventory if open
+			if (_invUI.isOpen())
+			{
+				_invUI.Close();
+			}
+			return; // Skip menu UI updates since we just transitioned to Playing
 		}
+
+		if (!_invUI.isOpen()) { _pauseUI.Visible = true; };
+		_hud.Visible = false;
+		Input.MouseMode = Input.MouseModeEnum.Visible;
 	}
 
 	// Rowing state input handling
