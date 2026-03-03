@@ -96,11 +96,16 @@ public partial class Inventory : Node
     int playerID = Multiplayer.GetRemoteSenderId();
     ArmNode playerArm = GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
     InvSlot playerSlot = playerArm.Item;
+    InvSlot invSlot = Slots[slot];
 
     // If it's a valid slot
     if (slot < Capacity)
     {
-      // Swap inventory slot for player's item
+      Slots[slot] = playerSlot;
+      playerArm.SetItem(
+        invSlot.Data.ResourcePath,
+        invSlot.Amount
+      );
     }
   }
 }
