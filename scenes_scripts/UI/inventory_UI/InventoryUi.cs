@@ -6,6 +6,8 @@ public partial class InventoryUi : CanvasLayer
 {
 	[Export] public PackedScene InvSlotUI;
 	public GridContainer GridContainer;
+	public ArmNode ArmNode;
+	public Inventory Inventory;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -13,6 +15,9 @@ public partial class InventoryUi : CanvasLayer
 		Visible = false;
 		GridContainer = GetNode<GridContainer>("GridContainer");
 		InvSlotUI = GD.Load<PackedScene>("res://scenes_scripts/UI/inventory_UI/InvSlotUI.tscn");
+
+		Player player = GetParent<Player>();
+		ArmNode = player.GetNode<ArmNode>("Head/ArmNode");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -23,6 +28,7 @@ public partial class InventoryUi : CanvasLayer
 	public void Open(Inventory inventory)
 	{
 		Visible = true;
+		Inventory = inventory;
 
 		int counter = 0;
 		foreach (InvSlot slot in inventory.Slots)
@@ -30,7 +36,7 @@ public partial class InventoryUi : CanvasLayer
 			InvSlotUi slotInstance = InvSlotUI.Instantiate<InvSlotUi>();
 
 			slotInstance.SlotNum = counter;
-			slotInstance.Inventory = inventory;
+			slotInstance.Item = slot;
 
 			GridContainer.AddChild(slotInstance);
 
@@ -54,5 +60,16 @@ public partial class InventoryUi : CanvasLayer
 	public bool isOpen()
 	{
 		return Visible;
+	}
+
+	public void Refresh()
+	{
+		int counter = 0;
+		foreach (InvSlotUi slot in GridContainer.GetChildren())
+		{
+			slot.Item = Inventory.Slots[counter];
+
+			counter++;
+		}
 	}
 }
