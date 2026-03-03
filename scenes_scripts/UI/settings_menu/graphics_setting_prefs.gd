@@ -16,13 +16,3 @@ static func load_or_create() -> UserSettingPrefrences:
 		return UserSettingPrefrences.new() # return a new instance of this class if we don't have a save file for their settings yet
 	else:
 		return res # otherwise just return their settings from the file
-
-# applies all of their settings
-# we need to pass in certain things because this calss extends resource and thus doesn't have access to things that node classes do
-func apply_settings(viewport: Viewport) -> void:
-	apply_graphics_settings(viewport)
-	# TODO: apply all other settings here
-
-# applies only graphics settings
-func apply_graphics_settings(viewport: Viewport) -> void:
-	viewport.msaa_3d = msaa_mode

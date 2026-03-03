@@ -21,6 +21,7 @@ driver/enable_input=true
 
 [autoload]
 
+PrefrencesLoader="*res://scenes_scripts/global/prefrences_loader.gd"
 GlobalSignalServer="*res://scenes_scripts/global/GlobalSignalServer.cs"
 GlobalVariables="*res://scenes_scripts/global/global_variables.gd"
 ProxChat="*res://scenes_scripts/global/prox_chat.gd"

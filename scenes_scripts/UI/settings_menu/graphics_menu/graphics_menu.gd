@@ -40,5 +40,6 @@ func _on_msaa_slider_slider_changed(new_value: float) -> void:
 # settings are only applied when this button is pressed
 # TODO: have a confirm page that resets the settings to the previous values either if they choose to revert them, or if 15 sec has gone by without any input
 func _on_apply_settings_button_pressed() -> void:
-	# just apply all the settings ig
+	# just save and apply all the settings
 	graphics_settings_prefrences.save()
+	PrefrencesLoader.apply_graphics_settings(graphics_settings_prefrences)
