@@ -45,6 +45,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private StaticBody3D _backLeftSeatCollision;
 	private StaticBody3D _backRightSeatCollision;
 
+	// Interact ray
+	private RayCast3D _interactRay;
+
 	// Different player models
 	private MeshInstance3D _localPlayerModel;
 	private Node3D _fullPlayerModel;
@@ -117,6 +120,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_fullPlayerModelVest = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/life vest");
 		_localPlayerModel = GetNode<MeshInstance3D>("LocalPlayerModel/Armature/Skeleton3D/body");
 		_fullPlayerModel = GetNode<Node3D>("FullPlayerModel");
+
+		_interactRay = GetNode<RayCast3D>("Head/CameraContainer/Camera3D/InteractRay");
 
 		_frontLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontLeftCollision");
 		_frontRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontRightCollision");
@@ -215,6 +220,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_pauseUI.Visible = false;
 		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
+		_interactRay.Enabled = true;
 
 		// Menu logic
 		// We use IsActionJustPressed because it's a trigger and not a continuous input event
@@ -250,6 +256,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		if (!_invUI.isOpen()) { _pauseUI.Visible = true; };
 		_hud.Visible = false;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
+		_interactRay.Enabled = false;
 	}
 
 	// Rowing state input handling

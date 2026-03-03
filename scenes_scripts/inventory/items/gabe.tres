@@ -1,15 +1,15 @@
 [gd_resource type="Resource" script_class="InvItem" load_steps=5 format=3 uid="uid://kq6ftwk7tuff"]
 
+[ext_resource type="Texture2D" uid="uid://b31jvbqbgoor" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeTexture.webp" id="1_3eoww"]
 [ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_43a45"]
-[ext_resource type="Texture2D" uid="uid://clw8cwtrtug24" path="res://art/Images/steam.webp" id="1_av4mp"]
-[ext_resource type="Shape3D" uid="uid://dcmohndxegy5p" path="res://scenes_scripts/inventory/items/item3DResources/gabeCollider.tres" id="2_1x0a1"]
-[ext_resource type="BoxMesh" uid="uid://yqgkynijlkcr" path="res://scenes_scripts/inventory/items/item3DResources/gabeMesh.tres" id="3_yrge7"]
+[ext_resource type="Shape3D" uid="uid://dcmohndxegy5p" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeCollider.tres" id="2_g303d"]
+[ext_resource type="BoxMesh" uid="uid://yqgkynijlkcr" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeMesh.tres" id="3_sqpos"]
 
 [resource]
 script = ExtResource("1_43a45")
 Name = "Gabe"
-Icon = ExtResource("1_av4mp")
+Icon = ExtResource("1_3eoww")
 MaxStackSize = 3
-ItemMesh = ExtResource("3_yrge7")
-ItemCollider = ExtResource("2_1x0a1")
+ItemMesh = ExtResource("3_sqpos")
+ItemCollider = ExtResource("2_g303d")
 metadata/_custom_type_script = "uid://5qqoau1yt53x"

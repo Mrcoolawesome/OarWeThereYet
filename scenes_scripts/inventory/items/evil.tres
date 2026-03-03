@@ -1,14 +1,14 @@
 [gd_resource type="Resource" script_class="InvItem" load_steps=5 format=3 uid="uid://dnhur17ilku5e"]
 
-[ext_resource type="Texture2D" uid="uid://kt83tf61prry" path="res://art/Images/evilAssFace.jpg" id="1_qupqt"]
+[ext_resource type="Texture2D" uid="uid://lkbgbdgi1pay" path="res://scenes_scripts/inventory/items/itemResources/evil/evilTexture.jpg" id="1_o2lut"]
 [ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="2_0bhkq"]
-[ext_resource type="Shape3D" uid="uid://cena74pk08yxq" path="res://scenes_scripts/inventory/items/item3DResources/evilCollider.tres" id="2_p7m1e"]
-[ext_resource type="BoxMesh" uid="uid://2og28wq6h1da" path="res://scenes_scripts/inventory/items/item3DResources/evilMesh.tres" id="3_6iebx"]
+[ext_resource type="Shape3D" uid="uid://cena74pk08yxq" path="res://scenes_scripts/inventory/items/itemResources/evil/evilCollider.tres" id="2_475cd"]
+[ext_resource type="BoxMesh" uid="uid://2og28wq6h1da" path="res://scenes_scripts/inventory/items/itemResources/evil/evilMesh.tres" id="3_4frok"]
 
 [resource]
 script = ExtResource("2_0bhkq")
 Name = "Evil"
-Icon = ExtResource("1_qupqt")
-ItemMesh = ExtResource("3_6iebx")
-ItemCollider = ExtResource("2_p7m1e")
+Icon = ExtResource("1_o2lut")
+ItemMesh = ExtResource("3_4frok")
+ItemCollider = ExtResource("2_475cd")
 metadata/_custom_type_script = "uid://5qqoau1yt53x"
