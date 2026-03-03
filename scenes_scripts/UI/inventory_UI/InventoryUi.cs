@@ -24,11 +24,16 @@ public partial class InventoryUi : CanvasLayer
 	{
 		Visible = true;
 
-		
+		int counter = 0;
 		foreach (InvSlot slot in inventory.Slots)
 		{
-			Panel slotInstance = InvSlotUI.Instantiate<Panel>();
+			InvSlotUi slotInstance = InvSlotUI.Instantiate<InvSlotUi>();
+
+			slotInstance.SlotNum = counter;
+
 			GridContainer.AddChild(slotInstance);
+
+			counter++;
 		}
 	}
 

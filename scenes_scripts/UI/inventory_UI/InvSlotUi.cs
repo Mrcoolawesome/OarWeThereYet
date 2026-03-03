@@ -5,7 +5,8 @@ public partial class InvSlotUi : Panel
 {
 	public InvSlot Item = null;
 	public Sprite2D ItemDisplay;
-	// Called when the node enters the scene tree for the first time.
+	public int SlotNum;
+	
 	public override void _Ready()
 	{
 		ItemDisplay = GetNode<Sprite2D>("CenterContainer/Panel/ItemDisplay");
@@ -23,5 +24,21 @@ public partial class InvSlotUi : Panel
 		{
 			ItemDisplay.Visible = false;
 		}
+	}
+
+	public override void _GuiInput(InputEvent @event)
+	{
+		if (@event is InputEventMouseButton mouseButton
+			&& mouseButton.ButtonIndex == MouseButton.Left
+			&& mouseButton.Pressed)
+		{
+			OnSlotClicked();
+			AcceptEvent();
+		}
+	}
+
+	private void OnSlotClicked()
+	{
+		GD.Print($"Slot {SlotNum} clicked!");
 	}
 }
