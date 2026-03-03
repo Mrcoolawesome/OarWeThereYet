@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://di3bvya4pxuod"]
+[gd_scene load_steps=4 format=3 uid="uid://di3bvya4pxuod"]
 
+[ext_resource type="Script" uid="uid://ctw3v5c2w3lg3" path="res://scenes_scripts/UI/settings_menu/graphics_menu/graphics_menu.gd" id="1_3uo4k"]
 [ext_resource type="PackedScene" uid="uid://0fqe1khyldg5" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/setting_slider.tscn" id="1_gw3us"]
+[ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="3_4r8ro"]
 
 [node name="GraphicsMenu" type="Control"]
 layout_mode = 3
@@ -9,6 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_3uo4k")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -18,13 +21,28 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
 layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 alignment = 1
 
-[node name="SettingSlider" parent="MarginContainer/VBoxContainer" instance=ExtResource("1_gw3us")]
+[node name="MSAASlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_gw3us")]
 layout_mode = 2
-MaxValue = 8.0
+MaxValue = 3.0
 SliderLabelText = "MSAA"
-TickCount = 9
-SliderLabelAppendedText = "x"
+TickCount = 4
+
+[node name="ApplySettingsButton" type="Button" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+theme = ExtResource("3_4r8ro")
+theme_type_variation = &"ApplySettingsButton"
+text = "Apply Settings"
+
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MSAASlider" to="." method="_on_msaa_slider_slider_changed"]
+[connection signal="pressed" from="MarginContainer/ApplySettingsButton" to="." method="_on_apply_settings_button_pressed"]

@@ -1,0 +1,28 @@
+class_name UserSettingPrefrences extends Resource
+
+# class variables
+# these are also the default values for the settings
+@export var msaa_mode: Viewport.MSAA = Viewport.MSAA_2X
+
+# saves the current instance of the class (self) into a file called 'user_settings_prefs.tres'
+func save() -> void:
+	ResourceSaver.save(self, "user://user_settings_prefs.tres")
+
+# this is a static function so that it doesn't get called on a specific instance, since it return instances of UserSettingPrefrences objects
+static func load_or_create() -> UserSettingPrefrences:
+	# first try and get their settings
+	var res: UserSettingPrefrences = ResourceLoader.load("user://user_settings_prefs.tres") as UserSettingPrefrences
+	if !res:
+		return UserSettingPrefrences.new() # return a new instance of this class if we don't have a save file for their settings yet
+	else:
+		return res # otherwise just return their settings from the file
+
+# applies all of their settings
+# we need to pass in certain things because this calss extends resource and thus doesn't have access to things that node classes do
+func apply_settings(viewport: Viewport) -> void:
+	apply_graphics_settings(viewport)
+	# TODO: apply all other settings here
+
+# applies only graphics settings
+func apply_graphics_settings(viewport: Viewport) -> void:
+	viewport.msaa_3d = msaa_mode

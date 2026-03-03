@@ -27,14 +27,6 @@ signal slider_changed(new_value: float)
 		StartingValue = value
 		if is_node_ready() and slider:
 			slider.value = value
-			_change_number_display_tag(value)
-
-@export var WholeNumbers: bool = true:
-	set(value):
-		WholeNumbers = value
-		if is_node_ready():
-			# Update the text formatting immediately if toggled
-			_change_number_display_tag(StartingValue) 
 
 @export var SliderLabelText: String = "":
 	set(value):
@@ -48,14 +40,6 @@ signal slider_changed(new_value: float)
 		if is_node_ready() and slider:
 			slider.tick_count = value
 
-@export var SliderLabelAppendedText: String = "":
-	set(value):
-		SliderLabelAppendedText = value
-		if is_node_ready() and value != "":
-			number_tag.text += value
-		elif value == "":
-			_change_number_display_tag(StartingValue) # make it use the starting value if the appended string is blank
-
 @onready var slider: Slider = $MarginContainer/HBoxContainer/Slider
 @onready var number_tag: Label = $MarginContainer/HBoxContainer/SliderNumberLabel
 @onready var slider_label: Label = $MarginContainer/HBoxContainer/SliderNameLabel
@@ -66,19 +50,14 @@ func _ready() -> void:
 	slider.min_value = MinValue
 	slider.max_value = MaxValue
 	slider.step = Step
-	slider.value = StartingValue
+	slider.set_value_no_signal(StartingValue) # don't wanna emit the signal just to set the value
 	slider_label.text = SliderLabelText
 	slider.tick_count = TickCount
-	_change_number_display_tag(StartingValue)
 
 func _on_slider_value_changed(value: float) -> void:
 	slider_changed.emit(value)
-	_change_number_display_tag(value) # update the display tag
 
 # function to update the amount displayed on the number tag
-func _change_number_display_tag(value: float) -> void:
-	if number_tag: # Good practice to check if it exists first
-		if WholeNumbers:
-			number_tag.text = "%.0f" % value + SliderLabelAppendedText
-		else:
-			number_tag.text = "%.1f" % value + SliderLabelAppendedText
+# THE SCENE THAT'S USING AN INSTANTIATED SLIDER NEED TO MANUALLY EDIT THE DISPLAY BY USING THIS
+func change_number_display_tag(value: String) -> void:
+	number_tag.text = value
