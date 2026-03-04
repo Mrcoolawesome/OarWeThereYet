@@ -52,8 +52,14 @@ layout_mode = 2
 size_flags_horizontal = 0
 alignment = 1
 
-[node name="BackButton" type="Button" parent="MainContainer/HBoxContainer/VBoxContainer"]
+[node name="ButtonControl" type="Control" parent="MainContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
+
+[node name="BackButton" type="Button" parent="MainContainer/HBoxContainer/VBoxContainer/ButtonControl"]
+layout_mode = 0
+offset_top = -295.0
+offset_right = 253.0
+offset_bottom = -186.0
 theme = ExtResource("1_823ys")
 theme_type_variation = &"SubMenuSelectionButtons"
 theme_override_font_sizes/font_size = 75
@@ -90,6 +96,7 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 
+[connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/ButtonControl/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/AudioMenuButton" to="." method="_on_audio_menu_button_pressed"]
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/ResetMenuButton" to="." method="_on_reset_menu_button_pressed"]
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/GraphicsMenuButton" to="." method="_on_graphics_menu_button_pressed"]

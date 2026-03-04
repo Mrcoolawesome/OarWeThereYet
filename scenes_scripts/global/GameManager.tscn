@@ -1,8 +1,27 @@
-[gd_scene load_steps=4 format=3 uid="uid://4fedud0prf6s"]
+[gd_scene load_steps=9 format=3 uid="uid://4fedud0prf6s"]
 
 [ext_resource type="Script" uid="uid://rwycewm5su24" path="res://scenes_scripts/global/game_manager.gd" id="1_br3cp"]
 [ext_resource type="PackedScene" uid="uid://d34pgbgxmrpd5" path="res://scenes_scripts/UI/main_menu/main_menu.tscn" id="2_4kgqc"]
 [ext_resource type="PackedScene" uid="uid://d18tnr8wt38pv" path="res://scenes_scripts/multiplayer/multiplayer_manager.tscn" id="3_7rip6"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_nkqvx"]
+sky_top_color = Color(0.25651547, 0.31176543, 0.38538215, 1)
+sky_horizon_color = Color(0.7740504, 0.6591817, 0.3316332, 1)
+sky_curve = 0.054903254
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_7aq50"]
+sky_material = SubResource("ProceduralSkyMaterial_nkqvx")
+
+[sub_resource type="Environment" id="Environment_kv811"]
+background_mode = 2
+sky = SubResource("Sky_7aq50")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_nkqvx"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_7aq50"]
 
 [node name="GameManager" type="Node"]
 script = ExtResource("1_br3cp")
@@ -17,3 +36,25 @@ spawn_limit = 1
 [node name="MainMenu" parent="." instance=ExtResource("2_4kgqc")]
 
 [node name="MultiplayerManager" parent="." instance=ExtResource("3_7rip6")]
+
+[node name="Menu3DScene" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Menu3DScene"]
+transform = Transform3D(-0.89733815, -0.4412512, -0.009036675, -0.44133452, 0.8969993, 0.024821265, -0.0028464943, 0.026261263, -0.99965113, 0, 0, 0)
+light_color = Color(1.1302981, 0.9674092, 0.5012097, 1)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Menu3DScene"]
+environment = SubResource("Environment_kv811")
+
+[node name="Camera3D" type="Camera3D" parent="Menu3DScene"]
+current = true
+fov = 42.270588
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Menu3DScene"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -5)
+mesh = SubResource("CapsuleMesh_nkqvx")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Menu3DScene"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -5)
+mesh = SubResource("SphereMesh_7aq50")

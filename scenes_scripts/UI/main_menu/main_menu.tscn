@@ -76,3 +76,4 @@ layout_mode = 1
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
 [connection signal="go_back_button_pressed" from="HostGamePopUpMenu" to="." method="_on_host_pop_up_menu_go_back_button_pressed"]
 [connection signal="go_back_button_pressed" from="JoinGamePopUpMenu" to="." method="_on_join_game_pop_up_menu_go_back_button_pressed"]
+[connection signal="back_button_pressed" from="SettingsMenu" to="." method="_on_settings_menu_back_button_pressed"]

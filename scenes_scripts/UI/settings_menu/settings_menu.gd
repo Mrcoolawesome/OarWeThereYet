@@ -4,9 +4,9 @@ extends Control
 @onready var reset_menu: Control = $MainContainer/HBoxContainer/ResetMenu
 @onready var graphics_menu: Control = $MainContainer/HBoxContainer/GraphicsMenu
 
-var audio_menu_button_visible: bool = false
-
 enum SubMenuVisibility {AUDIO, RESET, GRAPHICS}
+
+signal back_button_pressed
 
 func _on_audio_menu_button_pressed() -> void:
 	_show_menu(SubMenuVisibility.AUDIO)
@@ -16,6 +16,10 @@ func _on_reset_menu_button_pressed() -> void:
 
 func _on_graphics_menu_button_pressed() -> void:
 	_show_menu(SubMenuVisibility.GRAPHICS)
+
+func _on_back_button_pressed() -> void:
+	# emit the back button being pressed signal so the parent node can see it
+	back_button_pressed.emit() 
 
 # make only the given menu visible and all others invisible
 func _show_menu(menu: SubMenuVisibility) -> void:
