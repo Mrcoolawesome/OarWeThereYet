@@ -88,39 +88,128 @@ public partial class Inventory : Node
   }
 
 
-  public void RequestSwapItem(int slot)
+  public void RequestSlotClick(int slot)
   {
-    RpcId(1, MethodName.SwapItem, slot);
+    RpcId(1, MethodName.SlotClick, slot);
+  }
+
+  public void RequestStoreHeldItem()
+  {
+    RpcId(1, MethodName.StoreHeldItem);
+  }
+
+  private ArmNode GetPlayerArm()
+  {
+    int playerID = Multiplayer.GetRemoteSenderId();
+    return GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
+  }
+
+  private void SyncPlayerHand(ArmNode playerArm, InvSlot slot)
+  {
+    if (slot != null && slot.Data != null && slot.Amount > 0)
+    {
+      playerArm.Rpc(nameof(playerArm.SetItem), slot.Data.ResourcePath, slot.Amount);
+    }
+    else
+    {
+      playerArm.Rpc(nameof(playerArm.SetItem), "", 0);
+    }
   }
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-  private void SwapItem(int slot)
+  private void SlotClick(int slot)
   {
-    // Get player and their arm
-    int playerID = Multiplayer.GetRemoteSenderId();
-    ArmNode playerArm = GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
+    if (slot < 0 || slot >= Capacity) return;
+
+    ArmNode playerArm = GetPlayerArm();
     InvSlot playerSlot = playerArm.Item;
     InvSlot invSlot = Slots[slot];
 
-    // If it's a valid slot
-    if (slot < Capacity)
-    {
-      // Store player's held item into the inventory slot (use empty InvSlot if null)
-      Slots[slot] = playerSlot ?? new InvSlot(null, 0);
+    bool playerEmpty = playerSlot == null || playerSlot.IsEmpty();
+    bool slotEmpty = invSlot == null || invSlot.IsEmpty();
+    bool sameItem = !playerEmpty && !slotEmpty
+      && playerSlot.Data.ResourcePath == invSlot.Data.ResourcePath;
 
-      if (invSlot != null && invSlot.Data != null)
+    if (sameItem)
+    {
+      int maxStack = invSlot.Data.MaxStackSize;
+      int invSpace = maxStack - invSlot.Amount;
+
+      if (invSpace > 0)
       {
-        playerArm.Rpc(nameof(playerArm.SetItem),
-          invSlot.Data.ResourcePath,
-          invSlot.Amount
-        );
+        // Merge hand into inventory slot
+        int transfer = System.Math.Min(playerSlot.Amount, invSpace);
+        invSlot.Amount += transfer;
+        playerSlot.Amount -= transfer;
       }
       else
       {
-        playerArm.Rpc(nameof(playerArm.SetItem),"", 0);
+        // Inventory slot is full — pull from it to max out the hand
+        int handSpace = maxStack - playerSlot.Amount;
+        int transfer = System.Math.Min(invSlot.Amount, handSpace);
+        playerSlot.Amount += transfer;
+        invSlot.Amount -= transfer;
       }
 
-      EmitSignal(SignalName.InventoryUpdated);
+      SyncPlayerHand(playerArm, playerSlot);
     }
+    else
+    {
+      // Situation 1: Different items (or one/both empty) — swap
+      Slots[slot] = playerSlot ?? new InvSlot(null, 0);
+      SyncPlayerHand(playerArm, invSlot);
+    }
+
+    EmitSignal(SignalName.InventoryUpdated);
+  }
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void StoreHeldItem()
+  {
+    ArmNode playerArm = GetPlayerArm();
+    InvSlot playerSlot = playerArm.Item;
+
+    if (playerSlot == null || playerSlot.IsEmpty()) return;
+
+    int remaining = playerSlot.Amount;
+    string itemPath = playerSlot.Data.ResourcePath;
+    int maxStack = playerSlot.Data.MaxStackSize;
+
+    // First pass: fill existing stacks of the same item
+    for (int i = 0; i < Capacity && remaining > 0; i++)
+    {
+      InvSlot slot = Slots[i];
+      if (slot != null && slot.Data != null && slot.Data.ResourcePath == itemPath)
+      {
+        int space = maxStack - slot.Amount;
+        int transfer = System.Math.Min(remaining, space);
+        slot.Amount += transfer;
+        remaining -= transfer;
+      }
+    }
+
+    // Second pass: place remainder in empty slots
+    for (int i = 0; i < Capacity && remaining > 0; i++)
+    {
+      InvSlot slot = Slots[i];
+      if (slot == null || slot.IsEmpty())
+      {
+        int transfer = System.Math.Min(remaining, maxStack);
+        Slots[i] = new InvSlot(GD.Load<InvItem>(itemPath), transfer);
+        remaining -= transfer;
+      }
+    }
+
+    // Update player's hand with whatever is left
+    if (remaining <= 0)
+    {
+      playerArm.Rpc(nameof(playerArm.SetItem), "", 0);
+    }
+    else
+    {
+      playerArm.Rpc(nameof(playerArm.SetItem), itemPath, remaining);
+    }
+
+    EmitSignal(SignalName.InventoryUpdated);
   }
 }

@@ -6,6 +6,7 @@ public partial class InvSlotUi : Panel
 	public InvSlot Item = null;
 	public Sprite2D ItemDisplay;
 	public int SlotNum;
+	public bool IsPlayerSlot = false;
 	public InventoryUi InventoryUi;
 	public TextEdit CountText;
 	
@@ -61,6 +62,13 @@ public partial class InvSlotUi : Panel
 
 	private void OnSlotClicked()
 	{
-		InventoryUi.Inventory.RequestSwapItem(SlotNum);
+		if (IsPlayerSlot)
+		{
+			InventoryUi.Inventory.RequestStoreHeldItem();
+		}
+		else
+		{
+			InventoryUi.Inventory.RequestSlotClick(SlotNum);
+		}
 	}
 }

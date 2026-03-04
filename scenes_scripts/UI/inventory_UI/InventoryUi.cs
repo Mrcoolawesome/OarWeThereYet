@@ -17,6 +17,7 @@ public partial class InventoryUi : CanvasLayer
 		GridContainer = GetNode<GridContainer>("GridContainer");
 		InvSlotUI = GD.Load<PackedScene>("res://scenes_scripts/UI/inventory_UI/InvSlotUI.tscn");
 		PlayerSlot = GetNode<InvSlotUi>("PlayerSlot");
+		PlayerSlot.IsPlayerSlot = true;
 
 		Player player = GetParent<Player>();
 		ArmNode = player.GetNode<ArmNode>("Head/ArmNode");
