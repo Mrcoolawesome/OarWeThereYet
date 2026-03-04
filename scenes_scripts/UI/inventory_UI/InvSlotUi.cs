@@ -12,13 +12,28 @@ public partial class InvSlotUi : Panel
 	public override void _Ready()
 	{
 		ItemDisplay = GetNode<Sprite2D>("CenterContainer/Panel/ItemDisplay");
-		InventoryUi = GetNode<InventoryUi>("../..");
+		InventoryUi = FindAncestor<InventoryUi>();
 		CountText = GetNode<TextEdit>("TextEdit");
+	}
+
+	private T FindAncestor<T>() where T : Node
+	{
+		Node current = GetParent();
+		while (current != null)
+		{
+			if (current is T match)
+				return match;
+			current = current.GetParent();
+		}
+		return null;
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		if (ItemDisplay == null || CountText == null)
+			return;
+
 		if (Item != null && Item.Data != null)
 		{
 			ItemDisplay.Visible = true;

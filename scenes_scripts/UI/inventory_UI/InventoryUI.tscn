@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://c5qyjwmlp4xyw"]
+[gd_scene load_steps=3 format=3 uid="uid://c5qyjwmlp4xyw"]
 
 [ext_resource type="Script" uid="uid://6u6tlqxoqk1" path="res://scenes_scripts/UI/inventory_UI/InventoryUi.cs" id="1_0ers6"]
+[ext_resource type="PackedScene" uid="uid://cur7ngxm45hjf" path="res://scenes_scripts/UI/inventory_UI/InvSlotUI.tscn" id="2_dwdbm"]
 
 [node name="InventoryUi" type="CanvasLayer"]
 script = ExtResource("1_0ers6")
@@ -28,3 +29,14 @@ offset_bottom = 202.0
 grow_horizontal = 2
 grow_vertical = 2
 columns = 5
+
+[node name="PlayerSlot" parent="." instance=ExtResource("2_dwdbm")]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = -200.0
+offset_right = 100.0
+offset_bottom = 0.0
+grow_vertical = 0

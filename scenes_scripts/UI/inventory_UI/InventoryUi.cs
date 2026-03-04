@@ -8,6 +8,7 @@ public partial class InventoryUi : CanvasLayer
 	public GridContainer GridContainer;
 	public ArmNode ArmNode;
 	public Inventory Inventory;
+	public InvSlotUi PlayerSlot;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -15,6 +16,7 @@ public partial class InventoryUi : CanvasLayer
 		Visible = false;
 		GridContainer = GetNode<GridContainer>("GridContainer");
 		InvSlotUI = GD.Load<PackedScene>("res://scenes_scripts/UI/inventory_UI/InvSlotUI.tscn");
+		PlayerSlot = GetNode<InvSlotUi>("PlayerSlot");
 
 		Player player = GetParent<Player>();
 		ArmNode = player.GetNode<ArmNode>("Head/ArmNode");
@@ -43,6 +45,9 @@ public partial class InventoryUi : CanvasLayer
 
 			counter++;
 		}
+
+		// Update player slot
+		PlayerSlot.Item = ArmNode.Item;
 	}
 
 	public void Close()
@@ -74,5 +79,7 @@ public partial class InventoryUi : CanvasLayer
 
 			counter++;
 		}
+
+		PlayerSlot.Item = ArmNode.Item;
 	}
 }
