@@ -2,6 +2,8 @@ extends Control
 
 # get the sliders so we can edit their display properly
 @onready var msaa_slider = $MarginContainer/ScrollContainer/VBoxContainer/MSAASlider
+# get the screen mode dropdown menu
+@onready var screen_mode_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/ScreenModeDropdown
 
 # the settings object
 var graphics_settings_prefrences: UserSettingPrefrences
@@ -11,12 +13,8 @@ func _ready() -> void:
 	# load their settings to see what they already have saved
 	graphics_settings_prefrences = UserSettingPrefrences.load_or_create()
 
-	# set the number display to what they already have by default
-	# this is type casting to an int because the .msaa_mode value is an enum
-	var loaded_msaa_mode: float = int(graphics_settings_prefrences.msaa_mode) as float
-	_on_msaa_slider_slider_changed(loaded_msaa_mode) # this needs to be a float because that's what the function takes in due to that being what the slider emits
-	# then set the sliders default value as well so the grabber is in the right spot
-	msaa_slider.StartingValue = loaded_msaa_mode
+	# update all the ui upon loading in
+	_load_ui_stuff()
 
 func _on_msaa_slider_slider_changed(new_value: float) -> void:
 	var converted_value: Viewport.MSAA = int(new_value) as Viewport.MSAA # get the value in terms of the MSAA enum
@@ -62,3 +60,22 @@ func _on_apply_settings_button_pressed() -> void:
 	# just save and apply all the settings
 	graphics_settings_prefrences.save()
 	PrefrencesLoader.apply_graphics_settings(graphics_settings_prefrences)
+
+func _load_ui_stuff() -> void:
+	# set the number display to what they already have by default
+	# this is type casting to an int because the .msaa_mode value is an enum
+	var loaded_msaa_mode: float = int(graphics_settings_prefrences.msaa_mode) as float
+	_on_msaa_slider_slider_changed(loaded_msaa_mode) # this needs to be a float because that's what the function takes in due to that being what the slider emits
+	# then set the sliders default value as well so the grabber is in the right spot
+	msaa_slider.StartingValue = loaded_msaa_mode
+
+	# set the screen mode dropdown default value
+	var default_item: int = 0
+	match graphics_settings_prefrences.display_mode:
+		DisplayServer.WINDOW_MODE_FULLSCREEN:
+			default_item = 0
+		DisplayServer.WINDOW_MODE_MAXIMIZED:
+			default_item = 1
+		DisplayServer.WINDOW_MODE_WINDOWED:
+			default_item = 2
+	screen_mode_dropdown.DefaultItem = default_item

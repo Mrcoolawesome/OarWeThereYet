@@ -6,6 +6,7 @@ var user_settings_prefs: UserSettingPrefrences
 func _ready() -> void:
 	# load their settings or make a new settings save with the defaults defined in UserSettingPrefrences
 	user_settings_prefs = UserSettingPrefrences.load_or_create()
+	apply_all_settings()
 
 # applies all of their settings
 # we need to pass in certain things because this calss extends resource and thus doesn't have access to things that node classes do
