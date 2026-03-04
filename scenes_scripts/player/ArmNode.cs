@@ -4,6 +4,7 @@ using System;
 public partial class ArmNode : MeshInstance3D
 {
 	public InvSlot Item { get; set; }
+	private static int _dropCounter = 0;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -55,19 +56,21 @@ public partial class ArmNode : MeshInstance3D
 			string itemPath = Item.Data.ResourcePath;
 			int itemCount = Item.Amount;
 			Vector3 dropPosition = GlobalPosition;
+			string uniqueName = $"DroppedItem_{Multiplayer.GetUniqueId()}_{_dropCounter++}";
 
 			// Tell all peers to spawn the item and clear the arm
-			Rpc(nameof(SpawnDroppedItem), itemPath, itemCount, dropPosition);
+			Rpc(nameof(SpawnDroppedItem), itemPath, itemCount, dropPosition, uniqueName);
 			Rpc(nameof(SetItem), "", 0);
 		}
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void SpawnDroppedItem(string itemPath, int itemCount, Vector3 position)
+	private void SpawnDroppedItem(string itemPath, int itemCount, Vector3 position, string nodeName)
 	{
 		PackedScene inWorldScene = GD.Load<PackedScene>("res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn");
 		UniversalInWorld inWorldNode = inWorldScene.Instantiate<UniversalInWorld>();
 
+		inWorldNode.Name = nodeName;
 		inWorldNode.ItemObject = GD.Load<InvItem>(itemPath);
 		inWorldNode.ItemCount = itemCount;
 		inWorldNode.Position = position;
