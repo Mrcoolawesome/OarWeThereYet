@@ -1,6 +1,8 @@
 extends Control
 
-@onready var audio_menu_button: Control = $MarginContainer/HBoxContainer/AudioMenu
+@onready var audio_menu: Control = $MainContainer/HBoxContainer/AudioMenu
+@onready var reset_menu: Control = $MainContainer/HBoxContainer/ResetMenu
+@onready var graphics_menu: Control = $MainContainer/HBoxContainer/GraphicsMenu
 
 var audio_menu_button_visible: bool = false
 
@@ -9,10 +11,22 @@ enum SubMenuVisibility {AUDIO, RESET, GRAPHICS}
 func _on_audio_menu_button_pressed() -> void:
 	_show_menu(SubMenuVisibility.AUDIO)
 
+func _on_reset_menu_button_pressed() -> void:
+	_show_menu(SubMenuVisibility.RESET)
+
+func _on_graphics_menu_button_pressed() -> void:
+	_show_menu(SubMenuVisibility.GRAPHICS)
 
 # make only the given menu visible and all others invisible
 func _show_menu(menu: SubMenuVisibility) -> void:
-	# TODO: make all others stuff invisible right here so that they get turned visible right after this
+	# make all others stuff invisible right here so that they get turned visible right after this
+	audio_menu.visible = false
+	reset_menu.visible = false
+	graphics_menu.visible = false
 	match menu:
 		SubMenuVisibility.AUDIO:
-			audio_menu_button.visible = true
+			audio_menu.visible = true
+		SubMenuVisibility.RESET:
+			reset_menu.visible = true
+		SubMenuVisibility.GRAPHICS:
+			graphics_menu.visible = true
