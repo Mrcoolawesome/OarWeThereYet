@@ -3,6 +3,8 @@ using Godot.Collections;
 
 public partial class Inventory : Node
 {
+  [Signal] public delegate void InventoryUpdatedEventHandler();
+
   [Export] public int Capacity = 10;
   [Export] public Array<Dictionary<string, Variant>> NetworkInventory
   {
@@ -81,6 +83,8 @@ public partial class Inventory : Node
 
       Slots.Add(new InvSlot(item, amount));
     }
+
+    EmitSignal(SignalName.InventoryUpdated);
   }
 
 
@@ -106,15 +110,17 @@ public partial class Inventory : Node
 
       if (invSlot != null && invSlot.Data != null)
       {
-        playerArm.SetItem(
+        playerArm.Rpc(nameof(playerArm.SetItem),
           invSlot.Data.ResourcePath,
           invSlot.Amount
         );
       }
       else
       {
-        playerArm.SetItem("", 0);
+        playerArm.Rpc(nameof(playerArm.SetItem),"", 0);
       }
+
+      EmitSignal(SignalName.InventoryUpdated);
     }
   }
 }

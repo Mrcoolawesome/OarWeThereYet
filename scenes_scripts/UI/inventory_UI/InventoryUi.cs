@@ -29,6 +29,7 @@ public partial class InventoryUi : CanvasLayer
 	{
 		Visible = true;
 		Inventory = inventory;
+		Inventory.InventoryUpdated += Refresh;
 
 		int counter = 0;
 		foreach (InvSlot slot in inventory.Slots)
@@ -46,6 +47,8 @@ public partial class InventoryUi : CanvasLayer
 
 	public void Close()
 	{
+		if (Inventory != null)
+			Inventory.InventoryUpdated -= Refresh;
 		Visible = false;
 		var children = GridContainer.GetChildren();
 
