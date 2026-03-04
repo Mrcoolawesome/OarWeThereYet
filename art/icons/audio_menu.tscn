@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://b2o60fgelttrd"]
 
 [ext_resource type="Script" uid="uid://mo3uybp5bb24" path="res://scenes_scripts/UI/settings_menu/audio_menu/audio_menu.gd" id="1_08ngt"]
-[ext_resource type="PackedScene" uid="uid://0fqe1khyldg5" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/setting_slider.tscn" id="2_t3ptl"]
+[ext_resource type="PackedScene" uid="uid://0fqe1khyldg5" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/slider/setting_slider.tscn" id="2_t3ptl"]
 
 [node name="AudioMenu" type="Control"]
 layout_mode = 3

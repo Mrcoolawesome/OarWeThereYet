@@ -1,0 +1,43 @@
+[gd_scene load_steps=2 format=3 uid="uid://di3iyb18rny5e"]
+
+[ext_resource type="Theme" uid="uid://mii67dydch5w" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/dropdown/dropdown_themes.tres" id="1_8xx3v"]
+
+[node name="DropdownSetting" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme = ExtResource("1_8xx3v")
+theme_override_constants/separation = 40
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_8xx3v")
+text = "Placeholder"
+horizontal_alignment = 1
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(500, 20)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_8xx3v")
+fit_to_longest_item = false
+item_count = 1
+popup/item_0/text = "Placeholder"
+popup/item_0/id = 0
