@@ -188,7 +188,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   public override void _Input(InputEvent @event)
   {
 		// This is always done so that they can move their head
-		// TODO: Might wanna change this so that player head is always level
     if ((@event is InputEventMouseMotion mouseEvent) && _currGameState == GameState.Playing)
 		{
 			// The y rotation of the player in radians based off of the mouse sensitivity 
