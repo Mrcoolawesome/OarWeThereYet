@@ -37,6 +37,20 @@ func _on_msaa_slider_slider_changed(new_value: float) -> void:
 	# change the number display to the display string
 	msaa_slider.change_number_display_tag(display_string)
 
+# sets the dropdown value in the settings object
+func _on_screen_mode_dropdown_item_selected(item: int) -> void:
+	var converted_value: DisplayServer.WindowMode = item as DisplayServer.WindowMode
+	var new_display_mode: DisplayServer.WindowMode
+	# set the display mode based on what they select
+	match converted_value:
+		0:
+			new_display_mode = DisplayServer.WINDOW_MODE_FULLSCREEN
+		1: 
+			new_display_mode = DisplayServer.WINDOW_MODE_MAXIMIZED # TODO: i think this is borderless??
+		2: 
+			new_display_mode = DisplayServer.WINDOW_MODE_WINDOWED
+	graphics_settings_prefrences.display_mode = new_display_mode
+
 # settings are only applied when this button is pressed
 # TODO: have a confirm page that resets the settings to the previous values either if they choose to revert them, or if 15 sec has gone by without any input
 func _on_apply_settings_button_pressed() -> void:

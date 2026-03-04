@@ -16,3 +16,4 @@ func apply_all_settings() -> void:
 # applies only graphics settings
 func apply_graphics_settings(user_prefs: UserSettingPrefrences) -> void:
 	get_viewport().msaa_3d = user_prefs.msaa_mode
+	DisplayServer.window_set_mode(user_settings_prefs.display_mode)
