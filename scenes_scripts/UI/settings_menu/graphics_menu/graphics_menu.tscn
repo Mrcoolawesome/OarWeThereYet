@@ -44,6 +44,11 @@ size_flags_vertical = 3
 LabelText = "Screen Mode"
 DropdownItems = Array[String](["Fullscreen", "Borderless", "Windowed"])
 
+[node name="ResolutionDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+layout_mode = 2
+size_flags_vertical = 3
+LabelText = "Resolution"
+
 [node name="ApplySettingsButton" type="Button" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
@@ -54,4 +59,5 @@ text = "Apply Settings"
 
 [connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MSAASlider" to="." method="_on_msaa_slider_slider_changed"]
 [connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/ScreenModeDropdown" to="." method="_on_screen_mode_dropdown_item_selected"]
+[connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/ResolutionDropdown" to="." method="_on_resolution_dropdown_item_selected"]
 [connection signal="pressed" from="MarginContainer/ApplySettingsButton" to="." method="_on_apply_settings_button_pressed"]

@@ -6,6 +6,8 @@ class_name UserSettingPrefrences extends Resource
 @export var display_mode: DisplayServer.WindowMode = DisplayServer.WINDOW_MODE_FULLSCREEN
 @export var display_flag: DisplayServer.WindowFlags = DisplayServer.WINDOW_FLAG_BORDERLESS
 @export var borderless_enable: bool = false
+@export var resolution: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()) # set the resolution to their monitor's resolution by default
+@export var apply_resolution: bool = false
 
 # saves the current instance of the class (self) into a file called 'user_settings_prefs.tres'
 func save() -> void:

@@ -45,3 +45,11 @@ func _put_items_into_dropdown() -> void:
 
 func _on_option_button_item_selected(index: int) -> void:
 	item_selected.emit(index)
+
+# this is so that an item can be added with an id
+func add_item(display_string: String, id: int = -1) -> void:
+	# let it append the numbers itself if they don't supply an id
+	if id != -1:
+		option_button.add_item(display_string, id)
+	else:
+		option_button.add_item(display_string)
