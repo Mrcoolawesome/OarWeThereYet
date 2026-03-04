@@ -297,7 +297,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
             for (int i = 0; i < state.GetContactCount(); i++)
             {
                 // if we're colliding with a player, ignore them
-                if (state.GetContactColliderObject(i) is CharacterBody3D)
+                if (state.GetContactColliderObject(i) is CharacterBody3D || state.GetContactColliderObject(i) is UniversalInWorld)
                 {
                     continue;
                 }
