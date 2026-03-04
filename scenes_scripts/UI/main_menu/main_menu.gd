@@ -24,6 +24,9 @@ func _on_join_button_pressed() -> void:
 	else:
 		GlobalSignalServer.emit_signal("JoinGame", 0) # lobby id doesn't matter for ENet network
 
+func _on_settings_button_pressed() -> void:
+	pass # Replace with function body.
+
 func _on_host_pop_up_menu_go_back_button_pressed() -> void:
 	# hide the pop up menu and show the main menu
 	popup_menu.visible = false
