@@ -4,6 +4,8 @@ class_name UserSettingPrefrences extends Resource
 # these are also the default values for the settings
 @export var msaa_mode: Viewport.MSAA = Viewport.MSAA_2X
 @export var display_mode: DisplayServer.WindowMode = DisplayServer.WINDOW_MODE_FULLSCREEN
+@export var display_flag: DisplayServer.WindowFlags = DisplayServer.WINDOW_FLAG_BORDERLESS
+@export var borderless_enable: bool = false
 
 # saves the current instance of the class (self) into a file called 'user_settings_prefs.tres'
 func save() -> void:

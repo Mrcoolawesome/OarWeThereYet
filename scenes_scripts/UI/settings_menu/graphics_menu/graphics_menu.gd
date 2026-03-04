@@ -41,15 +41,20 @@ func _on_msaa_slider_slider_changed(new_value: float) -> void:
 func _on_screen_mode_dropdown_item_selected(item: int) -> void:
 	var converted_value: DisplayServer.WindowMode = item as DisplayServer.WindowMode
 	var new_display_mode: DisplayServer.WindowMode
+	var new_display_flag: DisplayServer.WindowFlags = DisplayServer.WINDOW_FLAG_BORDERLESS
+	var borderless_enable: bool = false
 	# set the display mode based on what they select
 	match converted_value:
 		0:
 			new_display_mode = DisplayServer.WINDOW_MODE_FULLSCREEN
 		1: 
-			new_display_mode = DisplayServer.WINDOW_MODE_MAXIMIZED # TODO: i think this is borderless??
+			new_display_mode = DisplayServer.WINDOW_MODE_MAXIMIZED
+			borderless_enable = true
 		2: 
 			new_display_mode = DisplayServer.WINDOW_MODE_WINDOWED
 	graphics_settings_prefrences.display_mode = new_display_mode
+	graphics_settings_prefrences.display_flag = new_display_flag
+	graphics_settings_prefrences.borderless_enable = borderless_enable
 
 # settings are only applied when this button is pressed
 # TODO: have a confirm page that resets the settings to the previous values either if they choose to revert them, or if 15 sec has gone by without any input

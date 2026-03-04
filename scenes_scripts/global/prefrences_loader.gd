@@ -17,3 +17,4 @@ func apply_all_settings() -> void:
 func apply_graphics_settings(user_prefs: UserSettingPrefrences) -> void:
 	get_viewport().msaa_3d = user_prefs.msaa_mode
 	DisplayServer.window_set_mode(user_settings_prefs.display_mode)
+	DisplayServer.window_set_flag(user_settings_prefs.display_flag, user_settings_prefs.borderless_enable) # this sets the gvien flag to false or true
