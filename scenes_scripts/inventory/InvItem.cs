@@ -12,4 +12,7 @@ public partial class InvItem : Resource
   [ExportGroup("3D Visuals")]
   [Export] public Mesh ItemMesh { get; set; }
   [Export] public Shape3D ItemCollider { get; set; }
+
+  [ExportGroup("Functionality")]
+  [Export] public ItemAction UseAction { get; set; }
 }

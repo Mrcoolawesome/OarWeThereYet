@@ -38,17 +38,26 @@ public partial class ArmNode : MeshInstance3D
 			Mesh = null;
 		}
 
-		if (Input.IsActionPressed("right_click") && GetParent().GetParent<Node>().IsMultiplayerAuthority())
+		if (GetParent().GetParent<Node>().IsMultiplayerAuthority())
 		{
-			// Get uncapped platform velocity from the player's moving platform (e.g. boat)
-			CharacterBody3D player = GetParent().GetParent<CharacterBody3D>();
-			Vector3 platformVelocity = player.GetPlatformVelocity();
+			if (Input.IsActionPressed("right_click"))
+			{
+				// Get uncapped platform velocity from the player's moving platform (e.g. boat)
+				CharacterBody3D player = GetParent().GetParent<CharacterBody3D>();
+				Vector3 platformVelocity = player.GetPlatformVelocity();
 
-			// Subtract platform contribution so we only cap the player's own throw velocity
-			Vector3 throwVelocity = (_armVelocity - platformVelocity).LimitLength(MaxThrowVelocity);
+				// Subtract platform contribution so we only cap the player's own throw velocity
+				Vector3 throwVelocity = (_armVelocity - platformVelocity).LimitLength(MaxThrowVelocity);
 
-			// Add uncapped platform velocity back on top
-			RequestDropItem(throwVelocity + platformVelocity);
+				// Add uncapped platform velocity back on top
+				RequestDropItem(throwVelocity + platformVelocity);
+			}
+
+			if (Input.IsActionJustPressed("left_click") && Item?.Data?.UseAction != null)
+			{
+				Player player = GetParent().GetParent<Player>();
+				Item.Data.UseAction.Use(player, this);
+			}
 		}
 	}
 
