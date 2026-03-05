@@ -458,4 +458,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
         return -1;
     }
+    
+    public bool IsSeatAvailable(int seat)
+    {
+        return !OccupiedSeats[seat];
+    }
 }
