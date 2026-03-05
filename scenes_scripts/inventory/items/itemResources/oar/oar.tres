@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="InvItem" load_steps=4 format=3 uid="uid://cjyr0xd08b32g"]
+
+[ext_resource type="Shape3D" uid="uid://c4bnraiqg3j03" path="res://scenes_scripts/inventory/items/itemResources/oar/oarCollider.tres" id="1_1t4ei"]
+[ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_8pfij"]
+[ext_resource type="ArrayMesh" uid="uid://dcslgr4fm3hi0" path="res://scenes_scripts/inventory/items/itemResources/oar/oarMesh.tres" id="2_760fp"]
+
+[resource]
+script = ExtResource("1_8pfij")
+Name = "Oar"
+ItemMesh = ExtResource("2_760fp")
+ItemCollider = ExtResource("1_1t4ei")
+metadata/_custom_type_script = "uid://5qqoau1yt53x"

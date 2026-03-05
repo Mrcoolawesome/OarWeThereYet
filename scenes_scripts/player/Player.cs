@@ -36,12 +36,17 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private CanvasLayer _pauseUI;
 	// HUD
 	private CanvasLayer _hud;
+	// Inventory Menu
+	private InventoryUi _invUI;
 
 	// Seat collision objects
 	private StaticBody3D _frontLeftSeatCollision;
 	private StaticBody3D _frontRightSeatCollision;
 	private StaticBody3D _backLeftSeatCollision;
 	private StaticBody3D _backRightSeatCollision;
+
+	// Interact ray
+	private RayCast3D _interactRay;
 
 	// Different player models
 	private MeshInstance3D _localPlayerModel;
@@ -109,11 +114,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
 		_boat = GetParent().GetNode<Boat>("Boat");
 		_hud = GetNode<CanvasLayer>("HUD");
+		_invUI = GetNode<InventoryUi>("InventoryUI");
 		_fullPlayerModelHead = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/head");
 		_fullPlayerModelBody = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/body");
 		_fullPlayerModelVest = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/life vest");
 		_localPlayerModel = GetNode<MeshInstance3D>("LocalPlayerModel/Armature/Skeleton3D/body");
 		_fullPlayerModel = GetNode<Node3D>("FullPlayerModel");
+
+		_interactRay = GetNode<RayCast3D>("Head/CameraContainer/Camera3D/InteractRay");
 
 		_frontLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontLeftCollision");
 		_frontRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontRightCollision");
@@ -180,7 +188,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   public override void _Input(InputEvent @event)
   {
 		// This is always done so that they can move their head
-		// TODO: Might wanna change this so that player head is always level
     if ((@event is InputEventMouseMotion mouseEvent) && _currGameState == GameState.Playing)
 		{
 			// The y rotation of the player in radians based off of the mouse sensitivity 
@@ -200,26 +207,25 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		{
 			case GameState.Playing:
 				PlayingStateProcess();
-				_pauseUI.Visible = false;
 				break;
 			case GameState.Menu:
-				_pauseUI.Visible = true;
+				MenuStateProcess();
 				break;
 		}
   }
 
 	private void PlayingStateProcess()
 	{
+		_pauseUI.Visible = false;
+		_hud.Visible = true;
+		Input.MouseMode = Input.MouseModeEnum.Captured;
+		_interactRay.Enabled = true;
+
 		// Menu logic
 		// We use IsActionJustPressed because it's a trigger and not a continuous input event
 		if (Input.IsActionJustPressed("ui_cancel")) 
 		{
 			_currGameState = GameState.Menu;
-			// Release the mouse
-			Input.MouseMode = Input.MouseModeEnum.Visible;
-
-			// hide the hud
-			_hud.Visible = false;
 		}
 
 		switch(_currPlayerState)
@@ -230,6 +236,26 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				RowingStateProcess();
 				break;
 		}
+	}
+
+	private void MenuStateProcess()
+	{
+		if (Input.IsActionJustPressed("ui_cancel")) 
+		{
+			_currGameState = GameState.Playing;			
+
+			// Hide Inventory if open
+			if (_invUI.isOpen())
+			{
+				_invUI.Close();
+			}
+			return; // Skip menu UI updates since we just transitioned to Playing
+		}
+
+		if (!_invUI.isOpen()) { _pauseUI.Visible = true; };
+		_hud.Visible = false;
+		Input.MouseMode = Input.MouseModeEnum.Visible;
+		_interactRay.Enabled = false;
 	}
 
 	// Rowing state input handling
@@ -571,6 +597,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		Position = Vector3.Zero;
 		Rotation = Vector3.Zero;
 		Velocity = Vector3.Zero;
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void OpenInventory(Inventory inventory)
+	{
+		_invUI.Open(inventory);
+		_currGameState = GameState.Menu;
 	}
 
 	// Helper functions

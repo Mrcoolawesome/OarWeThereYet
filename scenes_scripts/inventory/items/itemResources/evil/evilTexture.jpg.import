@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://kt83tf61prry"
-path.s3tc="res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.s3tc.ctex"
-path.etc2="res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.etc2.ctex"
+uid="uid://lkbgbdgi1pay"
+path.s3tc="res://.godot/imported/evilTexture.jpg-f6e5e77936c4725e48f0b30bfd77512a.s3tc.ctex"
+path.etc2="res://.godot/imported/evilTexture.jpg-f6e5e77936c4725e48f0b30bfd77512a.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://art/Images/evilAssFace.jpg"
-dest_files=["res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.s3tc.ctex", "res://.godot/imported/evilAssFace.jpg-973a0814aed01a43242387e0fe8b581e.etc2.ctex"]
+source_file="res://scenes_scripts/inventory/items/itemResources/evil/evilTexture.jpg"
+dest_files=["res://.godot/imported/evilTexture.jpg-f6e5e77936c4725e48f0b30bfd77512a.s3tc.ctex", "res://.godot/imported/evilTexture.jpg-f6e5e77936c4725e48f0b30bfd77512a.etc2.ctex"]
 
 [params]
 

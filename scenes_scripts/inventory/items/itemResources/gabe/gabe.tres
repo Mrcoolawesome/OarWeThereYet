@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="InvItem" load_steps=7 format=3 uid="uid://kq6ftwk7tuff"]
+
+[ext_resource type="Texture2D" uid="uid://dhv6rqnsgaabd" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeTexture.jpg" id="1_3eoww"]
+[ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_43a45"]
+[ext_resource type="Shape3D" uid="uid://dcmohndxegy5p" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeCollider.tres" id="2_g303d"]
+[ext_resource type="BoxMesh" uid="uid://yqgkynijlkcr" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeMesh.tres" id="3_sqpos"]
+[ext_resource type="Script" uid="uid://beqlxsfimqxnn" path="res://scenes_scripts/inventory/items/itemResources/gabe/Gabe.cs" id="4_g303d"]
+
+[sub_resource type="Resource" id="Resource_sqpos"]
+script = ExtResource("4_g303d")
+metadata/_custom_type_script = "uid://beqlxsfimqxnn"
+
+[resource]
+script = ExtResource("1_43a45")
+Name = "Gabe"
+Icon = ExtResource("1_3eoww")
+MaxStackSize = 3
+ItemMesh = ExtResource("3_sqpos")
+ItemCollider = ExtResource("2_g303d")
+UseAction = SubResource("Resource_sqpos")
+metadata/_custom_type_script = "uid://5qqoau1yt53x"
