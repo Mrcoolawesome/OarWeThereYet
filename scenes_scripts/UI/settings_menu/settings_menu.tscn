@@ -9,17 +9,17 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_uuni3"]
 shader = ExtResource("2_p0gyo")
-shader_parameter/brightness = 0.08
-shader_parameter/chromatic_shift_amount = 0.35999999195328
-shader_parameter/bend_amount = 0.60000000894072
-shader_parameter/blur_amount = 2.9000000432134803
+shader_parameter/brightness = 0.1
+shader_parameter/chromatic_shift_amount = 0.95999997854208
+shader_parameter/bend_amount = 0.55000000819566
+shader_parameter/blur_amount = 2.0000000298024
 shader_parameter/grain_amount = 0.0
-shader_parameter/curve_light_blend = 0.5000000074506
-shader_parameter/rim_light_blend = 0.60000000894072
+shader_parameter/curve_light_blend = 1.0
+shader_parameter/rim_light_blend = 0.8
 shader_parameter/shadow_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yk2iq"]
-bg_color = Color(4.9093364e-06, 0.6995726, 0.6054808, 1)
+bg_color = Color(0.22851346, 0.2167045, 0.20883185, 0.5019608)
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -29,6 +29,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_wykvw")
+
+[node name="BackBufferCopy" type="BackBufferCopy" parent="."]
+copy_mode = 2
 
 [node name="MainContainer" type="Panel" parent="."]
 material = SubResource("ShaderMaterial_uuni3")
