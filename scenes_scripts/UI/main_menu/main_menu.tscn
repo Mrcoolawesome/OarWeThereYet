@@ -93,6 +93,7 @@ theme_override_styles/panel = ExtResource("7_s46lk")
 
 [node name="SettingsMenu" parent="SettingsContainer" instance=ExtResource("8_s46lk")]
 layout_mode = 1
+reset_menu_visible = false
 
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]
