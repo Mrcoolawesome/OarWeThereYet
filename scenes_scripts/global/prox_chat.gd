@@ -29,6 +29,9 @@ func initialize_voice():
 	frames_to_buffer = int(current_sample_rate * buffer_target_seconds)
 	set_process(true)
 
+func stop_voice():
+	Steam.stopVoiceRecording()
+	set_process(false)
 
 func get_sample_rate():
 	if use_recommended_sample_rate:
