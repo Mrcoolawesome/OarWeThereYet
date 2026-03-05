@@ -128,6 +128,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_backLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackLeftCollision");
 		_backRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackRightCollision");
 
+		// subscribe to the global signal server call to respawn the player to the boat
+		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
+
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
 
@@ -683,6 +686,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	private void SyncAndLerpClientDataProcess(double delta)
 	{
+		// to account for not having any state at the very beginning
+		if (State == null)
+		{
+			return;
+		}
 		// Read and apply the state and seat from the authority
     _currPlayerState = (PlayerState)(int)State[3];
     _seat = (Boat.SeatIndicies)(int)State[4];

@@ -1,0 +1,15 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://mii67dydch5w"]
+
+[ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="1_3hje5"]
+[ext_resource type="Texture2D" uid="uid://c7axkuijd3b6i" path="res://art/icons/settings_menu_icons/dropdown arrow.svg" id="2_ii6g2"]
+
+[resource]
+default_font = ExtResource("1_3hje5")
+default_font_size = 40
+Label/constants/outline_size = 20
+Label/font_sizes/font_size = 64
+Label/fonts/font = ExtResource("1_3hje5")
+OptionButton/constants/outline_size = 10
+OptionButton/font_sizes/font_size = 40
+OptionButton/fonts/font = ExtResource("1_3hje5")
+OptionButton/icons/arrow = ExtResource("2_ii6g2")

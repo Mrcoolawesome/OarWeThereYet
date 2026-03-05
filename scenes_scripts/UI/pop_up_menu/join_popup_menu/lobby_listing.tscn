@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://llyb7w5nde1b"]
+
+[ext_resource type="Theme" uid="uid://b2bjemh6aq227" path="res://art/themes/buttons.tres" id="1_xxq8o"]
+[ext_resource type="Script" uid="uid://bjjqxn8v5fpb7" path="res://scenes_scripts/UI/pop_up_menu/join_popup_menu/lobby_listing.gd" id="1_y2qwc"]
+
+[node name="Lobby" type="MarginContainer"]
+custom_minimum_size = Vector2(200, 0)
+size_flags_vertical = 4
+script = ExtResource("1_y2qwc")
+
+[node name="LobbyName" type="Label" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("1_xxq8o")
+text = "Placeholder"
+
+[node name="JoinLobbyButton" type="Button" parent="."]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Join"
+alignment = 2
+
+[connection signal="pressed" from="JoinLobbyButton" to="." method="_on_join_lobby_button_pressed"]

@@ -21,7 +21,9 @@ driver/enable_input=true
 
 [autoload]
 
+PrefrencesLoader="*res://scenes_scripts/global/prefrences_loader.gd"
 GlobalSignalServer="*res://scenes_scripts/global/GlobalSignalServer.cs"
+GlobalVariables="*res://scenes_scripts/global/global_variables.gd"
 ProxChat="*res://scenes_scripts/global/prox_chat.gd"
 
 [debug]
@@ -46,6 +48,15 @@ project/assembly_name="OarWeThereYet"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/terrain_3d/plugin.cfg", "res://addons/waterways_net/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://scenes_scripts/UI/": "teal",
+"res://scenes_scripts/boat/": "blue",
+"res://scenes_scripts/environment/": "orange",
+"res://scenes_scripts/player/": "yellow"
+}
 
 [input]
 
@@ -114,7 +125,7 @@ textures/vram_compression/import_etc2_astc=true
 
 [steam]
 
+multiplayer_peer/max_channels=4
 initialization/app_id=0
 initialization/initialize_on_startup=false
 initialization/embed_callbacks=false
-multiplayer_peer/max_channels=4

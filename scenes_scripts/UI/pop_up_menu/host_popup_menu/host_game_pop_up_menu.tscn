@@ -1,0 +1,75 @@
+[gd_scene load_steps=5 format=3 uid="uid://657bxsni64f3"]
+
+[ext_resource type="PackedScene" uid="uid://c6n6ct037x4n2" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.tscn" id="1_teee5"]
+[ext_resource type="Script" uid="uid://dphvpqnr087pj" path="res://scenes_scripts/UI/pop_up_menu/host_popup_menu/host_game_pop_up_menu.gd" id="2_lyev8"]
+[ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="3_mhkqq"]
+[ext_resource type="Theme" uid="uid://b2bjemh6aq227" path="res://art/themes/buttons.tres" id="4_v2hjm"]
+
+[node name="HostGamePopUpMenu" instance=ExtResource("1_teee5")]
+script = ExtResource("2_lyev8")
+
+[node name="Header" parent="PanelContainer/VBoxContainer" index="0"]
+text = "Host A Game"
+
+[node name="CheckboxContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="1"]
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_right = 25
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/CheckboxContainer" index="0"]
+layout_mode = 2
+
+[node name="PublicQuestion" type="Label" parent="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer" index="0"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("3_mhkqq")
+theme_type_variation = &"LabelHeaderMedium"
+text = "Public Lobby"
+
+[node name="CheckBox" type="CheckBox" parent="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer" index="1"]
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+size_flags_stretch_ratio = 0.85
+theme = ExtResource("4_v2hjm")
+theme_override_constants/icon_max_width = 50
+icon_alignment = 2
+
+[node name="LobbyNameContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="2"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_right = 25
+
+[node name="LobbyName" type="Label" parent="PanelContainer/VBoxContainer/LobbyNameContainer" index="0"]
+layout_mode = 2
+theme = ExtResource("3_mhkqq")
+theme_type_variation = &"LabelHeaderMedium"
+text = "LobbyName"
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/LobbyNameContainer" index="1"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+theme = ExtResource("3_mhkqq")
+theme_override_constants/minimum_character_width = 15
+placeholder_text = "Gaming"
+alignment = 1
+emoji_menu_enabled = false
+
+[node name="MarginContainer3" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="3"]
+layout_mode = 2
+size_flags_vertical = 10
+
+[node name="HostButton" type="Button" parent="PanelContainer/VBoxContainer/MarginContainer3" index="0"]
+custom_minimum_size = Vector2(300, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("3_mhkqq")
+theme_type_variation = &"FlatButton"
+text = "Host"
+
+[connection signal="toggled" from="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer/CheckBox" to="." method="on_check_box_toggled"]
+[connection signal="text_changed" from="PanelContainer/VBoxContainer/LobbyNameContainer/LineEdit" to="." method="on_line_edit_text_changed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer3/HostButton" to="." method="on_host_button_pressed"]

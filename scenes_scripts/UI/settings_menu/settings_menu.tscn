@@ -1,0 +1,87 @@
+[gd_scene load_steps=7 format=3 uid="uid://cwoh3ayn5hlr1"]
+
+[ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="1_823ys"]
+[ext_resource type="Script" uid="uid://s8jk2ds0vhpi" path="res://scenes_scripts/UI/settings_menu/settings_menu.gd" id="1_wykvw"]
+[ext_resource type="PackedScene" uid="uid://b2o60fgelttrd" path="res://art/icons/audio_menu.tscn" id="2_mjx27"]
+[ext_resource type="Material" uid="uid://jpuau08ng2hf" path="res://scenes_scripts/UI/shader/menu_blur.tres" id="2_p0gyo"]
+[ext_resource type="PackedScene" uid="uid://dh5qqy16oj1fx" path="res://scenes_scripts/UI/settings_menu/reset_menu/reset_menu.tscn" id="4_yjekq"]
+[ext_resource type="PackedScene" uid="uid://di3bvya4pxuod" path="res://scenes_scripts/UI/settings_menu/graphics_menu/graphics_menu.tscn" id="6_daqcr"]
+
+[node name="SettingsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wykvw")
+
+[node name="MainContainer" type="MarginContainer" parent="."]
+material = ExtResource("2_p0gyo")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+alignment = 1
+
+[node name="ButtonControl" type="Control" parent="MainContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="MainContainer/HBoxContainer/VBoxContainer/ButtonControl"]
+layout_mode = 0
+offset_top = -295.0
+offset_right = 253.0
+offset_bottom = -186.0
+theme = ExtResource("1_823ys")
+theme_type_variation = &"SubMenuSelectionButtons"
+theme_override_font_sizes/font_size = 75
+text = "Back"
+
+[node name="AudioMenuButton" type="Button" parent="MainContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_823ys")
+theme_type_variation = &"SubMenuSelectionButtons"
+text = "Audio"
+
+[node name="ResetMenuButton" type="Button" parent="MainContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_823ys")
+theme_type_variation = &"SubMenuSelectionButtons"
+text = "Reset"
+
+[node name="GraphicsMenuButton" type="Button" parent="MainContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_823ys")
+theme_type_variation = &"SubMenuSelectionButtons"
+text = "Graphics"
+
+[node name="AudioMenu" parent="MainContainer/HBoxContainer" instance=ExtResource("2_mjx27")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResetMenu" parent="MainContainer/HBoxContainer" instance=ExtResource("4_yjekq")]
+visible = false
+layout_mode = 2
+
+[node name="GraphicsMenu" parent="MainContainer/HBoxContainer" instance=ExtResource("6_daqcr")]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/ButtonControl/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/AudioMenuButton" to="." method="_on_audio_menu_button_pressed"]
+[connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/ResetMenuButton" to="." method="_on_reset_menu_button_pressed"]
+[connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/GraphicsMenuButton" to="." method="_on_graphics_menu_button_pressed"]

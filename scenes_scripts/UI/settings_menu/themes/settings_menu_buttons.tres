@@ -1,0 +1,32 @@
+[gd_resource type="Theme" load_steps=9 format=3 uid="uid://chyq2g3h1geyf"]
+
+[ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="1_fmctm"]
+[ext_resource type="Texture2D" uid="uid://fdqunx3m2gre" path="res://art/icons/settings_menu_icons/icons 04 PillShapedSliderDefault.svg" id="1_snsg7"]
+[ext_resource type="Texture2D" uid="uid://bjofehlqovj45" path="res://art/icons/settings_menu_icons/icons 05 PillShapedSliderHighlighted.svg" id="2_6ccst"]
+[ext_resource type="StyleBox" uid="uid://br1s6c164royn" path="res://scenes_scripts/UI/settings_menu/themes/slider_empty.tres" id="3_6ccst"]
+[ext_resource type="Texture2D" uid="uid://xmql31bvh8py" path="res://art/icons/settings_menu_icons/icons 06 SliderTicks.svg" id="3_peyo1"]
+[ext_resource type="StyleBox" uid="uid://dx0julebsqqke" path="res://scenes_scripts/UI/settings_menu/themes/actual_slider_background_empty.tres" id="4_l7q22"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_peyo1"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fmctm"]
+
+[resource]
+ApplySettingsButton/base_type = &"Button"
+ApplySettingsButton/constants/outline_size = 20
+ApplySettingsButton/font_sizes/font_size = 64
+ApplySettingsButton/styles/normal = SubResource("StyleBoxEmpty_peyo1")
+Button/fonts/font = ExtResource("1_fmctm")
+HSlider/constants/center_grabber = 1
+HSlider/icons/grabber = ExtResource("1_snsg7")
+HSlider/icons/grabber_disabled = ExtResource("2_6ccst")
+HSlider/icons/grabber_highlight = ExtResource("2_6ccst")
+HSlider/icons/tick = ExtResource("3_peyo1")
+HSlider/styles/grabber_area = ExtResource("3_6ccst")
+HSlider/styles/grabber_area_highlight = ExtResource("3_6ccst")
+HSlider/styles/slider = ExtResource("4_l7q22")
+SubMenuSelectionButtons/base_type = &"Button"
+SubMenuSelectionButtons/constants/outline_size = 25
+SubMenuSelectionButtons/font_sizes/font_size = 100
+SubMenuSelectionButtons/fonts/font = ExtResource("1_fmctm")
+SubMenuSelectionButtons/styles/normal = SubResource("StyleBoxEmpty_fmctm")

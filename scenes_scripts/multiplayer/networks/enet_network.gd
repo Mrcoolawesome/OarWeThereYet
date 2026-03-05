@@ -6,6 +6,7 @@ const SERVER_IP = "127.0.0.1"
 var multiplayer_peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
 var test_level_scene = preload("res://scenes_scripts/levels/demo_level.tscn")
+var level_name = "DemoLevel"
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
 @onready var level_container = get_tree().current_scene.get_node_or_null("Level")
@@ -27,7 +28,7 @@ func become_host():
 	_add_player_to_game(1)
 
 # this is the function that's called by the multiplayer manager
-func join_as_client(lobby_id):
+func join_as_client(_lobby_id):
 	# set the peer of the current instance to be a peer
 	multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
 	multiplayer.multiplayer_peer = multiplayer_peer
@@ -59,9 +60,9 @@ func _add_player_to_game(id: int):
 	find the player we're looking to remove, and remove their instance.
 '''
 func _remove_player(id : int):		
-	# "true" means recursive (search inside children's children)
-	# "false" means it doesn't need to be owned by this node (safer for spawned objects)
-	var player_node = self.find_child(str(id), true, false)
+	# recursively looks for the player
+	var active_level = level_container.get_node_or_null(level_name)
+	var player_node = active_level.get_node_or_null(str(id))
 	
 	if player_node:
 		player_node.queue_free()

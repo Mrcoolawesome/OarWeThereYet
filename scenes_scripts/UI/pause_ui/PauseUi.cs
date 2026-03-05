@@ -5,21 +5,17 @@ public partial class PauseUi : Control
 {
 	[Signal] public delegate void ResumeEventHandler();
 	[Signal] public delegate void ExitEventHandler();
-	[Signal] public delegate void JoinEventHandler();
-	[Signal] public delegate void HostEventHandler();
-	[Signal] public delegate void RespawnPlayerEventHandler();
 	
-	// get the button
-	private Button _resetButton = new Button();
+	// get the settings menu
+	private Control _settingsMenu = new Control();
+	private MarginContainer _mainContainer = new MarginContainer();
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		// get the button from the tree
-		_resetButton = GetNode<Button>("ResetGameButton");
-
-		// if the user isn't the server they shouldn't be able to reset the game
-		_resetButton.Visible = Multiplayer.IsServer();
+		// get the stuff from the tree
+		_settingsMenu = GetNode<Control>("PanelContainer/SettingsMenu");
+		_mainContainer = GetNode<MarginContainer>("PanelContainer/PauseButtonMainContainer");
 	}
 
 	private void OnResumeButtonPressed()
@@ -32,24 +28,15 @@ public partial class PauseUi : Control
 		EmitSignal(SignalName.Exit);
 	}
 
-	private void OnJoinButtonPressed()
+	private void OnSettingsButtonPressed()
 	{
-		EmitSignal(SignalName.Join);
+		_settingsMenu.Visible = true;
+		_mainContainer.Visible = false;
 	}
 
-	private void OnHostButtonPressed()
+	private void OnSettingsBackButtonPressed()
 	{
-		EmitSignal(SignalName.Host);
-	}
-
-	private void OnResetButtonPressed()
-	{
-		// call the signal on the signal server don't locally emit a signal
-		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.ResetLevel);
-	}
-
-	private void OnRespawnPlayerButtonPressed()
-	{
-		EmitSignal(SignalName.RespawnPlayer);
+		_settingsMenu.Visible = false;
+		_mainContainer.Visible = true;
 	}
 }
