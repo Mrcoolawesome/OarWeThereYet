@@ -32,8 +32,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// BOAT
 	private Boat _boat = new Boat();
 
-	//Pause Menu
-	private CanvasLayer _pauseUI;
+	//Pause Menu canvas
+	private CanvasLayer _pauseUICanvas;
+	// Pause menu ui
+	private Control _pauseUI;
 	// HUD
 	private CanvasLayer _hud;
 	// Inventory Menu
@@ -79,7 +81,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	}
 
 	// Game state default is menu
-	private GameState _currGameState = GameState.Menu;
+	private GameState _currGameState = GameState.Playing;
 
 	// Player state default is standing
 	private PlayerState _currPlayerState = PlayerState.Standing;
@@ -111,7 +113,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_head = GetNode<Node3D>("Head");
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
-		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
+		_pauseUICanvas = GetNode<CanvasLayer>("PauseCanvas");
 		_boat = GetParent().GetNode<Boat>("Boat");
 		_hud = GetNode<CanvasLayer>("HUD");
 		_invUI = GetNode<InventoryUi>("InventoryUI");
@@ -173,7 +175,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		else
 		{
 			// Delete UI
-			_pauseUI.QueueFree();
+			_pauseUICanvas.QueueFree();
 
 			// Delete the Camera for other players
 			if (camera != null)
@@ -219,7 +221,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	private void PlayingStateProcess()
 	{
-		_pauseUI.Visible = false;
+		_pauseUICanvas.Visible = false;
 		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		_interactRay.Enabled = true;
@@ -255,7 +257,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			return; // Skip menu UI updates since we just transitioned to Playing
 		}
 
-		if (!_invUI.isOpen()) { _pauseUI.Visible = true; };
+		if (!_invUI.isOpen()) { _pauseUICanvas.Visible = true; };
 		_hud.Visible = false;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
 		_interactRay.Enabled = false;
@@ -542,6 +544,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
 		// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
 		Position = new Vector3(_boat.Position.X, _boat.Position.Y + 2, _boat.Position.Z);
+
+		// put them into the playing state after that so the pause ui goes away
+		_currGameState = GameState.Playing;
 	}
 
 	//RPC Functions
@@ -588,6 +593,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 			// stop the rowing animation too
 			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
+
+			// get rid of their pause ui after that
+			_currGameState = GameState.Playing;
 		}
 	}
 
