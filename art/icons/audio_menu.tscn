@@ -24,7 +24,9 @@ theme_override_constants/margin_right = 50
 
 [node name="VoicechatVolumeSlider" parent="MarginContainer" instance=ExtResource("2_t3ptl")]
 layout_mode = 2
-StartingValue = 100.0
+MaxValue = 1.0
+Step = 0.01
+StartingValue = 1.0
 SliderLabelText = "Voicechat Volume"
 
 [connection signal="slider_changed" from="MarginContainer/VoicechatVolumeSlider" to="." method="_on_voice_chat_volume_slider_value_changed"]
