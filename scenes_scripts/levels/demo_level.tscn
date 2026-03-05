@@ -14,8 +14,8 @@
 [ext_resource type="PackedScene" uid="uid://bspwtetc0fejm" path="res://art/models/fish.blend" id="12_phog2"]
 [ext_resource type="PackedScene" uid="uid://ce4hm33fw8if5" path="res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn" id="14_g7cjw"]
 [ext_resource type="PackedScene" uid="uid://cywagagtgqt2c" path="res://scenes_scripts/beer/staticbeer.tscn" id="14_xhv4w"]
-[ext_resource type="Resource" uid="uid://kq6ftwk7tuff" path="res://scenes_scripts/inventory/items/gabe.tres" id="15_r0jk7"]
-[ext_resource type="Resource" uid="uid://dnhur17ilku5e" path="res://scenes_scripts/inventory/items/evil.tres" id="16_r0jk7"]
+[ext_resource type="Resource" uid="uid://kq6ftwk7tuff" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabe.tres" id="15_r0jk7"]
+[ext_resource type="Resource" uid="uid://dnhur17ilku5e" path="res://scenes_scripts/inventory/items/itemResources/evil/evil.tres" id="16_r0jk7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_my7xx"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -30,7 +30,7 @@ sky = SubResource("Sky_to0o3")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Resource" id="Resource_y446i"]
+[sub_resource type="Resource" id="Resource_r0jk7"]
 script = ExtResource("4_dvlyx")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
@@ -58,7 +58,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_07cuj"]
+[sub_resource type="Curve3D" id="Curve3D_y446i"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -160,9 +160,9 @@ shadow_enabled = true
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1, -3, -5)
 script = ExtResource("2_lih0g")
-ShaderSettings = SubResource("Resource_y446i")
+ShaderSettings = SubResource("Resource_r0jk7")
 PointWidths = Array[float]([9.738645, 11.79303, 17.322895, 14.258924, 19.230875, 19.230875, 19.230875, 19.230875, 27.431053, 34.830986, 27.622408, 24.90232, 34.700542, 27.715273, 35.96378, 37.959026, 60.54432, 161.6149, 69.5427])
-Curve = SubResource("Curve3D_07cuj")
+Curve = SubResource("Curve3D_y446i")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
