@@ -145,6 +145,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// IsMultiplayerAuthority checks if the current client is the multiplayer authority of THIS current NODE 
 		if (IsMultiplayerAuthority())
 		{
+			// Spawn sitting in next available seat (only the authority should trigger this)
+			SitInSeat(_boat.NextAvailableSeat());
+
 			// Enable our camera
 			if (camera != null)
 			{
@@ -549,6 +552,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void Broadcast_SetSitStandState(bool isSitting, int seatIdx)
 	{
+		// Broadcast occupied seat
+		_boat.OccupiedSeats[seatIdx] = isSitting;
+
 		// set the rowing state
 		_currPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
 		_seat = (Boat.SeatIndicies)seatIdx;
