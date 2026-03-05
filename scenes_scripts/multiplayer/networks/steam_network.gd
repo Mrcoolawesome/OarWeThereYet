@@ -129,6 +129,8 @@ func _add_player_to_game(id: int):
 	find the player we're looking to remove, and remove their instance.
 '''
 func _remove_player(id : int):		
+	ProxChat.stop_voice()
+
 	# recursively looks for the player
 	var active_level = level_container.get_node_or_null(level_name)
 	var player_node = active_level.get_node_or_null(str(id))
