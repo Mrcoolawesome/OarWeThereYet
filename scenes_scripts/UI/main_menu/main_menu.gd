@@ -6,7 +6,7 @@ extends Control
 @onready var main_menu_container: MarginContainer = $MainMenuContainer
 @onready var host_game_menu: Control = $HostGamePopUpMenu
 @onready var join_menu_container: Control = $JoinGamePopUpMenu
-@onready var settings_menu_container: Control = $SettingsMenu
+@onready var settings_menu_container: Control = $SettingsContainer
 
 enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU}
 

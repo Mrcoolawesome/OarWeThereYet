@@ -1,25 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://cwoh3ayn5hlr1"]
+[gd_scene load_steps=7 format=3 uid="uid://cwoh3ayn5hlr1"]
 
 [ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="1_823ys"]
 [ext_resource type="Script" uid="uid://s8jk2ds0vhpi" path="res://scenes_scripts/UI/settings_menu/settings_menu.gd" id="1_wykvw"]
 [ext_resource type="PackedScene" uid="uid://b2o60fgelttrd" path="res://art/icons/audio_menu.tscn" id="2_mjx27"]
-[ext_resource type="Shader" uid="uid://cp56g87sva5nt" path="res://scenes_scripts/UI/shader/glass_panel.gdshader" id="2_p0gyo"]
+[ext_resource type="Material" uid="uid://jpuau08ng2hf" path="res://scenes_scripts/UI/shader/menu_blur.tres" id="2_p0gyo"]
 [ext_resource type="PackedScene" uid="uid://dh5qqy16oj1fx" path="res://scenes_scripts/UI/settings_menu/reset_menu/reset_menu.tscn" id="4_yjekq"]
 [ext_resource type="PackedScene" uid="uid://di3bvya4pxuod" path="res://scenes_scripts/UI/settings_menu/graphics_menu/graphics_menu.tscn" id="6_daqcr"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_uuni3"]
-shader = ExtResource("2_p0gyo")
-shader_parameter/brightness = 0.1
-shader_parameter/chromatic_shift_amount = 0.95999997854208
-shader_parameter/bend_amount = 0.55000000819566
-shader_parameter/blur_amount = 2.0000000298024
-shader_parameter/grain_amount = 0.0
-shader_parameter/curve_light_blend = 1.0
-shader_parameter/rim_light_blend = 0.8
-shader_parameter/shadow_color = Color(0, 0, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yk2iq"]
-bg_color = Color(0.22851346, 0.2167045, 0.20883185, 0.5019608)
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -30,11 +16,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_wykvw")
 
-[node name="BackBufferCopy" type="BackBufferCopy" parent="."]
-copy_mode = 2
-
-[node name="MainContainer" type="Panel" parent="."]
-material = SubResource("ShaderMaterial_uuni3")
+[node name="MainContainer" type="MarginContainer" parent="."]
+material = ExtResource("2_p0gyo")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -42,13 +25,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_yk2iq")
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 25
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MainContainer"]
-layout_mode = 0
-offset_left = 20.0
-offset_right = 1900.0
-offset_bottom = 1080.0
+layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MainContainer/HBoxContainer"]
 layout_mode = 2
