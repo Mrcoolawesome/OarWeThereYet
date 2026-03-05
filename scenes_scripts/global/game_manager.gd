@@ -25,4 +25,5 @@ func become_host_enet():
 func join_lobby(lobby_id):
   # remove the main menu ui
   main_menu_ui.queue_free()
+  menu_3d_scene.queue_free()
   $MultiplayerManager.join_as_client(lobby_id)
