@@ -14,6 +14,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void ResetLevelEventHandler();
 
+  // signal for respawning the player
+  [Signal]
+  public delegate void RespawnPlayerEventHandler();
+
   // signal for hosting game with steam
   [Signal]
   public delegate void HostGameSteamEventHandler(bool isPublic, string name);

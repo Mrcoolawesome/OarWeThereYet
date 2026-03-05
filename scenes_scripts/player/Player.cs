@@ -120,6 +120,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_backLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackLeftCollision");
 		_backRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackRightCollision");
 
+		// subscribe to the global signal server call to respawn the player to the boat
+		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
+
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
 
