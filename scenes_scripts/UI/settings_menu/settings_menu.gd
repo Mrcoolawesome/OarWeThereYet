@@ -1,12 +1,27 @@
 extends Control
 
+# controls if the reset menu should be visible 
+@export var reset_menu_visible: bool = true
+
+# submenus
 @onready var audio_menu: Control = $MainContainer/HBoxContainer/AudioMenu
 @onready var reset_menu: Control = $MainContainer/HBoxContainer/ResetMenu
 @onready var graphics_menu: Control = $MainContainer/HBoxContainer/GraphicsMenu
 
+# buttons
+@onready var audio_button: Button = $MainContainer/ApplySettingsButton
+@onready var reset_button: Button = $MainContainer/HBoxContainer/VBoxContainer/ResetMenuButton
+
 enum SubMenuVisibility {AUDIO, RESET, GRAPHICS}
 
+# keep track of the current menu
+var curr_menu: SubMenuVisibility = SubMenuVisibility.AUDIO
+
 signal back_button_pressed
+
+func _ready() -> void:
+	# make the reset button visible depending on if they want it or not
+	reset_button.visible = reset_menu_visible
 
 func _on_audio_menu_button_pressed() -> void:
 	_show_menu(SubMenuVisibility.AUDIO)
@@ -27,10 +42,26 @@ func _show_menu(menu: SubMenuVisibility) -> void:
 	audio_menu.visible = false
 	reset_menu.visible = false
 	graphics_menu.visible = false
+
+	# want this to be visible by default unless told otherwise
+	audio_button.visible = true
 	match menu:
 		SubMenuVisibility.AUDIO:
 			audio_menu.visible = true
+			curr_menu = SubMenuVisibility.AUDIO
 		SubMenuVisibility.RESET:
 			reset_menu.visible = true
+			curr_menu = SubMenuVisibility.RESET
+			audio_button.visible = false
 		SubMenuVisibility.GRAPHICS:
 			graphics_menu.visible = true
+			curr_menu = SubMenuVisibility.GRAPHICS
+
+func _on_apply_settings_button_pressed() -> void:
+	# run the apply settings function for the specific submenu
+	# just make sure that the function name is 'apply_settings()' for every submenu node
+	match curr_menu:
+		SubMenuVisibility.AUDIO:
+			audio_menu.apply_settings()
+		SubMenuVisibility.GRAPHICS:
+			graphics_menu.apply_settings()

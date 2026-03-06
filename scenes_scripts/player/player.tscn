@@ -54,7 +54,6 @@ Player = NodePath("../../../..")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39999998, -1.4)
 skeleton = NodePath("../..")
 script = ExtResource("7_csk1d")
-MaxThrowVelocity = 7.0
 
 [node name="AimLook" type="Node" parent="."]
 
@@ -66,6 +65,7 @@ transform = Transform3D(-0.5, 0, 4.371139e-08, 0, 0.5, 0, -4.371139e-08, 0, -0.5
 visible = false
 
 [node name="PauseCanvas" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="PauseUI" parent="PauseCanvas" instance=ExtResource("5_8t03j")]
 
@@ -83,8 +83,6 @@ bus = &"Voice Chat"
 doppler_tracking = 1
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
-[connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
-[connection signal="RespawnPlayer" from="PauseCanvas/PauseUI" to="." method="OnPauseUIRespawnPlayer"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]
 
 [editable path="FullPlayerModel"]

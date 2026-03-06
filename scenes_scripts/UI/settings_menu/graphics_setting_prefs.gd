@@ -2,12 +2,16 @@ class_name UserSettingPrefrences extends Resource
 
 # class variables
 # these are also the default values for the settings
+# GRAPHICS SETTINGS
 @export var msaa_mode: Viewport.MSAA = Viewport.MSAA_2X
 @export var display_mode: DisplayServer.WindowMode = DisplayServer.WINDOW_MODE_FULLSCREEN
 @export var display_flag: DisplayServer.WindowFlags = DisplayServer.WINDOW_FLAG_BORDERLESS
 @export var borderless_enable: bool = false
 @export var resolution: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen()) # set the resolution to their monitor's resolution by default
 @export var apply_resolution: bool = false
+# VOLUME SETTINGS
+@export var voicechat_volume: float = 1.0
+@export var master_volume: float = 1.0
 
 # saves the current instance of the class (self) into a file called 'user_settings_prefs.tres'
 func save() -> void:

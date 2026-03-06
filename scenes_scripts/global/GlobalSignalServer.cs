@@ -45,6 +45,9 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void OpenInventoryEventHandler(int playerID);
 
+  [Signal]
+  public delegate void GoToMainMenuEventHandler();
+
   public int Health { get; set; }
 
   public override void _Ready()
