@@ -83,7 +83,6 @@ bus = &"Voice Chat"
 doppler_tracking = 1
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
-[connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]
 
 [editable path="FullPlayerModel"]

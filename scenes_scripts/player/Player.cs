@@ -530,15 +530,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 	}
 
-	private void OnPauseUIExit()
-	{
-		// if they press exit button
-		if (_currGameState == GameState.Menu)
-		{
-			GetTree().Quit();
-		}
-	}
-
 	private void OnPauseUIRespawnPlayer()
 	{
 		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
