@@ -20,11 +20,11 @@ public partial class TestLevel : Node
 	public override void _Ready()
 	{
 		// attach the reset function to the signal from the signal server script
-		GlobalSignalServer.Instance.ResetLevel += _InitateReset; // might be a problem to directly call an Rpc function
-		GlobalSignalServer.Instance.BoatDeath += _InitateReset;
+		GlobalSignalServer.Instance.ResetLevel += InitateReset; // might be a problem to directly call an Rpc function
+		GlobalSignalServer.Instance.BoatDeath += InitateReset;
 
-		GlobalSignalServer.Instance.LoadGame += LoadGame;
-		GlobalSignalServer.Instance.SaveGame += SaveGame;
+		GlobalSignalServer.Instance.LoadGame += RequestLoadGame;
+		GlobalSignalServer.Instance.SaveGame += RequestSaveGame;
 
 		// load or create save slot
 		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
@@ -44,7 +44,7 @@ public partial class TestLevel : Node
 	// Reset
 	// ───────────────────────────────────────────────
 
-	private void _InitateReset()
+	private void InitateReset()
 	{
 		RpcId(1, MethodName._Reset);
 	}
@@ -66,8 +66,16 @@ public partial class TestLevel : Node
 	// ───────────────────────────────────────────────
 	// Saving and Loading Game
 	// ───────────────────────────────────────────────
+	private void RequestSaveGame()
+	{
+		RpcId(1, nameof(SaveGame));
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void SaveGame() 
 	{
+		if (!Multiplayer.IsServer()) return;
+
 		// Collect held items as world items positioned at the boat
 		var heldItems = new Array<Dictionary<string, Variant>>();
 		foreach (Node player in GetTree().GetNodesInGroup("players"))
@@ -90,6 +98,12 @@ public partial class TestLevel : Node
 		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, heldItems);
 	}
 
+	private void RequestLoadGame()
+	{
+		RpcId(1, nameof(LoadGame));
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void LoadGame()
 	{
 		if (!Multiplayer.IsServer()) return;
