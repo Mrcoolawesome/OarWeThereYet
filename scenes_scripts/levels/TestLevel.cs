@@ -80,7 +80,7 @@ public partial class TestLevel : Node
 					{ "path",  arm.Item.Data.ResourcePath },
 					{ "count", arm.Item.Amount },
 					{ "pos_x", _boat.GlobalPosition.X },
-					{ "pos_y", _boat.GlobalPosition.Y },
+					{ "pos_y", _boat.GlobalPosition.Y + 1},
 					{ "pos_z", _boat.GlobalPosition.Z },
 				});
 			}
