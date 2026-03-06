@@ -107,6 +107,10 @@ public partial class ArmNode : MeshInstance3D
 		inWorldNode.Position = position;
 		inWorldNode.LinearVelocity = dropVelocity;
 
+		// Remove MultiplayerSynchronizer — items spawned via RPC (not MultiplayerSpawner)
+		// cause path resolution errors in the multiplayer cache
+		inWorldNode.GetNodeOrNull("MultiplayerSynchronizer")?.QueueFree();
+
 		GetNode("/root/GameManager/Level/DemoLevel/ItemContainer").AddChild(inWorldNode);
 	}
 }

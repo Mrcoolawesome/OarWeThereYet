@@ -80,6 +80,7 @@ public partial class ItemContainer : Node3D
 				(float)data["pos_x"],
 				(float)data["pos_y"],
 				(float)data["pos_z"]);
+			node.GetNodeOrNull("MultiplayerSynchronizer")?.QueueFree();
 			AddChild(node);
 		}
 	}
