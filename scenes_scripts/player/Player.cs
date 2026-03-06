@@ -65,7 +65,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	*/
 
 	// Player state machine. 
-	// TODO: I made this a state machine so that we could add swimming in the future
 	private enum PlayerState
 	{
 		Rowing,

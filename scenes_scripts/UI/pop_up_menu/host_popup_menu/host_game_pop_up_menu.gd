@@ -21,6 +21,7 @@ func on_line_edit_text_changed(new_text: String) -> void:
 
 # Triggered when the HOST button is pressed
 func on_host_button_pressed() -> void:
+	# TODO: Host needs to tell level which save slot they want to use
 	if GlobalVariables.active_network_type == GlobalVariables.MULTIPLAYER_NETWORK_TYPE.STEAM:
 		# Emit via the global signal server
 		# Assuming GlobalSignalServer is set up as an Autoload (Singleton) in your project settings
