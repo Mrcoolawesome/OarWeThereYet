@@ -29,7 +29,7 @@ public partial class ItemContainer : Node3D
 		}
 	}
 
-	private void CollectWorldItems(Array<Dictionary<string, Variant>> items)
+	public void CollectWorldItems(Array<Dictionary<string, Variant>> items)
 	{
 		foreach (Node child in GetChildren())
 		{
@@ -49,7 +49,7 @@ public partial class ItemContainer : Node3D
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
-	private void ReceiveWorldItems(Array<Dictionary<string, Variant>> items)
+	public void ReceiveWorldItems(Array<Dictionary<string, Variant>> items)
 	{
 		// build a set of item names the server still has
 		var serverItemNames = new System.Collections.Generic.HashSet<string>();

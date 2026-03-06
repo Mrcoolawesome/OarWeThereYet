@@ -8,6 +8,13 @@ public partial class TestLevel : Node
 	// boat object 
 	private Boat _boat = new Boat();
 
+	// Items to serialize and save
+	private Inventory _inventory = new();
+	private ItemContainer _itemContainer = new();
+
+	// Game saves object
+	private GameSaves _gameSaves;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -18,8 +25,14 @@ public partial class TestLevel : Node
 		GlobalSignalServer.Instance.LoadGame += LoadGame;
 		GlobalSignalServer.Instance.SaveGame += SaveGame;
 
+		// load or create save slot 0
+		_gameSaves = GameSaves.LoadOrCreate(0);
+
 		// set the boat variable
 		_boat = GetNode<Boat>("Boat");
+
+		_inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
+		_itemContainer = GetNode<ItemContainer>("ItemContainer");
 
 		// late-joining clients ask the server for the current world state
 		if (!Multiplayer.IsServer())
@@ -54,11 +67,16 @@ public partial class TestLevel : Node
 	// ───────────────────────────────────────────────
 	private void SaveGame() 
 	{
+		_gameSaves.Save(0, _inventory, _itemContainer);
 		GD.Print("Saved game");
 	}
 
 	private void LoadGame()
 	{
-		GD.Print("Load game");
+		_gameSaves = GameSaves.LoadOrCreate(0);
+		GD.Print("Loaded game");
+
+		_inventory.DeserializeInventory(_gameSaves.BoatInventory);
+		_itemContainer.ReceiveWorldItems(_gameSaves.WorldItems);
 	}
 }
