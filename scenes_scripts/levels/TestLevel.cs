@@ -94,6 +94,16 @@ public partial class TestLevel : Node
 	{
 		if (!Multiplayer.IsServer()) return;
 
+		// Remove held items from players
+		foreach (Node player in GetTree().GetNodesInGroup("players"))
+		{
+			ArmNode arm = player.GetNode<ArmNode>("Head/ArmNode");
+			if (arm.Item != null)
+			{
+				arm.Rpc(nameof(arm.SetItem), "", 0);
+			}
+		}
+
 		_gameSaves = GameSaves.LoadOrCreate(0);
 		GD.Print("Loaded game");
 
