@@ -107,6 +107,6 @@ public partial class ArmNode : MeshInstance3D
 		inWorldNode.Position = position;
 		inWorldNode.LinearVelocity = dropVelocity;
 
-		GetNode("/root/GameManager/Level/DemoLevel").AddChild(inWorldNode);
+		GetNode("/root/GameManager/Level/DemoLevel/ItemContainer").AddChild(inWorldNode);
 	}
 }
