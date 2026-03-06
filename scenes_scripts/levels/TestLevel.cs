@@ -12,8 +12,9 @@ public partial class TestLevel : Node
 	private Inventory _inventory = new();
 	private ItemContainer _itemContainer = new();
 
-	// Game saves object
+	// Game saves object and slot tracker
 	private GameSaves _gameSaves;
+	public int SaveSlot = 0;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -25,8 +26,8 @@ public partial class TestLevel : Node
 		GlobalSignalServer.Instance.LoadGame += LoadGame;
 		GlobalSignalServer.Instance.SaveGame += SaveGame;
 
-		// load or create save slot 0
-		_gameSaves = GameSaves.LoadOrCreate(0);
+		// load or create save slot
+		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
 
 		// set the boat variable
 		_boat = GetNode<Boat>("Boat");
@@ -86,8 +87,7 @@ public partial class TestLevel : Node
 			}
 		}
 
-		_gameSaves.Save(0, _inventory, _itemContainer, heldItems);
-		GD.Print("Saved game");
+		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, heldItems);
 	}
 
 	private void LoadGame()
@@ -104,8 +104,7 @@ public partial class TestLevel : Node
 			}
 		}
 
-		_gameSaves = GameSaves.LoadOrCreate(0);
-		GD.Print("Loaded game");
+		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
 
 		_inventory.DeserializeInventory(_gameSaves.BoatInventory);
 		_itemContainer.ReceiveWorldItems(_gameSaves.WorldItems);
