@@ -65,6 +65,12 @@ func _remove_player(id : int):
 	var player_node = active_level.get_node_or_null(str(id))
 	
 	if player_node:
+		# Player drops item if they're holding it
+		var arm_node = player_node.get_node_or_null("Head/ArmNode")
+		if arm_node:
+			arm_node.DropItem(Vector3.ZERO)
+
+		# Free player
 		player_node.queue_free()
 	else:
 		print("Could not find player with ID: ", id)
