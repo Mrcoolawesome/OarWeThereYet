@@ -112,6 +112,8 @@ func _on_screen_mode_dropdown_item_selected(item: int) -> void:
 			new_display_mode = DisplayServer.WINDOW_MODE_MAXIMIZED
 			borderless_enable = true
 			resolution_dropdown.visible = false
+			# set the display resolution to be the full resolution
+			settings_prefrences.resolution = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
 		2: 
 			new_display_mode = DisplayServer.WINDOW_MODE_WINDOWED
 			resolution_dropdown.visible = true
