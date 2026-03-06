@@ -1,6 +1,8 @@
 class_name GameSaves extends Resource
 
 @export var checkpoint_num: int = 0
+@export var boat_inventory: Array[Dictionary] = []
+@export var world_items: Array[Dictionary] = []
 
 const SAVE_DIR := "user://saves/"
 

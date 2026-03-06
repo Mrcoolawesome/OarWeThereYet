@@ -15,6 +15,9 @@ public partial class TestLevel : Node
 		GlobalSignalServer.Instance.ResetLevel += _InitateReset; // might be a problem to directly call an Rpc function
 		GlobalSignalServer.Instance.BoatDeath += _InitateReset;
 
+		GlobalSignalServer.Instance.LoadGame += LoadGame;
+		GlobalSignalServer.Instance.SaveGame += SaveGame;
+
 		// set the boat variable
 		_boat = GetNode<Boat>("Boat");
 
@@ -44,5 +47,18 @@ public partial class TestLevel : Node
 
 		// reset the players by calling the 'ResetToStart' function on all of them
 		GetTree().CallGroup("players", "Reset");
+	}
+
+	// ───────────────────────────────────────────────
+	// Saving and Loading Game
+	// ───────────────────────────────────────────────
+	private void SaveGame() 
+	{
+		GD.Print("Saved game");
+	}
+
+	private void LoadGame()
+	{
+		GD.Print("Load game");
 	}
 }
