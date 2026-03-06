@@ -70,7 +70,18 @@ public partial class ItemContainer : Node3D
 		foreach (Dictionary<string, Variant> data in items)
 		{
 			string itemName = (string)data["name"];
-			if (localItemNames.Contains(itemName)) continue;
+			if (localItemNames.Contains(itemName))
+			{
+				// Sync count for items that already exist locally
+				UniversalInWorld existing = GetNodeOrNull<UniversalInWorld>(itemName);
+				if (existing?.Item != null)
+				{
+					int serverCount = (int)data["count"];
+					existing.Item.Amount = serverCount;
+					existing.ItemCount = serverCount;
+				}
+				continue;
+			}
 
 			UniversalInWorld node = scene.Instantiate<UniversalInWorld>();
 			node.Name = itemName;
