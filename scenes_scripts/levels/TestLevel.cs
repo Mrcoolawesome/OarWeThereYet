@@ -67,16 +67,40 @@ public partial class TestLevel : Node
 	// ───────────────────────────────────────────────
 	private void SaveGame() 
 	{
-		_gameSaves.Save(0, _inventory, _itemContainer);
+		// Collect held items as world items positioned at the boat
+		var heldItems = new Array<Dictionary<string, Variant>>();
+		foreach (Node player in GetTree().GetNodesInGroup("players"))
+		{
+			ArmNode arm = player.GetNode<ArmNode>("Head/ArmNode");
+			if (arm.Item != null)
+			{
+				heldItems.Add(new Dictionary<string, Variant>
+				{
+					{ "name",  $"held_{player.Name}" },
+					{ "path",  arm.Item.Data.ResourcePath },
+					{ "count", arm.Item.Amount },
+					{ "pos_x", _boat.GlobalPosition.X },
+					{ "pos_y", _boat.GlobalPosition.Y },
+					{ "pos_z", _boat.GlobalPosition.Z },
+				});
+			}
+		}
+
+		_gameSaves.Save(0, _inventory, _itemContainer, heldItems);
 		GD.Print("Saved game");
 	}
 
 	private void LoadGame()
 	{
+		if (!Multiplayer.IsServer()) return;
+
 		_gameSaves = GameSaves.LoadOrCreate(0);
 		GD.Print("Loaded game");
 
 		_inventory.DeserializeInventory(_gameSaves.BoatInventory);
 		_itemContainer.ReceiveWorldItems(_gameSaves.WorldItems);
+
+		// Broadcast world items to all clients
+		_itemContainer.Rpc(ItemContainer.MethodName.ReceiveWorldItems, _gameSaves.WorldItems);
 	}
 }

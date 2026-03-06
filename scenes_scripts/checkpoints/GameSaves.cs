@@ -9,10 +9,18 @@ public partial class GameSaves : Resource
 
 	private const string SaveDir = "user://saves/";
 
-	public void Save(int slot, Inventory inventory, ItemContainer itemContainer)
+	public void Save(int slot, Inventory inventory, ItemContainer itemContainer,
+		Array<Dictionary<string, Variant>> heldItems = null)
 	{
     BoatInventory = inventory.SerializeInventory();
+    WorldItems.Clear();
     itemContainer.CollectWorldItems(WorldItems);
+
+		if (heldItems != null)
+		{
+			foreach (var item in heldItems)
+				WorldItems.Add(item);
+		}
 
 		DirAccess.MakeDirRecursiveAbsolute(SaveDir);
 		ResourceSaver.Save(this, GetPath(slot));
