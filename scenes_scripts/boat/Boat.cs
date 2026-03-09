@@ -272,6 +272,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
             state.LinearVelocity = Vector3.Zero;
             state.AngularVelocity = Vector3.Zero;
 
+            // TODO: Reset boat position and rotation to the checkpoints respawn position
             // Force the transform to the spawn point
             Basis resetBasis = new Basis(Quaternion.FromEuler(BoatResetRotation));
             state.Transform = new Transform3D(resetBasis, BoatResetPosition);
