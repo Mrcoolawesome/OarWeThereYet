@@ -24,6 +24,7 @@ public partial class TestLevel : Node
 	{
 		// load or create save slot
 		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
+		RequestLoadGame();
 		
 		// attach the reset function to the signal from the signal server script
 		GlobalSignalServer.Instance.ResetLevel += RequestLoadGame;
