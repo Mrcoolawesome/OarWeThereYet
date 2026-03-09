@@ -8,9 +8,10 @@ public partial class Checkpoint : Area3D
 
 	public void OnBodyEntered(Node3D body)
 	{
+		if (!Multiplayer.IsServer()) return;
+		
 		if (body.Name == "Boat")
 		{
-			GD.Print("Boat entered checkpoint: " + CheckpointNum);
 			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SaveGame), CheckpointNum);
 		}
 	}

@@ -611,10 +611,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void SyncReset()
 	{
 		// Set the player into the standing state and reset their position and velocity
-		_currPlayerState = PlayerState.Standing;
-		Position = Vector3.Zero;
-		Rotation = Vector3.Zero;
-		Velocity = Vector3.Zero;
+		// _currPlayerState = PlayerState.Standing;
+		// Position = Vector3.Zero;
+		// Rotation = Vector3.Zero;
+		// Velocity = Vector3.Zero;
+
+		// Sit in boat which should be reset
+		if (IsMultiplayerAuthority())
+			RequestSitInSeat(-1);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]

@@ -253,6 +253,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 		// set the player into the standing state and reset their position and velocity
 		_rowingStates = [false, false, false, false];
 
+        // Reset occupied seats
+        OccupiedSeats = [false, false, false, false];
+
         // reset the boat health
         _healthComponent.ResetHealth();
 
