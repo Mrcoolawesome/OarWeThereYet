@@ -19,15 +19,15 @@ public partial class TestLevel : Node
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		// load or create save slot
+		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
+		
 		// attach the reset function to the signal from the signal server script
 		GlobalSignalServer.Instance.ResetLevel += InitateReset; // might be a problem to directly call an Rpc function
 		GlobalSignalServer.Instance.BoatDeath += InitateReset;
 
 		GlobalSignalServer.Instance.LoadGame += RequestLoadGame;
 		GlobalSignalServer.Instance.SaveGame += RequestSaveGame;
-
-		// load or create save slot
-		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
 
 		// set the boat variable
 		_boat = GetNode<Boat>("Boat");
@@ -66,15 +66,19 @@ public partial class TestLevel : Node
 	// ───────────────────────────────────────────────
 	// Saving and Loading Game
 	// ───────────────────────────────────────────────
-	private void RequestSaveGame()
+	private void RequestSaveGame(int checkpointNum)
 	{
-		RpcId(1, nameof(SaveGame));
+		RpcId(1, nameof(SaveGame), checkpointNum);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void SaveGame() 
+	private void SaveGame(int checkpointNum) 
 	{
 		if (!Multiplayer.IsServer()) return;
+		if (_gameSaves.CheckpointNum == checkpointNum) return;
+
+		// Set new checkpoint
+		_gameSaves.CheckpointNum = checkpointNum;
 
 		// Collect held items as world items positioned at the boat
 		var heldItems = new Array<Dictionary<string, Variant>>();

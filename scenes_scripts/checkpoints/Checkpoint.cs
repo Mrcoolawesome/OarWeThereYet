@@ -11,6 +11,7 @@ public partial class Checkpoint : Area3D
 		if (body.Name == "Boat")
 		{
 			GD.Print("Boat entered checkpoint: " + CheckpointNum);
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SaveGame), CheckpointNum);
 		}
 	}
 }

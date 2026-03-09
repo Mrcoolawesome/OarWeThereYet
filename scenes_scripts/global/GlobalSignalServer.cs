@@ -48,7 +48,7 @@ public partial class GlobalSignalServer : Node
 
   // Saving and loading games
   [Signal]
-  public delegate void SaveGameEventHandler();
+  public delegate void SaveGameEventHandler(int checkpointNum);
   [Signal]
   public delegate void LoadGameEventHandler();
 
