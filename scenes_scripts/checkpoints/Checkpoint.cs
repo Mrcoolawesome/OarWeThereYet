@@ -6,11 +6,11 @@ public partial class Checkpoint : Area3D
 {
 	[Export] public int CheckpointNum;
 
-	public override void _Ready()
+	public void OnBodyEntered(Node3D body)
 	{
-	}
-
-	public override void _Process(double delta)
-	{
+		if (body.Name == "Boat")
+		{
+			GD.Print("Boat entered checkpoint: " + CheckpointNum);
+		}
 	}
 }
