@@ -285,7 +285,7 @@ transform = Transform3D(0.8857098, 0, 0.46423927, 0, 1, 0, -0.46423927, 0, 0.885
 CheckpointNum = 2
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint2" index="0"]
-transform = Transform3D(0.99594116, 0, -0.09000683, 0, 1, 0, 0.09000683, 0, 0.99594116, 7.584427, -0.5406704, -14.39253)
+transform = Transform3D(-4.3711392e-08, 0, 1.0000001, 0, 1, 0, -1.0000001, 0, -4.3711392e-08, 7.584427, -0.5406704, -14.39253)
 
 [node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint2" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4696198, 0.9383545, -7.340975)

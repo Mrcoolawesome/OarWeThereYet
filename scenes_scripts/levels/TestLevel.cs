@@ -26,8 +26,8 @@ public partial class TestLevel : Node
 		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
 		
 		// attach the reset function to the signal from the signal server script
-		GlobalSignalServer.Instance.ResetLevel += InitateReset; // might be a problem to directly call an Rpc function
-		GlobalSignalServer.Instance.BoatDeath += InitateReset;
+		GlobalSignalServer.Instance.ResetLevel += RequestLoadGame;
+		GlobalSignalServer.Instance.BoatDeath += RequestLoadGame;
 
 		GlobalSignalServer.Instance.LoadGame += RequestLoadGame;
 		GlobalSignalServer.Instance.SaveGame += RequestSaveGame;
@@ -157,5 +157,8 @@ public partial class TestLevel : Node
 
 		// Broadcast world items to all clients
 		_itemContainer.Rpc(ItemContainer.MethodName.ReceiveWorldItems, _gameSaves.WorldItems);
+
+		// Reset boat and players
+		InitateReset();
 	}
 }
