@@ -24,6 +24,8 @@ seamless = true
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_q7cy6"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_osn7b"]
+width = 2160
+height = 2160
 noise = SubResource("FastNoiseLite_q7cy6")
 as_normal_map = true
 
@@ -646,7 +648,7 @@ _shader_parameters = {
 &"noise1_offset": Vector2(0.5, 0.5),
 &"noise1_scale": 0.04,
 &"noise2_scale": 0.076,
-&"noise_scale": 0.1,
+&"noise_scale": 0.365,
 &"noise_texture": SubResource("NoiseTexture2D_ldm8g"),
 &"projection_threshold": 0.8,
 &"shadow_color": Color(0.15, 0.15, 0.25, 1),
