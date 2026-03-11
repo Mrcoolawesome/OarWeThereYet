@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://bhjy2n3qwlbxi"]
+[gd_scene load_steps=33 format=3 uid="uid://bhjy2n3qwlbxi"]
 
 [ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes_scripts/levels/TestLevel.cs" id="1_rahni"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="2_lih0g"]
@@ -30,11 +30,17 @@ sky = SubResource("Sky_to0o3")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Resource" id="Resource_r0jk7"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_r0jk7"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_y446i"]
+noise = SubResource("FastNoiseLite_r0jk7")
+seamless = true
+
+[sub_resource type="Resource" id="Resource_07cuj"]
 script = ExtResource("4_dvlyx")
 MatShaderType = 1
-mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
-mat_albedo_color_second = Color(0.25, 0.35, 0.35, 1)
+mat_albedo_color_first = Color(0.4390477, 0.810188, 0.99799937, 1)
+mat_albedo_color_second = Color(1.8770993e-06, 0.44420162, 0.57795244, 1)
 mat_albedo_depth = 10.0
 mat_albedo_depth_curve = 0.25
 mat_transparency_clarity = 10.0
@@ -48,17 +54,20 @@ mat_flow_steepness = 2.0
 mat_flow_distance = 1.0
 mat_flow_pressure = 1.0
 mat_flow_max = 4.0
-mat_foam_color = Color(0.9, 0.9, 0.9, 1)
-mat_foam_amount = 2.0
+mat_foam_color = Color(1, 1, 1, 1)
+mat_foam_amount = 2.5550001213625
 mat_foam_steepness = 2.0
 mat_foam_smoothness = 0.3
+mat_custom_noise_map = SubResource("NoiseTexture2D_y446i")
+mat_custom_wave_height = 2.0
+mat_custom_noise_scale = 0.20000000624012
 mat_uv_scale = Vector3(1, 1, 1)
 mat_roughness = 0.2
 mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_y446i"]
+[sub_resource type="Curve3D" id="Curve3D_3ug7j"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -160,9 +169,12 @@ shadow_enabled = true
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1, -3, -5)
 script = ExtResource("2_lih0g")
-ShaderSettings = SubResource("Resource_r0jk7")
+ShaderSettings = SubResource("Resource_07cuj")
+ShapeStepLengthDivs = 8
+ShapeStepWidthDivs = 8
+ShapeSmoothness = 0.1
 PointWidths = Array[float]([9.738645, 11.79303, 17.322895, 14.258924, 19.230875, 19.230875, 19.230875, 19.230875, 27.431053, 34.830986, 27.622408, 24.90232, 34.700542, 27.715273, 35.96378, 37.959026, 60.54432, 161.6149, 69.5427])
-Curve = SubResource("Curve3D_y446i")
+Curve = SubResource("Curve3D_3ug7j")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
@@ -171,7 +183,7 @@ DefaultHeight = -1000.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 
 [node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_t3n8c")]
-transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -3, -8)
+transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -3, -15.9955635)
 River = NodePath("../RiverManager/RiverFloatSystem")
 RowForce = 200.0
 ImpactVelocityThreshold = 2.0
