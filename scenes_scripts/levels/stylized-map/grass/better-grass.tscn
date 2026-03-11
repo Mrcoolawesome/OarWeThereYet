@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bjv00w6bq2d0b"]
+
+[ext_resource type="ArrayMesh" uid="uid://ynrawfy6l0tc" path="res://scenes_scripts/levels/stylized-map/grass/grass-clump-mesh.res" id="1_pk1ka"]
+
+[node name="BetterGrass" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29294318, 0)
+cast_shadow = 0
+mesh = ExtResource("1_pk1ka")

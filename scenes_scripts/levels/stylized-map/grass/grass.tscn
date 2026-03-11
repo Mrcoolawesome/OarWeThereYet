@@ -5,5 +5,51 @@
 [node name="Grass" type="Node3D"]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.11, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29294318, 0)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D9" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.8082526e-08, 0, 1, 0.53313947, 0.43734792, 2.1185697e-08, -0.9621654, 0.24233612, -3.823417e-08, -4.26582e-10, 0.17281002, 0.06819446)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D10" type="MeshInstance3D" parent="."]
+transform = Transform3D(1.1, 0, 0, 0, 0.43734792, -0.48467225, -1.4901161e-08, 0.24233612, 0.87469584, -4.26582e-10, 0.17281002, 0.06819446)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D7" type="MeshInstance3D" parent="."]
+transform = Transform3D(-3.7855173e-08, -1.3113417e-08, 1, -0.5, 0.51961523, 0, -0.8660254, -0.3, -4.371139e-08, 2.788703e-09, 0.18244165, -0.08958718)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D8" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, 0, -8.156656e-08, 2.9802322e-08, 0.5196153, -0.50000006, 5.9604645e-08, -0.30000004, -0.86602545, 2.788703e-09, 0.18244165, -0.08958718)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0.29294318, 0)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.94391066, -0.24718039, 0, 0.33020145, 0.70658743, 0, 0, 0, 1, -0.088759944, 0.2259411, -5.9509775e-17)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="."]
+transform = Transform3D(-2.9802322e-08, -0.2471804, 0.94391054, 0, 0.7065875, 0.33020142, -1.0000002, -2.2309258e-08, -4.371139e-08, -0.088759944, 0.22594109, 2.1154734e-09)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.9160341, 0.36099052, 0, -0.4011006, 0.82443064, 0, 0, 0, 1, 0.09708974, 0.23186862, 0)
+cast_shadow = 0
+mesh = ExtResource("1_sfmgj")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.2370871, 0.3609905, 0.8848209, -0.103812516, 0.82443064, -0.38743338, -0.9659258, 0, 0.25881907, 0.097089745, 0.23186862, -4.4979426e-10)
+cast_shadow = 0
 mesh = ExtResource("1_sfmgj")
