@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cir6y7hc4lern"]
+
+[ext_resource type="Shader" uid="uid://c751qrcgsnms2" path="res://scenes_scripts/levels/stylized-map/grass/grass.gdshader" id="1_fho0x"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_fho0x")
+shader_parameter/scale_x = 0.9290000916275001
+shader_parameter/skew_amount_x = 1.4600001643500002
+shader_parameter/stretch_g = 1.0
+shader_parameter/offset_o = 0.0
+shader_parameter/height_u = 1.0
+shader_parameter/top_pinch = 1.0
+shader_parameter/color = Color(0, 0.9411765, 0.2784314, 1)
+shader_parameter/outline_thickness = 0.0510000024225
+shader_parameter/outline_color = Color(0.02, 0.1, 0.02, 1)
