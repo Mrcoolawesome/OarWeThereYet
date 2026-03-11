@@ -22,15 +22,17 @@ volumetric_fog_density = 0.286
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lnqtx"]
 
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_jq3eh"]
+name = "better-grass"
+scene_file = ExtResource("3_jq3eh")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
 [sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_itx5c"]
 name = "grass"
-scene_file = ExtResource("2_6a22d")
-cast_shadows = 0
-
-[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_xk170"]
-name = "better-grass"
 id = 1
-scene_file = ExtResource("3_jq3eh")
+scene_file = ExtResource("2_6a22d")
 last_lod = 0
 last_shadow_lod = 0
 lod0_range = 128.0
@@ -54,7 +56,7 @@ albedo_texture = ExtResource("2_lnqtx")
 normal_texture = SubResource("ImageTexture_jq3eh")
 
 [sub_resource type="Terrain3DAssets" id="Terrain3DAssets_3ixrk"]
-mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_itx5c"), SubResource("Terrain3DMeshAsset_xk170")])
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_jq3eh"), SubResource("Terrain3DMeshAsset_itx5c")])
 texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_itx5c")])
 
 [node name="StylizedMap" type="Node3D"]
