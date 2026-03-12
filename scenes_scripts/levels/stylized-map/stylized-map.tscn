@@ -92,7 +92,7 @@ light_energy = 0.6
 shadow_enabled = true
 
 [node name="Terrain3D" type="Terrain3D" parent="."]
-data_directory = "res://scenes_scripts/levels/stylized-map/stylized-map-data"
+data_directory = "res://scenes_scripts/levels/stylized-map/canyon-map-data"
 material = ExtResource("1_jsj3l")
 assets = SubResource("Terrain3DAssets_3ixrk")
 cast_shadows = 0
@@ -100,7 +100,10 @@ top_level = true
 metadata/_edit_lock_ = true
 
 [node name="Player" parent="." instance=ExtResource("1_gspic")]
-transform = Transform3D(-0.9379858, 0, 0.3466737, 0, 1, 0, -0.3466737, 0, -0.9379858, 91.093544, 1, 65.77394)
+transform = Transform3D(-0.9379858, 0, 0.3466737, 0, 1, 0, -0.3466737, 0, -0.9379858, 1012.16364, 1, 838.9665)
+
+[node name="FullPlayerModel" parent="Player" index="5"]
+visible = false
 
 [editable path="Player"]
 [editable path="Player/FullPlayerModel"]
