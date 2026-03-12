@@ -1,34 +1,4 @@
-[gd_resource type="Terrain3DMaterial" load_steps=7 format=3 uid="uid://dawexow81k0tj"]
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_q7cy6"]
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_osn7b"]
-width = 2160
-height = 2160
-noise = SubResource("FastNoiseLite_q7cy6")
-seamless = true
-as_normal_map = true
-
-[sub_resource type="Gradient" id="Gradient_xqopx"]
-offsets = PackedFloat32Array(0.2, 1)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_28iyc"]
-noise_type = 2
-frequency = 0.03
-cellular_jitter = 3.0
-cellular_return_type = 0
-domain_warp_enabled = true
-domain_warp_type = 1
-domain_warp_amplitude = 50.0
-domain_warp_fractal_type = 2
-domain_warp_fractal_lacunarity = 1.5
-domain_warp_fractal_gain = 1.0
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ldm8g"]
-noise = SubResource("FastNoiseLite_28iyc")
-color_ramp = SubResource("Gradient_xqopx")
-seamless = true
+[gd_resource type="Terrain3DMaterial" load_steps=2 format=3 uid="uid://dawexow81k0tj"]
 
 [sub_resource type="Shader" id="Shader_gspic"]
 code = "shader_type spatial;
@@ -130,6 +100,10 @@ uniform float noise_scale = 0.1; // To control how stretched the bumps are
 uniform vec3 shadow_color : source_color = vec3(0.15, 0.15, 0.25); // A cool, dark blue/purple by default
 uniform float shadow_softness : hint_range(0.001, 1.0) = 0.05; // How blurry the edge of the shadow is
 uniform float light_threshold : hint_range(-1.0, 1.0) = 0.0; // Where the shadow starts on the bump
+// NEW: Cliff controls
+uniform vec3 cliff_color : source_color = vec3(0.4, 0.3, 0.3);
+uniform float cliff_angle : hint_range(0.0, 1.0) = 0.7; // 1.0 is perfectly flat ground, 0.0 is a pure vertical wall
+uniform float cliff_blend : hint_range(0.001, 1.0) = 0.1; // How smooth the transition is
 
 // Varyings & Types
 
@@ -143,6 +117,7 @@ struct material {
 
 varying float v_vertex_xz_dist;
 varying vec3 v_vertex;
+
 
 ////////////////////////
 // Vertex
@@ -595,8 +570,23 @@ void fragment() {
 	AO = clamp(1. - ao * mat.ao_strength, mat.albedo_height.a, 1.0);
 	AO_LIGHT_AFFECT = (1.0 - mat.albedo_height.a) * clamp(mat.normal_rough.y, 0., 1.);
 
-	// our custom vertex lighting (i don't think we really need this here)
+	// our custom vertex lighting
 	NORMAL = normalize(cross(dFdy(VERTEX), dFdx(VERTEX)));
+
+	// --- NEW CLIFF LOGIC ---
+
+    // 1. Get the World Space Normal
+    // In the fragment shader, NORMAL is relative to the camera (View Space).
+    // We must multiply it by the Inverse View Matrix to find out which way is truly \"Up\" in the game world.
+    vec3 world_bump_normal = (INV_VIEW_MATRIX * vec4(NORMAL, 0.0)).xyz;
+
+    // 2. Calculate the steepness
+    // world_bump_normal.y will be 1.0 if pointing straight up into the sky, and 0.0 if perfectly vertical.
+    // smoothstep creates a gradient mask between our angle and our blend values.
+    float cliff_mask = smoothstep(cliff_angle + cliff_blend, cliff_angle - cliff_blend, world_bump_normal.y);
+
+    // 3. Mix the cliff color over the existing terrain albedo
+    ALBEDO = mix(ALBEDO, cliff_color, cliff_mask);
 }
 
 void light() {
@@ -635,12 +625,15 @@ _shader_parameters = {
 &"bias_distance": 512.0,
 &"blend_sharpness": 0.5,
 &"bump_height": 2.0,
-&"custom_noise_texture": SubResource("NoiseTexture2D_osn7b"),
+&"cliff_angle": 0.7,
+&"cliff_blend": 0.1,
+&"cliff_color": Color(0.4, 0.3, 0.3, 1),
+&"custom_noise_texture": null,
 &"depth_blur": 0.0,
-&"enable_macro_variation": false,
+&"enable_macro_variation": true,
 &"enable_projection": true,
 &"flat_terrain_normals": false,
-&"light_threshold": 1.0,
+&"light_threshold": 0.0,
 &"macro_variation1": Color(1, 1, 1, 1),
 &"macro_variation2": Color(1, 1, 1, 1),
 &"macro_variation_slope": 0.333,
@@ -649,11 +642,11 @@ _shader_parameters = {
 &"noise1_offset": Vector2(0.5, 0.5),
 &"noise1_scale": 0.04,
 &"noise2_scale": 0.076,
-&"noise_scale": 0.365,
-&"noise_texture": SubResource("NoiseTexture2D_ldm8g"),
+&"noise_scale": 0.1,
+&"noise_texture": null,
 &"projection_threshold": 0.8,
 &"shadow_color": Color(0.15, 0.15, 0.25, 1),
-&"shadow_softness": 0.800000038
+&"shadow_softness": 0.05
 }
 world_background = 0
 shader_override_enabled = true
