@@ -6,6 +6,7 @@
 width = 2160
 height = 2160
 noise = SubResource("FastNoiseLite_q7cy6")
+seamless = true
 as_normal_map = true
 
 [sub_resource type="Gradient" id="Gradient_xqopx"]
@@ -636,7 +637,7 @@ _shader_parameters = {
 &"bump_height": 2.0,
 &"custom_noise_texture": SubResource("NoiseTexture2D_osn7b"),
 &"depth_blur": 0.0,
-&"enable_macro_variation": true,
+&"enable_macro_variation": false,
 &"enable_projection": true,
 &"flat_terrain_normals": false,
 &"light_threshold": 1.0,
