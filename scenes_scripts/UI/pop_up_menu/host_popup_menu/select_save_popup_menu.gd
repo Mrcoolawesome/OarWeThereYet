@@ -6,6 +6,8 @@ extends BasePopUpMenu
 
 const SAVE_DIR := "user://saves/"
 
+signal selected_save
+
 func _ready() -> void:
 	# Load saves 1-3 and display buttons with save info
 	_update_save_button(_button_1, 1)
@@ -32,9 +34,12 @@ func _update_save_button(button: Button, slot: int) -> void:
 
 func on_save_1_button_pressed():
 	GlobalVariables.save_slot = 1
+	selected_save.emit()
 
 func on_save_2_button_pressed():
 	GlobalVariables.save_slot = 2
+	selected_save.emit()
 
 func on_save_3_button_pressed():
 	GlobalVariables.save_slot = 3
+	selected_save.emit()

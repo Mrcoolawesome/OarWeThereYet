@@ -9,14 +9,14 @@ extends Control
 @onready var settings_menu_container: Control = $SettingsContainer
 @onready var select_save_menu: Control = $SelectSavePopupMenu
 
-enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU}
+enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU, SAVE_MENU}
 
 func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
 
 func _on_host_button_pressed() -> void:
 	# show the pop up menu and hide the main menu
-	_show_menu(MenuType.HOST_MENU)
+	_show_menu(MenuType.SAVE_MENU)
 
 func _on_join_button_pressed() -> void:
 	if GlobalVariables.active_network_type == GlobalVariables.MULTIPLAYER_NETWORK_TYPE.STEAM:
@@ -31,7 +31,7 @@ func _on_settings_button_pressed() -> void:
 
 func _on_host_pop_up_menu_go_back_button_pressed() -> void:
 	# hide the other menus and show the main menu
-	_show_menu(MenuType.MAIN_MENU)
+	_show_menu(MenuType.SAVE_MENU)
 
 func _on_join_game_pop_up_menu_go_back_button_pressed() -> void:
 	# hide the other menus and show the main menu
@@ -42,6 +42,9 @@ func _on_settings_menu_back_button_pressed() -> void:
 
 func _on_select_save_menu_back_button_pressed() -> void:
 	_show_menu(MenuType.MAIN_MENU)
+
+func _on_select_save_button_pressed() -> void:
+	_show_menu(MenuType.HOST_MENU)
 
 func _show_menu(menu: MenuType) -> void:
 	# make them all invisible except for one
@@ -55,10 +58,11 @@ func _show_menu(menu: MenuType) -> void:
 	match menu:
 		MenuType.HOST_MENU:
 			host_game_menu.visible = true
-			#select_save_menu.visible = true
 		MenuType.JOIN_MENU:
 			join_menu_container.visible = true
 		MenuType.SETTINGS_MENU:
 			settings_menu_container.visible = true
 		MenuType.MAIN_MENU:
 			main_menu_container.visible = true
+		MenuType.SAVE_MENU:
+			select_save_menu.visible = true

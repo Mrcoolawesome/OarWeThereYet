@@ -4,7 +4,6 @@ using System;
 
 public partial class TestLevel : Node
 {
-
 	// boat object 
 	private Boat _boat = new Boat();
 
