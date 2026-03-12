@@ -619,8 +619,14 @@ void light() {
     // 2. Fake sky angle for the shadows
     float sky_angle = clamp((dot(NORMAL, vec3(0.0, 1.0, 0.0)) + 1.0) / 2.0, 0.0, 1.0);
 
-    // 3. Toon transition for the shadow edge
+    // 3. Toon transition for the shadow edge (Self-shadowing)
     float light_intensity = smoothstep(light_threshold - shadow_softness, light_threshold + shadow_softness, NdotL);
+
+    // --- THE FIX: APPLY CAST SHADOWS ---
+    // Multiply our intensity by ATTENUATION so cast shadows force the area into darkness.
+    // If you want the cast shadow edges to be razor-sharp like your toon shading, 
+    // you can use step(0.5, ATTENUATION) instead.
+    light_intensity *= ATTENUATION;
 
     // 4. Dynamic shadow color
     vec3 dynamic_shadow = shadow_color + (vec3(0.25) * sky_angle);
@@ -628,12 +634,11 @@ void light() {
     // 5. Calculate the base lit angle
     float lit_angle = clamp((NdotL - light_threshold) / (1.0 - light_threshold), 0.0, 1.0);
 
-    // NEW: Apply a power curve to make it highly sensitive to direct hits.
-    // 1.0 is linear. 4.0 is strict. 8.0 or 16.0 will require the face to be almost perfectly aligned.
+    // Apply a power curve to make it highly sensitive to direct hits.
     float sun_sensitivity = 0.01;
     float directness = pow(lit_angle, sun_sensitivity);
 
-    // Mix the baseline lit brightness (0.6) with the direct sun blast (1.0) using the new strict curve.
+    // Mix the baseline lit brightness with the direct sun blast
     vec3 dynamic_lit = LIGHT_COLOR * mix(0.6, 1.0, directness);
 
     // 6. Mix the dynamic shadow with the new dynamic lit color
@@ -671,6 +676,5 @@ _shader_parameters = {
 &"shadow_color": Color(0.15, 0.15, 0.25, 1),
 &"shadow_softness": 1.0
 }
-world_background = 0
 shader_override_enabled = true
 shader_override = SubResource("Shader_gspic")
