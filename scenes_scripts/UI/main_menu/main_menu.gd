@@ -7,6 +7,7 @@ extends Control
 @onready var host_game_menu: Control = $HostGamePopUpMenu
 @onready var join_menu_container: Control = $JoinGamePopUpMenu
 @onready var settings_menu_container: Control = $SettingsContainer
+@onready var select_save_menu: Control = $SelectSavePopupMenu
 
 enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU}
 
@@ -39,17 +40,22 @@ func _on_join_game_pop_up_menu_go_back_button_pressed() -> void:
 func _on_settings_menu_back_button_pressed() -> void:
 	_show_menu(MenuType.MAIN_MENU)
 
+func _on_select_save_menu_back_button_pressed() -> void:
+	_show_menu(MenuType.MAIN_MENU)
+
 func _show_menu(menu: MenuType) -> void:
 	# make them all invisible except for one
 	join_menu_container.visible = false
 	host_game_menu.visible = false
 	main_menu_container.visible = false
 	settings_menu_container.visible = false
+	select_save_menu.visible = false
 
 	# make the specified menu visible
 	match menu:
 		MenuType.HOST_MENU:
-			host_game_menu.visible = true
+			#host_game_menu.visible = true
+			select_save_menu.visible = true
 		MenuType.JOIN_MENU:
 			join_menu_container.visible = true
 		MenuType.SETTINGS_MENU:

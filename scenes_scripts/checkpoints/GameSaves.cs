@@ -54,19 +54,4 @@ public partial class GameSaves : Resource
 	{
 		return $"{SaveDir}save_{slot}.tres";
 	}
-
-	public Array<int> ListSaves()
-	{
-		Array<int> saves = new();
-
-		// Go through the three save slots
-		for (int i = 0; i < 3; i++)
-		{
-			// Append CheckpointNum to saves
-			GameSaves save = LoadOrCreate(i);
-			saves.Add(save.CheckpointNum);
-		}
-
-		return saves;
-	}
 }

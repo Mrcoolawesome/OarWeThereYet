@@ -14,7 +14,7 @@ public partial class TestLevel : Node
 
 	// Game saves object and slot tracker
 	private GameSaves _gameSaves;
-	public int SaveSlot = 0;
+	public int SaveSlot = 1;
 
 	// Checkpoint container
 	private Node3D _checkpointContainer;
