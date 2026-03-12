@@ -33,14 +33,14 @@ public partial class TestLevel : Node
 
 		// load or create save slot
 		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
-		RequestLoadGame();
+		LoadGame();
 		
 		// attach the reset function to the signal from the signal server script
-		GlobalSignalServer.Instance.ResetLevel += RequestLoadGame;
-		GlobalSignalServer.Instance.BoatDeath += RequestLoadGame;
+		GlobalSignalServer.Instance.ResetLevel += LoadGame;
+		GlobalSignalServer.Instance.BoatDeath += LoadGame;
 
-		GlobalSignalServer.Instance.LoadGame += RequestLoadGame;
-		GlobalSignalServer.Instance.SaveGame += RequestSaveGame;
+		GlobalSignalServer.Instance.LoadGame += LoadGame;
+		GlobalSignalServer.Instance.SaveGame += SaveGame;
 
 		// Get river
 		_river = GetNode<RiverFloatSystem>("RiverManager/RiverFloatSystem");
@@ -116,12 +116,6 @@ public partial class TestLevel : Node
 	// ───────────────────────────────────────────────
 	// Saving and Loading Game
 	// ───────────────────────────────────────────────
-	private void RequestSaveGame(int checkpointNum)
-	{
-		RpcId(1, nameof(SaveGame), checkpointNum);
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void SaveGame(int checkpointNum) 
 	{
 		if (!Multiplayer.IsServer()) return;
@@ -155,12 +149,6 @@ public partial class TestLevel : Node
 		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, heldItems);
 	}
 
-	private void RequestLoadGame()
-	{
-		RpcId(1, nameof(LoadGame));
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void LoadGame()
 	{
 		if (!Multiplayer.IsServer()) return;
