@@ -182,8 +182,13 @@ public partial class TestLevel : Node
 		}
 
 		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
+
+		// If brand new game
 		if (_gameSaves.CheckpointNum <= 0)
+		{
 			_gameSaves.CheckpointNum = 1;
+			SaveGame(1);
+		}
 
 		SetBoatSpawn();
 
