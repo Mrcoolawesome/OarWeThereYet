@@ -4,6 +4,8 @@ extends BasePopUpMenu
 var lobby_name: String = "gaming"
 var is_public: bool = false
 
+signal delete_save
+
 # We need to get the textbox container so we can hide and unhide it depending on if they made it public or not.
 # In GDScript, @onready is the cleanest way to grab nodes. It automatically fetches the node right before _ready() is called.
 @onready var _text_box_container: MarginContainer = $PanelContainer/VBoxContainer/LobbyNameContainer
@@ -29,3 +31,7 @@ func on_host_button_pressed() -> void:
 	else:
 		# For the ENet network
 		GlobalSignalServer.emit_signal("HostGameEnet")
+
+
+func _delete_save_button_pressed() -> void:
+	delete_save.emit()

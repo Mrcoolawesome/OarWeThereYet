@@ -30,10 +30,12 @@ public partial class TestLevel : Node
 	public override void _Ready()
 	{
 		_checkpointContainer = GetNode<Node3D>("CheckpointContainer");
+		_itemContainer = GetNode<ItemContainer>("ItemContainer");
 
 		// load or create save slot
 		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
-		LoadGame();
+		if (_gameSaves.CheckpointNum <= 0)
+			_gameSaves.CheckpointNum = 1;
 		
 		// attach the reset function to the signal from the signal server script
 		GlobalSignalServer.Instance.ResetLevel += LoadGame;
@@ -54,16 +56,18 @@ public partial class TestLevel : Node
 
 		_boat = BoatScene.Instantiate<Boat>();
 		_boat.River = _river;
+		AddChild(_boat);
+		_inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
+
 		SetBoatSpawn();
 		_boat.Position = _boat.BoatResetPosition;
 		_boat.Rotation = _boat.BoatResetRotation;
-		AddChild(_boat);
 
 		IsBoatReady = true;
 		EmitSignal(SignalName.BoatReady);
-		
-		_inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
-		_itemContainer = GetNode<ItemContainer>("ItemContainer");
+
+		if (Multiplayer.IsServer())
+			LoadGame();
 		
 		// Set boat spawn location
 		if (Multiplayer.IsServer())
@@ -100,14 +104,28 @@ public partial class TestLevel : Node
 	private void SetBoatSpawn()
 	{
 		Node3D boatSpawn = null;
+		Node3D fallbackBoatSpawn = null;
 		// Find the boat spawn node of current checkpoint
 		foreach (Checkpoint child in _checkpointContainer.GetChildren())
 		{
+			Node3D childBoatSpawn = child.GetNodeOrNull<Node3D>("BoatSpawn");
+			if (fallbackBoatSpawn == null && childBoatSpawn != null)
+				fallbackBoatSpawn = childBoatSpawn;
+
 			if (child.CheckpointNum == _gameSaves.CheckpointNum)
 			{
-				boatSpawn = child.GetNode<Node3D>("BoatSpawn");
+				boatSpawn = childBoatSpawn;
+				break;
 			}
 		}
+
+		boatSpawn ??= fallbackBoatSpawn;
+		if (boatSpawn == null)
+		{
+			GD.PushError("No BoatSpawn node found under CheckpointContainer.");
+			return;
+		}
+
 		// Set BoatResetVector to that node
 		_boat.BoatResetPosition = boatSpawn.GlobalPosition;
 		_boat.BoatResetRotation = boatSpawn.GlobalRotation;
@@ -119,7 +137,6 @@ public partial class TestLevel : Node
 	private void SaveGame(int checkpointNum) 
 	{
 		if (!Multiplayer.IsServer()) return;
-		if (_gameSaves.CheckpointNum == checkpointNum) return;
 
 		// Set new checkpoint
 		_gameSaves.CheckpointNum = checkpointNum;
@@ -152,6 +169,7 @@ public partial class TestLevel : Node
 	private void LoadGame()
 	{
 		if (!Multiplayer.IsServer()) return;
+		if (_boat == null || _inventory == null || _itemContainer == null || _gameSaves == null) return;
 
 		// Remove held items from players
 		foreach (Node player in GetTree().GetNodesInGroup("players"))
@@ -164,6 +182,10 @@ public partial class TestLevel : Node
 		}
 
 		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
+		if (_gameSaves.CheckpointNum <= 0)
+			_gameSaves.CheckpointNum = 1;
+
+		SetBoatSpawn();
 
 		_inventory.DeserializeInventory(_gameSaves.BoatInventory);
 		_itemContainer.ReceiveWorldItems(_gameSaves.WorldItems);

@@ -30,6 +30,7 @@ layout_mode = 2
 [node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer1" index="0"]
 layout_mode = 2
 theme = ExtResource("2_m5llw")
+theme_type_variation = &"FlatButton"
 text = "Save 1"
 
 [node name="SaveContainer2" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="2"]
@@ -38,6 +39,7 @@ layout_mode = 2
 [node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer2" index="0"]
 layout_mode = 2
 theme = ExtResource("2_m5llw")
+theme_type_variation = &"FlatButton"
 text = "Save 2"
 
 [node name="SaveContainer3" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="3"]
@@ -46,6 +48,7 @@ layout_mode = 2
 [node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer3" index="0"]
 layout_mode = 2
 theme = ExtResource("2_m5llw")
+theme_type_variation = &"FlatButton"
 text = "Save 3"
 
 [node name="ExitButton" parent="PanelContainer/ExitButtonControl" index="0"]

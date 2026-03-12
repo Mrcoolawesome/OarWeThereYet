@@ -46,6 +46,9 @@ func _on_select_save_menu_back_button_pressed() -> void:
 func _on_select_save_button_pressed() -> void:
 	_show_menu(MenuType.HOST_MENU)
 
+func _on_select_save_popup_menu_deleted_save() -> void:
+	_show_menu(MenuType.SAVE_MENU)
+
 func _show_menu(menu: MenuType) -> void:
 	# make them all invisible except for one
 	join_menu_container.visible = false
@@ -66,3 +69,4 @@ func _show_menu(menu: MenuType) -> void:
 			main_menu_container.visible = true
 		MenuType.SAVE_MENU:
 			select_save_menu.visible = true
+
