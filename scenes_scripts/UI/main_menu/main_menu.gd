@@ -54,8 +54,8 @@ func _show_menu(menu: MenuType) -> void:
 	# make the specified menu visible
 	match menu:
 		MenuType.HOST_MENU:
-			#host_game_menu.visible = true
-			select_save_menu.visible = true
+			host_game_menu.visible = true
+			#select_save_menu.visible = true
 		MenuType.JOIN_MENU:
 			join_menu_container.visible = true
 		MenuType.SETTINGS_MENU:

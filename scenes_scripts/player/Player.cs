@@ -236,8 +236,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		switch(_currPlayerState)
 		{
 			case PlayerState.Standing:
+				_interactRay.Enabled = true;
 				break;
 			case PlayerState.Rowing:
+				_interactRay.Enabled = false;
 				RowingStateProcess();
 				break;
 		}
