@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes_scripts/levels/TestLevel.cs" id="1_rahni"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="2_lih0g"]
-[ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="3_677m7"]
-[ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="4_dvlyx"]
+[ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="3_r0jk7"]
+[ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="4_y446i"]
 [ext_resource type="Script" uid="uid://dw3yrisbnd4me" path="res://addons/waterways_net/RiverFloatSystem.cs" id="5_1lt1y"]
 [ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes_scripts/boat/boat.tscn" id="6_t3n8c"]
 [ext_resource type="Texture2D" uid="uid://cah11bis1j2yl" path="res://art/textures/rocks16_alb_ht.dds" id="7_bindi"]
@@ -37,7 +37,7 @@ noise = SubResource("FastNoiseLite_r0jk7")
 seamless = true
 
 [sub_resource type="Resource" id="Resource_07cuj"]
-script = ExtResource("4_dvlyx")
+script = ExtResource("4_y446i")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.4390477, 0.810188, 0.99799937, 1)
 mat_albedo_color_second = Color(1.8770993e-06, 0.44420162, 0.57795244, 1)
@@ -47,7 +47,7 @@ mat_transparency_clarity = 10.0
 mat_transparency_depth_curve = 0.25
 mat_transparency_refraction = 0.05
 mat_normal_scale = 1.0
-mat_normal_bump_texture = ExtResource("3_677m7")
+mat_normal_bump_texture = ExtResource("3_r0jk7")
 mat_flow_speed = 1.0
 mat_flow_base = 0.0
 mat_flow_steepness = 2.0

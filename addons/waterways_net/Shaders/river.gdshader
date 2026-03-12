@@ -106,7 +106,7 @@ void vertex() {
 void fragment() {
     // --- NEW LOW POLY LIGHTING ---
     // This forces the faceted look by using the geometry's screen derivatives
-    NORMAL = normalize(cross(dFdx(VERTEX), dFdy(VERTEX)));
+    NORMAL = normalize(cross(dFdy(VERTEX), dFdx(VERTEX)));
 
     // Sample the UV2 textures
     vec2 custom_UV = (UV2 + 1.0 / float(i_uv2_sides)) * (float(i_uv2_sides) / float(i_uv2_sides + 2));
