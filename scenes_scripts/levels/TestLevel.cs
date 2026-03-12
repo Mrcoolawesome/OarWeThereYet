@@ -1,13 +1,18 @@
 using Godot;
 using Godot.Collections;
 using System;
+using Waterways;
 
 public partial class TestLevel : Node
 {
+	[Signal] public delegate void BoatReadyEventHandler();
+
 	[Export] public int SaveSlot = 0;
-	
+	public bool IsBoatReady { get; private set; } = false;
+
 	// boat object 
-	private Boat _boat = new Boat();
+	[Export] private PackedScene BoatScene;
+	private Boat _boat;
 
 	// Items to serialize and save
 	private Inventory _inventory = new();
@@ -19,9 +24,13 @@ public partial class TestLevel : Node
 	// Checkpoint container
 	private Node3D _checkpointContainer;
 
+	private RiverFloatSystem _river;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		_checkpointContainer = GetNode<Node3D>("CheckpointContainer");
+
 		// load or create save slot
 		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
 		RequestLoadGame();
@@ -33,13 +42,28 @@ public partial class TestLevel : Node
 		GlobalSignalServer.Instance.LoadGame += RequestLoadGame;
 		GlobalSignalServer.Instance.SaveGame += RequestSaveGame;
 
-		// set the boat variable
-		_boat = GetNode<Boat>("Boat");
+		// Get river
+		_river = GetNode<RiverFloatSystem>("RiverManager/RiverFloatSystem");
+
+		// load and spawn boat
+		if (BoatScene == null)
+		{
+			GD.PushError("BoatScene is not assigned on TestLevel.");
+			return;
+		}
+
+		_boat = BoatScene.Instantiate<Boat>();
+		_boat.River = _river;
+		SetBoatSpawn();
+		_boat.Position = _boat.BoatResetPosition;
+		_boat.Rotation = _boat.BoatResetRotation;
+		AddChild(_boat);
+
+		IsBoatReady = true;
+		EmitSignal(SignalName.BoatReady);
 		
 		_inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
 		_itemContainer = GetNode<ItemContainer>("ItemContainer");
-
-		_checkpointContainer = GetNode<Node3D>("CheckpointContainer");
 		
 		// Set boat spawn location
 		if (Multiplayer.IsServer())

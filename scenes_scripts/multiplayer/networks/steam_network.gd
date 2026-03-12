@@ -118,6 +118,11 @@ func _add_player_to_game(id: int):
 			# Get the actual map node (the first child of the Level container)
 			var current_map = level_container.get_child(0)
 
+			# Ensure dynamic map setup (boat spawn, references, etc.) is done before adding players.
+			if current_map.has_method("get") and current_map.has_signal("BoatReady"):
+				if !current_map.get("IsBoatReady"):
+					await current_map.BoatReady
+
 			# instantiate a new player object
 			var player = player_scene.instantiate()
 			player.name = str(id) # set the name of the player to be their client id

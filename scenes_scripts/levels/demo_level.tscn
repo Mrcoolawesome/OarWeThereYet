@@ -33,7 +33,7 @@ sky = SubResource("Sky_to0o3")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Resource" id="Resource_3ug7j"]
+[sub_resource type="Resource" id="Resource_07cuj"]
 script = ExtResource("4_dvlyx")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
@@ -61,7 +61,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_ynuke"]
+[sub_resource type="Curve3D" id="Curve3D_3ug7j"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -152,6 +152,7 @@ texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_
 
 [node name="DemoLevel" type="Node"]
 script = ExtResource("1_rahni")
+BoatScene = ExtResource("6_t3n8c")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_phog2")
@@ -163,23 +164,15 @@ shadow_enabled = true
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1, -3, -5)
 script = ExtResource("2_lih0g")
-ShaderSettings = SubResource("Resource_3ug7j")
+ShaderSettings = SubResource("Resource_07cuj")
 PointWidths = Array[float]([9.738645, 11.79303, 17.322895, 14.258924, 19.230875, 19.230875, 19.230875, 19.230875, 27.431053, 34.830986, 27.622408, 24.90232, 34.700542, 27.715273, 35.96378, 37.959026, 60.54432, 161.6149, 69.5427])
-Curve = SubResource("Curve3D_ynuke")
+Curve = SubResource("Curve3D_3ug7j")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
 script = ExtResource("5_1lt1y")
 DefaultHeight = -1000.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
-
-[node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_t3n8c")]
-transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -3, -8)
-River = NodePath("../RiverManager/RiverFloatSystem")
-RowForce = 200.0
-ImpactVelocityThreshold = 2.0
-BoatResetPosition = Vector3(0, -3, -8)
-BoatResetRotation = Vector3(0, -90, 0)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://dmth1b1qymst1")
