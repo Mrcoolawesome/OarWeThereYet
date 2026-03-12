@@ -38,6 +38,7 @@ func _add_level():
 	if multiplayer.is_server():
 		# load the level
 		var test_level = test_level_scene.instantiate()
+		test_level.set("SaveSlot", GlobalVariables.save_slot)
 		level_container.add_child(test_level)
 
 func _add_player_to_game(id: int):

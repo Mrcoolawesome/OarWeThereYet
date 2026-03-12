@@ -4,6 +4,8 @@ using System;
 
 public partial class TestLevel : Node
 {
+	[Export] public int SaveSlot = 0;
+	
 	// boat object 
 	private Boat _boat = new Boat();
 
@@ -13,7 +15,6 @@ public partial class TestLevel : Node
 
 	// Game saves object and slot tracker
 	private GameSaves _gameSaves;
-	public int SaveSlot = 1;
 
 	// Checkpoint container
 	private Node3D _checkpointContainer;
