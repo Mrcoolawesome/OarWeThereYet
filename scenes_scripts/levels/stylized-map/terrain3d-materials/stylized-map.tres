@@ -658,7 +658,7 @@ _shader_parameters = {
 &"bias_distance": 512.0,
 &"blend_sharpness": 0.5,
 &"bump_height": 2.0,
-&"bumpy_disntance_cutoff": 100.0,
+&"bumpy_disntance_cutoff": 75.0,
 &"bumpy_distance_fade_start": 50.0,
 &"cliff_angle": 0.7,
 &"cliff_blend": 0.1,
@@ -683,5 +683,6 @@ _shader_parameters = {
 &"shadow_color": Color(0.15, 0.15, 0.25, 1),
 &"shadow_softness": 1.0
 }
+world_background = 0
 shader_override_enabled = true
 shader_override = SubResource("Shader_gspic")
