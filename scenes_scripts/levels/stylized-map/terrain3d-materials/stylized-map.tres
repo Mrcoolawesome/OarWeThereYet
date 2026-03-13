@@ -128,6 +128,10 @@ uniform vec3 cliff_color : source_color = vec3(0.4, 0.3, 0.3);
 uniform float cliff_angle : hint_range(0.0, 1.0) = 0.7; // 1.0 is perfectly flat ground, 0.0 is a pure vertical wall
 uniform float cliff_blend : hint_range(0.001, 1.0) = 0.1; // How smooth the transition is
 
+// bumpy distance controls
+uniform float bumpy_disntance_cutoff = 100.0;
+uniform float bumpy_distance_fade_start = 50.0;
+
 // Varyings & Types
 
 struct material {
@@ -228,17 +232,18 @@ void vertex() {
 	NORMAL = normalize((MODELVIEW_MATRIX * vec4(NORMAL, 0.0)).xyz);
 	BINORMAL = normalize((MODELVIEW_MATRIX * vec4(BINORMAL, 0.0)).xyz);
 	TANGENT = normalize((MODELVIEW_MATRIX * vec4(TANGENT, 0.0)).xyz);
-
+	
 	// our custom bumpyness stuff
-    // Sample the noise using the scaled world position
     float noise_val = texture(custom_noise_texture, UV * noise_scale).r;
-
-    // Shift the noise from a 0.0 to 1.0 range into a -1.0 to 1.0 range
-    // This makes the ground bump both up AND down, rather than just floating upward
     float centered_noise = (noise_val * 2.0) - 1.0;
 
-    // Apply the displacement
-    VERTEX.y += centered_noise * bump_height;
+    // --- NEW: DISTANCE FADE ---
+    // Change 50.0 to the distance where you want the bumps to start fading.
+    // Change 100.0 to the distance where the ground should become perfectly flat.
+    float bump_fade = 1.0 - smoothstep(bumpy_distance_fade_start, bumpy_disntance_cutoff, v_vertex_xz_dist);
+
+    // Apply the displacement, multiplied by the fade
+    VERTEX.y += centered_noise * bump_height * bump_fade;
 }
 
 ////////////////////////
@@ -653,6 +658,8 @@ _shader_parameters = {
 &"bias_distance": 512.0,
 &"blend_sharpness": 0.5,
 &"bump_height": 2.0,
+&"bumpy_disntance_cutoff": 100.0,
+&"bumpy_distance_fade_start": 50.0,
 &"cliff_angle": 0.7,
 &"cliff_blend": 0.1,
 &"cliff_color": Color(0.4, 0.3, 0.3, 1),
@@ -661,7 +668,7 @@ _shader_parameters = {
 &"enable_macro_variation": true,
 &"enable_projection": true,
 &"flat_terrain_normals": false,
-&"light_threshold": 0.522000072295,
+&"light_threshold": 0.35000006412500007,
 &"macro_variation1": Color(1, 1, 1, 1),
 &"macro_variation2": Color(1, 1, 1, 1),
 &"macro_variation_slope": 0.333,
