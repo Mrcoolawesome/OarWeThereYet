@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes_scripts/UI/pause_ui/pause_ui.tscn" id="5_8t03j"]
 [ext_resource type="Material" uid="uid://d0v5pv2hfg3nt" path="res://scenes_scripts/levels/stylized-map/misc-stuff/outline.tres" id="5_sfgrd"]
 [ext_resource type="PackedScene" uid="uid://dyjf8cl7dhrr5" path="res://scenes_scripts/UI/hud/hud.tscn" id="6_2ieo8"]
-[ext_resource type="ArrayMesh" uid="uid://d1gwga6chrysj" path="res://scenes_scripts/player/rightPupilMesh.res" id="6_uwfgf"]
+[ext_resource type="ArrayMesh" uid="uid://y614cwaa1sf8" path="res://scenes_scripts/player/rightPupilMesh.res" id="6_uwfgf"]
 [ext_resource type="ArrayMesh" uid="uid://cr1e065scuekb" path="res://scenes_scripts/player/leftPupilMesh.res" id="7_33s6o"]
 [ext_resource type="Script" uid="uid://cmj52qja6qqii" path="res://scenes_scripts/player/ArmNode.cs" id="7_csk1d"]
 [ext_resource type="PackedScene" uid="uid://c5qyjwmlp4xyw" path="res://scenes_scripts/UI/inventory_UI/InventoryUI.tscn" id="8_a5pl4"]
@@ -50,6 +50,10 @@ blend_shape_mode = 0
 height = 0.01
 radius = 0.15
 
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_uwfgf"]
+height = 0.005
+radius = 0.07
+
 [sub_resource type="ArrayMesh" id="ArrayMesh_qjplb"]
 resource_name = "character2_Circle_007"
 _surfaces = [{
@@ -68,10 +72,6 @@ _surfaces = [{
 "vertex_data": PackedByteArray("jUU8vlx9a0CA+fY+HiOevnZKZ0CA+fY+s0aCvk9gakCA+fY+aPvnvU9gakCA+fY+xHsHvcPwYkCA+fY+eBNxvXZKZ0CA+fY+gtmmvllSXkCA+fY+FFarvsPwYkCA+fY+XX5hvo5UWECA+fY+h7SRvhd+WkCA+fY+GUSqvRd+WkCA+fY+VGArvVlSXkCA+fY+vQwXvo5UWECA+fY+/3//f////z//f/9/////P/9//3////8//3//f////z//f/9/////P/9//3////8//3//f////z//f/9/////P/9//3////8//3//f////z//f/9/////P/9//3////8//3//f////z8=")
 }]
 blend_shape_mode = 0
-
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_uwfgf"]
-height = 0.005
-radius = 0.07
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_33s6o"]
 height = 0.005
@@ -144,7 +144,6 @@ collision_layer = 0
 collision_mask = 0
 axis_lock_linear_z = true
 axis_lock_angular_x = true
-axis_lock_angular_y = true
 axis_lock_angular_z = true
 sync_to_physics = false
 
@@ -158,11 +157,32 @@ shape = SubResource("CylinderShape3D_iwtuv")
 [node name="Generic6DOFJoint3D" type="Generic6DOFJoint3D" parent="FullPlayerModel/eyeLeft"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.182, 3.524, 0.486)
 node_a = NodePath("..")
-node_b = NodePath("../../pupilLeft")
-linear_limit_x/upper_distance = 0.05
-linear_limit_x/lower_distance = -0.05
-linear_limit_y/upper_distance = 0.05
-linear_limit_y/lower_distance = -0.05
+node_b = NodePath("../pupilLeft")
+linear_limit_x/upper_distance = 0.03
+linear_limit_x/lower_distance = -0.03
+linear_limit_x/restitution = 0.01
+linear_limit_y/upper_distance = 0.03
+linear_limit_y/lower_distance = -0.03
+linear_limit_y/restitution = 0.01
+
+[node name="pupilLeft" type="RigidBody3D" parent="FullPlayerModel/eyeLeft"]
+collision_layer = 0
+collision_mask = 0
+axis_lock_linear_z = true
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+continuous_cd = true
+linear_damp_mode = 1
+linear_damp = 16.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/eyeLeft/pupilLeft"]
+extra_cull_margin = 2.0
+mesh = ExtResource("7_33s6o")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FullPlayerModel/eyeLeft/pupilLeft"]
+transform = Transform3D(1, -1.509958e-07, 1.509958e-07, 1.509958e-07, -4.371139e-08, -1, 1.509958e-07, 1, -4.3711367e-08, -0.185, 3.526, 0.487)
+shape = SubResource("CylinderShape3D_uwfgf")
 
 [node name="eyeRight" type="AnimatableBody3D" parent="FullPlayerModel"]
 collision_layer = 0
@@ -183,46 +203,31 @@ shape = SubResource("CylinderShape3D_iwtuv")
 [node name="Generic6DOFJoint3D" type="Generic6DOFJoint3D" parent="FullPlayerModel/eyeRight"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.18152256, 3.5244765, 0.48613304)
 node_a = NodePath("..")
-node_b = NodePath("../../pupilRight")
-linear_limit_x/upper_distance = 0.05
-linear_limit_x/lower_distance = -0.05
-linear_limit_y/upper_distance = 0.05
-linear_limit_y/lower_distance = -0.05
+node_b = NodePath("../pupilRight")
+linear_limit_x/upper_distance = 0.03
+linear_limit_x/lower_distance = -0.03
+linear_limit_x/restitution = 0.01
+linear_limit_y/upper_distance = 0.03
+linear_limit_y/lower_distance = -0.03
+linear_limit_y/restitution = 0.01
 angular_motor_x/enabled = true
 angular_motor_y/enabled = true
 angular_motor_z/enabled = true
 
-[node name="pupilLeft" type="RigidBody3D" parent="FullPlayerModel"]
+[node name="pupilRight" type="RigidBody3D" parent="FullPlayerModel/eyeRight"]
 collision_layer = 0
 collision_mask = 0
 axis_lock_linear_z = true
 axis_lock_angular_x = true
 axis_lock_angular_y = true
 axis_lock_angular_z = true
-mass = 0.1
+continuous_cd = true
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/pupilLeft"]
-extra_cull_margin = 2.0
-mesh = ExtResource("7_33s6o")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="FullPlayerModel/pupilLeft"]
-transform = Transform3D(1, -1.509958e-07, 1.509958e-07, 1.509958e-07, -4.371139e-08, -1, 1.509958e-07, 1, -4.3711367e-08, -0.185, 3.526, 0.487)
-shape = SubResource("CylinderShape3D_uwfgf")
-
-[node name="pupilRight" type="RigidBody3D" parent="FullPlayerModel"]
-collision_layer = 0
-collision_mask = 0
-axis_lock_linear_z = true
-axis_lock_angular_x = true
-axis_lock_angular_y = true
-axis_lock_angular_z = true
-mass = 0.1
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/pupilRight"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/eyeRight/pupilRight"]
 extra_cull_margin = 2.0
 mesh = ExtResource("6_uwfgf")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="FullPlayerModel/pupilRight"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FullPlayerModel/eyeRight/pupilRight"]
 transform = Transform3D(1, -1.509958e-07, 1.509958e-07, 1.509958e-07, -4.371139e-08, -1, 1.509958e-07, 1, -4.3711367e-08, 0.185, 3.526, 0.487)
 shape = SubResource("CylinderShape3D_33s6o")
 
