@@ -114,8 +114,6 @@ left_click={
 3d_physics/layer_3="player"
 3d_physics/layer_4="interact"
 3d_physics/layer_5="Item"
-3d_physics/layer_6="pupil"
-3d_physics/layer_7="eyeball"
 
 [physics]
 
