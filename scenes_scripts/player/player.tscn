@@ -180,11 +180,17 @@ linear_limit_x/upper_distance = 0.1
 linear_limit_x/lower_distance = -0.1
 linear_limit_y/upper_distance = 0.1
 linear_limit_y/lower_distance = -0.1
+angular_motor_x/enabled = true
+angular_motor_y/enabled = true
+angular_motor_z/enabled = true
 
 [node name="pupilLeft" type="RigidBody3D" parent="FullPlayerModel"]
 collision_layer = 0
 collision_mask = 0
-gravity_scale = 0.001
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+mass = 0.1
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/pupilLeft"]
 extra_cull_margin = 2.0
@@ -197,7 +203,10 @@ shape = SubResource("CylinderShape3D_uwfgf")
 [node name="pupilRight" type="RigidBody3D" parent="FullPlayerModel"]
 collision_layer = 0
 collision_mask = 0
-gravity_scale = 0.001
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+axis_lock_angular_z = true
+mass = 0.1
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/pupilRight"]
 extra_cull_margin = 2.0
