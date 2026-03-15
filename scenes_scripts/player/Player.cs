@@ -56,6 +56,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private MeshInstance3D _fullPlayerModelBody;
 	private MeshInstance3D _fullPlayerModelHead;
 	private MeshInstance3D _fullPlayerModelVest;
+	private MeshInstance3D _eyeBallLeft;
+	private MeshInstance3D _eyeBallRight;
+	private MeshInstance3D _pupilLeft;
+	private MeshInstance3D _pupilRight;
 
 	// Global variable for seat player is sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
@@ -122,6 +126,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_fullPlayerModelVest = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/life vest");
 		_localPlayerModel = GetNode<MeshInstance3D>("LocalPlayerModel/Armature/Skeleton3D/body");
 		_fullPlayerModel = GetNode<Node3D>("FullPlayerModel");
+		_eyeBallLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/eyeBallLeft");
+		_eyeBallRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/eyeBallRight");
+		_pupilLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilLeft");
+		_pupilRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilRight");
 
 		_interactRay = GetNode<RayCast3D>("Head/CameraContainer/Camera3D/InteractRay");
 
@@ -167,6 +175,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			_fullPlayerModelBody.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 			_fullPlayerModelHead.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 			_fullPlayerModelVest.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_eyeBallLeft.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_eyeBallRight.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_pupilLeft.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_pupilRight.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 
 			// the shadow of the local shoudn't be cast
 			_localPlayerModel.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
