@@ -227,7 +227,7 @@ void vertex() {
     float bump_fade = 1.0 - smoothstep(bumpy_distance_fade_start, bumpy_disntance_cutoff, v_vertex_xz_dist);
 
     // Apply the displacement, multiplied by the fade
-    VERTEX.y += centered_noise * bump_height; // Removed * bump_fade
+    VERTEX.y += centered_noise * bump_height * bump_fade;
 }
 
 ////////////////////////
