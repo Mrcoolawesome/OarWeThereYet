@@ -1,6 +1,5 @@
-[gd_scene load_steps=35 format=3 uid="uid://3e1j5wcifl2m"]
+[gd_scene load_steps=34 format=3 uid="uid://3e1j5wcifl2m"]
 
-[ext_resource type="PackedScene" uid="uid://dmth1b1qymst1" path="res://scenes_scripts/player/player.tscn" id="1_gspic"]
 [ext_resource type="Terrain3DMaterial" uid="uid://dawexow81k0tj" path="res://scenes_scripts/levels/stylized-map/terrain3d-materials/stylized-map.tres" id="1_jsj3l"]
 [ext_resource type="PackedScene" uid="uid://jtvihl2drglo" path="res://scenes_scripts/levels/stylized-map/grass/grass.tscn" id="2_6a22d"]
 [ext_resource type="Texture2D" uid="uid://2pl5j3hqrvty" path="res://art/textures/solid_color_texture.png" id="2_lnqtx"]
@@ -190,9 +189,6 @@ metadata/_edit_lock_ = true
 [node name="OccluderInstance3D" type="OccluderInstance3D" parent="Terrain3D"]
 visible = false
 occluder = SubResource("ArrayOccluder3D_dlybm")
-
-[node name="Player" parent="." instance=ExtResource("1_gspic")]
-transform = Transform3D(0.16876474, 0, -0.9856565, 0, 1, 0, 0.9856565, 0, 0.16876474, -20.078857, 1.0000305, 1354.8416)
 
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 7.5, 1387.26)

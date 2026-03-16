@@ -9,7 +9,7 @@ var LOBBY_NAME = "gaming"
 
 # player scene and test level scene
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
-var test_level_scene = preload("res://scenes_scripts/levels/demo_level.tscn")
+var level_scene = preload("res://scenes_scripts/levels/stylized-map/stylized-map.tscn")
 var level_name = "DemoLevel"
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
