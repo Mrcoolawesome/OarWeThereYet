@@ -51,6 +51,8 @@ public partial class GlobalSignalServer : Node
   public delegate void SaveGameEventHandler(int checkpointNum);
   [Signal]
   public delegate void LoadGameEventHandler();
+  [Signal]
+  public delegate void GoToMainMenuEventHandler();
 
   public int Health { get; set; }
 

@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://cqyahccxkl0t1"]
+
+[ext_resource type="QuadMesh" uid="uid://7jh6hogdc630" path="res://scenes_scripts/levels/stylized-map/grass/tall-dead-grass-mesh.tres" id="1_3r60f"]
+
+[node name="Grass" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = ExtResource("1_3r60f")

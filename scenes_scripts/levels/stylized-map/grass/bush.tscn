@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://s8dugh7p18xo"]
+
+[ext_resource type="ArrayMesh" uid="uid://bj33ceyhugr7f" path="res://scenes_scripts/levels/stylized-map/grass/bsuh-clump-mesh.res" id="1_f53lm"]
+
+[node name="Bush" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+mesh = ExtResource("1_f53lm")

@@ -32,8 +32,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// BOAT
 	private Boat _boat = new Boat();
 
-	//Pause Menu
-	private CanvasLayer _pauseUI;
+	//Pause Menu canvas
+	private CanvasLayer _pauseUICanvas;
+	// Pause menu ui
+	private Control _pauseUI;
 	// HUD
 	private CanvasLayer _hud;
 	// Inventory Menu
@@ -54,6 +56,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private MeshInstance3D _fullPlayerModelBody;
 	private MeshInstance3D _fullPlayerModelHead;
 	private MeshInstance3D _fullPlayerModelVest;
+	private MeshInstance3D _eyeBallLeft;
+	private MeshInstance3D _eyeBallRight;
+	private MeshInstance3D _pupilLeft;
+	private MeshInstance3D _pupilRight;
 
 	// Global variable for seat player is sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
@@ -78,7 +84,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	}
 
 	// Game state default is menu
-	private GameState _currGameState = GameState.Menu;
+	private GameState _currGameState = GameState.Playing;
 
 	// Player state default is standing
 	private PlayerState _currPlayerState = PlayerState.Standing;
@@ -110,7 +116,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_head = GetNode<Node3D>("Head");
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
-		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
+		_pauseUICanvas = GetNode<CanvasLayer>("PauseCanvas");
 		_boat = GetParent().GetNode<Boat>("Boat");
 		_hud = GetNode<CanvasLayer>("HUD");
 		_invUI = GetNode<InventoryUi>("InventoryUI");
@@ -119,6 +125,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_fullPlayerModelVest = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/life vest");
 		_localPlayerModel = GetNode<MeshInstance3D>("LocalPlayerModel/Armature/Skeleton3D/body");
 		_fullPlayerModel = GetNode<Node3D>("FullPlayerModel");
+		_eyeBallLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/eyeBallLeft");
+		_eyeBallRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/eyeBallRight");
+		_pupilLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilLeft");
+		_pupilRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilRight");
 
 		_interactRay = GetNode<RayCast3D>("Head/CameraContainer/Camera3D/InteractRay");
 
@@ -167,6 +177,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			_fullPlayerModelBody.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 			_fullPlayerModelHead.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 			_fullPlayerModelVest.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_eyeBallLeft.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_eyeBallRight.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_pupilLeft.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_pupilRight.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 
 			// the shadow of the local shoudn't be cast
 			_localPlayerModel.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
@@ -175,7 +189,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		else
 		{
 			// Delete UI
-			_pauseUI.QueueFree();
+			_pauseUICanvas.QueueFree();
 
 			// Delete the Camera for other players
 			if (camera != null)
@@ -221,7 +235,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	private void PlayingStateProcess()
 	{
-		_pauseUI.Visible = false;
+		_pauseUICanvas.Visible = false;
 		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		_interactRay.Enabled = true;
@@ -259,7 +273,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			return; // Skip menu UI updates since we just transitioned to Playing
 		}
 
-		if (!_invUI.isOpen()) { _pauseUI.Visible = true; };
+		if (!_invUI.isOpen()) { _pauseUICanvas.Visible = true; };
 		_hud.Visible = false;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
 		_interactRay.Enabled = false;
@@ -524,20 +538,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 	}
 
-	private void OnPauseUIExit()
-	{
-		// if they press exit button
-		if (_currGameState == GameState.Menu)
-		{
-			GetTree().Quit();
-		}
-	}
-
 	private void OnPauseUIRespawnPlayer()
 	{
 		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
 		// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
 		Position = new Vector3(_boat.Position.X, _boat.Position.Y + 2, _boat.Position.Z);
+
+		// put them into the playing state after that so the pause ui goes away
+		_currGameState = GameState.Playing;
 	}
 
 	//RPC Functions
@@ -605,6 +613,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 			// stop the rowing animation too
 			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
+
+			// get rid of their pause ui after that
+			_currGameState = GameState.Playing;
 		}
 	}
 
