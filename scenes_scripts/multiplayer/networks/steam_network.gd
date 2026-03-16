@@ -129,6 +129,21 @@ func _add_player_to_game(id: int):
 			
 			# Add the player as a child of the LOADED MAP
 			current_map.add_child(player, true) # that second boolean is important because it keeps the name of the player to be the one that we set for it
+
+			# Check if the player we just spawned is OUR local player
+	  if id == multiplayer.get_unique_id():
+		  # Grab the Terrain3D node from the map
+		  var terrain = current_map.get_node_or_null("Terrain3D")
+		  
+		  # Grab the Camera3D from the newly spawned player
+		  # NOTE: Change "Head/Camera3D" to your actual camera path!
+		  var local_camera = player.get_node_or_null("Head/Camera3D") 
+		  
+		  if terrain and local_camera:
+			  terrain.set_camera(local_camera)
+			  print("Successfully linked local camera to Terrain3D!")
+		  else:
+			  print("Could not link camera. Terrain or Camera node missing.")
 	else:
 			print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
 
