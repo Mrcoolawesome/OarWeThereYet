@@ -1,164 +1,96 @@
 using Godot;
 using Godot.Collections;
 using System;
+using Waterways;
 
 public partial class TestLevel : Node
 {
+	[Signal] public delegate void BoatReadyEventHandler();
+
+	[Export] public int SaveSlot = 0;
+	public bool IsBoatReady { get; private set; } = false;
 
 	// boat object 
-	private Boat _boat = new Boat();
+	[Export] private PackedScene BoatScene;
+	private Boat _boat;
+
+	// Items to serialize and save
+	private Inventory _inventory = new();
+	private ItemContainer _itemContainer = new();
+
+	// Game saves object and slot tracker
+	private GameSaves _gameSaves;
+
+	// Checkpoint container
+	private Node3D _checkpointContainer;
+
+	private RiverFloatSystem _river;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		// attach the reset function to the signal from the signal server script
-		GlobalSignalServer.Instance.ResetLevel += _InitateReset; // might be a problem to directly call an Rpc function
-		GlobalSignalServer.Instance.BoatDeath += _InitateReset;
+		_checkpointContainer = GetNode<Node3D>("CheckpointContainer");
+		_itemContainer = GetNode<ItemContainer>("ItemContainer");
 
-		// set the boat variable
-		_boat = GetNode<Boat>("Boat");
+		// load or create save slot
+		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
+		if (_gameSaves.CheckpointNum <= 0)
+			_gameSaves.CheckpointNum = 1;
+		
+		// attach the reset function to the signal from the signal server script
+		GlobalSignalServer.Instance.ResetLevel += LoadGame;
+		GlobalSignalServer.Instance.BoatDeath += LoadGame;
+
+		GlobalSignalServer.Instance.LoadGame += LoadGame;
+		GlobalSignalServer.Instance.SaveGame += SaveGame;
+
+		// Get river
+		_river = GetNode<RiverFloatSystem>("RiverManager/RiverFloatSystem");
+
+		// load and spawn boat
+		if (BoatScene == null)
+		{
+			GD.PushError("BoatScene is not assigned on TestLevel.");
+			return;
+		}
+
+		_boat = BoatScene.Instantiate<Boat>();
+		_boat.River = _river;
+		AddChild(_boat);
+		_inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
+
+		SetBoatSpawn();
+		_boat.Position = _boat.BoatResetPosition;
+		_boat.Rotation = _boat.BoatResetRotation;
+
+		IsBoatReady = true;
+		EmitSignal(SignalName.BoatReady);
+
+		if (Multiplayer.IsServer())
+			LoadGame();
+		
+		// Set boat spawn location
+		if (Multiplayer.IsServer())
+			SetBoatSpawn();
 
 		// late-joining clients ask the server for the current world state
 		if (!Multiplayer.IsServer())
-			RpcId(1, MethodName.RequestWorldState);
-	}
-
-	// ───────────────────────────────────────────────
-	// Late-join sync: world items + held items
-	// ───────────────────────────────────────────────
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
-	private void RequestWorldState()
-	{
-		if (!Multiplayer.IsServer()) return;
-		long senderId = Multiplayer.GetRemoteSenderId();
-
-		// --- Sync world items ---
-		var items = new Array<Dictionary<string, Variant>>();
-		CollectWorldItems(this, items);
-		RpcId(senderId, MethodName.ReceiveWorldItems, items);
-
-		// --- Sync held items for every player ---
-		foreach (Node player in GetTree().GetNodesInGroup("players"))
-		{
-			ArmNode arm = player.GetNode<ArmNode>("Head/ArmNode");
-			if (arm.Item != null)
-			{
-				RpcId(senderId, MethodName.ReceiveHeldItem,
-					player.Name.ToString(),
-					arm.Item.Data.ResourcePath,
-					arm.Item.Amount);
-			}
-		}
-	}
-
-	private void CollectWorldItems(Node parent, Array<Dictionary<string, Variant>> items)
-	{
-		foreach (Node child in parent.GetChildren())
-		{
-			if (child is UniversalInWorld item && item.Item != null)
-			{
-				items.Add(new Dictionary<string, Variant>
-				{
-					{ "name",  item.Name.ToString() },
-					{ "path",  item.Item.Data.ResourcePath },
-					{ "count", item.Item.Amount },
-					{ "pos_x", item.GlobalPosition.X },
-					{ "pos_y", item.GlobalPosition.Y },
-					{ "pos_z", item.GlobalPosition.Z },
-				});
-			}
-			else
-			{
-				// recurse into non-item children to find nested scene-placed items
-				CollectWorldItems(child, items);
-			}
-		}
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
-	private void ReceiveWorldItems(Array<Dictionary<string, Variant>> items)
-	{
-		// build a set of item names the server still has
-		var serverItemNames = new System.Collections.Generic.HashSet<string>();
-		foreach (Dictionary<string, Variant> data in items)
-			serverItemNames.Add((string)data["name"]);
-
-		// remove local items that no longer exist on the server (picked up)
-		RemoveMissingWorldItems(this, serverItemNames);
-
-		// collect names of items that already exist locally
-		var localItemNames = new System.Collections.Generic.HashSet<string>();
-		CollectLocalItemNames(this, localItemNames);
-
-		// spawn only items the client doesn't already have (dropped items)
-		PackedScene scene = GD.Load<PackedScene>(
-			"res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn");
-
-		foreach (Dictionary<string, Variant> data in items)
-		{
-			string itemName = (string)data["name"];
-			if (localItemNames.Contains(itemName)) continue;
-
-			UniversalInWorld node = scene.Instantiate<UniversalInWorld>();
-			node.Name = itemName;
-			node.ItemObject = GD.Load<InvItem>((string)data["path"]);
-			node.ItemCount = (int)data["count"];
-			node.Position = new Vector3(
-				(float)data["pos_x"],
-				(float)data["pos_y"],
-				(float)data["pos_z"]);
-			AddChild(node);
-		}
-	}
-
-	private void RemoveMissingWorldItems(Node parent, System.Collections.Generic.HashSet<string> serverItemNames)
-	{
-		foreach (Node child in parent.GetChildren())
-		{
-			if (child is UniversalInWorld)
-			{
-				if (!serverItemNames.Contains(child.Name.ToString()))
-					child.QueueFree();
-			}
-			else
-			{
-				RemoveMissingWorldItems(child, serverItemNames);
-			}
-		}
-	}
-
-	private void CollectLocalItemNames(Node parent, System.Collections.Generic.HashSet<string> names)
-	{
-		foreach (Node child in parent.GetChildren())
-		{
-			if (child is UniversalInWorld)
-				names.Add(child.Name.ToString());
-			else
-				CollectLocalItemNames(child, names);
-		}
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
-	private void ReceiveHeldItem(string playerId, string itemPath, int itemCount)
-	{
-		ArmNode arm = GetNodeOrNull<ArmNode>(playerId + "/Head/ArmNode");
-		arm?.SetItem(itemPath, itemCount);
+			GetNode<ItemContainer>("ItemContainer").RpcId(1, nameof(ItemContainer.RequestWorldState));
 	}
 
 	// ───────────────────────────────────────────────
 	// Reset
 	// ───────────────────────────────────────────────
 
-	private void _InitateReset()
+	private void InitateReset()
 	{
-		RpcId(1, MethodName._Reset);
+		RpcId(1, nameof(Reset));
 	}
 
 	// still only want the server to execute this stuff, so even though CallLocal is set to true this
 	// method should ONLY EVER BE ACCESSED BY THE SERVER - hence you must always use RpcId with an id of 1 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void _Reset()
+	private void Reset()
 	{
 		// extra check to make sure only the server can do this
 		if (!Multiplayer.IsServer()) return;
@@ -167,5 +99,106 @@ public partial class TestLevel : Node
 
 		// reset the players by calling the 'ResetToStart' function on all of them
 		GetTree().CallGroup("players", "Reset");
+	}
+
+	private void SetBoatSpawn()
+	{
+		Node3D boatSpawn = null;
+		Node3D fallbackBoatSpawn = null;
+		// Find the boat spawn node of current checkpoint
+		foreach (Checkpoint child in _checkpointContainer.GetChildren())
+		{
+			Node3D childBoatSpawn = child.GetNodeOrNull<Node3D>("BoatSpawn");
+			if (fallbackBoatSpawn == null && childBoatSpawn != null)
+				fallbackBoatSpawn = childBoatSpawn;
+
+			if (child.CheckpointNum == _gameSaves.CheckpointNum)
+			{
+				boatSpawn = childBoatSpawn;
+				break;
+			}
+		}
+
+		boatSpawn ??= fallbackBoatSpawn;
+		if (boatSpawn == null)
+		{
+			GD.PushError("No BoatSpawn node found under CheckpointContainer.");
+			return;
+		}
+
+		// Set BoatResetVector to that node
+		_boat.BoatResetPosition = boatSpawn.GlobalPosition;
+		_boat.BoatResetRotation = boatSpawn.GlobalRotation;
+	}
+
+	// ───────────────────────────────────────────────
+	// Saving and Loading Game
+	// ───────────────────────────────────────────────
+	private void SaveGame(int checkpointNum) 
+	{
+		if (!Multiplayer.IsServer()) return;
+
+		// Set new checkpoint
+		_gameSaves.CheckpointNum = checkpointNum;
+
+		// Set new boat spawn
+		SetBoatSpawn();
+
+		// Collect held items as world items positioned at the boat
+		var heldItems = new Array<Dictionary<string, Variant>>();
+		foreach (Node player in GetTree().GetNodesInGroup("players"))
+		{
+			ArmNode arm = player.GetNode<ArmNode>("Head/ArmNode");
+			if (arm.Item != null)
+			{
+				heldItems.Add(new Dictionary<string, Variant>
+				{
+					{ "name",  $"held_{player.Name}" },
+					{ "path",  arm.Item.Data.ResourcePath },
+					{ "count", arm.Item.Amount },
+					{ "pos_x", _boat.GlobalPosition.X },
+					{ "pos_y", _boat.GlobalPosition.Y + 1},
+					{ "pos_z", _boat.GlobalPosition.Z },
+				});
+			}
+		}
+
+		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, heldItems);
+	}
+
+	private void LoadGame()
+	{
+		if (!Multiplayer.IsServer()) return;
+		if (_boat == null || _inventory == null || _itemContainer == null || _gameSaves == null) return;
+
+		// Remove held items from players
+		foreach (Node player in GetTree().GetNodesInGroup("players"))
+		{
+			ArmNode arm = player.GetNode<ArmNode>("Head/ArmNode");
+			if (arm.Item != null)
+			{
+				arm.Rpc(nameof(arm.SetItem), "", 0);
+			}
+		}
+
+		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
+
+		// If brand new game
+		if (_gameSaves.CheckpointNum <= 0)
+		{
+			_gameSaves.CheckpointNum = 1;
+			SaveGame(1);
+		}
+
+		SetBoatSpawn();
+
+		_inventory.DeserializeInventory(_gameSaves.BoatInventory);
+		_itemContainer.ReceiveWorldItems(_gameSaves.WorldItems);
+
+		// Broadcast world items to all clients
+		_itemContainer.Rpc(ItemContainer.MethodName.ReceiveWorldItems, _gameSaves.WorldItems);
+
+		// Reset boat and players
+		InitateReset();
 	}
 }

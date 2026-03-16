@@ -9,6 +9,6 @@ public partial class Seat : StaticBody3D, Interactable
 
 	public void Interact(Player player)
 	{
-			player.SitInSeat(seatIndex);
+			player.RequestSitInSeat(seatIndex);
 	}
 }

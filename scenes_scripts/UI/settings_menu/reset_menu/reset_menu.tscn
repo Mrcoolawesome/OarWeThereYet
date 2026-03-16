@@ -38,5 +38,11 @@ layout_mode = 2
 theme = ExtResource("1_6nvit")
 text = "Respawn"
 
+[node name="SaveButton" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_6nvit")
+text = "Save"
+
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ResetGameButton" to="." method="_on_reset_game_button_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/RespawnPlayerButton" to="." method="_on_respawn_player_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]

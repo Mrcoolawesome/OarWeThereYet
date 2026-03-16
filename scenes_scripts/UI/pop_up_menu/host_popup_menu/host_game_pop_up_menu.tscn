@@ -11,7 +11,16 @@ script = ExtResource("2_lyev8")
 [node name="Header" parent="PanelContainer/VBoxContainer" index="0"]
 text = "Host A Game"
 
-[node name="CheckboxContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="1"]
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="1"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/MarginContainer" index="0"]
+layout_mode = 2
+theme = ExtResource("3_mhkqq")
+theme_type_variation = &"FlatButton"
+text = "Delete Save"
+
+[node name="CheckboxContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="2"]
 layout_mode = 2
 theme_override_constants/margin_left = 25
 theme_override_constants/margin_right = 25
@@ -35,7 +44,7 @@ theme = ExtResource("4_v2hjm")
 theme_override_constants/icon_max_width = 50
 icon_alignment = 2
 
-[node name="LobbyNameContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="2"]
+[node name="LobbyNameContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="3"]
 visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 25
@@ -57,7 +66,7 @@ placeholder_text = "Gaming"
 alignment = 1
 emoji_menu_enabled = false
 
-[node name="MarginContainer3" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="3"]
+[node name="MarginContainer3" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="4"]
 layout_mode = 2
 size_flags_vertical = 10
 
@@ -70,6 +79,7 @@ theme = ExtResource("3_mhkqq")
 theme_type_variation = &"FlatButton"
 text = "Host"
 
+[connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer/Button" to="." method="_delete_save_button_pressed"]
 [connection signal="toggled" from="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer/CheckBox" to="." method="on_check_box_toggled"]
 [connection signal="text_changed" from="PanelContainer/VBoxContainer/LobbyNameContainer/LineEdit" to="." method="on_line_edit_text_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer3/HostButton" to="." method="on_host_button_pressed"]

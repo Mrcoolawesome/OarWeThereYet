@@ -70,7 +70,9 @@ func _add_level():
 	# only add the level if the current instance is the server
 	if multiplayer.is_server():
 		# load the level
-		level_container.add_child(test_level_scene.instantiate())
+		var test_level = test_level_scene.instantiate()
+		test_level.set("SaveSlot", GlobalVariables.save_slot)
+		level_container.add_child(test_level)
 
 '''
 	this just prints their lobby id and then also sets the lobby metadata
@@ -116,6 +118,11 @@ func _add_player_to_game(id: int):
 			# Get the actual map node (the first child of the Level container)
 			var current_map = level_container.get_child(0)
 
+			# Ensure dynamic map setup (boat spawn, references, etc.) is done before adding players.
+			if current_map.has_method("get") and current_map.has_signal("BoatReady"):
+				if !current_map.get("IsBoatReady"):
+					await current_map.BoatReady
+
 			# instantiate a new player object
 			var player = player_scene.instantiate()
 			player.name = str(id) # set the name of the player to be their client id
@@ -136,6 +143,12 @@ func _remove_player(id : int):
 	var player_node = active_level.get_node_or_null(str(id))
 	
 	if player_node:
+		# Player drops item if they're holding it
+		var arm_node = player_node.get_node_or_null("Head/ArmNode")
+		if arm_node:
+			arm_node.DropItem(Vector3.ZERO)
+
+		# Free player
 		player_node.queue_free()
 	else:
 		print("Could not find player with ID: ", id)

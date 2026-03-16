@@ -71,7 +71,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	*/
 
 	// Player state machine. 
-	// TODO: I made this a state machine so that we could add swimming in the future
 	private enum PlayerState
 	{
 		Rowing,
@@ -155,6 +154,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// IsMultiplayerAuthority checks if the current client is the multiplayer authority of THIS current NODE 
 		if (IsMultiplayerAuthority())
 		{
+			// Spawn sitting in next available seat (only the authority should trigger this)
+			RequestSitInSeat(-1);
+
 			// Enable our camera
 			if (camera != null)
 			{
@@ -248,8 +250,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		switch(_currPlayerState)
 		{
 			case PlayerState.Standing:
+				_interactRay.Enabled = true;
 				break;
 			case PlayerState.Rowing:
+				_interactRay.Enabled = false;
 				RowingStateProcess();
 				break;
 		}
@@ -293,7 +297,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 1, 0); 
 
 			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
-			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
+			Rpc(MethodName.SetSitStandState, false, (int)_seat);
 
 			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 
@@ -519,14 +523,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_mouseMovementYaw = 0.0f;
 	}
 
-	public void SitInSeat(int seat)
-	{
-		_currPlayerState = PlayerState.Rowing;
-
-		// Broadcast sitting to true and update their seat
-		Rpc(nameof(Broadcast_SetSitStandState), true, seat);
-	}
-
 	//Signals recieved from Pause Menu UI
 	private void OnPauseUIResume()
 	{
@@ -553,10 +549,31 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	}
 
 	//RPC Functions
+	public void RequestSitInSeat(int seat)
+	{
+		RpcId(1, nameof(SitInSeat), seat);
+	}
+	
+	// If seat == -1, sit in next available seat
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void SitInSeat(int seat)
+	{
+		if (seat == -1) seat = _boat.NextAvailableSeat();
+		
+		if (_boat.IsSeatAvailable(seat))
+		{
+			// Broadcast sitting to true and update their seat
+			Rpc(nameof(SetSitStandState), true, seat);
+		}
+	}
+
 	// Makes sure that PlayerState changes is synced for everyone
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	public void Broadcast_SetSitStandState(bool isSitting, int seatIdx)
+	public void SetSitStandState(bool isSitting, int seatIdx)
 	{
+		// Broadcast occupied seat
+		_boat.OccupiedSeats[seatIdx] = isSitting;
+
 		// set the rowing state
 		_currPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
 		_seat = (Boat.SeatIndicies)seatIdx;
@@ -607,10 +624,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void SyncReset()
 	{
 		// Set the player into the standing state and reset their position and velocity
-		_currPlayerState = PlayerState.Standing;
-		Position = Vector3.Zero;
-		Rotation = Vector3.Zero;
-		Velocity = Vector3.Zero;
+		// _currPlayerState = PlayerState.Standing;
+		// Position = Vector3.Zero;
+		// Rotation = Vector3.Zero;
+		// Velocity = Vector3.Zero;
+
+		// Sit in boat which should be reset
+		if (IsMultiplayerAuthority())
+			RequestSitInSeat(-1);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]

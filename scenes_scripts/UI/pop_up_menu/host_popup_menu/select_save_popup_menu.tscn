@@ -1,0 +1,67 @@
+[gd_scene load_steps=4 format=3 uid="uid://bipyyrfm52tn2"]
+
+[ext_resource type="PackedScene" uid="uid://c6n6ct037x4n2" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.tscn" id="1_m5llw"]
+[ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="2_m5llw"]
+[ext_resource type="Script" uid="uid://e8wunmpgij61" path="res://scenes_scripts/UI/pop_up_menu/host_popup_menu/select_save_popup_menu.gd" id="2_o1e5o"]
+
+[node name="SelectSavePopupMenu" instance=ExtResource("1_m5llw")]
+script = ExtResource("2_o1e5o")
+
+[node name="PanelContainer" parent="." index="0"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -456.0
+offset_top = -422.5
+offset_right = 456.0
+offset_bottom = 422.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" parent="PanelContainer/VBoxContainer" index="0"]
+text = "Select Save"
+
+[node name="SaveContainer1" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="1"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer1" index="0"]
+layout_mode = 2
+theme = ExtResource("2_m5llw")
+theme_type_variation = &"FlatButton"
+text = "Save 1"
+
+[node name="SaveContainer2" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="2"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer2" index="0"]
+layout_mode = 2
+theme = ExtResource("2_m5llw")
+theme_type_variation = &"FlatButton"
+text = "Save 2"
+
+[node name="SaveContainer3" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="3"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer3" index="0"]
+layout_mode = 2
+theme = ExtResource("2_m5llw")
+theme_type_variation = &"FlatButton"
+text = "Save 3"
+
+[node name="ExitButton" parent="PanelContainer/ExitButtonControl" index="0"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -78.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 78.0
+grow_horizontal = 0
+
+[connection signal="pressed" from="PanelContainer/VBoxContainer/SaveContainer1/Button" to="." method="on_save_1_button_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/SaveContainer2/Button" to="." method="on_save_2_button_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/SaveContainer3/Button" to="." method="on_save_3_button_pressed"]

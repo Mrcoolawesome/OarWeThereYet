@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Godot;
 
 public partial class GlobalSignalServer : Node
@@ -45,6 +46,11 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void OpenInventoryEventHandler(int playerID);
 
+  // Saving and loading games
+  [Signal]
+  public delegate void SaveGameEventHandler(int checkpointNum);
+  [Signal]
+  public delegate void LoadGameEventHandler();
   [Signal]
   public delegate void GoToMainMenuEventHandler();
 
