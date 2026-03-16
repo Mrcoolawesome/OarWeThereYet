@@ -1,0 +1,23 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://cir6y7hc4lern"]
+
+[ext_resource type="Shader" uid="uid://c751qrcgsnms2" path="res://scenes_scripts/levels/stylized-map/grass/grass.gdshader" id="1_fho0x"]
+[ext_resource type="Texture2D" uid="uid://bou4d6h75i6b5" path="res://scenes_scripts/levels/stylized-map/grass/grass-and-wind-noise-texture.tres" id="2_kldut"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_fho0x")
+shader_parameter/scale_x = 0.8300000869250002
+shader_parameter/skew_amount_x = 2.0
+shader_parameter/stretch_g = 1.0
+shader_parameter/offset_o = 0.0
+shader_parameter/height_u = 1.0
+shader_parameter/top_pinch = 1.0
+shader_parameter/color = Color(0.21568628, 0.91764706, 0, 1)
+shader_parameter/color_bottom = Color(0, 0, 0, 1)
+shader_parameter/noise = ExtResource("2_kldut")
+shader_parameter/noise_scale = 20.0
+shader_parameter/gradient_strength = 1.2400000589
+shader_parameter/mesh_height = 1.085
+shader_parameter/wind_direction = Vector2(1, 0.5)
+shader_parameter/wind_speed = 0.03
+shader_parameter/wind_strength = 0.4

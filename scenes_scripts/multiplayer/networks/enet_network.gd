@@ -5,7 +5,7 @@ const SERVER_IP = "127.0.0.1"
 
 var multiplayer_peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
-var test_level_scene = preload("res://scenes_scripts/levels/demo_level.tscn")
+var level_scene = preload("res://scenes_scripts/levels/stylized-map/stylized-map.tscn")
 var level_name = "DemoLevel"
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
@@ -37,7 +37,7 @@ func _add_level():
 	# only add the level if the current instance is the server
 	if multiplayer.is_server():
 		# load the level
-		var test_level = test_level_scene.instantiate()
+		var test_level = level_scene.instantiate()
 		level_container.add_child(test_level)
 
 func _add_player_to_game(id: int):
