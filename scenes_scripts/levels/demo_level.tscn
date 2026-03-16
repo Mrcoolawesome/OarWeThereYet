@@ -1,9 +1,9 @@
-[gd_scene load_steps=31 format=3 uid="uid://bhjy2n3qwlbxi"]
+[gd_scene load_steps=34 format=3 uid="uid://bhjy2n3qwlbxi"]
 
 [ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes_scripts/levels/TestLevel.cs" id="1_rahni"]
 [ext_resource type="Script" uid="uid://d20js1b0dipxh" path="res://addons/waterways_net/RiverManager.cs" id="2_lih0g"]
-[ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="3_677m7"]
-[ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="4_dvlyx"]
+[ext_resource type="Texture2D" uid="uid://b85tlq8wcklbo" path="res://addons/waterways_net/Textures/water_normal_bump.png" id="3_r0jk7"]
+[ext_resource type="Script" uid="uid://b25tlgwpdg0rm" path="res://addons/waterways_net/Data/RiverShaderSettings.cs" id="4_y446i"]
 [ext_resource type="Script" uid="uid://dw3yrisbnd4me" path="res://addons/waterways_net/RiverFloatSystem.cs" id="5_1lt1y"]
 [ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes_scripts/boat/boat.tscn" id="6_t3n8c"]
 [ext_resource type="Texture2D" uid="uid://cah11bis1j2yl" path="res://art/textures/rocks16_alb_ht.dds" id="7_bindi"]
@@ -12,10 +12,13 @@
 [ext_resource type="Texture2D" uid="uid://dbifmkbrn7p4j" path="res://art/textures/Rocks002_nrm_rgh.dds" id="10_65fa2"]
 [ext_resource type="PackedScene" uid="uid://p1gq126hb7ur" path="res://scenes_scripts/environment/rock/rock.tscn" id="11_to0o3"]
 [ext_resource type="PackedScene" uid="uid://bspwtetc0fejm" path="res://art/models/fish.blend" id="12_phog2"]
-[ext_resource type="PackedScene" uid="uid://ce4hm33fw8if5" path="res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn" id="14_g7cjw"]
+[ext_resource type="PackedScene" uid="uid://bd31pb0t08ex2" path="res://scenes_scripts/item_container/item_container.tscn" id="14_g7cjw"]
 [ext_resource type="PackedScene" uid="uid://cywagagtgqt2c" path="res://scenes_scripts/beer/staticbeer.tscn" id="14_xhv4w"]
 [ext_resource type="Resource" uid="uid://kq6ftwk7tuff" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabe.tres" id="15_r0jk7"]
+[ext_resource type="PackedScene" uid="uid://ce4hm33fw8if5" path="res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn" id="15_y446i"]
 [ext_resource type="Resource" uid="uid://dnhur17ilku5e" path="res://scenes_scripts/inventory/items/itemResources/evil/evil.tres" id="16_r0jk7"]
+[ext_resource type="PackedScene" uid="uid://kwtfhiyv11ux" path="res://scenes_scripts/checkpoints/checkpoint_container.tscn" id="18_07cuj"]
+[ext_resource type="PackedScene" uid="uid://bg1o82hix6xue" path="res://scenes_scripts/checkpoints/Checkpoint.tscn" id="19_3ug7j"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_my7xx"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -30,35 +33,37 @@ sky = SubResource("Sky_to0o3")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Resource" id="Resource_r0jk7"]
-script = ExtResource("4_dvlyx")
+[sub_resource type="Resource" id="Resource_3ug7j"]
+script = ExtResource("4_y446i")
 MatShaderType = 1
-mat_albedo_color_first = Color(0.6, 0.7, 0.65, 1)
-mat_albedo_color_second = Color(0.25, 0.35, 0.35, 1)
+mat_albedo_color_first = Color(0.4390477, 0.810188, 0.99799937, 1)
+mat_albedo_color_second = Color(1.8770993e-06, 0.44420162, 0.57795244, 1)
 mat_albedo_depth = 10.0
 mat_albedo_depth_curve = 0.25
 mat_transparency_clarity = 10.0
 mat_transparency_depth_curve = 0.25
 mat_transparency_refraction = 0.05
 mat_normal_scale = 1.0
-mat_normal_bump_texture = ExtResource("3_677m7")
+mat_normal_bump_texture = ExtResource("3_r0jk7")
 mat_flow_speed = 1.0
 mat_flow_base = 0.0
 mat_flow_steepness = 2.0
 mat_flow_distance = 1.0
 mat_flow_pressure = 1.0
 mat_flow_max = 4.0
-mat_foam_color = Color(0.9, 0.9, 0.9, 1)
-mat_foam_amount = 2.0
+mat_foam_color = Color(1, 1, 1, 1)
+mat_foam_amount = 2.5550001213625
 mat_foam_steepness = 2.0
 mat_foam_smoothness = 0.3
+mat_custom_wave_height = 2.0
+mat_custom_noise_scale = 0.20000000624012
 mat_uv_scale = Vector3(1, 1, 1)
 mat_roughness = 0.2
 mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_y446i"]
+[sub_resource type="Curve3D" id="Curve3D_ynuke"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -149,6 +154,7 @@ texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_
 
 [node name="DemoLevel" type="Node"]
 script = ExtResource("1_rahni")
+BoatScene = ExtResource("6_t3n8c")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_phog2")
@@ -160,23 +166,15 @@ shadow_enabled = true
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 1, -3, -5)
 script = ExtResource("2_lih0g")
-ShaderSettings = SubResource("Resource_r0jk7")
+ShaderSettings = SubResource("Resource_3ug7j")
 PointWidths = Array[float]([9.738645, 11.79303, 17.322895, 14.258924, 19.230875, 19.230875, 19.230875, 19.230875, 27.431053, 34.830986, 27.622408, 24.90232, 34.700542, 27.715273, 35.96378, 37.959026, 60.54432, 161.6149, 69.5427])
-Curve = SubResource("Curve3D_y446i")
+Curve = SubResource("Curve3D_ynuke")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
 script = ExtResource("5_1lt1y")
 DefaultHeight = -1000.0
 metadata/_custom_type_script = "uid://dw3yrisbnd4me"
-
-[node name="Boat" parent="." node_paths=PackedStringArray("River") instance=ExtResource("6_t3n8c")]
-transform = Transform3D(-4.371138e-08, 0, -1, 0, 1, 0, 1, 0, -4.371138e-08, 0, -3, -8)
-River = NodePath("../RiverManager/RiverFloatSystem")
-RowForce = 200.0
-ImpactVelocityThreshold = 2.0
-BoatResetPosition = Vector3(0, -3, -8)
-BoatResetRotation = Vector3(0, -90, 0)
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://dmth1b1qymst1")
@@ -242,23 +240,50 @@ transform = Transform3D(1, 0, 0, 0, 0.8660254, -0.5, 0, 0.5, 0.8660254, 77, 0, -
 [node name="RigidBody3D7" parent="Beers" instance=ExtResource("14_xhv4w")]
 transform = Transform3D(-0.9659258, 0.12940957, 0.22414394, 0, 0.8660254, -0.5, -0.25881913, -0.4829629, -0.83651626, 77, 0, -87)
 
-[node name="UniversalInWorld" parent="." instance=ExtResource("14_g7cjw")]
+[node name="ItemContainer" parent="." instance=ExtResource("14_g7cjw")]
+
+[node name="UniversalInWorld" parent="ItemContainer" instance=ExtResource("15_y446i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2656013, 0, -1.9944173)
 ItemObject = ExtResource("15_r0jk7")
 
-[node name="UniversalInWorld2" parent="." instance=ExtResource("14_g7cjw")]
+[node name="UniversalInWorld2" parent="ItemContainer" instance=ExtResource("15_y446i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3296103, 5.9604645e-08, -2.2341666)
 ItemObject = ExtResource("15_r0jk7")
 
-[node name="UniversalInWorld3" parent="." instance=ExtResource("14_g7cjw")]
+[node name="UniversalInWorld3" parent="ItemContainer" instance=ExtResource("15_y446i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8938637, 0.86170286, -2.2341666)
 ItemObject = ExtResource("15_r0jk7")
 ItemCount = 2
 
-[node name="UniversalInWorld4" parent="." instance=ExtResource("14_g7cjw")]
+[node name="UniversalInWorld4" parent="ItemContainer" instance=ExtResource("15_y446i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.018359, 0.8617031, -0.75851583)
 ItemObject = ExtResource("16_r0jk7")
 
-[node name="UniversalInWorld5" parent="." instance=ExtResource("14_g7cjw")]
+[node name="UniversalInWorld5" parent="ItemContainer" instance=ExtResource("15_y446i")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6500218, 0.8617031, -2.5805192)
 ItemObject = ExtResource("16_r0jk7")
+
+[node name="CheckpointContainer" parent="." instance=ExtResource("18_07cuj")]
+
+[node name="Checkpoint" parent="CheckpointContainer" instance=ExtResource("19_3ug7j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -2.8846242, -1.4678168)
+CheckpointNum = 1
+
+[node name="BoatSpawn" parent="CheckpointContainer/Checkpoint" index="0"]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -0.35853958, -0.08834529, -7.152556)
+
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34823608, 0.9383545, -7.0703125)
+
+[node name="Checkpoint2" parent="CheckpointContainer" instance=ExtResource("19_3ug7j")]
+transform = Transform3D(0.8857098, 0, 0.46423927, 0, 1, 0, -0.46423927, 0, 0.8857098, 131.81424, -23.51991, -33.88759)
+CheckpointNum = 2
+
+[node name="BoatSpawn" parent="CheckpointContainer/Checkpoint2" index="0"]
+transform = Transform3D(-4.3711392e-08, 0, 1.0000001, 0, 1, 0, -1.0000001, 0, -4.3711392e-08, 7.584427, -0.5406704, -14.39253)
+
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint2" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4696198, 0.9383545, -7.340975)
+
+[editable path="CheckpointContainer/Checkpoint"]
+[editable path="CheckpointContainer/Checkpoint2"]

@@ -35,6 +35,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     // booleans to apply rowing force to specific spots on the boat
     private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
     private bool[] _rowingStatesDirection = new bool[4]; // direction of rowing: backward = false | forward = true
+    public bool[] OccupiedSeats = new bool[4];
 
     // boolean for checking if a reset is pending
     private bool _resetPending = false;
@@ -252,6 +253,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 		// set the player into the standing state and reset their position and velocity
 		_rowingStates = [false, false, false, false];
 
+        // Reset occupied seats
+        OccupiedSeats = [false, false, false, false];
+
         // reset the boat health
         _healthComponent.ResetHealth();
 
@@ -446,5 +450,20 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     {
         // allow for damage to be taken again
         _damageAllowed = true;
+    }
+
+    public int NextAvailableSeat()
+    {
+        for (int i = 0; i < OccupiedSeats.Length; i++)
+        {
+            if (!OccupiedSeats[i]) return i;
+        }
+
+        return -1;
+    }
+    
+    public bool IsSeatAvailable(int seat)
+    {
+        return !OccupiedSeats[seat];
     }
 }

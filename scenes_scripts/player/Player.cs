@@ -32,8 +32,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// BOAT
 	private Boat _boat = new Boat();
 
-	//Pause Menu
-	private CanvasLayer _pauseUI;
+	//Pause Menu canvas
+	private CanvasLayer _pauseUICanvas;
+	// Pause menu ui
+	private Control _pauseUI;
 	// HUD
 	private CanvasLayer _hud;
 	// Inventory Menu
@@ -54,6 +56,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private MeshInstance3D _fullPlayerModelBody;
 	private MeshInstance3D _fullPlayerModelHead;
 	private MeshInstance3D _fullPlayerModelVest;
+	private MeshInstance3D _eyeBallLeft;
+	private MeshInstance3D _eyeBallRight;
+	private MeshInstance3D _pupilLeft;
+	private MeshInstance3D _pupilRight;
 
 	// Global variable for seat player is sitting in
 	private Boat.SeatIndicies _seat = Boat.SeatIndicies.FrontLeft;
@@ -65,7 +71,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	*/
 
 	// Player state machine. 
-	// TODO: I made this a state machine so that we could add swimming in the future
 	private enum PlayerState
 	{
 		Rowing,
@@ -79,7 +84,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	}
 
 	// Game state default is menu
-	private GameState _currGameState = GameState.Menu;
+	private GameState _currGameState = GameState.Playing;
 
 	// Player state default is standing
 	private PlayerState _currPlayerState = PlayerState.Standing;
@@ -111,7 +116,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_head = GetNode<Node3D>("Head");
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
-		_pauseUI = GetNode<CanvasLayer>("PauseCanvas");
+		_pauseUICanvas = GetNode<CanvasLayer>("PauseCanvas");
 		_boat = GetParent().GetNode<Boat>("Boat");
 		_hud = GetNode<CanvasLayer>("HUD");
 		_invUI = GetNode<InventoryUi>("InventoryUI");
@@ -120,6 +125,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_fullPlayerModelVest = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/life vest");
 		_localPlayerModel = GetNode<MeshInstance3D>("LocalPlayerModel/Armature/Skeleton3D/body");
 		_fullPlayerModel = GetNode<Node3D>("FullPlayerModel");
+		_eyeBallLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/eyeBallLeft");
+		_eyeBallRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/eyeBallRight");
+		_pupilLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilLeft");
+		_pupilRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilRight");
 
 		_interactRay = GetNode<RayCast3D>("Head/CameraContainer/Camera3D/InteractRay");
 
@@ -145,6 +154,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// IsMultiplayerAuthority checks if the current client is the multiplayer authority of THIS current NODE 
 		if (IsMultiplayerAuthority())
 		{
+			// Spawn sitting in next available seat (only the authority should trigger this)
+			RequestSitInSeat(-1);
+
 			// Enable our camera
 			if (camera != null)
 			{
@@ -165,6 +177,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			_fullPlayerModelBody.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 			_fullPlayerModelHead.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 			_fullPlayerModelVest.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_eyeBallLeft.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_eyeBallRight.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_pupilLeft.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
+			_pupilRight.CastShadow = GeometryInstance3D.ShadowCastingSetting.ShadowsOnly;
 
 			// the shadow of the local shoudn't be cast
 			_localPlayerModel.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
@@ -173,7 +189,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		else
 		{
 			// Delete UI
-			_pauseUI.QueueFree();
+			_pauseUICanvas.QueueFree();
 
 			// Delete the Camera for other players
 			if (camera != null)
@@ -219,7 +235,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	private void PlayingStateProcess()
 	{
-		_pauseUI.Visible = false;
+		_pauseUICanvas.Visible = false;
 		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		_interactRay.Enabled = true;
@@ -234,8 +250,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		switch(_currPlayerState)
 		{
 			case PlayerState.Standing:
+				_interactRay.Enabled = true;
 				break;
 			case PlayerState.Rowing:
+				_interactRay.Enabled = false;
 				RowingStateProcess();
 				break;
 		}
@@ -255,7 +273,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			return; // Skip menu UI updates since we just transitioned to Playing
 		}
 
-		if (!_invUI.isOpen()) { _pauseUI.Visible = true; };
+		if (!_invUI.isOpen()) { _pauseUICanvas.Visible = true; };
 		_hud.Visible = false;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
 		_interactRay.Enabled = false;
@@ -279,7 +297,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 1, 0); 
 
 			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
-			Rpc(MethodName.Broadcast_SetSitStandState, false, (int)_seat);
+			Rpc(MethodName.SetSitStandState, false, (int)_seat);
 
 			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 
@@ -505,14 +523,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_mouseMovementYaw = 0.0f;
 	}
 
-	public void SitInSeat(int seat)
-	{
-		_currPlayerState = PlayerState.Rowing;
-
-		// Broadcast sitting to true and update their seat
-		Rpc(nameof(Broadcast_SetSitStandState), true, seat);
-	}
-
 	//Signals recieved from Pause Menu UI
 	private void OnPauseUIResume()
 	{
@@ -528,27 +538,42 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 	}
 
-	private void OnPauseUIExit()
-	{
-		// if they press exit button
-		if (_currGameState == GameState.Menu)
-		{
-			GetTree().Quit();
-		}
-	}
-
 	private void OnPauseUIRespawnPlayer()
 	{
 		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
 		// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
 		Position = new Vector3(_boat.Position.X, _boat.Position.Y + 2, _boat.Position.Z);
+
+		// put them into the playing state after that so the pause ui goes away
+		_currGameState = GameState.Playing;
 	}
 
 	//RPC Functions
+	public void RequestSitInSeat(int seat)
+	{
+		RpcId(1, nameof(SitInSeat), seat);
+	}
+	
+	// If seat == -1, sit in next available seat
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void SitInSeat(int seat)
+	{
+		if (seat == -1) seat = _boat.NextAvailableSeat();
+		
+		if (_boat.IsSeatAvailable(seat))
+		{
+			// Broadcast sitting to true and update their seat
+			Rpc(nameof(SetSitStandState), true, seat);
+		}
+	}
+
 	// Makes sure that PlayerState changes is synced for everyone
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	public void Broadcast_SetSitStandState(bool isSitting, int seatIdx)
+	public void SetSitStandState(bool isSitting, int seatIdx)
 	{
+		// Broadcast occupied seat
+		_boat.OccupiedSeats[seatIdx] = isSitting;
+
 		// set the rowing state
 		_currPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
 		_seat = (Boat.SeatIndicies)seatIdx;
@@ -588,6 +613,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 			// stop the rowing animation too
 			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
+
+			// get rid of their pause ui after that
+			_currGameState = GameState.Playing;
 		}
 	}
 
@@ -596,10 +624,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void SyncReset()
 	{
 		// Set the player into the standing state and reset their position and velocity
-		_currPlayerState = PlayerState.Standing;
-		Position = Vector3.Zero;
-		Rotation = Vector3.Zero;
-		Velocity = Vector3.Zero;
+		// _currPlayerState = PlayerState.Standing;
+		// Position = Vector3.Zero;
+		// Rotation = Vector3.Zero;
+		// Velocity = Vector3.Zero;
+
+		// Sit in boat which should be reset
+		if (IsMultiplayerAuthority())
+			RequestSitInSeat(-1);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]

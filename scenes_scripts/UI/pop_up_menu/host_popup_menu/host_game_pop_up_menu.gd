@@ -4,6 +4,8 @@ extends BasePopUpMenu
 var lobby_name: String = "gaming"
 var is_public: bool = false
 
+signal delete_save
+
 # We need to get the textbox container so we can hide and unhide it depending on if they made it public or not.
 # In GDScript, @onready is the cleanest way to grab nodes. It automatically fetches the node right before _ready() is called.
 @onready var _text_box_container: MarginContainer = $PanelContainer/VBoxContainer/LobbyNameContainer
@@ -21,6 +23,7 @@ func on_line_edit_text_changed(new_text: String) -> void:
 
 # Triggered when the HOST button is pressed
 func on_host_button_pressed() -> void:
+	# TODO: Host needs to tell level which save slot they want to use
 	if GlobalVariables.active_network_type == GlobalVariables.MULTIPLAYER_NETWORK_TYPE.STEAM:
 		# Emit via the global signal server
 		# Assuming GlobalSignalServer is set up as an Autoload (Singleton) in your project settings
@@ -28,3 +31,7 @@ func on_host_button_pressed() -> void:
 	else:
 		# For the ENet network
 		GlobalSignalServer.emit_signal("HostGameEnet")
+
+
+func _delete_save_button_pressed() -> void:
+	delete_save.emit()

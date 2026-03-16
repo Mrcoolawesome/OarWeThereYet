@@ -25,7 +25,24 @@ public partial class PauseUi : Control
 
 	private void OnExitButtonPressed()
 	{
-		EmitSignal(SignalName.Exit);
+		// tell the signal server to tell the game manager to kill the level put the main menu back
+		if (Multiplayer.IsServer())
+		{
+			// if they're the server then tell everyone to go to the main menu
+			Rpc(nameof(BroadcastCloseGame));
+		} 
+		else
+		{
+			// if they're not the server then just emit the goto menu signal locally
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
+		}
+	}
+
+	// this runs on everyone's machine so everybody goes to the main menu, only the server should be able to call this
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void BroadcastCloseGame()
+	{
+		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
 	}
 
 	private void OnSettingsButtonPressed()

@@ -8,7 +8,7 @@ extends Control
 @onready var resolution_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/ResolutionDropdown
 
 # the settings object
-var graphics_settings_prefrences: UserSettingPrefrences
+var settings_prefrences: UserSettingPrefrences
 
 # all the resolutions they're able to select
 var resolutions_array: Array[Vector2i] = [
@@ -35,7 +35,7 @@ var resolutions_array: Array[Vector2i] = [
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# load their settings to see what they already have saved
-	graphics_settings_prefrences = UserSettingPrefrences.load_or_create()
+	settings_prefrences = UserSettingPrefrences.load_or_create()
 
 	# update all the ui upon loading in
 	_load_ui_stuff()
@@ -44,7 +44,7 @@ func _load_ui_stuff() -> void:
 	# MSAA SLIDER
 	# set the number display to what they already have by default
 	# this is type casting to an int because the .msaa_mode value is an enum
-	var loaded_msaa_mode: float = int(graphics_settings_prefrences.msaa_mode) as float
+	var loaded_msaa_mode: float = int(settings_prefrences.msaa_mode) as float
 	_on_msaa_slider_slider_changed(loaded_msaa_mode) # this needs to be a float because that's what the function takes in due to that being what the slider emits
 	# then set the sliders default value as well so the grabber is in the right spot
 	msaa_slider.StartingValue = loaded_msaa_mode
@@ -52,7 +52,7 @@ func _load_ui_stuff() -> void:
 	# WINDOW MODE DROPDOWN
 	# set the screen mode dropdown default value
 	var default_item: int = 0
-	match graphics_settings_prefrences.display_mode:
+	match settings_prefrences.display_mode:
 		DisplayServer.WINDOW_MODE_FULLSCREEN:
 			default_item = 0
 		DisplayServer.WINDOW_MODE_MAXIMIZED:
@@ -63,14 +63,14 @@ func _load_ui_stuff() -> void:
 
 	# RESOLUTION DROPDOWN
 	# only display this if they've selected either windowed or fullscreen
-	if graphics_settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_FULLSCREEN ||\
-	graphics_settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_WINDOWED:
+	if settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_FULLSCREEN ||\
+	settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_WINDOWED:
 		resolution_dropdown.visible = true # make it visible
 		# load all the resolutions into the resolution dropdown
 		_load_all_resolutions()
 		# load the current resolution into the dropdown menu
 		# get the index of the resolution in the table, which will correlate to the index in the dropdown
-		resolution_dropdown.DefaultItem = resolutions_array.find(graphics_settings_prefrences.resolution)
+		resolution_dropdown.DefaultItem = resolutions_array.find(settings_prefrences.resolution)
 	else:
 		# make it invisible if they're not in a window mode that makes sense
 		resolution_dropdown.visible = false
@@ -78,7 +78,7 @@ func _load_ui_stuff() -> void:
 
 func _on_msaa_slider_slider_changed(new_value: float) -> void:
 	var converted_value: Viewport.MSAA = int(new_value) as Viewport.MSAA # get the value in terms of the MSAA enum
-	graphics_settings_prefrences.msaa_mode = converted_value # store the value in the temp settings object
+	settings_prefrences.msaa_mode = converted_value # store the value in the temp settings object
 
 	# set the display depending on the mode
 	var display_string: String = ""
@@ -112,26 +112,29 @@ func _on_screen_mode_dropdown_item_selected(item: int) -> void:
 			new_display_mode = DisplayServer.WINDOW_MODE_MAXIMIZED
 			borderless_enable = true
 			resolution_dropdown.visible = false
+			# set the display resolution to be the full resolution
+			settings_prefrences.resolution = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
 		2: 
 			new_display_mode = DisplayServer.WINDOW_MODE_WINDOWED
 			resolution_dropdown.visible = true
 
 	# apply everything to the prefrences object
-	graphics_settings_prefrences.display_mode = new_display_mode
-	graphics_settings_prefrences.display_flag = new_display_flag
-	graphics_settings_prefrences.borderless_enable = borderless_enable
+	settings_prefrences.display_mode = new_display_mode
+	settings_prefrences.display_flag = new_display_flag
+	settings_prefrences.borderless_enable = borderless_enable
 
 # settings are only applied when this button is pressed
 # TODO: have a confirm page that resets the settings to the previous values either if they choose to revert them, or if 15 sec has gone by without any input
-func _on_apply_settings_button_pressed() -> void:
+# this is ran by the parent settings script
+func apply_settings() -> void:
 	# just save and apply all the settings
-	graphics_settings_prefrences.save()
-	PrefrencesLoader.apply_graphics_settings(graphics_settings_prefrences)
+	settings_prefrences.save()
+	PrefrencesLoader.apply_graphics_settings(settings_prefrences)
 
 func _on_resolution_dropdown_item_selected(item: int) -> void:
 	# get the resoluiton and put it into the prefrences object
 	var new_resolution: Vector2i = resolutions_array[item]
-	graphics_settings_prefrences.resolution = new_resolution
+	settings_prefrences.resolution = new_resolution
 
 # function to pass in all the resolutions into the resolution selection dropdown
 func _load_all_resolutions() -> void:

@@ -7,15 +7,16 @@ extends Control
 @onready var host_game_menu: Control = $HostGamePopUpMenu
 @onready var join_menu_container: Control = $JoinGamePopUpMenu
 @onready var settings_menu_container: Control = $SettingsContainer
+@onready var select_save_menu: Control = $SelectSavePopupMenu
 
-enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU}
+enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU, SAVE_MENU}
 
 func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
 
 func _on_host_button_pressed() -> void:
 	# show the pop up menu and hide the main menu
-	_show_menu(MenuType.HOST_MENU)
+	_show_menu(MenuType.SAVE_MENU)
 
 func _on_join_button_pressed() -> void:
 	if GlobalVariables.active_network_type == GlobalVariables.MULTIPLAYER_NETWORK_TYPE.STEAM:
@@ -30,7 +31,7 @@ func _on_settings_button_pressed() -> void:
 
 func _on_host_pop_up_menu_go_back_button_pressed() -> void:
 	# hide the other menus and show the main menu
-	_show_menu(MenuType.MAIN_MENU)
+	_show_menu(MenuType.SAVE_MENU)
 
 func _on_join_game_pop_up_menu_go_back_button_pressed() -> void:
 	# hide the other menus and show the main menu
@@ -39,12 +40,22 @@ func _on_join_game_pop_up_menu_go_back_button_pressed() -> void:
 func _on_settings_menu_back_button_pressed() -> void:
 	_show_menu(MenuType.MAIN_MENU)
 
+func _on_select_save_menu_back_button_pressed() -> void:
+	_show_menu(MenuType.MAIN_MENU)
+
+func _on_select_save_button_pressed() -> void:
+	_show_menu(MenuType.HOST_MENU)
+
+func _on_select_save_popup_menu_deleted_save() -> void:
+	_show_menu(MenuType.SAVE_MENU)
+
 func _show_menu(menu: MenuType) -> void:
 	# make them all invisible except for one
 	join_menu_container.visible = false
 	host_game_menu.visible = false
 	main_menu_container.visible = false
 	settings_menu_container.visible = false
+	select_save_menu.visible = false
 
 	# make the specified menu visible
 	match menu:
@@ -56,3 +67,6 @@ func _show_menu(menu: MenuType) -> void:
 			settings_menu_container.visible = true
 		MenuType.MAIN_MENU:
 			main_menu_container.visible = true
+		MenuType.SAVE_MENU:
+			select_save_menu.visible = true
+

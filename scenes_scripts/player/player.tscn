@@ -1,10 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=14 format=3 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
 [ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="3_rgyib"]
 [ext_resource type="PackedScene" uid="uid://b2yilq5mplalt" path="res://art/models/character-local.blend" id="4_hg6s5"]
 [ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes_scripts/UI/pause_ui/pause_ui.tscn" id="5_8t03j"]
+[ext_resource type="Material" uid="uid://d0v5pv2hfg3nt" path="res://scenes_scripts/levels/stylized-map/misc-stuff/outline.tres" id="5_sfgrd"]
 [ext_resource type="PackedScene" uid="uid://dyjf8cl7dhrr5" path="res://scenes_scripts/UI/hud/hud.tscn" id="6_2ieo8"]
 [ext_resource type="Script" uid="uid://cmj52qja6qqii" path="res://scenes_scripts/player/ArmNode.cs" id="7_csk1d"]
 [ext_resource type="PackedScene" uid="uid://c5qyjwmlp4xyw" path="res://scenes_scripts/UI/inventory_UI/InventoryUI.tscn" id="8_a5pl4"]
@@ -54,18 +55,106 @@ Player = NodePath("../../../..")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39999998, -1.4)
 skeleton = NodePath("../..")
 script = ExtResource("7_csk1d")
-MaxThrowVelocity = 7.0
 
 [node name="AimLook" type="Node" parent="."]
 
 [node name="FullPlayerModel" parent="." instance=ExtResource("3_rgyib")]
-transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 0, -1, 0)
+transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 0, -1, 0.059278548)
+
+[node name="Armature" parent="FullPlayerModel" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.39621035e-08, 1.4612839, -0.09246683)
+
+[node name="body" parent="FullPlayerModel/Armature/Skeleton3D" index="0"]
+material_overlay = ExtResource("5_sfgrd")
+
+[node name="head" parent="FullPlayerModel/Armature/Skeleton3D" index="1"]
+material_overlay = ExtResource("5_sfgrd")
+
+[node name="HeadMovement" type="SpringBoneSimulator3D" parent="FullPlayerModel/Armature/Skeleton3D" index="3"]
+setting_count = 1
+settings/0/root_bone_name = "neck"
+settings/0/root_bone = 2
+settings/0/end_bone_name = "head_2"
+settings/0/end_bone = 3
+settings/0/extend_end_bone = false
+settings/0/center_from = 0
+settings/0/individual_config = false
+settings/0/rotation_axis = 3
+settings/0/radius/value = 0.02
+settings/0/radius/damping_curve = null
+settings/0/stiffness/value = 1.0
+settings/0/stiffness/damping_curve = null
+settings/0/drag/value = 1.5
+settings/0/drag/damping_curve = null
+settings/0/gravity/value = 0.0
+settings/0/gravity/damping_curve = null
+settings/0/gravity/direction = Vector3(0, -1, 0)
+settings/0/enable_all_child_collisions = true
+settings/0/exclude_collision_count = 0
+
+[node name="SpringBoneCollisionCapsule3D" type="SpringBoneCollisionCapsule3D" parent="FullPlayerModel/Armature/Skeleton3D/HeadMovement"]
+transform = Transform3D(1, 3.5527137e-14, -1.1368684e-13, -7.1054274e-15, 0.9999999, 8.940697e-08, 8.526513e-14, -2.9802322e-08, 0.9999998, 0, 1.3061922, 1.3411045e-07)
+bone_name = "head_2"
+bone = 3
+position_offset = Vector3(0, 0, 0)
+rotation_offset = Quaternion(0, 0, 0, 1)
+height = 0.59
+inside = true
+
+[node name="RightEyeJiggle" type="SpringBoneSimulator3D" parent="FullPlayerModel/Armature/Skeleton3D" index="4"]
+setting_count = 1
+settings/0/root_bone_name = "eyeBall.R"
+settings/0/root_bone = 5
+settings/0/end_bone_name = "eyeBall.R"
+settings/0/end_bone = 5
+settings/0/extend_end_bone = true
+settings/0/end_bone/direction = 6
+settings/0/end_bone/length = 1.0
+settings/0/center_from = 0
+settings/0/individual_config = false
+settings/0/rotation_axis = 3
+settings/0/radius/value = 0.0
+settings/0/radius/damping_curve = null
+settings/0/stiffness/value = 2.0
+settings/0/stiffness/damping_curve = null
+settings/0/drag/value = 0.1
+settings/0/drag/damping_curve = null
+settings/0/gravity/value = 0.0
+settings/0/gravity/damping_curve = null
+settings/0/gravity/direction = Vector3(0, -1, 0)
+settings/0/enable_all_child_collisions = true
+settings/0/exclude_collision_count = 0
+
+[node name="LeftEyeJiggle" type="SpringBoneSimulator3D" parent="FullPlayerModel/Armature/Skeleton3D" index="5"]
+setting_count = 1
+settings/0/root_bone_name = "eyeBall.L"
+settings/0/root_bone = 6
+settings/0/end_bone_name = "eyeBall.L"
+settings/0/end_bone = 6
+settings/0/extend_end_bone = true
+settings/0/end_bone/direction = 6
+settings/0/end_bone/length = 1.0
+settings/0/center_from = 0
+settings/0/individual_config = false
+settings/0/rotation_axis = 3
+settings/0/radius/value = 0.0
+settings/0/radius/damping_curve = null
+settings/0/stiffness/value = 2.0
+settings/0/stiffness/damping_curve = null
+settings/0/drag/value = 0.1
+settings/0/drag/damping_curve = null
+settings/0/gravity/value = 0.0
+settings/0/gravity/damping_curve = null
+settings/0/gravity/direction = Vector3(0, -1, 0)
+settings/0/enable_all_child_collisions = true
+settings/0/exclude_collision_count = 0
 
 [node name="LocalPlayerModel" parent="." instance=ExtResource("4_hg6s5")]
 transform = Transform3D(-0.5, 0, 4.371139e-08, 0, 0.5, 0, -4.371139e-08, 0, -0.5, 0, -1, 0)
 visible = false
 
 [node name="PauseCanvas" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="PauseUI" parent="PauseCanvas" instance=ExtResource("5_8t03j")]
 
@@ -83,8 +172,6 @@ bus = &"Voice Chat"
 doppler_tracking = 1
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
-[connection signal="Exit" from="PauseCanvas/PauseUI" to="." method="OnPauseUIExit"]
-[connection signal="RespawnPlayer" from="PauseCanvas/PauseUI" to="." method="OnPauseUIRespawnPlayer"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]
 
 [editable path="FullPlayerModel"]
