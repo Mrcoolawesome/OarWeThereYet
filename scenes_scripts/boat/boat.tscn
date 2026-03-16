@@ -82,7 +82,7 @@ FloatForce = 40.0
 RiverSpeed = 35.0
 WaterDrag = 15.0
 RowForce = 200.0
-ImpactVelocityThreshold = 2.0
+ImpactVelocityThreshold = 15.0
 ImpactDamage = 15
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
