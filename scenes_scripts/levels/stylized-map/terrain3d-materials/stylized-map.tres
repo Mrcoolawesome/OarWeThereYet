@@ -1,27 +1,11 @@
-[gd_resource type="Terrain3DMaterial" load_steps=6 format=3 uid="uid://dawexow81k0tj"]
+[gd_resource type="Terrain3DMaterial" load_steps=5 format=3 uid="uid://dawexow81k0tj"]
 
 [ext_resource type="Texture2D" uid="uid://f4ber6k7l5jc" path="res://scenes_scripts/levels/stylized-map/map-bumpy-noise-texture.tres" id="1_28iyc"]
 
-[sub_resource type="Gradient" id="Gradient_xqopx"]
-offsets = PackedFloat32Array(0.2, 1)
-colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
-
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_28iyc"]
-noise_type = 2
-frequency = 0.03
-cellular_jitter = 3.0
-cellular_return_type = 0
-domain_warp_enabled = true
-domain_warp_type = 1
-domain_warp_amplitude = 50.0
-domain_warp_fractal_type = 2
-domain_warp_fractal_lacunarity = 1.5
-domain_warp_fractal_gain = 1.0
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ldm8g"]
 noise = SubResource("FastNoiseLite_28iyc")
-color_ramp = SubResource("Gradient_xqopx")
-seamless = true
 
 [sub_resource type="Shader" id="Shader_gspic"]
 code = "shader_type spatial;
@@ -683,6 +667,5 @@ _shader_parameters = {
 &"shadow_color": Color(0.15, 0.15, 0.25, 1),
 &"shadow_softness": 1.0
 }
-world_background = 0
 shader_override_enabled = true
 shader_override = SubResource("Shader_gspic")
