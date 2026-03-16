@@ -34,7 +34,7 @@ tonemap_mode = 2
 glow_enabled = true
 
 [sub_resource type="Resource" id="Resource_3ug7j"]
-script = ExtResource("4_dvlyx")
+script = ExtResource("4_y446i")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.4390477, 0.810188, 0.99799937, 1)
 mat_albedo_color_second = Color(1.8770993e-06, 0.44420162, 0.57795244, 1)
@@ -55,7 +55,6 @@ mat_foam_color = Color(1, 1, 1, 1)
 mat_foam_amount = 2.5550001213625
 mat_foam_steepness = 2.0
 mat_foam_smoothness = 0.3
-mat_custom_noise_map = SubResource("NoiseTexture2D_y446i")
 mat_custom_wave_height = 2.0
 mat_custom_noise_scale = 0.20000000624012
 mat_uv_scale = Vector3(1, 1, 1)

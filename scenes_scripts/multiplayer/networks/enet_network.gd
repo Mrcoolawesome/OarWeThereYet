@@ -37,7 +37,7 @@ func _add_level():
 	# only add the level if the current instance is the server
 	if multiplayer.is_server():
 		# load the level
-		var test_level = test_level_scene.instantiate()
+		var test_level = level_scene.instantiate()
 		test_level.set("SaveSlot", GlobalVariables.save_slot)
 		level_container.add_child(test_level)
 
