@@ -136,8 +136,8 @@ func _add_player_to_game(id: int):
       var terrain = current_map.get_node_or_null("Terrain3D")
       
       # Grab the Camera3D from the newly spawned player
-      # NOTE: Change "Head/Camera3D" to your actual camera path!
-      var local_camera = player.get_node_or_null("Head/Camera3D") 
+      var camera_path = str(id) + "/Head/CameraContainer/Camera3D"
+      var local_camera = current_map.get_node_or_null(camera_path)
       
       if terrain and local_camera:
         terrain.set_camera(local_camera)
