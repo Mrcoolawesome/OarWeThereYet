@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bjv00w6bq2d0b"]
 
-[ext_resource type="ArrayMesh" uid="uid://ynrawfy6l0tc" path="res://scenes_scripts/levels/stylized-map/grass/grass-clump-mesh.res" id="1_pk1ka"]
+[ext_resource type="ArrayMesh" uid="uid://iatiw4a77uqq" path="res://scenes_scripts/levels/stylized-map/grass/grass-clump-mesh.res" id="1_pk1ka"]
 
 [node name="BetterGrass" type="Node3D"]
 
