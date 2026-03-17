@@ -56,7 +56,10 @@ public partial class ArmNode : MeshInstance3D
 			if (Input.IsActionJustPressed("left_click") && Item?.Data?.UseAction != null)
 			{
 				Player player = GetParent().GetParent<Player>();
-				Item.Data.UseAction.Use(player, this);
+				if (player.CurrGameState == Player.GameState.Playing)
+				{
+					Item.Data.UseAction.Use(player, this);
+				}
 			}
 		}
 	}

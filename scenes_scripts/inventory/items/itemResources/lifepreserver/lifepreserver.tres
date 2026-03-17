@@ -1,9 +1,14 @@
-[gd_resource type="Resource" script_class="InvItem" load_steps=5 format=3 uid="uid://dpd6e10b0dpbb"]
+[gd_resource type="Resource" script_class="InvItem" load_steps=7 format=3 uid="uid://dpd6e10b0dpbb"]
 
 [ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_44cwy"]
 [ext_resource type="Texture2D" uid="uid://dhv6rqnsgaabd" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeTexture.jpg" id="1_l7j2i"]
 [ext_resource type="Shape3D" uid="uid://fds5owncpngu" path="res://scenes_scripts/inventory/items/itemResources/lifepreserver/lifepreserverCollider.tres" id="1_qqu17"]
 [ext_resource type="ArrayMesh" uid="uid://n06eruf6x2or" path="res://scenes_scripts/inventory/items/itemResources/lifepreserver/lifepreserverMesh.tres" id="2_l7j2i"]
+[ext_resource type="Script" uid="uid://dsqe67fldaapb" path="res://scenes_scripts/inventory/items/itemResources/lifepreserver/Lifepreserver.cs" id="4_oeyvb"]
+
+[sub_resource type="Resource" id="Resource_kvra8"]
+script = ExtResource("4_oeyvb")
+metadata/_custom_type_script = "uid://dsqe67fldaapb"
 
 [resource]
 script = ExtResource("1_44cwy")
@@ -11,4 +16,5 @@ Name = "Life Preserver"
 Icon = ExtResource("1_l7j2i")
 ItemMesh = ExtResource("2_l7j2i")
 ItemCollider = ExtResource("1_qqu17")
+UseAction = SubResource("Resource_kvra8")
 metadata/_custom_type_script = "uid://5qqoau1yt53x"
