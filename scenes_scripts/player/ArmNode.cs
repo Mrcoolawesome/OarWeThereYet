@@ -4,6 +4,7 @@ using System;
 public partial class ArmNode : MeshInstance3D
 {
 	[Export] public float MaxThrowVelocity = 7.0f;
+	[Export] public float LifepreserverThrowVelocity = 10.0f;
 
 	public InvSlot Item { get; set; }
 	private static int _dropCounter = 0;
@@ -129,7 +130,7 @@ public partial class ArmNode : MeshInstance3D
 			launchDirection = player != null ? -player.GlobalTransform.Basis.Z : -GlobalTransform.Basis.Z;
 		}
 
-		Vector3 launchVelocity = launchDirection * MaxThrowVelocity + platformVelocity;
+		Vector3 launchVelocity = launchDirection * LifepreserverThrowVelocity + platformVelocity;
 		string uniqueName = $"LifepreserverThrown_{senderId}_{_dropCounter++}";
 
 		Rpc(nameof(SpawnThrownLifepreserver), Item.Data.ResourcePath, GlobalPosition, uniqueName, launchVelocity);
