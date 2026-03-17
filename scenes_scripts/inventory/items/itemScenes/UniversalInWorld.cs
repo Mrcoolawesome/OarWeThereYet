@@ -43,9 +43,9 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void ItemPickup()
   {
-    // Get player and their arm
     int playerID = Multiplayer.GetRemoteSenderId();
-    ArmNode playerArm = GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
+    ArmNode playerArm = GetPlayerArm(playerID);
+    if (playerArm == null) return;
 
     string itemPath = Item.Data.ResourcePath;
 
@@ -81,6 +81,15 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
       // Delete item in world
       Rpc(nameof(DeleteItem));
     }
+  }
+
+  private ArmNode GetPlayerArm(int playerID)
+  {
+    // UniversalInWorld is expected under Level/ItemContainer, so walk to Level first.
+    Node levelNode = GetParent()?.GetParent();
+    if (levelNode == null) return null;
+
+    return levelNode.GetNodeOrNull<ArmNode>(playerID + "/Head/ArmNode");
   }
 
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]

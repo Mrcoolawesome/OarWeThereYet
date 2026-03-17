@@ -111,6 +111,10 @@ public partial class ArmNode : MeshInstance3D
 		// cause path resolution errors in the multiplayer cache
 		inWorldNode.GetNodeOrNull("MultiplayerSynchronizer")?.QueueFree();
 
-		GetNode("/root/GameManager/Level/DemoLevel/ItemContainer").AddChild(inWorldNode);
+		Node levelNode = GetParent()?.GetParent()?.GetParent();
+		Node itemContainer = levelNode?.GetNodeOrNull("ItemContainer");
+		if (itemContainer == null) return;
+
+		itemContainer.AddChild(inWorldNode);
 	}
 }

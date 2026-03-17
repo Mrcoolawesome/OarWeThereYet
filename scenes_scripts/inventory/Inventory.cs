@@ -101,7 +101,16 @@ public partial class Inventory : Node
   private ArmNode GetPlayerArm()
   {
     int playerID = Multiplayer.GetRemoteSenderId();
-    return GetNode<ArmNode>("/root/GameManager/Level/DemoLevel/" + playerID + "/Head/ArmNode");
+
+    foreach (Node node in GetTree().GetNodesInGroup("players"))
+    {
+      if (node.Name == playerID.ToString())
+      {
+        return node.GetNodeOrNull<ArmNode>("Head/ArmNode");
+      }
+    }
+
+    return null;
   }
 
   private void SyncPlayerHand(ArmNode playerArm, InvSlot slot)
@@ -122,6 +131,7 @@ public partial class Inventory : Node
     if (slot < 0 || slot >= Capacity) return;
 
     ArmNode playerArm = GetPlayerArm();
+    if (playerArm == null) return;
     InvSlot playerSlot = playerArm.Item;
     InvSlot invSlot = Slots[slot];
 
@@ -167,6 +177,7 @@ public partial class Inventory : Node
   private void StoreHeldItem()
   {
     ArmNode playerArm = GetPlayerArm();
+    if (playerArm == null) return;
     InvSlot playerSlot = playerArm.Item;
 
     if (playerSlot == null || playerSlot.IsEmpty()) return;
