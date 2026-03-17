@@ -17,7 +17,6 @@
 [ext_resource type="PackedScene" uid="uid://bchwofjewsivn" path="res://scenes_scripts/boat/boat.tscn" id="10_bvt7m"]
 [ext_resource type="PackedScene" uid="uid://bd31pb0t08ex2" path="res://scenes_scripts/item_container/item_container.tscn" id="14_sfwft"]
 [ext_resource type="PackedScene" uid="uid://kwtfhiyv11ux" path="res://scenes_scripts/checkpoints/checkpoint_container.tscn" id="15_fjq28"]
-[ext_resource type="PackedScene" uid="uid://ce4hm33fw8if5" path="res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn" id="15_sfwft"]
 [ext_resource type="PackedScene" uid="uid://bg1o82hix6xue" path="res://scenes_scripts/checkpoints/Checkpoint.tscn" id="16_0b6ne"]
 [ext_resource type="PackedScene" uid="uid://buqw2lg62mn3i" path="res://scenes_scripts/environment/rock/silver-rock.tscn" id="19_0b6ne"]
 
@@ -246,15 +245,10 @@ metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 
 [node name="ItemContainer" parent="." instance=ExtResource("14_sfwft")]
 
-[node name="UniversalInWorld" parent="ItemContainer" instance=ExtResource("15_sfwft")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2741833, 0.4086495, 1375.0374)
-ItemObject = ExtResource("16_fjq28")
-
 [node name="CheckpointContainer" parent="." instance=ExtResource("15_fjq28")]
 
 [node name="Checkpoint" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.835167, 0, 1374.0201)
-CheckpointNum = 1
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint" index="0"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -664,4 +658,3 @@ transform = Transform3D(2.6644144, 0.21977083, -1.2470336, 0.23171775, 2.7715461
 transform = Transform3D(-0.98645806, 0, -0.16401458, 0, 1, 0, 0.16401458, 0, -0.98645806, 2322.2988, -85.08689, 202.26582)
 
 [editable path="CheckpointContainer/Checkpoint"]
-[editable path="CheckpointContainer/Checkpoint2"]
