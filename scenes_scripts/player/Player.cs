@@ -542,7 +542,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
 		// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
-		Position = new Vector3(_boat.Position.X, _boat.Position.Y + 2, _boat.Position.Z);
+		RequestSitInSeat(-1);
 
 		// put them into the playing state after that so the pause ui goes away
 		_currGameState = GameState.Playing;
