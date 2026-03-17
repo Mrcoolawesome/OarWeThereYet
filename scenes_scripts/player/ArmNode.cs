@@ -7,6 +7,7 @@ public partial class ArmNode : MeshInstance3D
 
 	public InvSlot Item { get; set; }
 	private static int _dropCounter = 0;
+	private string _activeLifepreserverNodeName = "";
 
 	// Used to compute the arm's velocity from frame-to-frame position changes
 	private Vector3 _previousGlobalPosition;
@@ -67,6 +68,13 @@ public partial class ArmNode : MeshInstance3D
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void SetItem(string itemPath, int itemCount)
 	{
+		string currentItemPath = Item?.Data?.ResourcePath ?? "";
+		if (Multiplayer.IsServer() && currentItemPath != itemPath && !string.IsNullOrEmpty(_activeLifepreserverNodeName))
+		{
+			Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNodeName);
+			Rpc(nameof(SetActiveLifepreserverNodeName), "");
+		}
+
 		if (string.IsNullOrEmpty(itemPath))
 		{
 			Item = null;
@@ -75,6 +83,63 @@ public partial class ArmNode : MeshInstance3D
 		{
 			Item = new InvSlot(GD.Load<InvItem>(itemPath), itemCount);
 		}
+	}
+
+	public void RequestToggleLifepreserverThrow(Vector3 throwDirection)
+	{
+		if (!IsMultiplayerAuthority()) return;
+		RpcId(1, MethodName.ToggleLifepreserverThrow, throwDirection);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void ToggleLifepreserverThrow(Vector3 throwDirection)
+	{
+		if (!Multiplayer.IsServer()) return;
+
+		int senderId = Multiplayer.GetRemoteSenderId();
+		if (senderId == 0)
+		{
+			senderId = Multiplayer.GetUniqueId();
+		}
+
+		Node playerNode = GetParent()?.GetParent();
+		if (playerNode == null || playerNode.Name.ToString() != senderId.ToString()) return;
+		if (Item?.Data == null) return;
+		if (Item.Data.UseAction is not Lifepreserver) return;
+
+		Node itemContainer = GetItemContainerNode();
+		if (itemContainer == null) return;
+
+		if (!string.IsNullOrEmpty(_activeLifepreserverNodeName))
+		{
+			if (itemContainer.GetNodeOrNull(_activeLifepreserverNodeName) != null)
+			{
+				Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNodeName);
+			}
+
+			Rpc(nameof(SetActiveLifepreserverNodeName), "");
+			return;
+		}
+
+		CharacterBody3D player = playerNode as CharacterBody3D;
+		Vector3 platformVelocity = player?.GetPlatformVelocity() ?? Vector3.Zero;
+		Vector3 launchDirection = throwDirection.Normalized();
+		if (launchDirection == Vector3.Zero)
+		{
+			launchDirection = player != null ? -player.GlobalTransform.Basis.Z : -GlobalTransform.Basis.Z;
+		}
+
+		Vector3 launchVelocity = launchDirection * MaxThrowVelocity + platformVelocity;
+		string uniqueName = $"LifepreserverThrown_{senderId}_{_dropCounter++}";
+
+		Rpc(nameof(SpawnThrownLifepreserver), Item.Data.ResourcePath, GlobalPosition, uniqueName, launchVelocity);
+		Rpc(nameof(SetActiveLifepreserverNodeName), uniqueName);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void SetActiveLifepreserverNodeName(string nodeName)
+	{
+		_activeLifepreserverNodeName = nodeName;
 	}
 
 	private void RequestDropItem(Vector3 dropVelocity)
@@ -87,6 +152,12 @@ public partial class ArmNode : MeshInstance3D
 	{
 		if (Item != null)
 		{
+			if (!string.IsNullOrEmpty(_activeLifepreserverNodeName))
+			{
+				Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNodeName);
+				Rpc(nameof(SetActiveLifepreserverNodeName), "");
+			}
+
 			string itemPath = Item.Data.ResourcePath;
 			int itemCount = Item.Amount;
 			Vector3 dropPosition = GlobalPosition;
@@ -114,10 +185,47 @@ public partial class ArmNode : MeshInstance3D
 		// cause path resolution errors in the multiplayer cache
 		inWorldNode.GetNodeOrNull("MultiplayerSynchronizer")?.QueueFree();
 
-		Node levelNode = GetParent()?.GetParent()?.GetParent();
-		Node itemContainer = levelNode?.GetNodeOrNull("ItemContainer");
+		Node itemContainer = GetItemContainerNode();
 		if (itemContainer == null) return;
 
 		itemContainer.AddChild(inWorldNode);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void SpawnThrownLifepreserver(string itemPath, Vector3 position, string nodeName, Vector3 launchVelocity)
+	{
+		PackedScene inWorldScene = GD.Load<PackedScene>("res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn");
+		UniversalInWorld inWorldNode = inWorldScene.Instantiate<UniversalInWorld>();
+
+		inWorldNode.Name = nodeName;
+		inWorldNode.ItemObject = GD.Load<InvItem>(itemPath);
+		inWorldNode.ItemCount = 1;
+		inWorldNode.Position = position;
+		inWorldNode.LinearVelocity = launchVelocity;
+		inWorldNode.CanBePickedUp = false;
+
+		inWorldNode.GetNodeOrNull("MultiplayerSynchronizer")?.QueueFree();
+
+		Node itemContainer = GetItemContainerNode();
+		if (itemContainer == null) return;
+
+		if (itemContainer.GetNodeOrNull(nodeName) != null) return;
+		itemContainer.AddChild(inWorldNode);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void DeleteWorldItemByName(string nodeName)
+	{
+		if (string.IsNullOrEmpty(nodeName)) return;
+
+		Node itemContainer = GetItemContainerNode();
+		Node itemNode = itemContainer?.GetNodeOrNull(nodeName);
+		itemNode?.QueueFree();
+	}
+
+	private Node GetItemContainerNode()
+	{
+		Node levelNode = GetParent()?.GetParent()?.GetParent();
+		return levelNode?.GetNodeOrNull("ItemContainer");
 	}
 }

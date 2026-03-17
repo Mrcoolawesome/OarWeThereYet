@@ -5,6 +5,7 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 {
   [Export] public InvItem ItemObject { get; set; }
   [Export] public int ItemCount { get; set; } = 1;
+  [Export] public bool CanBePickedUp { get; set; } = true;
   public InvSlot Item { get; set; }
   public string PromptMessage { get; set; } = "Pick Up";
   public string PromptInput { get; set; } = "action_key";
@@ -27,11 +28,12 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   public override void _Process(double delta)
   {
     if (Item == null) return;
-    PromptMessage = "Pick Up (" + Item.Amount + ")";
+    PromptMessage = CanBePickedUp ? "Pick Up (" + Item.Amount + ")" : "";
   }
 
   public void Interact(Player player)
   {
+    if (!CanBePickedUp) return;
     RequestItemPickup();
   }
 
