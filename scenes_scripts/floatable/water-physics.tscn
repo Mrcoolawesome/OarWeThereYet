@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5od8jurojwbs"]
+
+[ext_resource type="Script" uid="uid://bjf16rpixhys4" path="res://scenes_scripts/floatable/WaterPhysics.cs" id="1_8ifid"]
+
+[node name="WaterPhysics" type="Node3D"]
+script = ExtResource("1_8ifid")

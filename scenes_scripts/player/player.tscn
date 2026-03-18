@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=16 format=3 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dyjf8cl7dhrr5" path="res://scenes_scripts/UI/hud/hud.tscn" id="6_2ieo8"]
 [ext_resource type="Script" uid="uid://cmj52qja6qqii" path="res://scenes_scripts/player/ArmNode.cs" id="7_csk1d"]
 [ext_resource type="PackedScene" uid="uid://c5qyjwmlp4xyw" path="res://scenes_scripts/UI/inventory_UI/InventoryUI.tscn" id="8_a5pl4"]
+[ext_resource type="PackedScene" uid="uid://c5od8jurojwbs" path="res://scenes_scripts/floatable/water-physics.tscn" id="10_qjplb"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
 properties/0/path = NodePath(".:State")
@@ -37,6 +38,8 @@ script = ExtResource("1_g6k8r")
 MouseSens = 0.5
 LerpSpeed = 5.0
 CrouchLerpSpeed = 7.5
+Mass = 1.0
+RiverSpeed = 300.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_qhqgy")
@@ -184,8 +187,17 @@ attenuation_model = 2
 bus = &"Voice Chat"
 doppler_tracking = 1
 
+[node name="WaterPhysics" parent="." node_paths=PackedStringArray("ProbeContainer") instance=ExtResource("10_qjplb")]
+ProbeContainer = NodePath("../ProbeContainer")
+
+[node name="ProbeContainer" type="Node3D" parent="."]
+
+[node name="Marker3D" type="Marker3D" parent="ProbeContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]
+[connection signal="ApplyWaterForce" from="WaterPhysics" to="." method="QueueApplyWaterPhysicsForce"]
 
 [editable path="FullPlayerModel"]
 [editable path="LocalPlayerModel"]
