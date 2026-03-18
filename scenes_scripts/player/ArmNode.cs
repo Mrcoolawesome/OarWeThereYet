@@ -72,6 +72,9 @@ public partial class ArmNode : MeshInstance3D
 
 	public override void _PhysicsProcess(double delta)
 	{
+		// Host authoritative simulation: clients only render replicated state.
+		if (!Multiplayer.IsServer()) return;
+
 		UniversalInWorld activeLifepreserver = GetActiveLifepreserverNode();
 		if (activeLifepreserver == null) return;
 
@@ -88,6 +91,21 @@ public partial class ArmNode : MeshInstance3D
 
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
 		}
+
+		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNodeName, activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void SyncWorldItemState(string nodeName, Vector3 globalPosition, Vector3 linearVelocity)
+	{
+		if (string.IsNullOrEmpty(nodeName)) return;
+
+		Node itemContainer = GetItemContainerNode();
+		UniversalInWorld itemNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
+		if (itemNode == null) return;
+
+		itemNode.GlobalPosition = globalPosition;
+		itemNode.LinearVelocity = linearVelocity;
 	}
 
 
