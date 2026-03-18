@@ -355,12 +355,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			// always set the state array as often as possible AS THE CLIENT
 			SetStateArray();
 
-			if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Standing)
+			if (_currPlayerState == PlayerState.Standing)
 			{
 				StandingStatePhysicsProcess(delta);
 				CrouchSprintPhysicsProcess(delta);
 			} 
-			else if (_currGameState == GameState.Playing && _currPlayerState == PlayerState.Rowing)
+			else if (_currPlayerState == PlayerState.Rowing)
 			{
 				RowingStatePhysicsProcess();
 			}
