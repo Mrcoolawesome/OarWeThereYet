@@ -6,6 +6,8 @@ public partial class ArmNode : MeshInstance3D
 	[Export] public float MaxThrowVelocity = 7.0f;
 	[Export] public float LifepreserverThrowVelocity = 10.0f;
 	[Export] public float MaxLifepreserverRange = 10.0f;
+	[Export] public float PullStrength = 0.1f;
+	[Export] public float RetractThreshold = 0.5f;
 
 	public InvSlot Item { get; set; }
 	private static int _dropCounter = 0;
@@ -59,12 +61,25 @@ public partial class ArmNode : MeshInstance3D
 				RequestDropItem(throwVelocity + platformVelocity);
 			}
 
-			if (Input.IsActionJustPressed("left_click") && Item?.Data?.UseAction != null)
+			if (Input.IsActionPressed("left_click"))
 			{
-				Player player = GetParent().GetParent<Player>();
-				if (player.CurrGameState == Player.GameState.Playing)
+				// If preserver is active, hold left_click to pull it closer continuously
+				if (!string.IsNullOrEmpty(_activeLifepreserverNodeName))
 				{
-					Item.Data.UseAction.Use(player, this);
+					RequestPullLifepreserver();
+				}
+			}
+
+			if (Input.IsActionJustPressed("left_click"))
+			{
+				// If no preserver is active, use the item on fresh click
+				if (string.IsNullOrEmpty(_activeLifepreserverNodeName) && Item?.Data?.UseAction != null)
+				{
+					Player player = GetParent().GetParent<Player>();
+					if (player.CurrGameState == Player.GameState.Playing)
+					{
+						Item.Data.UseAction.Use(player, this);
+					}
 				}
 			}
 		}
@@ -80,6 +95,7 @@ public partial class ArmNode : MeshInstance3D
 
 		float distance = GlobalPosition.DistanceTo(activeLifepreserver.GlobalPosition);
 
+		// Apply auto-pull toward arm when range is exceeded
 		if (distance >= _currLifepreserverRange)
 		{
 			Vector3 directionToArm = activeLifepreserver.GlobalPosition.DirectionTo(GlobalPosition);
@@ -133,6 +149,26 @@ public partial class ArmNode : MeshInstance3D
 	{
 		if (!IsMultiplayerAuthority()) return;
 		RpcId(1, MethodName.ToggleLifepreserverThrow, throwDirection);
+	}
+
+	private void RequestPullLifepreserver()
+	{
+		if (!IsMultiplayerAuthority()) return;
+		RpcId(1, MethodName.PullLifepreserver);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void PullLifepreserver()
+	{
+		if (!Multiplayer.IsServer()) return;
+		if (string.IsNullOrEmpty(_activeLifepreserverNodeName)) return;
+
+		_currLifepreserverRange -= PullStrength;
+
+		if (_currLifepreserverRange <= RetractThreshold)
+		{
+			RetractLifepreserver();
+		}
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -300,5 +336,25 @@ public partial class ArmNode : MeshInstance3D
 
 		// Keep platform motion in the pull-back velocity so behavior matches throw motion.
 		return player.Velocity + player.GetPlatformVelocity();
+	}
+
+	private void RetractLifepreserver()
+	{
+		UniversalInWorld activePreserver = GetActiveLifepreserverNode();
+		if (activePreserver == null) return;
+
+		// Store the item info before deletion
+		InvItem itemObject = activePreserver.ItemObject;
+		int itemCount = activePreserver.ItemCount;
+
+		// Delete the preserver from the world and clear active state
+		Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNodeName);
+		Rpc(nameof(SetActiveLifepreserverNodeName), "");
+
+		// Return the item to the player's hand
+		if (itemObject != null)
+		{
+			Rpc(nameof(SetItem), itemObject.ResourcePath, itemCount);
+		}
 	}
 }
