@@ -45,23 +45,24 @@ func _add_player_to_game(id: int):
 	# this is where we have to add them properly to the level	
 	# the Level container should always be there, just need to check if it has a level actually loaded (as a child) in it
 	if level_container.get_child_count() > 0:
-			# Get the actual map node (the first child of the Level container)
-			var current_map = level_container.get_child(0)
+		# Get the actual map node (the first child of the Level container)
+		var current_map = level_container.get_child(0)
 
-			# Ensure dynamic map setup (boat spawn, references, etc.) is done before adding players.
-			if current_map.has_method("get") and current_map.has_signal("BoatReady"):
-				if !current_map.get("IsBoatReady"):
-					await current_map.BoatReady
+		# Ensure dynamic map setup (boat spawn, references, etc.) is done before adding players.
+		if current_map.has_method("get") and current_map.has_signal("BoatReady"):
+			if !current_map.get("IsBoatReady"):
+				await current_map.BoatReady
 
-			# instantiate a new player object
-			var player = player_scene.instantiate()
-			player.name = str(id) # set the name of the player to be their client id
-			
-			# Add the player as a child of the LOADED MAP
-			current_map.add_child(player, true) # that second boolean is important because it keeps the name of the player to be the one that we set for it
+		# instantiate a new player object
+		var player = player_scene.instantiate()
+		player.name = str(id) # set the name of the player to be their client id
+		
+		# Add the player as a child of the LOADED MAP
+		current_map.add_child(player, true) # that second boolean is important because it keeps the name of the player to be the one that we set for it
+		
+		# assign the camera to the player for the terrain3d addon
+		rpc_id(id, "_assign_camera", id)
 
-			# assign the camera to the player for the terrain3d addon
-			rpc_id(id, "_assign_camera", id)
 	else:
 			print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
 
