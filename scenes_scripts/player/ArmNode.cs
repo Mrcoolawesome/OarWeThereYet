@@ -5,6 +5,7 @@ public partial class ArmNode : MeshInstance3D
 {
 	[Export] public float MaxThrowVelocity = 7.0f;
 	[Export] public float LifepreserverThrowVelocity = 10.0f;
+	[Export] public float MaxLifepreserverRange = 10.0f;
 
 	public InvSlot Item { get; set; }
 	private static int _dropCounter = 0;
@@ -13,6 +14,9 @@ public partial class ArmNode : MeshInstance3D
 	// Used to compute the arm's velocity from frame-to-frame position changes
 	private Vector3 _previousGlobalPosition;
 	private Vector3 _armVelocity;
+
+	// Current range of life preserver
+	private float _currLifepreserverRange = 0.0f;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -66,6 +70,27 @@ public partial class ArmNode : MeshInstance3D
 		}
 	}
 
+	public override void _PhysicsProcess(double delta)
+	{
+		UniversalInWorld activeLifepreserver = GetActiveLifepreserverNode();
+		if (activeLifepreserver == null) return;
+
+		float distance = GlobalPosition.DistanceTo(activeLifepreserver.GlobalPosition);
+
+		if (distance >= _currLifepreserverRange)
+		{
+			Vector3 directionToArm = activeLifepreserver.GlobalPosition.DirectionTo(GlobalPosition);
+			Vector3 carrierVelocity = GetCarrierVelocity();
+
+			const float pullSpeed = 14.0f;
+			const float pullBlend = 8.0f;
+			Vector3 desiredVelocity = directionToArm * pullSpeed + carrierVelocity;
+
+			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
+		}
+	}
+
+
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void SetItem(string itemPath, int itemCount)
 	{
@@ -104,6 +129,7 @@ public partial class ArmNode : MeshInstance3D
 			senderId = Multiplayer.GetUniqueId();
 		}
 
+		// Validate ownership and item type before touching world state.
 		Node playerNode = GetParent()?.GetParent();
 		if (playerNode == null || playerNode.Name.ToString() != senderId.ToString()) return;
 		if (Item?.Data == null) return;
@@ -112,6 +138,7 @@ public partial class ArmNode : MeshInstance3D
 		Node itemContainer = GetItemContainerNode();
 		if (itemContainer == null) return;
 
+		// Toggle-off path: if one is already active, delete it and clear active state.
 		if (!string.IsNullOrEmpty(_activeLifepreserverNodeName))
 		{
 			if (itemContainer.GetNodeOrNull(_activeLifepreserverNodeName) != null)
@@ -123,17 +150,24 @@ public partial class ArmNode : MeshInstance3D
 			return;
 		}
 
+		// Toggle-on path: 
+		// Set current range to max
+		_currLifepreserverRange = MaxLifepreserverRange;
+
+		// Compute launch velocity from aim direction plus platform movement.
 		CharacterBody3D player = playerNode as CharacterBody3D;
 		Vector3 platformVelocity = player?.GetPlatformVelocity() ?? Vector3.Zero;
 		Vector3 launchDirection = throwDirection.Normalized();
 		if (launchDirection == Vector3.Zero)
 		{
+			// Fall back to forward-facing direction if no aim vector was provided.
 			launchDirection = player != null ? -player.GlobalTransform.Basis.Z : -GlobalTransform.Basis.Z;
 		}
 
 		Vector3 launchVelocity = launchDirection * LifepreserverThrowVelocity + platformVelocity;
 		string uniqueName = $"LifepreserverThrown_{senderId}_{_dropCounter++}";
 
+		// Spawn on all peers and store the active node name so the next toggle can retract it.
 		Rpc(nameof(SpawnThrownLifepreserver), Item.Data.ResourcePath, GlobalPosition, uniqueName, launchVelocity);
 		Rpc(nameof(SetActiveLifepreserverNodeName), uniqueName);
 	}
@@ -229,5 +263,24 @@ public partial class ArmNode : MeshInstance3D
 	{
 		Node levelNode = GetParent()?.GetParent()?.GetParent();
 		return levelNode?.GetNodeOrNull("ItemContainer");
+	}
+
+	private UniversalInWorld GetActiveLifepreserverNode()
+	{
+		if (string.IsNullOrEmpty(_activeLifepreserverNodeName)) return null;
+
+		Node itemContainer = GetItemContainerNode();
+		if (itemContainer == null) return null;
+
+		return itemContainer.GetNodeOrNull<UniversalInWorld>(_activeLifepreserverNodeName);
+	}
+
+	private Vector3 GetCarrierVelocity()
+	{
+		CharacterBody3D player = GetParent()?.GetParent<CharacterBody3D>();
+		if (player == null) return _armVelocity;
+
+		// Keep platform motion in the pull-back velocity so behavior matches throw motion.
+		return player.Velocity + player.GetPlatformVelocity();
 	}
 }
