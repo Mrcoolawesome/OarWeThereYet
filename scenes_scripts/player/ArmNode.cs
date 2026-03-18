@@ -98,6 +98,7 @@ public partial class ArmNode : MeshInstance3D
 		if (!Multiplayer.IsServer()) return;
 
 		int senderId = Multiplayer.GetRemoteSenderId();
+		// Get id of sender if sender is the host
 		if (senderId == 0)
 		{
 			senderId = Multiplayer.GetUniqueId();
