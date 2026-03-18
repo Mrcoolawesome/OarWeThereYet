@@ -7,6 +7,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Exported variables
 	[Export] public float JumpVelocity = 4.5f;
 	[Export] public float WalkingSpeed = 5.0f;
+	[Export] public float SwimmingSpeed = 1.0f;
 	[Export] public float SprintSpeed = 8.0f;
 	[Export] public float CrouchingSpeed = 3.0f;
 	[Export] public float AirSpeed = 3.0f;
@@ -465,7 +466,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			velocity.X = _direction.X * _currSpeed;
 			velocity.Z = _direction.Z * _currSpeed;
 		} 
-		else if (!IsOnFloor() || !_applyWaterPhysicsForce)
+		else
 		{
 			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
 			velocity.X = _direction.X * _currSpeed + _initialVelocity.X;
@@ -539,12 +540,18 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		if (_applyWaterPhysicsForce)
 		{
+			// set the movement speed
+			_currSpeed = SwimmingSpeed;
 			// Calculate acceleration: a = F/m
 			Vector3 waterAcceleration = _waterPhysicsForce / Mass;
 			// Add the acceleration to the velocity over time
 			Velocity += waterAcceleration * (float)delta;
 			// set _applyWaterPhysicsForce back to false
 			_applyWaterPhysicsForce = false;
+		} else
+		{
+			// otherwise set the speed to the regular walkign speed
+			_currSpeed = WalkingSpeed;
 		}
 	}
 
