@@ -64,7 +64,7 @@ func _add_player_to_game(id: int):
 		rpc_id(id, "_assign_camera", id)
 
 	else:
-			print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
+		print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
 
 @rpc("authority", "reliable")
 func _assign_camera(id: int) -> void:

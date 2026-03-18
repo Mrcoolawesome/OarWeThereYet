@@ -12,6 +12,7 @@ public partial class ArmNode : MeshInstance3D
 	public InvSlot Item { get; set; }
 	private static int _dropCounter = 0;
 	private string _activeLifepreserverNodeName = "";
+	private string _capturedPlayerNodeName = "";
 
 	// Used to compute the arm's velocity from frame-to-frame position changes
 	private Vector3 _previousGlobalPosition;
@@ -106,6 +107,11 @@ public partial class ArmNode : MeshInstance3D
 			Vector3 desiredVelocity = directionToArm * pullSpeed + carrierVelocity;
 
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
+		}
+
+		if (_capturedPlayerNodeName != null) 
+		{
+			GD.Print(_capturedPlayerNodeName);
 		}
 
 		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNodeName, activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity);
@@ -230,6 +236,11 @@ public partial class ArmNode : MeshInstance3D
 	private void SetActiveLifepreserverNodeName(string nodeName)
 	{
 		_activeLifepreserverNodeName = nodeName;
+
+		if (string.IsNullOrEmpty(nodeName))
+		{
+			_capturedPlayerNodeName = "";
+		}
 	}
 
 	private void RequestDropItem(Vector3 dropVelocity)
@@ -293,6 +304,13 @@ public partial class ArmNode : MeshInstance3D
 		inWorldNode.Position = position;
 		inWorldNode.LinearVelocity = launchVelocity;
 		inWorldNode.CanBePickedUp = false;
+		inWorldNode.ContactMonitor = true;
+		inWorldNode.MaxContactsReported = 4;
+
+		if (Multiplayer.IsServer())
+		{
+			inWorldNode.BodyEntered += OnLifepreserverBodyEntered;
+		}
 
 		inWorldNode.GetNodeOrNull("MultiplayerSynchronizer")?.QueueFree();
 
@@ -301,6 +319,18 @@ public partial class ArmNode : MeshInstance3D
 
 		if (itemContainer.GetNodeOrNull(nodeName) != null) return;
 		itemContainer.AddChild(inWorldNode);
+	}
+
+	private void OnLifepreserverBodyEntered(Node body)
+	{
+		if (!Multiplayer.IsServer()) return;
+		if (string.IsNullOrEmpty(_activeLifepreserverNodeName)) return;
+		if (!string.IsNullOrEmpty(_capturedPlayerNodeName)) return;
+
+		if (body is not Player hitPlayer) return;
+		if (!hitPlayer.IsInGroup("players")) return;
+
+		_capturedPlayerNodeName = hitPlayer.Name;
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -327,6 +357,15 @@ public partial class ArmNode : MeshInstance3D
 		if (itemContainer == null) return null;
 
 		return itemContainer.GetNodeOrNull<UniversalInWorld>(_activeLifepreserverNodeName);
+	}
+
+	private Player GetCapturedPlayerNode()
+	{
+		if (string.IsNullOrEmpty(_capturedPlayerNodeName)) return null;
+
+		Node levelNode = GetParent()?.GetParent()?.GetParent();
+
+		return levelNode.GetNodeOrNull<Player>(_capturedPlayerNodeName);
 	}
 
 	private Vector3 GetCarrierVelocity()
