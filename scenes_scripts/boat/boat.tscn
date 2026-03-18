@@ -91,10 +91,15 @@ FloatForce = 40.0
 RiverSpeed = 35.0
 WaterDrag = 15.0
 RowForce = 200.0
-ImpactVelocityThreshold = 3.0
+ImpactVelocityThreshold = 5.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_0063d")
+
+[node name="DamageDelayTimer" type="Timer" parent="."]
+process_callback = 0
+wait_time = 3.0
+one_shot = true
 
 [node name="BoatFloatProbesContainer" type="Node3D" parent="."]
 
@@ -234,10 +239,6 @@ script = ExtResource("4_s60o4")
 
 [node name="OarsContainer" parent="." instance=ExtResource("4_li7rg")]
 transform = Transform3D(-1, 0, 8.742277e-08, 0, 1, 0, -8.742277e-08, 0, -1, 0, 1, 0)
-
-[node name="DamageDelayTimer" type="Timer" parent="."]
-process_callback = 0
-one_shot = true
 
 [connection signal="delta_synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="timeout" from="DamageDelayTimer" to="." method="DamageTimerEnded"]
