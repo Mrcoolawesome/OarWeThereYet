@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=4 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=19 format=4 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scenes_scripts/boat/Boat.cs" id="1_vvssr"]
 [ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scenes_scripts/boat/seat/Seat.cs" id="2_kgk83"]
@@ -17,8 +17,17 @@ properties/1/replication_mode = 2
 [sub_resource type="BoxMesh" id="BoxMesh_0063d"]
 size = Vector3(1, 0.25, 1)
 
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_0063d"]
-data = PackedVector3Array(-0.5, 0.125, 0.5, 0.5, 0.125, 0.5, -0.5, -0.125, 0.5, 0.5, 0.125, 0.5, 0.5, -0.125, 0.5, -0.5, -0.125, 0.5, 0.5, 0.125, -0.5, -0.5, 0.125, -0.5, 0.5, -0.125, -0.5, -0.5, 0.125, -0.5, -0.5, -0.125, -0.5, 0.5, -0.125, -0.5, 0.5, 0.125, 0.5, 0.5, 0.125, -0.5, 0.5, -0.125, 0.5, 0.5, 0.125, -0.5, 0.5, -0.125, -0.5, 0.5, -0.125, 0.5, -0.5, 0.125, -0.5, -0.5, 0.125, 0.5, -0.5, -0.125, -0.5, -0.5, 0.125, 0.5, -0.5, -0.125, 0.5, -0.5, -0.125, -0.5, 0.5, 0.125, 0.5, -0.5, 0.125, 0.5, 0.5, 0.125, -0.5, -0.5, 0.125, 0.5, -0.5, 0.125, -0.5, 0.5, 0.125, -0.5, -0.5, -0.125, 0.5, 0.5, -0.125, 0.5, -0.5, -0.125, -0.5, 0.5, -0.125, 0.5, 0.5, -0.125, -0.5, -0.5, -0.125, -0.5)
+[sub_resource type="BoxShape3D" id="BoxShape3D_s60o4"]
+size = Vector3(1, 0.25, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8vmau"]
+size = Vector3(1, 0.25, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_45odv"]
+size = Vector3(1, 0.25, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3b5xp"]
+size = Vector3(1, 0.25, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xqws5"]
 resource_name = "Material"
@@ -83,7 +92,7 @@ RiverSpeed = 35.0
 WaterDrag = 15.0
 RowForce = 200.0
 ImpactVelocityThreshold = 15.0
-ImpactDamage = 15
+ImpactDamage = 4
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_0063d")
@@ -127,19 +136,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2.5)
 
 [node name="FrontLeftCollision" type="StaticBody3D" parent="SeatContainer"]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.9999999, 1, 1.5)
-collision_layer = 2
+collision_layer = 8
 collision_mask = 0
 script = ExtResource("2_kgk83")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontLeftCollision"]
 mesh = SubResource("BoxMesh_0063d")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatContainer/FrontLeftCollision"]
-shape = SubResource("ConcavePolygonShape3D_0063d")
+[node name="FrontLeftSeatCollision" type="CollisionShape3D" parent="SeatContainer/FrontLeftCollision"]
+shape = SubResource("BoxShape3D_s60o4")
 
 [node name="FrontRightCollision" type="StaticBody3D" parent="SeatContainer"]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -2, 1, -1.5)
-collision_layer = 2
+collision_layer = 8
 collision_mask = 0
 script = ExtResource("2_kgk83")
 seatIndex = 1
@@ -147,12 +156,12 @@ seatIndex = 1
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontRightCollision"]
 mesh = SubResource("BoxMesh_0063d")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatContainer/FrontRightCollision"]
-shape = SubResource("ConcavePolygonShape3D_0063d")
+[node name="FrontRightSeatCollision" type="CollisionShape3D" parent="SeatContainer/FrontRightCollision"]
+shape = SubResource("BoxShape3D_8vmau")
 
 [node name="BackLeftCollision" type="StaticBody3D" parent="SeatContainer"]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2, 1, 1.4999998)
-collision_layer = 2
+collision_layer = 8
 collision_mask = 0
 script = ExtResource("2_kgk83")
 seatIndex = 3
@@ -160,12 +169,12 @@ seatIndex = 3
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackLeftCollision"]
 mesh = SubResource("BoxMesh_0063d")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatContainer/BackLeftCollision"]
-shape = SubResource("ConcavePolygonShape3D_0063d")
+[node name="BackLeftSeatCollision" type="CollisionShape3D" parent="SeatContainer/BackLeftCollision"]
+shape = SubResource("BoxShape3D_45odv")
 
 [node name="BackRightCollision" type="StaticBody3D" parent="SeatContainer"]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.9999999, 1, -1.5000002)
-collision_layer = 2
+collision_layer = 8
 collision_mask = 0
 script = ExtResource("2_kgk83")
 seatIndex = 2
@@ -173,8 +182,8 @@ seatIndex = 2
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackRightCollision"]
 mesh = SubResource("BoxMesh_0063d")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SeatContainer/BackRightCollision"]
-shape = SubResource("ConcavePolygonShape3D_0063d")
+[node name="BackRightSeatCollision" type="CollisionShape3D" parent="SeatContainer/BackRightCollision"]
+shape = SubResource("BoxShape3D_3b5xp")
 
 [node name="Raft" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
@@ -219,6 +228,7 @@ shape = SubResource("BoxShape3D_evv4r")
 
 [node name="DryBox" parent="." instance=ExtResource("3_ltyy5")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.1, 0.6884266, 0)
+collision_layer = 8
 
 [node name="Inventory" type="Node" parent="DryBox"]
 script = ExtResource("4_s60o4")
