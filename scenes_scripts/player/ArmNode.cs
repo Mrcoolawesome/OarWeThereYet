@@ -412,36 +412,46 @@ public partial class ArmNode : MeshInstance3D
 		return player.Velocity + player.GetPlatformVelocity();
 	}
 
-	private void RetractLifepreserver()
-	{
-		UniversalInWorld activePreserver = GetActiveLifepreserverNode();
-		if (activePreserver == null) return;
+	   private void RetractLifepreserver()
+	   {
+		   UniversalInWorld activePreserver = GetActiveLifepreserverNode();
+		   if (activePreserver == null) return;
 
-		// Reset captured player rotation and node
-		if (_capturedPlayerNode != null)
-		{
-			int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
-			_capturedPlayerNode.SetCapturedByLifepreserver(false);
-			if (capturedAuthorityId != Multiplayer.GetUniqueId())
-			{
-				_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
-			}
-			_capturedPlayerNode.GlobalRotation = Vector3.Zero;
-		}
-		_capturedPlayerNode = null;
+		   // Teleport captured player to the holder's position plus offset, then reset rotation and node
+		   if (_capturedPlayerNode != null)
+		   {
+			   // Get the player holding the preserver (the parent of this ArmNode)
+			   Player holder = GetParent()?.GetParent<Player>();
+			   Vector3 newPosition = _capturedPlayerNode.GlobalPosition;
+			   if (holder != null)
+			   {
+				   newPosition = holder.GlobalPosition + new Vector3(0, PlayerSpawnOffset, 0);
+				   _capturedPlayerNode.GlobalPosition = newPosition;
+			   }
+			   int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
+			   _capturedPlayerNode.SetCapturedByLifepreserver(false);
+			   if (capturedAuthorityId != Multiplayer.GetUniqueId())
+			   {
+				   _capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
+				   // Tell the client to sync their position and rotation
+				   _capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SyncCapturedTransform), newPosition, Vector3.Zero);
+			   }
+			   _capturedPlayerNode.GlobalRotation = Vector3.Zero;
+		   }
+		   _capturedPlayerNode = null;
 
-		// Store the item info before deletion
-		InvItem itemObject = activePreserver.ItemObject;
-		int itemCount = activePreserver.ItemCount;
+		   // Store the item info before deletion
+		   InvItem itemObject = activePreserver.ItemObject;
+		   int itemCount = activePreserver.ItemCount;
 
-		// Delete the preserver from the world and clear active state
-		Rpc(nameof(DeleteWorldItemByName), activePreserver.Name.ToString());
-		Rpc(nameof(SetActiveLifepreserverNode), "");
+		   // Delete the preserver from the world and clear active state
+		   Rpc(nameof(DeleteWorldItemByName), activePreserver.Name.ToString());
+		   Rpc(nameof(SetActiveLifepreserverNode), "");
 
-		// Return the item to the player's hand
-		if (itemObject != null)
-		{
-			Rpc(nameof(SetItem), itemObject.ResourcePath, itemCount);
-		}
-	}
+		   // Return the item to the player's hand
+		   if (itemObject != null)
+		   {
+			   Rpc(nameof(SetItem), itemObject.ResourcePath, itemCount);
+		   }
+	   }
 }

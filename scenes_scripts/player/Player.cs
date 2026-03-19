@@ -615,15 +615,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	public void SyncCapturedTransform(Vector3 globalPosition, Vector3 globalRotation)
-	{
-		if (!_isServerCaptured) return;
-
-		GlobalPosition = globalPosition;
-		GlobalRotation = globalRotation;
-		Velocity = Vector3.Zero;
-	}
+	   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	   public void SyncCapturedTransform(Vector3 globalPosition, Vector3 globalRotation)
+	   {
+		   GlobalPosition = globalPosition;
+		   GlobalRotation = globalRotation;
+		   Velocity = Vector3.Zero;
+	   }
 
 	// THIS FUNCTION SHOULDN'T BE CALLED DIRECTLY
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
