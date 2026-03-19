@@ -8,6 +8,7 @@ public partial class ArmNode : MeshInstance3D
 	[Export] public float MaxLifepreserverRange = 10.0f;
 	[Export] public float PullStrength = 0.1f;
 	[Export] public float RetractThreshold = 0.5f;
+	[Export] public float PlayerSpawnOffset = 2.0f;
 
 	public InvSlot Item { get; set; }
 	private static int _dropCounter = 0;
@@ -237,25 +238,27 @@ public partial class ArmNode : MeshInstance3D
 		Rpc(nameof(SetActiveLifepreserverNode), uniqueName);
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void SetActiveLifepreserverNode(string nodeName)
-	{
-		if (string.IsNullOrEmpty(nodeName))
-		{
-			_activeLifepreserverNode = null;
-			if (_capturedPlayerNode != null)
-			{
-				int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
-				_capturedPlayerNode.SetCapturedByLifepreserver(false);
-				if (capturedAuthorityId != Multiplayer.GetUniqueId())
-				{
-					_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
-				}
-				_capturedPlayerNode.GlobalRotation = Vector3.Zero;
-			}
-			_capturedPlayerNode = null;
-			return;
-		}
+	   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	   private void SetActiveLifepreserverNode(string nodeName)
+	   {
+		   if (string.IsNullOrEmpty(nodeName))
+		   {
+			   _activeLifepreserverNode = null;
+			   if (_capturedPlayerNode != null)
+			   {
+				   int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
+				   _capturedPlayerNode.SetCapturedByLifepreserver(false);
+				   if (capturedAuthorityId != Multiplayer.GetUniqueId())
+				   {
+					   _capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
+				   }
+				   // Spawn the player slightly above the last preserver position to avoid ground collision
+				   _capturedPlayerNode.GlobalPosition += new Vector3(0, PlayerSpawnOffset, 0);
+				   _capturedPlayerNode.GlobalRotation = Vector3.Zero;
+			   }
+			   _capturedPlayerNode = null;
+			   return;
+		   }
 
 		Node itemContainer = GetItemContainerNode();
 		_activeLifepreserverNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
