@@ -118,21 +118,22 @@ public partial class ArmNode : MeshInstance3D
 			_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SyncCapturedTransform), _activeLifepreserverNode.GlobalPosition, _activeLifepreserverNode.GlobalRotation);
 		}
 
-		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNode?.Name.ToString() ?? "", activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity);
+		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNode?.Name.ToString() ?? "", activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity, activeLifepreserver.GlobalRotation);
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void SyncWorldItemState(string nodeName, Vector3 globalPosition, Vector3 linearVelocity)
-	{
-		if (string.IsNullOrEmpty(nodeName)) return;
+	   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	   private void SyncWorldItemState(string nodeName, Vector3 globalPosition, Vector3 linearVelocity, Vector3 globalRotation)
+	   {
+		   if (string.IsNullOrEmpty(nodeName)) return;
 
-		Node itemContainer = GetItemContainerNode();
-		UniversalInWorld itemNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
-		if (itemNode == null) return;
+		   Node itemContainer = GetItemContainerNode();
+		   UniversalInWorld itemNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
+		   if (itemNode == null) return;
 
-		itemNode.GlobalPosition = globalPosition;
-		itemNode.LinearVelocity = linearVelocity;
-	}
+		   itemNode.GlobalPosition = globalPosition;
+		   itemNode.LinearVelocity = linearVelocity;
+		   itemNode.GlobalRotation = globalRotation;
+	   }
 
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]

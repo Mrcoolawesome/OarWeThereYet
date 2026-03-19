@@ -611,6 +611,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			if (_standingCollision != null) _standingCollision.Disabled = false;
 			if (_crouchingCollision != null) _crouchingCollision.Disabled = true; // Only standing enabled by default
 			Velocity = Vector3.Zero;
+			Rotation = Vector3.Zero;
 		}
 	}
 
