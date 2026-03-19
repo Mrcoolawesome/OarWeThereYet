@@ -18,6 +18,8 @@
 [ext_resource type="PackedScene" uid="uid://bd31pb0t08ex2" path="res://scenes_scripts/item_container/item_container.tscn" id="14_sfwft"]
 [ext_resource type="PackedScene" uid="uid://kwtfhiyv11ux" path="res://scenes_scripts/checkpoints/checkpoint_container.tscn" id="15_fjq28"]
 [ext_resource type="PackedScene" uid="uid://bg1o82hix6xue" path="res://scenes_scripts/checkpoints/Checkpoint.tscn" id="16_0b6ne"]
+[ext_resource type="PackedScene" uid="uid://ce4hm33fw8if5" path="res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn" id="17_etdru"]
+[ext_resource type="Resource" uid="uid://cjyr0xd08b32g" path="res://scenes_scripts/inventory/items/itemResources/oar/oar.tres" id="18_stpvs"]
 [ext_resource type="PackedScene" uid="uid://ce4hm33fw8if5" path="res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn" id="17_34k5s"]
 [ext_resource type="Resource" uid="uid://dpd6e10b0dpbb" path="res://scenes_scripts/inventory/items/itemResources/lifepreserver/lifepreserver.tres" id="18_etdru"]
 [ext_resource type="PackedScene" uid="uid://buqw2lg62mn3i" path="res://scenes_scripts/environment/rock/silver-rock.tscn" id="19_0b6ne"]
@@ -248,6 +250,9 @@ metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 
 [node name="ItemContainer" parent="." instance=ExtResource("14_sfwft")]
 
+[node name="UniversalInWorld" parent="ItemContainer" instance=ExtResource("17_etdru")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.44019, 1.2555285, 1358.376)
+ItemObject = ExtResource("18_stpvs")
 [node name="UniversalInWorld" parent="ItemContainer" instance=ExtResource("17_34k5s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.424251, 0.17463163, 1372.4286)
 ItemObject = ExtResource("18_etdru")

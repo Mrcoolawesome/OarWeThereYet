@@ -1,12 +1,18 @@
-[gd_resource type="Resource" script_class="InvItem" load_steps=4 format=3 uid="uid://cjyr0xd08b32g"]
+[gd_resource type="Resource" script_class="InvItem" load_steps=6 format=3 uid="uid://cjyr0xd08b32g"]
 
 [ext_resource type="Shape3D" uid="uid://c4bnraiqg3j03" path="res://scenes_scripts/inventory/items/itemResources/oar/oarCollider.tres" id="1_1t4ei"]
 [ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_8pfij"]
-[ext_resource type="ArrayMesh" uid="uid://dcslgr4fm3hi0" path="res://scenes_scripts/inventory/items/itemResources/oar/oarMesh.tres" id="2_760fp"]
+[ext_resource type="ArrayMesh" uid="uid://ca0tud6dn2du4" path="res://scenes_scripts/inventory/items/itemResources/oar/oar.res" id="2_4kmxm"]
+[ext_resource type="Script" uid="uid://dw0h2wdo267uw" path="res://scenes_scripts/inventory/items/itemResources/oar/Oar.cs" id="3_rfrtn"]
+
+[sub_resource type="Resource" id="Resource_yfmv0"]
+script = ExtResource("3_rfrtn")
+metadata/_custom_type_script = "uid://dw0h2wdo267uw"
 
 [resource]
 script = ExtResource("1_8pfij")
 Name = "Oar"
-ItemMesh = ExtResource("2_760fp")
+ItemMesh = ExtResource("2_4kmxm")
 ItemCollider = ExtResource("1_1t4ei")
+UseAction = SubResource("Resource_yfmv0")
 metadata/_custom_type_script = "uid://5qqoau1yt53x"
