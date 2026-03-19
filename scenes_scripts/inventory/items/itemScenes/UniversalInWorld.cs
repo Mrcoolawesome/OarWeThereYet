@@ -1,14 +1,26 @@
 using Godot;
 using System;
+using Waterways;
 
 public partial class UniversalInWorld : RigidBody3D, Interactable
 {
   [Export] public InvItem ItemObject { get; set; }
   [Export] public int ItemCount { get; set; } = 1;
   [Export] public bool CanBePickedUp { get; set; } = true;
+
+  [ExportGroup("Water Physics Settings")]
+	[Export] public float Mass = 10.0f;
+	[Export] public float FloatForce = 1.0f;
+	[Export] public float RiverSpeed = 1.0f;
+	[Export] public float WaterDrag = 2.0f;
   public InvSlot Item { get; set; }
   public string PromptMessage { get; set; } = "Pick Up";
   public string PromptInput { get; set; } = "action_key";
+  private WaterPhysics _waterPhysics;
+  private RiverFloatSystem _riverFloatSystem;
+  private bool _applyWaterPhysicsForce = false;
+	private Vector3 _waterPhysicsForce;
+	private Vector3 _waterPhysicsForcePosition;
 
   public override void _Ready()
   {
@@ -23,6 +35,11 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
     GetNode<MeshInstance3D>("MeshInstance3D").Mesh = Item.Data.ItemMesh;
     GetNode<CollisionShape3D>("CollisionShape3D").Shape = Item.Data.ItemCollider;
+
+    // get the water physics node and set its parameters
+    _waterPhysics = GetNode<WaterPhysics>("WaterPhysics");
+		_riverFloatSystem = GetNode<RiverFloatSystem>("../../RiverManager/RiverFloatSystem");
+		_waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
   }
 
   public override void _Process(double delta)
@@ -30,6 +47,12 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     if (Item == null) return;
     PromptMessage = CanBePickedUp ? "Pick Up (" + Item.Amount + ")" : "";
   }
+
+  public override void _PhysicsProcess(double delta)
+  {
+    FloatingPhysicsProcess(delta);
+  }
+
 
   public void Interact(Player player)
   {
@@ -106,4 +129,28 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   {
     QueueFree();
   }
+
+  // function that's called from the water physics node's signal
+	private void QueueApplyWaterPhysicsForce(Vector3 force, Vector3 relativePosition)
+	{
+		// set the apply water physics force boolean to be true so that it can be applied in PhysicsProcess
+		_applyWaterPhysicsForce = true;
+
+		// then set the global force and forcePosition variables so that they can be seen by PhysicsProcess
+		_waterPhysicsForce = force;
+		_waterPhysicsForcePosition = relativePosition;
+	}
+
+  private void FloatingPhysicsProcess(double delta)
+	{
+		if (_applyWaterPhysicsForce)
+		{
+			// Calculate acceleration: a = F/m
+			Vector3 waterAcceleration = _waterPhysicsForce / Mass;
+			// Add the acceleration to the velocity over time
+			ApplyForce(waterAcceleration * (float)delta);
+			// set _applyWaterPhysicsForce back to false
+			_applyWaterPhysicsForce = false;
+		}
+	}
 }
