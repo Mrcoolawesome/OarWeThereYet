@@ -12,7 +12,7 @@ public partial class ArmNode : MeshInstance3D
 	public InvSlot Item { get; set; }
 	private static int _dropCounter = 0;
 	private string _activeLifepreserverNodeName = "";
-	private string _capturedPlayerNodeName = "";
+	private Player _capturedPlayerNode = null;
 
 	// Used to compute the arm's velocity from frame-to-frame position changes
 	private Vector3 _previousGlobalPosition;
@@ -109,9 +109,9 @@ public partial class ArmNode : MeshInstance3D
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
 		}
 
-		if (string.IsNullOrEmpty(_capturedPlayerNodeName)) 
+		if (_capturedPlayerNode != null) 
 		{
-			GD.Print(_capturedPlayerNodeName);
+			GD.Print(_capturedPlayerNode.Name);
 		}
 
 		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNodeName, activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity);
@@ -239,7 +239,7 @@ public partial class ArmNode : MeshInstance3D
 
 		if (string.IsNullOrEmpty(nodeName))
 		{
-			_capturedPlayerNodeName = "";
+			_capturedPlayerNode = null;
 		}
 	}
 
@@ -303,6 +303,8 @@ public partial class ArmNode : MeshInstance3D
 		inWorldNode.ItemCount = 1;
 		inWorldNode.Position = position;
 		inWorldNode.LinearVelocity = launchVelocity;
+		// Player is on physics layer 4; include it so the hook can attach on contact.
+		inWorldNode.CollisionMask |= 1u << 2;
 		inWorldNode.CanBePickedUp = false;
 		inWorldNode.ContactMonitor = true;
 		inWorldNode.MaxContactsReported = 4;
@@ -325,12 +327,27 @@ public partial class ArmNode : MeshInstance3D
 	{
 		if (!Multiplayer.IsServer()) return;
 		if (string.IsNullOrEmpty(_activeLifepreserverNodeName)) return;
-		if (!string.IsNullOrEmpty(_capturedPlayerNodeName)) return;
+		if (_capturedPlayerNode != null) return;
+		GD.Print("Body entered");
 
-		if (body is not Player hitPlayer) return;
-		if (!hitPlayer.IsInGroup("players")) return;
+		Player hitPlayer = ResolvePlayerFromCollisionBody(body);
+		if (hitPlayer == null) return;
 
-		_capturedPlayerNodeName = hitPlayer.Name;
+		GD.Print("hit a player: " + hitPlayer.Name);
+		_capturedPlayerNode = hitPlayer;
+	}
+
+	private Player ResolvePlayerFromCollisionBody(Node body)
+	{
+		for (Node curr = body; curr != null; curr = curr.GetParent())
+		{
+			if (curr is Player player)
+			{
+				return player;
+			}
+		}
+
+		return null;
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -359,15 +376,6 @@ public partial class ArmNode : MeshInstance3D
 		return itemContainer.GetNodeOrNull<UniversalInWorld>(_activeLifepreserverNodeName);
 	}
 
-	private Player GetCapturedPlayerNode()
-	{
-		if (string.IsNullOrEmpty(_capturedPlayerNodeName)) return null;
-
-		Node levelNode = GetParent()?.GetParent()?.GetParent();
-
-		return levelNode.GetNodeOrNull<Player>(_capturedPlayerNodeName);
-	}
-
 	private Vector3 GetCarrierVelocity()
 	{
 		CharacterBody3D player = GetParent()?.GetParent<CharacterBody3D>();
@@ -383,7 +391,7 @@ public partial class ArmNode : MeshInstance3D
 		if (activePreserver == null) return;
 
 		// Reset captured player name
-		_capturedPlayerNodeName = "";
+		_capturedPlayerNode = null;
 
 		// Store the item info before deletion
 		InvItem itemObject = activePreserver.ItemObject;
