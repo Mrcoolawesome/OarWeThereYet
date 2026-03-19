@@ -11,7 +11,7 @@ public partial class ArmNode : MeshInstance3D
 
 	public InvSlot Item { get; set; }
 	private static int _dropCounter = 0;
-	private string _activeLifepreserverNodeName = "";
+	private UniversalInWorld _activeLifepreserverNode = null;
 	private Player _capturedPlayerNode = null;
 
 	// Used to compute the arm's velocity from frame-to-frame position changes
@@ -65,7 +65,7 @@ public partial class ArmNode : MeshInstance3D
 			if (Input.IsActionPressed("left_click"))
 			{
 				// If preserver is active, hold left_click to pull it closer continuously
-				if (!string.IsNullOrEmpty(_activeLifepreserverNodeName))
+				if (_activeLifepreserverNode != null)
 				{
 					RequestPullLifepreserver();
 				}
@@ -74,7 +74,7 @@ public partial class ArmNode : MeshInstance3D
 			if (Input.IsActionJustPressed("left_click"))
 			{
 				// If no preserver is active, use the item on fresh click
-				if (string.IsNullOrEmpty(_activeLifepreserverNodeName) && Item?.Data?.UseAction != null)
+				if (_activeLifepreserverNode == null && Item?.Data?.UseAction != null)
 				{
 					Player player = GetParent().GetParent<Player>();
 					if (player.CurrGameState == Player.GameState.Playing)
@@ -114,7 +114,7 @@ public partial class ArmNode : MeshInstance3D
 			GD.Print(_capturedPlayerNode.Name);
 		}
 
-		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNodeName, activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity);
+		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNode?.Name.ToString() ?? "", activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -135,10 +135,10 @@ public partial class ArmNode : MeshInstance3D
 	public void SetItem(string itemPath, int itemCount)
 	{
 		string currentItemPath = Item?.Data?.ResourcePath ?? "";
-		if (Multiplayer.IsServer() && currentItemPath != itemPath && !string.IsNullOrEmpty(_activeLifepreserverNodeName))
+		if (Multiplayer.IsServer() && currentItemPath != itemPath && _activeLifepreserverNode != null)
 		{
-			Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNodeName);
-			Rpc(nameof(SetActiveLifepreserverNodeName), "");
+			Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNode.Name.ToString());
+			Rpc(nameof(SetActiveLifepreserverNode), "");
 		}
 
 		if (string.IsNullOrEmpty(itemPath))
@@ -167,7 +167,7 @@ public partial class ArmNode : MeshInstance3D
 	private void PullLifepreserver()
 	{
 		if (!Multiplayer.IsServer()) return;
-		if (string.IsNullOrEmpty(_activeLifepreserverNodeName)) return;
+		if (_activeLifepreserverNode == null) return;
 
 		_currLifepreserverRange -= PullStrength;
 
@@ -199,14 +199,14 @@ public partial class ArmNode : MeshInstance3D
 		if (itemContainer == null) return;
 
 		// Toggle-off path: if one is already active, delete it and clear active state.
-		if (!string.IsNullOrEmpty(_activeLifepreserverNodeName))
+		if (_activeLifepreserverNode != null)
 		{
-			if (itemContainer.GetNodeOrNull(_activeLifepreserverNodeName) != null)
+			if (itemContainer.GetNodeOrNull(_activeLifepreserverNode.Name.ToString()) != null)
 			{
-				Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNodeName);
+				Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNode.Name.ToString());
 			}
 
-			Rpc(nameof(SetActiveLifepreserverNodeName), "");
+			Rpc(nameof(SetActiveLifepreserverNode), "");
 			return;
 		}
 
@@ -229,18 +229,21 @@ public partial class ArmNode : MeshInstance3D
 
 		// Spawn on all peers and store the active node name so the next toggle can retract it.
 		Rpc(nameof(SpawnThrownLifepreserver), Item.Data.ResourcePath, GlobalPosition, uniqueName, launchVelocity);
-		Rpc(nameof(SetActiveLifepreserverNodeName), uniqueName);
+		Rpc(nameof(SetActiveLifepreserverNode), uniqueName);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void SetActiveLifepreserverNodeName(string nodeName)
+	private void SetActiveLifepreserverNode(string nodeName)
 	{
-		_activeLifepreserverNodeName = nodeName;
-
 		if (string.IsNullOrEmpty(nodeName))
 		{
+			_activeLifepreserverNode = null;
 			_capturedPlayerNode = null;
+			return;
 		}
+
+		Node itemContainer = GetItemContainerNode();
+		_activeLifepreserverNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
 	}
 
 	private void RequestDropItem(Vector3 dropVelocity)
@@ -253,10 +256,10 @@ public partial class ArmNode : MeshInstance3D
 	{
 		if (Item != null)
 		{
-			if (!string.IsNullOrEmpty(_activeLifepreserverNodeName))
+			if (_activeLifepreserverNode != null)
 			{
-				Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNodeName);
-				Rpc(nameof(SetActiveLifepreserverNodeName), "");
+				Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNode.Name.ToString());
+				Rpc(nameof(SetActiveLifepreserverNode), "");
 			}
 
 			string itemPath = Item.Data.ResourcePath;
@@ -326,14 +329,12 @@ public partial class ArmNode : MeshInstance3D
 	private void OnLifepreserverBodyEntered(Node body)
 	{
 		if (!Multiplayer.IsServer()) return;
-		if (string.IsNullOrEmpty(_activeLifepreserverNodeName)) return;
+		if (_activeLifepreserverNode == null) return;
 		if (_capturedPlayerNode != null) return;
-		GD.Print("Body entered");
 
 		Player hitPlayer = ResolvePlayerFromCollisionBody(body);
 		if (hitPlayer == null) return;
 
-		GD.Print("hit a player: " + hitPlayer.Name);
 		_capturedPlayerNode = hitPlayer;
 	}
 
@@ -368,12 +369,14 @@ public partial class ArmNode : MeshInstance3D
 
 	private UniversalInWorld GetActiveLifepreserverNode()
 	{
-		if (string.IsNullOrEmpty(_activeLifepreserverNodeName)) return null;
+		if (_activeLifepreserverNode == null) return null;
+		if (!IsInstanceValid(_activeLifepreserverNode))
+		{
+			_activeLifepreserverNode = null;
+			return null;
+		}
 
-		Node itemContainer = GetItemContainerNode();
-		if (itemContainer == null) return null;
-
-		return itemContainer.GetNodeOrNull<UniversalInWorld>(_activeLifepreserverNodeName);
+		return _activeLifepreserverNode;
 	}
 
 	private Vector3 GetCarrierVelocity()
@@ -398,8 +401,8 @@ public partial class ArmNode : MeshInstance3D
 		int itemCount = activePreserver.ItemCount;
 
 		// Delete the preserver from the world and clear active state
-		Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNodeName);
-		Rpc(nameof(SetActiveLifepreserverNodeName), "");
+		Rpc(nameof(DeleteWorldItemByName), activePreserver.Name.ToString());
+		Rpc(nameof(SetActiveLifepreserverNode), "");
 
 		// Return the item to the player's hand
 		if (itemObject != null)
