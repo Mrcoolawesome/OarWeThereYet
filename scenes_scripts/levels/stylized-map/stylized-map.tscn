@@ -261,12 +261,20 @@ ItemObject = ExtResource("18_etdru")
 
 [node name="Checkpoint" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.835167, 0, 1374.0201)
+CheckpointNum = 1
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint" index="0"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
 [node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.960175, 1.5957031, 3.8066406)
+
+[node name="Checkpoint2" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
+transform = Transform3D(0.1417651, 0, 0.98990035, 0, 1, 0, -0.98990035, 0, 0.1417651, 1075.0454, -11.778191, 860.44617)
+CheckpointNum = 2
+
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint2" index="1"]
+transform = Transform3D(0.44652596, 0, 0.894771, 0, 1, 0, -0.894771, 0, 0.44652596, -7.7955933, 0.3149414, 6.869385)
 
 [node name="Rocks" type="Node3D" parent="."]
 
@@ -922,3 +930,4 @@ transform = Transform3D(0.6441655, 0.90101665, 2.7341762, -0.20662048, 2.8090332
 transform = Transform3D(2.6644144, 0.21977083, -1.2470336, 0.23171775, 2.7715461, 0.9835316, 1.244869, -0.98626983, 2.485975, 227.64412, -2.8164558, 1299.1909)
 
 [editable path="CheckpointContainer/Checkpoint"]
+[editable path="CheckpointContainer/Checkpoint2"]
