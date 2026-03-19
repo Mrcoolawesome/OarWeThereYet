@@ -39,7 +39,12 @@ public partial class ArmNode : MeshInstance3D
 		}
 		_previousGlobalPosition = GlobalPosition;
 
-		if (Item != null)
+		// Hide the mesh if the lifepreserver is active
+		if (_activeLifepreserverNode != null)
+		{
+			Mesh = null;
+		}
+		else if (Item != null)
 		{
 			Mesh = Item.Data.ItemMesh;
 		}
@@ -260,8 +265,10 @@ public partial class ArmNode : MeshInstance3D
 			   return;
 		   }
 
-		Node itemContainer = GetItemContainerNode();
-		_activeLifepreserverNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
+		   Node itemContainer = GetItemContainerNode();
+		   _activeLifepreserverNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
+		   // Hide the arm mesh when the lifepreserver is thrown
+		   Mesh = null;
 	}
 
 	private void RequestDropItem(Vector3 dropVelocity)
