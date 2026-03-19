@@ -109,7 +109,7 @@ public partial class ArmNode : MeshInstance3D
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
 		}
 
-		if (_capturedPlayerNode != null && _activeLifepreserverNode != null) 
+		if (_capturedPlayerNode != null && _activeLifepreserverNode != null && _capturedPlayerNode.CurrPlayerState == Player.PlayerState.Standing) 
 		{
 			_capturedPlayerNode.GlobalPosition = _activeLifepreserverNode.GlobalPosition;
 			_capturedPlayerNode.GlobalRotation = _activeLifepreserverNode.GlobalRotation;
