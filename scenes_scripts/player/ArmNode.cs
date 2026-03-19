@@ -3,6 +3,10 @@ using System;
 
 public partial class ArmNode : MeshInstance3D
 {
+	// Node for the rope visual
+	private Node3D _ropeRoot = null;
+	private MeshInstance3D _ropeMeshInstance = null;
+	private CylinderMesh _ropeMesh = null;
 	[Export] public float MaxThrowVelocity = 7.0f;
 	[Export] public float LifepreserverThrowVelocity = 10.0f;
 	[Export] public float MaxLifepreserverRange = 10.0f;
@@ -27,6 +31,27 @@ public partial class ArmNode : MeshInstance3D
 	{
 		Mesh = null;
 		_previousGlobalPosition = GlobalPosition;
+
+		// Create a root node for the rope mesh at the world origin
+		_ropeRoot = new Node3D();
+		_ropeRoot.Name = "RopeRoot";
+		_ropeRoot.GlobalPosition = Vector3.Zero;
+		GetTree().Root.AddChild(_ropeRoot);
+
+		_ropeMesh = new CylinderMesh();
+		_ropeMesh.TopRadius = 0.05f;
+		_ropeMesh.BottomRadius = 0.05f;
+		_ropeMesh.Height = 1.0f;
+		_ropeMesh.RadialSegments = 8;
+		_ropeMeshInstance = new MeshInstance3D();
+		_ropeMeshInstance.Mesh = _ropeMesh;
+		_ropeMeshInstance.Visible = false;
+		// Assign a visible unshaded yellow material
+		var ropeMaterial = new StandardMaterial3D();
+		ropeMaterial.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
+		ropeMaterial.AlbedoColor = new Color(1, 1, 1); // Yellow
+		_ropeMeshInstance.SetSurfaceOverrideMaterial(0, ropeMaterial);
+		_ropeRoot.AddChild(_ropeMeshInstance);
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -43,15 +68,52 @@ public partial class ArmNode : MeshInstance3D
 		if (_activeLifepreserverNode != null)
 		{
 			Mesh = null;
-		}
-		else if (Item != null)
-		{
-			Mesh = Item.Data.ItemMesh;
+			// Show and update the rope mesh
+			_ropeMeshInstance.Visible = true;
+			UpdateRopeMesh();
 		}
 		else
 		{
-			Mesh = null;
+			if (Item != null)
+			{
+				Mesh = Item.Data.ItemMesh;
+			}
+			else
+			{
+				Mesh = null;
+			}
+			// Hide the rope mesh
+			_ropeMeshInstance.Visible = false;
 		}
+
+	// Draws a line between the arm and the active lifepreserver
+	void UpdateRopeMesh()
+	{
+		if (_activeLifepreserverNode == null || !IsInstanceValid(_activeLifepreserverNode))
+		{
+			_ropeMeshInstance.Visible = false;
+			return;
+		}
+		Vector3 start = GlobalPosition;
+		Vector3 end = _activeLifepreserverNode.GlobalPosition;
+		Vector3 mid = (start + end) * 0.5f;
+		Vector3 dir = end - start;
+		float length = dir.Length();
+		if (length < 0.01f)
+		{
+			_ropeMeshInstance.Visible = false;
+			return;
+		}
+		_ropeMeshInstance.Visible = true;
+		_ropeMesh.Height = length;
+		_ropeMeshInstance.GlobalPosition = mid;
+		// Align the cylinder with the direction vector (default cylinder points up, so align Vector3.Up to dir)
+		var up = Vector3.Up;
+		var axis = up.Cross(dir.Normalized());
+		float angle = Mathf.Acos(up.Dot(dir.Normalized()));
+		var rotation = axis.LengthSquared() > 0.0001f ? new Quaternion(axis.Normalized(), angle) : Quaternion.Identity;
+		_ropeMeshInstance.GlobalTransform = new Transform3D(new Basis(rotation), mid);
+	}
 
 		if (GetParent().GetParent<Node>().IsMultiplayerAuthority())
 		{
@@ -269,6 +331,15 @@ public partial class ArmNode : MeshInstance3D
 		   _activeLifepreserverNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
 		   // Hide the arm mesh when the lifepreserver is thrown
 		   Mesh = null;
+		   // Show rope mesh if preserver is active
+		   if (!string.IsNullOrEmpty(nodeName))
+		   {
+			   _ropeMeshInstance.Visible = true;
+		   }
+		   else
+		   {
+			   _ropeMeshInstance.Visible = false;
+		   }
 	}
 
 	private void RequestDropItem(Vector3 dropVelocity)
