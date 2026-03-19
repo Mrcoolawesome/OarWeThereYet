@@ -102,6 +102,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// new rotation state
 	private Basis _newRotationState;
 
+	// When true, the server is currently driving this player's transform.
+	private bool _isServerCaptured = false;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -349,6 +352,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// do all the movement and stuff if we're the owner of this instance, we'll sync it to the clients 
 		if (IsMultiplayerAuthority())
 		{
+			if (_isServerCaptured)
+			{
+				// During capture, the host continuously pushes transform updates via RPC.
+				Velocity = Vector3.Zero;
+				return;
+			}
+
 			// Always apply gravity 
 			Gravity(delta);
 
@@ -585,6 +595,35 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		RpcId(1, MethodName.ServerRequestRowing, seatIdx, stopStart, backForward);
 	}
 
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void SetCapturedByLifepreserver(bool captured)
+	{
+		_isServerCaptured = captured;
+		if (captured)
+		{
+			// Disable both collision shapes so player doesn't collide with preserver
+			if (_standingCollision != null) _standingCollision.Disabled = true;
+			if (_crouchingCollision != null) _crouchingCollision.Disabled = true;
+		}
+		else
+		{
+			// Re-enable both collision shapes
+			if (_standingCollision != null) _standingCollision.Disabled = false;
+			if (_crouchingCollision != null) _crouchingCollision.Disabled = true; // Only standing enabled by default
+			Velocity = Vector3.Zero;
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void SyncCapturedTransform(Vector3 globalPosition, Vector3 globalRotation)
+	{
+		if (!_isServerCaptured) return;
+
+		GlobalPosition = globalPosition;
+		GlobalRotation = globalRotation;
+		Velocity = Vector3.Zero;
+	}
+
 	// THIS FUNCTION SHOULDN'T BE CALLED DIRECTLY
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void ServerRequestRowing(int seatIdx, bool stopStart, bool backForward)
@@ -671,7 +710,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// client updates their position ig
   public void SetStateArray()
   {
-    if (IsMultiplayerAuthority())
+		if (_isServerCaptured) return;
+
+		if (IsMultiplayerAuthority())
 		{
 			State = [Position, Quaternion, Velocity, (int)CurrPlayerState, (int)_seat];
 		}

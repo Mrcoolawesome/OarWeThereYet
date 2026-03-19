@@ -113,6 +113,9 @@ public partial class ArmNode : MeshInstance3D
 		{
 			_capturedPlayerNode.GlobalPosition = _activeLifepreserverNode.GlobalPosition;
 			_capturedPlayerNode.GlobalRotation = _activeLifepreserverNode.GlobalRotation;
+
+			int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
+			_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SyncCapturedTransform), _activeLifepreserverNode.GlobalPosition, _activeLifepreserverNode.GlobalRotation);
 		}
 
 		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNode?.Name.ToString() ?? "", activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity);
@@ -239,7 +242,16 @@ public partial class ArmNode : MeshInstance3D
 		if (string.IsNullOrEmpty(nodeName))
 		{
 			_activeLifepreserverNode = null;
-			_capturedPlayerNode.GlobalRotation = Vector3.Zero;
+			if (_capturedPlayerNode != null)
+			{
+				int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
+				_capturedPlayerNode.SetCapturedByLifepreserver(false);
+				if (capturedAuthorityId != Multiplayer.GetUniqueId())
+				{
+					_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
+				}
+				_capturedPlayerNode.GlobalRotation = Vector3.Zero;
+			}
 			_capturedPlayerNode = null;
 			return;
 		}
@@ -338,6 +350,12 @@ public partial class ArmNode : MeshInstance3D
 		if (hitPlayer == null) return;
 
 		_capturedPlayerNode = hitPlayer;
+		int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
+		_capturedPlayerNode.SetCapturedByLifepreserver(true);
+		if (capturedAuthorityId != Multiplayer.GetUniqueId())
+		{
+			_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), true);
+		}
 	}
 
 	private Player ResolvePlayerFromCollisionBody(Node body)
@@ -396,7 +414,16 @@ public partial class ArmNode : MeshInstance3D
 		if (activePreserver == null) return;
 
 		// Reset captured player rotation and node
-		_capturedPlayerNode.GlobalRotation = Vector3.Zero;
+		if (_capturedPlayerNode != null)
+		{
+			int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
+			_capturedPlayerNode.SetCapturedByLifepreserver(false);
+			if (capturedAuthorityId != Multiplayer.GetUniqueId())
+			{
+				_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
+			}
+			_capturedPlayerNode.GlobalRotation = Vector3.Zero;
+		}
 		_capturedPlayerNode = null;
 
 		// Store the item info before deletion
