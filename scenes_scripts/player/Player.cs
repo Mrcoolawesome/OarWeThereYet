@@ -5,6 +5,7 @@ using Waterways;
 public partial class Player : CharacterBody3D, ISyncBuffer
 {
 	// Exported variables
+	[ExportGroup("Movement Speed Settings")]
 	[Export] public float JumpVelocity = 4.5f;
 	[Export] public float WalkingSpeed = 5.0f;
 	[Export] public float SwimmingSpeed = 1.0f;
@@ -12,6 +13,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Export] public float CrouchingSpeed = 3.0f;
 	[Export] public float AirSpeed = 3.0f;
 	[Export] public float MouseSens = 0.4f;
+
+	[ExportGroup("Knockback Force Settings")]
+	[Export] public float PlayerKnockbackForce = 10.0f; // this is applied as a velocity, not actually a force
+	[Export] public float ObjectKnockbackForce = 20.0f; // this is actually applied as a force
+
+	[ExportGroup("Network Lerp Settings")]
 	[Export] public float LerpSpeed = 10.0f;
 	[Export] public float CrouchLerpSpeed = 10.0f;
 	[Export] public float NetworkLerpSpeed = 10.0f;
@@ -119,6 +126,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private bool _applyWaterPhysicsForce = false;
 	private Vector3 _waterPhysicsForce;
 	private Vector3 _waterPhysicsForcePosition;
+
+	// variable to check if we want to get knocked back or not
+	private bool _applyKnockback = false;
+	private Vector3 _knockbackDirection = Vector3.Zero;
+  private Vector3 _knockbackVelocity = Vector3.Zero;
 
   public override void _EnterTree()
 	{
@@ -385,6 +397,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				StandingStatePhysicsProcess(delta);
 				CrouchSprintPhysicsProcess(delta);
 				FloatingPhysicsProcess(delta);
+				ApplyKnockbackPhysicsProcess(delta);
 			} 
 			else if (_currPlayerState == PlayerState.Rowing)
 			{
@@ -633,6 +646,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// set the rowing state
 		_currPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
 		_seat = (Boat.SeatIndicies)seatIdx;
+
+		// If we wipe it when standing up, getting knocked out of the boat deletes the hit!
+    if (isSitting)
+    {
+      _knockbackVelocity = Vector3.Zero;
+      _applyKnockback = false;
+    }
 	}
 
 	// Wrapper for ServerRequestRowing RPC function
@@ -832,4 +852,110 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			}
 		}
 	}
+
+	// --- OAR HELPER FUNCTIONS FOR HITTING PEOPLE AND OBJECTS ---
+
+  public GodotObject GetRaycastObject()
+  {
+    return _interactRay.GetCollider();
+  }
+
+  // 1. Ask the Server to relay the command AND the direction
+  public void ApplyKnockbackOnClient(string clientName, Vector3 pushDirection)
+  {
+    int targetId = clientName.ToInt(); 
+    RpcId(1, nameof(ServerRelayKnockback), targetId, pushDirection);
+  }
+
+  // 2. The Server forwards the direction to the specific client
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void ServerRelayKnockback(int targetClientId, Vector3 pushDirection)
+  {
+    if (Multiplayer.IsServer())
+    {
+			RpcId(targetClientId, nameof(BroadcastApplyKnockback), pushDirection);
+    }
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void BroadcastApplyKnockback(Vector3 pushDirection)
+  {
+
+    // If they are sitting in the boat, forcibly eject them!
+    if (_currPlayerState == PlayerState.Rowing)
+    {
+      // 1. Tell the server to stop the rowing physics for this seat
+      RequestRowing((int)_seat, false, false);
+      
+      // 2. Run the state change locally IMMEDIATELY so we don't get trapped by the physics frame
+      SetSitStandState(false, (int)_seat);
+      
+      // 3. Now tell everyone else over the network that we stood up
+      Rpc(MethodName.SetSitStandState, false, (int)_seat);
+      
+      // 4. Teleport them slightly up so they don't clip into the boat hull when launched
+      GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 0.2f, 0); 
+      
+      // 5. Stop their oar animation
+      Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
+    }
+
+    // Now that they are officially Standing, apply the new hit
+    _applyKnockback = true;
+    _knockbackDirection = pushDirection;
+  }
+
+  private void ApplyKnockbackPhysicsProcess(double delta)
+  {
+    if (_applyKnockback)
+    {
+      // 1. Force the hit direction to be perfectly horizontal so they don't fly to space
+      _knockbackDirection.Y = 0; 
+      
+      // 2. Apply the massive horizontal force
+      _knockbackVelocity = _knockbackDirection.Normalized() * PlayerKnockbackForce;
+      
+      // 3. Add a strict, small vertical pop (2 meters per second) just to clear floor friction
+      _knockbackVelocity.Y = 0.2f; 
+      
+      _applyKnockback = false;
+    }
+
+    if (_knockbackVelocity != Vector3.Zero)
+    {
+      // Decay the momentum over time using Lerp 
+      _knockbackVelocity = _knockbackVelocity.Lerp(Vector3.Zero, (float)delta * 5.0f);
+
+      if (_knockbackVelocity.LengthSquared() < 0.01f)
+      {
+        _knockbackVelocity = Vector3.Zero;
+      }
+
+      Velocity += _knockbackVelocity;
+    }
+  }
+
+  // --- RIGIDBODY FIXES ---
+
+  public void ApplyKnockbackRigidBodies(RigidBody3D rigidBody, Vector3 pushDirection)
+  {
+    if (Multiplayer.IsServer())
+    {
+      ApplyImpulseOnHost(rigidBody.GetPath(), pushDirection);
+    }
+    else
+    {
+      RpcId(1, nameof(ApplyImpulseOnHost), rigidBody.GetPath(), pushDirection);
+    }
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+  private void ApplyImpulseOnHost(NodePath targetPath, Vector3 pushDirection)
+  {
+    if (GetNodeOrNull(targetPath) is RigidBody3D rb)
+    {
+      // Now rigidbodies will fly away from the oar swing properly too!
+      rb.ApplyCentralImpulse(pushDirection * ObjectKnockbackForce); 
+    }
+  }
 }

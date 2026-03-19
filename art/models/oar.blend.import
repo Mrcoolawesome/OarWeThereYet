@@ -38,6 +38,17 @@ materials/extract=0
 materials/extract_format=0
 materials/extract_path=""
 _subresources={
+"meshes": {
+"oar_Cube": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 20.0,
+"save_to_file/enabled": true,
+"save_to_file/fallback_path": "res://scenes_scripts/inventory/items/itemResources/oar/oar.res",
+"save_to_file/path": "uid://ca0tud6dn2du4"
+}
+},
 "nodes": {
 "PATH:Sun": {
 "import/skip_import": true
