@@ -109,9 +109,10 @@ public partial class ArmNode : MeshInstance3D
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
 		}
 
-		if (_capturedPlayerNode != null) 
+		if (_capturedPlayerNode != null && _activeLifepreserverNode != null) 
 		{
-			GD.Print(_capturedPlayerNode.Name);
+			_capturedPlayerNode.GlobalPosition = _activeLifepreserverNode.GlobalPosition;
+			_capturedPlayerNode.GlobalRotation = _activeLifepreserverNode.GlobalRotation;
 		}
 
 		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNode?.Name.ToString() ?? "", activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity);
@@ -238,6 +239,7 @@ public partial class ArmNode : MeshInstance3D
 		if (string.IsNullOrEmpty(nodeName))
 		{
 			_activeLifepreserverNode = null;
+			_capturedPlayerNode.GlobalRotation = Vector3.Zero;
 			_capturedPlayerNode = null;
 			return;
 		}
@@ -393,7 +395,8 @@ public partial class ArmNode : MeshInstance3D
 		UniversalInWorld activePreserver = GetActiveLifepreserverNode();
 		if (activePreserver == null) return;
 
-		// Reset captured player name
+		// Reset captured player rotation and node
+		_capturedPlayerNode.GlobalRotation = Vector3.Zero;
 		_capturedPlayerNode = null;
 
 		// Store the item info before deletion
