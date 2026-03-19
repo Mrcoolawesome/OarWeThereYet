@@ -85,23 +85,23 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	*/
 
 	// Player state machine. 
-	private enum PlayerState
+	public enum PlayerState
 	{
 		Rowing,
 		Standing
 	}
 
 	// Game state machine
-	private enum GameState {
+	public enum GameState {
 		Playing,
 		Menu,
 	}
 
 	// Game state default is menu
-	private GameState _currGameState = GameState.Playing;
+	public GameState CurrGameState = GameState.Playing;
 
 	// Player state default is standing
-	private PlayerState _currPlayerState = PlayerState.Standing;
+	public PlayerState CurrPlayerState = PlayerState.Standing;
 
 	// Stuff for player keeping momentum while in the air
 	private Vector3 _initialVelocity;
@@ -116,6 +116,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// new rotation state
 	private Basis _newRotationState;
 
+	// When true, the server is currently driving this player's transform.
+	private bool _isServerCaptured = false;
 	// water physics node
 	private WaterPhysics _waterPhysics;
 	// probe container
@@ -201,7 +203,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			}
 
 			// set the current game state to be the menu state	
-			if (_currGameState == GameState.Menu)
+			if (CurrGameState == GameState.Menu)
 			{
 				Input.MouseMode = Input.MouseModeEnum.Visible;
 			}
@@ -244,7 +246,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   public override void _Input(InputEvent @event)
   {
 		// This is always done so that they can move their head
-    if ((@event is InputEventMouseMotion mouseEvent) && _currGameState == GameState.Playing)
+    if ((@event is InputEventMouseMotion mouseEvent) && CurrGameState == GameState.Playing)
 		{
 			// The y rotation of the player in radians based off of the mouse sensitivity 
 			_mouseMovementYaw = -Mathf.DegToRad(mouseEvent.Relative.X * MouseSens);
@@ -259,7 +261,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   public override void _Process(double delta)
   {
     // Hide/Unhide PauseUI depending on game state
-		switch(_currGameState)
+		switch(CurrGameState)
 		{
 			case GameState.Playing:
 				PlayingStateProcess();
@@ -281,10 +283,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// We use IsActionJustPressed because it's a trigger and not a continuous input event
 		if (Input.IsActionJustPressed("ui_cancel")) 
 		{
-			_currGameState = GameState.Menu;
+			CurrGameState = GameState.Menu;
 		}
 
-		switch(_currPlayerState)
+		switch(CurrPlayerState)
 		{
 			case PlayerState.Standing:
 				_interactRay.Enabled = true;
@@ -300,7 +302,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		if (Input.IsActionJustPressed("ui_cancel")) 
 		{
-			_currGameState = GameState.Playing;			
+			CurrGameState = GameState.Playing;			
 
 			// Hide Inventory if open
 			if (_invUI.isOpen())
@@ -386,26 +388,33 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// do all the movement and stuff if we're the owner of this instance, we'll sync it to the clients 
 		if (IsMultiplayerAuthority())
 		{
+			if (_isServerCaptured)
+			{
+				// During capture, the host continuously pushes transform updates via RPC.
+				Velocity = Vector3.Zero;
+				return;
+			}
+
 			// Always apply gravity 
 			Gravity(delta);
 
 			// always set the state array as often as possible AS THE CLIENT
 			SetStateArray();
 
-			if (_currPlayerState == PlayerState.Standing)
+			if (CurrGameState == GameState.Playing && CurrPlayerState == PlayerState.Standing)
 			{
 				StandingStatePhysicsProcess(delta);
 				CrouchSprintPhysicsProcess(delta);
 				FloatingPhysicsProcess(delta);
 				ApplyKnockbackPhysicsProcess(delta);
 			} 
-			else if (_currPlayerState == PlayerState.Rowing)
+			else if (CurrGameState == GameState.Playing && CurrPlayerState == PlayerState.Rowing)
 			{
 				RowingStatePhysicsProcess();
 			}
 
 			// Always apply MoveAndSlide unless they're rowing
-			if (_currPlayerState != PlayerState.Rowing)
+			if (CurrPlayerState != PlayerState.Rowing)
 			{
 				MoveAndSlide();
 			}
@@ -416,7 +425,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       Gravity(delta);
 
 			// do local movement for the puppet while in the boat
-			if (_currPlayerState == PlayerState.Rowing)
+			if (CurrPlayerState == PlayerState.Rowing)
       {
         // Force them to the seat perfectly. The boat is already handling movement.
         RowingStatePhysicsProcess();
@@ -596,9 +605,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void OnPauseUIResume()
 	{
 		// If they press resume button
-		if (_currGameState == GameState.Menu)
+		if (CurrGameState == GameState.Menu)
 		{
-			_currGameState = GameState.Playing;
+			CurrGameState = GameState.Playing;
 		// Capture mouse
 			Input.MouseMode = Input.MouseModeEnum.Captured;
 
@@ -614,7 +623,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		RequestSitInSeat(-1);
 
 		// put them into the playing state after that so the pause ui goes away
-		_currGameState = GameState.Playing;
+		CurrGameState = GameState.Playing;
 	}
 
 	//RPC Functions
@@ -644,7 +653,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_boat.OccupiedSeats[seatIdx] = isSitting;
 
 		// set the rowing state
-		_currPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
+		CurrPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
 		_seat = (Boat.SeatIndicies)seatIdx;
 
 		// If we wipe it when standing up, getting knocked out of the boat deletes the hit!
@@ -659,6 +668,35 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	public void RequestRowing(int seatIdx, bool stopStart, bool backForward)
 	{
 		RpcId(1, MethodName.ServerRequestRowing, seatIdx, stopStart, backForward);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void SetCapturedByLifepreserver(bool captured)
+	{
+		_isServerCaptured = captured;
+		if (captured)
+		{
+			// Disable both collision shapes so player doesn't collide with preserver
+			if (_standingCollision != null) _standingCollision.Disabled = true;
+			if (_crouchingCollision != null) _crouchingCollision.Disabled = true;
+		}
+		else
+		{
+			// Re-enable both collision shapes
+			if (_standingCollision != null) _standingCollision.Disabled = false;
+			if (_crouchingCollision != null) _crouchingCollision.Disabled = true; // Only standing enabled by default
+			Velocity = Vector3.Zero;
+			Rotation = Vector3.Zero;
+		}
+	}
+
+	   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void SyncCapturedTransform(Vector3 globalPosition, Vector3 globalRotation)
+	{
+		GlobalPosition = globalPosition;
+		GlobalRotation = globalRotation;
+		Velocity = Vector3.Zero;
+		SetStateArray(); // Immediately broadcast new state to clients
 	}
 
 	// THIS FUNCTION SHOULDN'T BE CALLED DIRECTLY
@@ -691,7 +729,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 
 			// get rid of their pause ui after that
-			_currGameState = GameState.Playing;
+			CurrGameState = GameState.Playing;
 		}
 	}
 
@@ -714,7 +752,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	public void OpenInventory(Inventory inventory)
 	{
 		_invUI.Open(inventory);
-		_currGameState = GameState.Menu;
+		CurrGameState = GameState.Menu;
 	}
 
 	// Helper functions
@@ -747,9 +785,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// client updates their position ig
   public void SetStateArray()
   {
-    if (IsMultiplayerAuthority())
+		//if (_isServerCaptured) return;
+
+		if (IsMultiplayerAuthority())
 		{
-			State = [Position, Quaternion, Velocity, (int)_currPlayerState, (int)_seat];
+			State = [Position, Quaternion, Velocity, (int)CurrPlayerState, (int)_seat];
 		}
   }
 
@@ -800,13 +840,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			return;
 		}
 		// Read and apply the state and seat from the authority
-    _currPlayerState = (PlayerState)(int)State[3];
+    CurrPlayerState = (PlayerState)(int)State[3];
     _seat = (Boat.SeatIndicies)(int)State[4];
 		// get the 'speed' at which we lerp at 
 		float weight = (float)delta * NetworkLerpSpeed; // state.Step is like the 'delta' parameters given from Process
 		// apply the updated state variable if any changes were made
 		// ONLY correct position and velocity if they are walking around normally
-    if (_currPlayerState != PlayerState.Rowing)
+    if (CurrPlayerState != PlayerState.Rowing)
     {
 			if (_applyNewPositionState)
 			{
