@@ -616,12 +616,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	}
 
 	   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	   public void SyncCapturedTransform(Vector3 globalPosition, Vector3 globalRotation)
-	   {
-		   GlobalPosition = globalPosition;
-		   GlobalRotation = globalRotation;
-		   Velocity = Vector3.Zero;
-	   }
+	public void SyncCapturedTransform(Vector3 globalPosition, Vector3 globalRotation)
+	{
+		GlobalPosition = globalPosition;
+		GlobalRotation = globalRotation;
+		Velocity = Vector3.Zero;
+		SetStateArray(); // Immediately broadcast new state to clients
+	}
 
 	// THIS FUNCTION SHOULDN'T BE CALLED DIRECTLY
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -709,7 +710,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// client updates their position ig
   public void SetStateArray()
   {
-		if (_isServerCaptured) return;
+		//if (_isServerCaptured) return;
 
 		if (IsMultiplayerAuthority())
 		{
