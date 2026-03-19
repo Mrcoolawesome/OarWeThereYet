@@ -109,7 +109,7 @@ public partial class ArmNode : MeshInstance3D
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
 		}
 
-		if (_capturedPlayerNodeName != null) 
+		if (string.IsNullOrEmpty(_capturedPlayerNodeName)) 
 		{
 			GD.Print(_capturedPlayerNodeName);
 		}
@@ -381,6 +381,9 @@ public partial class ArmNode : MeshInstance3D
 	{
 		UniversalInWorld activePreserver = GetActiveLifepreserverNode();
 		if (activePreserver == null) return;
+
+		// Reset captured player name
+		_capturedPlayerNodeName = "";
 
 		// Store the item info before deletion
 		InvItem itemObject = activePreserver.ItemObject;
