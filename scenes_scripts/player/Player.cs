@@ -1,12 +1,13 @@
 using Godot;
 using Godot.Collections;
-using System;
+using Waterways;
 
 public partial class Player : CharacterBody3D, ISyncBuffer
 {
 	// Exported variables
 	[Export] public float JumpVelocity = 4.5f;
 	[Export] public float WalkingSpeed = 5.0f;
+	[Export] public float SwimmingSpeed = 1.0f;
 	[Export] public float SprintSpeed = 8.0f;
 	[Export] public float CrouchingSpeed = 3.0f;
 	[Export] public float AirSpeed = 3.0f;
@@ -15,6 +16,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Export] public float CrouchLerpSpeed = 10.0f;
 	[Export] public float NetworkLerpSpeed = 10.0f;
 	[Export] public Array<Variant> State { get; set; }
+
+	[ExportGroup("Water Physics Settings")]
+	[Export] public float Mass = 10.0f;
+	[Export] public float FloatForce = 1.0f;
+	[Export] public float RiverSpeed = 1.0f;
+	[Export] public float WaterDrag = 2.0f;
 
 	// Private variables
 	private float _currSpeed = 5.0f;
@@ -104,6 +111,16 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	// When true, the server is currently driving this player's transform.
 	private bool _isServerCaptured = false;
+	// water physics node
+	private WaterPhysics _waterPhysics;
+	// probe container
+	private Node3D _probeContainer;
+	// river node
+	private RiverFloatSystem _riverFloatSystem;
+	// variables to help apply water physics force
+	private bool _applyWaterPhysicsForce = false;
+	private Vector3 _waterPhysicsForce;
+	private Vector3 _waterPhysicsForcePosition;
 
   public override void _EnterTree()
 	{
@@ -139,6 +156,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_frontRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/FrontRightCollision");
 		_backLeftSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackLeftCollision");
 		_backRightSeatCollision = _boat.GetNode<StaticBody3D>("SeatContainer/BackRightCollision");
+
+		// get the water physics node and set its parameters
+		// get the probe container and water physics nodes
+		_probeContainer = GetNode<Node3D>("ProbeContainer");
+    _waterPhysics = GetNode<WaterPhysics>("WaterPhysics");
+		_riverFloatSystem = GetParent().GetNode<RiverFloatSystem>("RiverManager/RiverFloatSystem");
+		_waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -369,6 +393,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			{
 				StandingStatePhysicsProcess(delta);
 				CrouchSprintPhysicsProcess(delta);
+				FloatingPhysicsProcess(delta);
 			} 
 			else if (CurrGameState == GameState.Playing && CurrPlayerState == PlayerState.Rowing)
 			{
@@ -450,7 +475,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			velocity.X = _direction.X * _currSpeed;
 			velocity.Z = _direction.Z * _currSpeed;
 		} 
-		else 
+		else
 		{
 			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
 			velocity.X = _direction.X * _currSpeed + _initialVelocity.X;
@@ -518,6 +543,36 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		// Handle mouse input while sitting
 		PlayerRotation();
+	}
+
+	private void FloatingPhysicsProcess(double delta)
+	{
+		if (_applyWaterPhysicsForce)
+		{
+			// set the movement speed
+			_currSpeed = SwimmingSpeed;
+			// Calculate acceleration: a = F/m
+			Vector3 waterAcceleration = _waterPhysicsForce / Mass;
+			// Add the acceleration to the velocity over time
+			Velocity += waterAcceleration * (float)delta;
+			// set _applyWaterPhysicsForce back to false
+			_applyWaterPhysicsForce = false;
+		} else
+		{
+			// otherwise set the speed to the regular walkign speed
+			_currSpeed = WalkingSpeed;
+		}
+	}
+
+	// function that's called from the water physics node's signal
+	private void QueueApplyWaterPhysicsForce(Vector3 force, Vector3 relativePosition)
+	{
+		// set the apply water physics force boolean to be true so that it can be applied in PhysicsProcess
+		_applyWaterPhysicsForce = true;
+
+		// then set the global force and forcePosition variables so that they can be seen by PhysicsProcess
+		_waterPhysicsForce = force;
+		_waterPhysicsForcePosition = relativePosition;
 	}
 
 	private void PlayerRotation()

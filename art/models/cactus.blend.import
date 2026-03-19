@@ -45,8 +45,8 @@ _subresources={
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 20.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://scenes_scripts/levels/stylized-map/objects/the-cactus.res",
-"save_to_file/path": "uid://b6ypq4uua2iuu"
+"save_to_file/fallback_path": "res://scenes_scripts/levels/stylized-map/objects/cactus/cactus.res",
+"save_to_file/path": "uid://da4yuxy1ge7vk"
 }
 },
 "nodes": {

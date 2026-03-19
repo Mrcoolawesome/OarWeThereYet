@@ -39,14 +39,37 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={
 "meshes": {
-"grass_Mesh_0": {
+"grass_Mesh_0_002": {
 "generate/lightmap_uv": 0,
 "generate/lods": 0,
 "generate/shadow_meshes": 0,
 "lods/normal_merge_angle": 20.0,
 "save_to_file/enabled": true,
-"save_to_file/fallback_path": "res://scenes_scripts/levels/stylized-map/grass/grass-clump-mesh.res",
-"save_to_file/path": "uid://iatiw4a77uqq"
+"save_to_file/fallback_path": "res://scenes_scripts/levels/stylized-map/grass/grass-clump.res",
+"save_to_file/path": "uid://cqtomfuoqlrdl"
+}
+},
+"nodes": {
+"PATH:Grass_001": {
+"import/skip_import": true
+},
+"PATH:Grass_003": {
+"import/skip_import": true
+},
+"PATH:Grass_004": {
+"import/skip_import": true
+},
+"PATH:NurbsCurve_002": {
+"import/skip_import": true
+},
+"PATH:NurbsCurve_003": {
+"import/skip_import": true
+},
+"PATH:NurbsCurve_005": {
+"import/skip_import": true
+},
+"PATH:NurbsCurve_006": {
+"import/skip_import": true
 }
 }
 }
