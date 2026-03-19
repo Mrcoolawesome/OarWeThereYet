@@ -922,7 +922,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   {
 
     // If they are sitting in the boat, forcibly eject them!
-    if (_currPlayerState == PlayerState.Rowing)
+    if (CurrPlayerState == PlayerState.Rowing)
     {
       // 1. Tell the server to stop the rowing physics for this seat
       RequestRowing((int)_seat, false, false);
