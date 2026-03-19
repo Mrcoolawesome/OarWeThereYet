@@ -6,7 +6,7 @@
 [ext_resource type="BoxMesh" uid="uid://yqgkynijlkcr" path="res://scenes_scripts/inventory/items/itemResources/gabe/gabeMesh.tres" id="3_sqpos"]
 [ext_resource type="Script" uid="uid://beqlxsfimqxnn" path="res://scenes_scripts/inventory/items/itemResources/gabe/Gabe.cs" id="4_g303d"]
 
-[sub_resource type="Resource" id="Resource_sqpos"]
+[sub_resource type="Resource" id="Resource_5p2cl"]
 script = ExtResource("4_g303d")
 metadata/_custom_type_script = "uid://beqlxsfimqxnn"
 
@@ -17,5 +17,5 @@ Icon = ExtResource("1_3eoww")
 MaxStackSize = 3
 ItemMesh = ExtResource("3_sqpos")
 ItemCollider = ExtResource("2_g303d")
-UseAction = SubResource("Resource_sqpos")
+UseAction = SubResource("Resource_5p2cl")
 metadata/_custom_type_script = "uid://5qqoau1yt53x"
