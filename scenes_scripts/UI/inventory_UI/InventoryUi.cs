@@ -9,6 +9,8 @@ public partial class InventoryUi : CanvasLayer
 	public ArmNode ArmNode;
 	public Inventory Inventory;
 	public InvSlotUi PlayerSlot;
+	public TextEdit _itemName;
+	public TextEdit _itemDesc;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -21,11 +23,28 @@ public partial class InventoryUi : CanvasLayer
 
 		Player player = GetParent<Player>();
 		ArmNode = player.GetNode<ArmNode>("Head/ArmNode");
+
+		_itemName = GetNode<TextEdit>("VBoxContainer/ItemName");
+		_itemDesc = GetNode<TextEdit>("VBoxContainer/ItemDesc");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
+		if (PlayerSlot.Item?.Data != null)
+		{
+			_itemName.Visible = true;
+			_itemDesc.Visible = true;
+			_itemName.Text = PlayerSlot.Item.Data.Name;
+			_itemDesc.Text = PlayerSlot.Item.Data.Description;
+		}
+		else
+		{
+			_itemName.Visible = false;
+			_itemDesc.Visible = false;
+			_itemName.Text = "";
+			_itemDesc.Text = "";
+		}
 	}
 
 	public void Open(Inventory inventory)

@@ -1,20 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://c5qyjwmlp4xyw"]
+[gd_scene load_steps=4 format=3 uid="uid://c5qyjwmlp4xyw"]
 
 [ext_resource type="Script" uid="uid://6u6tlqxoqk1" path="res://scenes_scripts/UI/inventory_UI/InventoryUi.cs" id="1_0ers6"]
 [ext_resource type="PackedScene" uid="uid://cur7ngxm45hjf" path="res://scenes_scripts/UI/inventory_UI/InvSlotUI.tscn" id="2_dwdbm"]
+[ext_resource type="Theme" uid="uid://dujaq66w8tdw7" path="res://art/themes/dongleFont.tres" id="3_sosgj"]
 
 [node name="InventoryUi" type="CanvasLayer"]
 script = ExtResource("1_0ers6")
-
-[node name="ColorRect" type="ColorRect" parent="."]
-z_index = -1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.5120527, 0.84405756, 0.9999997, 1)
-metadata/_edit_lock_ = true
 
 [node name="GridContainer" type="GridContainer" parent="."]
 anchors_preset = 8
@@ -40,3 +31,30 @@ offset_top = -200.0
 offset_right = 100.0
 offset_bottom = 0.0
 grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(854, 200)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -854.0
+offset_top = -200.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="ItemName" type="TextEdit" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.45
+theme = ExtResource("3_sosgj")
+theme_override_constants/line_spacing = -36
+
+[node name="ItemDesc" type="TextEdit" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 31
+wrap_mode = 1
