@@ -18,6 +18,7 @@ public partial class ArmNode : MeshInstance3D
 	private static int _dropCounter = 0;
 	private UniversalInWorld _activeLifepreserverNode = null;
 	private Player _capturedPlayerNode = null;
+	private Player _player;
 
 	// Used to compute the arm's velocity from frame-to-frame position changes
 	private Vector3 _previousGlobalPosition;
@@ -52,6 +53,8 @@ public partial class ArmNode : MeshInstance3D
 		ropeMaterial.AlbedoColor = new Color(1, 1, 1); // Yellow
 		_ropeMeshInstance.SetSurfaceOverrideMaterial(0, ropeMaterial);
 		_ropeRoot.AddChild(_ropeMeshInstance);
+
+		_player = GetParent().GetParent<Player>();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -76,7 +79,14 @@ public partial class ArmNode : MeshInstance3D
 		{
 			if (Item != null)
 			{
-				Mesh = Item.Data.ItemMesh;
+				if (Item.Data.UseAction is Oar && _player.CurrPlayerState == Player.PlayerState.Rowing)
+				{
+					Mesh = null;
+				}
+				else
+				{
+					Mesh = Item.Data.ItemMesh;
+				}
 			}
 			else
 			{
