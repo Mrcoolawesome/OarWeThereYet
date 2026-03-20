@@ -134,6 +134,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private Vector3 _knockbackDirection = Vector3.Zero;
   private Vector3 _knockbackVelocity = Vector3.Zero;
 
+	// get the arm node
+	private ArmNode _armNode;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -175,6 +178,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     _waterPhysics = GetNode<WaterPhysics>("WaterPhysics");
 		_riverFloatSystem = GetParent().GetNode<RiverFloatSystem>("RiverManager/RiverFloatSystem");
 		_waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
+
+		// get the armnode
+		_armNode = GetNode<ArmNode>("Head/ArmNode");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -341,6 +347,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
+		}
+
+		if (_armNode.Item.Data.UseAction is not Oar)
+		{
+			return;
 		}
 
 		// (Boat.SeatIndicies seat, bool stopStart, bool backForward)

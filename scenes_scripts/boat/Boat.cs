@@ -234,6 +234,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         // set the rowing state to be true for whichever seat is being sat in
         _rowingStates[seat] = stopStart;
         _rowingStatesDirection[seat] = backForward;
+
+        // hide the given oar 
     }
 
     public void Reset()
