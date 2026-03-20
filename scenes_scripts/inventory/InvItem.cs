@@ -8,6 +8,8 @@ public partial class InvItem : Resource
   [Export] public string Name = "ItemDefault";
   [Export] public Texture Icon = null;
   [Export] public int MaxStackSize = 1;
+  [Export] public string Hint = "";
+  [Export] public string Description = "ItemDefault";
 
   [ExportGroup("3D Visuals")]
   [Export] public Mesh ItemMesh { get; set; }
