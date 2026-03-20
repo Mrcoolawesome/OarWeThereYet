@@ -253,6 +253,42 @@ metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.44019, 1.2555285, 1358.376)
 ItemObject = ExtResource("18_stpvs")
 
+[node name="UniversalInWorld4" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.874737, 1.2555285, 1358.3668)
+ItemObject = ExtResource("18_stpvs")
+
+[node name="UniversalInWorld5" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.832468, 1.2555294, 1356.98)
+ItemObject = ExtResource("18_stpvs")
+
+[node name="UniversalInWorld6" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.099047, 1.2555294, 1355.6488)
+ItemObject = ExtResource("18_stpvs")
+
+[node name="UniversalInWorld7" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.779476, 1.2555304, 1358.3718)
+ItemObject = ExtResource("18_stpvs")
+
+[node name="UniversalInWorld8" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.262249, 1.2555304, 1357.3323)
+ItemObject = ExtResource("18_stpvs")
+
+[node name="UniversalInWorld9" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.96884, 1.2555294, 1355.221)
+ItemObject = ExtResource("18_stpvs")
+
+[node name="UniversalInWorld10" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.770748, 1.2555285, 1356.6724)
+ItemObject = ExtResource("18_stpvs")
+
+[node name="UniversalInWorld11" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.770748, 1.2555285, 1356.6724)
+ItemObject = ExtResource("18_stpvs")
+
+[node name="UniversalInWorld3" parent="ItemContainer" instance=ExtResource("17_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.781092, 1.2555294, 1356.0239)
+ItemObject = ExtResource("18_stpvs")
+
 [node name="UniversalInWorld2" parent="ItemContainer" instance=ExtResource("17_34k5s")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.424251, 0.17463163, 1372.4286)
 ItemObject = ExtResource("18_etdru")
