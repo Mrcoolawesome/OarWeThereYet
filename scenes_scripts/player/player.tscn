@@ -40,6 +40,8 @@ PlayerKnockbackForce = 4.0
 ObjectKnockbackForce = 200.0
 LerpSpeed = 5.0
 CrouchLerpSpeed = 7.5
+Mass = 1.0
+RiverSpeed = 250.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_qhqgy")
