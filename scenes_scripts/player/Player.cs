@@ -497,7 +497,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			_initialVelocity = GetPlatformVelocity() + velocity;
 		}
 
-		if (IsOnFloor())
+		if (IsOnFloor() || _applyWaterPhysicsForce)
 		{
 			// Set direction and move in that direction
 			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
