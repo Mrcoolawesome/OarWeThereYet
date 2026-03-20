@@ -412,14 +412,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			// always set the state array as often as possible AS THE CLIENT
 			SetStateArray();
 
-			if (CurrGameState == GameState.Playing && CurrPlayerState == PlayerState.Standing)
+			if (CurrPlayerState == PlayerState.Standing)
 			{
 				StandingStatePhysicsProcess(delta);
 				CrouchSprintPhysicsProcess(delta);
 				FloatingPhysicsProcess(delta);
 				ApplyKnockbackPhysicsProcess(delta);
 			} 
-			else if (CurrGameState == GameState.Playing && CurrPlayerState == PlayerState.Rowing)
+			else if (CurrPlayerState == PlayerState.Rowing)
 			{
 				RowingStatePhysicsProcess();
 			}
@@ -470,7 +470,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		Vector3 velocity = Velocity;
 		
 		// Handle Jump.
-		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
+		if (Input.IsActionJustPressed("ui_accept") && IsOnFloor() && CurrGameState == GameState.Playing)
 		{
 			// actually make them jump
 			velocity.Y = JumpVelocity;
@@ -482,6 +482,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		Vector3 targetDirection = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
 		// Move towards zero vector if we're not trying to move anywhere
 		if (inputDir == Vector2.Zero)
+		{
+			targetDirection = Vector3.Zero;
+		}
+
+		if (CurrGameState == GameState.Menu)
 		{
 			targetDirection = Vector3.Zero;
 		}
