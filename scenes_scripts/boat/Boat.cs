@@ -36,6 +36,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
     private bool[] _rowingStatesDirection = new bool[4]; // direction of rowing: backward = false | forward = true
     public bool[] OccupiedSeats = new bool[4];
+    public bool[] HasOarInSeat = new bool[4];
 
     // boolean for checking if a reset is pending
     private bool _resetPending = false;
@@ -57,6 +58,12 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private Timer _damageDelayTimer = new Timer();
     // boolean to act as a gate to allow for more damage to be taken
     private bool _damageAllowed = true;
+
+    // get all the oar objects
+    private Node3D _frontRightOar;
+    private Node3D _frontLeftOar;
+    private Node3D _backRightOar;
+    private Node3D _backLeftOar;
 
   /*
       front left localShapeIndex: 0
@@ -80,6 +87,12 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         _healthComponent.Name = "HealthComponent"; 
         _damageDelayTimer = GetNode<Timer>("DamageDelayTimer");
         AddChild(_healthComponent);
+
+        // get all the oars
+        _backLeftOar = GetNode<Node3D>("OarsContainer/OarBackLeft");
+        _backRightOar = GetNode<Node3D>("OarsContainer/OarBackRight");
+        _frontRightOar = GetNode<Node3D>("OarsContainer/OarFrontRight");
+        _frontLeftOar = GetNode<Node3D>("OarsContainer/OarFrontLeft");
 
         // subscribe to the Rowing signal from the singleton script
         GlobalSignalServer.Instance.Rowing += OnPlayerRowing;
@@ -121,6 +134,11 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         // apply the rowing forces if the player is rowing
         ApplyRowingForcePhysicsProcess();
     }
+
+  public override void _Process(double delta)
+  {
+    ChangeOarVisibiltiy();
+  }
 
     // does the bouyancy stuff for the probes
     private void ProbeBouyancyPhysicsProcess()
@@ -234,8 +252,31 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         // set the rowing state to be true for whichever seat is being sat in
         _rowingStates[seat] = stopStart;
         _rowingStatesDirection[seat] = backForward;
+    }
 
-        // hide the given oar 
+    private void ChangeOarVisibiltiy()
+    {
+        int i = 0;
+        foreach (bool seatHasOar in HasOarInSeat)
+        {
+            // hide the given oar 
+            SeatIndicies convertedSeat = (SeatIndicies)i;
+            if (convertedSeat == SeatIndicies.FrontLeft)
+            {
+                _frontLeftOar.Visible = seatHasOar;
+            } else if (convertedSeat == SeatIndicies.FrontRight)
+            {
+                _frontRightOar.Visible = seatHasOar;
+            } else if (convertedSeat == SeatIndicies.BackRight)
+            {
+                _backRightOar.Visible = seatHasOar;
+            } else if (convertedSeat == SeatIndicies.BackLeft)
+            {
+                _backLeftOar.Visible = seatHasOar;
+            }
+
+            i++;
+        }
     }
 
     public void Reset()

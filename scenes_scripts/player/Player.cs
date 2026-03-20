@@ -349,7 +349,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
 
-		if (_armNode.Item.Data.UseAction is not Oar)
+		if (_armNode?.Item?.Data?.UseAction is not Oar)
 		{
 			return;
 		}
@@ -662,6 +662,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		// Broadcast occupied seat
 		_boat.OccupiedSeats[seatIdx] = isSitting;
+		if (_armNode?.Item?.Data?.UseAction == null)
+		{
+			_boat.HasOarInSeat[seatIdx] = false;
+		}
+		else if (_armNode.Item.Data.UseAction is Oar)
+    {
+			_boat.HasOarInSeat[seatIdx] = isSitting;
+    }
 
 		// set the rowing state
 		CurrPlayerState = isSitting ? PlayerState.Rowing : PlayerState.Standing;
