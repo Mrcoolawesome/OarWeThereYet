@@ -627,14 +627,17 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 	}
 
-	private void OnPauseUIRespawnPlayer()
+	private void OnPauseUIRespawnPlayer(int multiplayerID)
 	{
-		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
-		// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
-		RequestSitInSeat(-1);
+		if (Name == multiplayerID.ToString())
+		{
+			// set their position to be the position of the boat but just a little higher so they're not just clipping into it
+			// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
+			RequestSitInSeat(-1);
 
-		// put them into the playing state after that so the pause ui goes away
-		CurrGameState = GameState.Playing;
+			// put them into the playing state after that so the pause ui goes away
+			CurrGameState = GameState.Playing;
+		}
 	}
 
 	//RPC Functions
