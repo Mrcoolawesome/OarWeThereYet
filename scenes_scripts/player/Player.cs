@@ -276,6 +276,17 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				MenuStateProcess();
 				break;
 		}
+
+		switch(CurrPlayerState)
+		{
+			case PlayerState.Standing:
+				_interactRay.Enabled = true;
+				break;
+			case PlayerState.Rowing:
+				_interactRay.Enabled = false;
+				RowingStateProcess();
+				break;
+		}
   }
 
 	private void PlayingStateProcess()
@@ -290,17 +301,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		if (Input.IsActionJustPressed("ui_cancel")) 
 		{
 			CurrGameState = GameState.Menu;
-		}
-
-		switch(CurrPlayerState)
-		{
-			case PlayerState.Standing:
-				_interactRay.Enabled = true;
-				break;
-			case PlayerState.Rowing:
-				_interactRay.Enabled = false;
-				RowingStateProcess();
-				break;
 		}
 	}
 
