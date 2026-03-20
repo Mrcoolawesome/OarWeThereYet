@@ -10,7 +10,6 @@ func _ready() -> void:
 
 # respawns player onto the boat
 func _on_respawn_player_button_pressed() -> void:
-	print(multiplayer.get_unique_id())
 	GlobalSignalServer.emit_signal("RespawnPlayer", multiplayer.get_unique_id());
 
 # resets the whole game, only the host should be able to do this
