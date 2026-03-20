@@ -25,9 +25,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Export] public Array<Variant> State { get; set; }
 
 	[ExportGroup("Water Physics Settings")]
-	[Export] public float Mass = 10.0f;
+	[Export] public float Mass = 1.0f;
 	[Export] public float FloatForce = 1.0f;
-	[Export] public float RiverSpeed = 1.0f;
+	[Export] public float RiverSpeed = 250.0f;
 	[Export] public float WaterDrag = 2.0f;
 
 	// Private variables
