@@ -939,7 +939,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   private void BroadcastApplyKnockback(Vector3 pushDirection)
   {
-
     // If they are sitting in the boat, forcibly eject them!
     if (CurrPlayerState == PlayerState.Rowing)
     {
