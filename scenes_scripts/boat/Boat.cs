@@ -299,6 +299,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
         // Reset occupied seats
         OccupiedSeats = [false, false, false, false];
+        
+        // Reset Oar visuals
+        HasOarInSeat = [false, false, false, false];
 
         // reset the boat health
         _healthComponent.ResetHealth();

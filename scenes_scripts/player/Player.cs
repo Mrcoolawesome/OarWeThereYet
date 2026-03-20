@@ -627,14 +627,27 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 	}
 
-	private void OnPauseUIRespawnPlayer()
+	private void OnPauseUIRespawnPlayer(int multiplayerID)
 	{
-		// set their position to be the position of the boat but just a little higher so they're not just clipping into it
-		// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
-		RequestSitInSeat(-1);
+		if (Name == multiplayerID.ToString())
+		{
+			// If they're in a seat, reset the seat
+			if (CurrPlayerState == PlayerState.Rowing)
+			{
+				// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
+				RequestRowing((int)_seat, false, false);
+				// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
+				Rpc(MethodName.SetSitStandState, false, (int)_seat);
+				Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
+			}
 
-		// put them into the playing state after that so the pause ui goes away
-		CurrGameState = GameState.Playing;
+			// set their position to be the position of the boat but just a little higher so they're not just clipping into it
+			// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
+			RequestSitInSeat(-1);
+
+			// put them into the playing state after that so the pause ui goes away
+			CurrGameState = GameState.Playing;
+		}
 	}
 
 	//RPC Functions
@@ -939,7 +952,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   private void BroadcastApplyKnockback(Vector3 pushDirection)
   {
-
     // If they are sitting in the boat, forcibly eject them!
     if (CurrPlayerState == PlayerState.Rowing)
     {

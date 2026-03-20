@@ -17,7 +17,7 @@ public partial class GlobalSignalServer : Node
 
   // signal for respawning the player
   [Signal]
-  public delegate void RespawnPlayerEventHandler();
+  public delegate void RespawnPlayerEventHandler(int multiplayerID);
 
   // signal for hosting game with steam
   [Signal]
