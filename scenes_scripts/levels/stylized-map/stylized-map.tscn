@@ -317,11 +317,32 @@ transform = Transform3D(0.44652596, 0, 0.894771, 0, 1, 0, -0.894771, 0, 0.446525
 
 [node name="Checkpoint3" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1458.8381, -29.17074, 834.4896)
+CheckpointNum = 3
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint3" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5006104, 1.9073486e-06, -6.6589355)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5006104, 2.2708473, -4.091675)
 
 [node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint3" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.271606, 4.845337, 0.32702637)
+
+[node name="Checkpoint4" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
+transform = Transform3D(0.81344604, 0, 0.58164036, 0, 1, 0, -0.58164036, 0, 0.81344604, 1854.2428, -62.155045, 449.6166)
+CheckpointNum = 4
+
+[node name="BoatSpawn" parent="CheckpointContainer/Checkpoint4" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.445465, 0)
+
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint4" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.271606, 4.845337, 0.32702637)
+
+[node name="Checkpoint5" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
+transform = Transform3D(0.9625499, 0, 0.27110448, 0, 1, 0, -0.27110448, 0, 0.9625499, 2496.9272, -88.49762, 169.63)
+CheckpointNum = 5
+
+[node name="BoatSpawn" parent="CheckpointContainer/Checkpoint5" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.367676, 0, 0.7364502)
+
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint5" index="1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.271606, 4.845337, 0.32702637)
 
 [node name="Rocks" type="Node3D" parent="."]
@@ -659,3 +680,5 @@ transform = Transform3D(2.6644144, 0.21977083, -1.2470336, 0.23171775, 2.7715461
 [editable path="CheckpointContainer/Checkpoint"]
 [editable path="CheckpointContainer/Checkpoint2"]
 [editable path="CheckpointContainer/Checkpoint3"]
+[editable path="CheckpointContainer/Checkpoint4"]
+[editable path="CheckpointContainer/Checkpoint5"]
