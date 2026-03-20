@@ -56,22 +56,15 @@ public partial class TestLevel : Node
 
 		_boat = BoatScene.Instantiate<Boat>();
 		_boat.River = _river;
+		SetBoatSpawn();
 		AddChild(_boat);
 		_inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
-
-		SetBoatSpawn();
-		_boat.Position = _boat.BoatResetPosition;
-		_boat.Rotation = _boat.BoatResetRotation;
 
 		IsBoatReady = true;
 		EmitSignal(SignalName.BoatReady);
 
 		if (Multiplayer.IsServer())
 			LoadGame();
-		
-		// Set boat spawn location
-		if (Multiplayer.IsServer())
-			SetBoatSpawn();
 
 		// late-joining clients ask the server for the current world state
 		if (!Multiplayer.IsServer())
@@ -150,9 +143,6 @@ public partial class TestLevel : Node
 
 		// Set new checkpoint
 		_gameSaves.CheckpointNum = checkpointNum;
-
-		// Set new boat spawn
-		SetBoatSpawn();
 
 		// Collect held items as world items positioned at the boat
 		var heldItems = new Array<Dictionary<string, Variant>>();
