@@ -117,6 +117,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
             Mathf.DegToRad(BoatResetRotation.Y),
             Mathf.DegToRad(BoatResetRotation.Z)
         );
+        GlobalRotation = BoatResetRotation;
 
         // set the state if we're the server
         SetStateArray();

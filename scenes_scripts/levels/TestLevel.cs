@@ -56,22 +56,15 @@ public partial class TestLevel : Node
 
 		_boat = BoatScene.Instantiate<Boat>();
 		_boat.River = _river;
+		SetBoatSpawn();
 		AddChild(_boat);
 		_inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
-
-		SetBoatSpawn();
-		_boat.Position = _boat.BoatResetPosition;
-		_boat.Rotation = _boat.BoatResetRotation;
 
 		IsBoatReady = true;
 		EmitSignal(SignalName.BoatReady);
 
 		if (Multiplayer.IsServer())
 			LoadGame();
-		
-		// Set boat spawn location
-		if (Multiplayer.IsServer())
-			SetBoatSpawn();
 
 		// late-joining clients ask the server for the current world state
 		if (!Multiplayer.IsServer())
@@ -105,13 +98,16 @@ public partial class TestLevel : Node
 	{
 		Node3D boatSpawn = null;
 		Node3D fallbackBoatSpawn = null;
+
 		// Find the boat spawn node of current checkpoint
 		foreach (Checkpoint child in _checkpointContainer.GetChildren())
 		{
 			Node3D childBoatSpawn = child.GetNodeOrNull<Node3D>("BoatSpawn");
+			// Currently iterated checkpoint becomes new fallback spawn
 			if (fallbackBoatSpawn == null && childBoatSpawn != null)
 				fallbackBoatSpawn = childBoatSpawn;
 
+			// If currently iterated checkpoint matches the checkpoint we have saved
 			if (child.CheckpointNum == _gameSaves.CheckpointNum)
 			{
 				boatSpawn = childBoatSpawn;
@@ -126,9 +122,16 @@ public partial class TestLevel : Node
 			return;
 		}
 
-		// Set BoatResetVector to that node
-		_boat.BoatResetPosition = boatSpawn.GlobalPosition;
-		_boat.BoatResetRotation = boatSpawn.GlobalRotation;
+		// Set BoatResetVector to that node for host and clients
+		Rpc(nameof(BroadcastBoatSpawn), boatSpawn.GlobalPosition, boatSpawn.GlobalRotation);
+	}
+
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void BroadcastBoatSpawn(Vector3 position, Vector3 rotation)
+	{
+		_boat.BoatResetPosition = position;
+		_boat.BoatResetRotation = rotation;
 	}
 
 	// ───────────────────────────────────────────────
@@ -140,9 +143,6 @@ public partial class TestLevel : Node
 
 		// Set new checkpoint
 		_gameSaves.CheckpointNum = checkpointNum;
-
-		// Set new boat spawn
-		SetBoatSpawn();
 
 		// Collect held items as world items positioned at the boat
 		var heldItems = new Array<Dictionary<string, Variant>>();
