@@ -462,6 +462,9 @@ public partial class ArmNode : MeshInstance3D
 		Player hitPlayer = ResolvePlayerFromCollisionBody(body);
 		if (hitPlayer == null) return;
 
+		// If player is sitting, don't do anything
+		if (hitPlayer.CurrPlayerState == Player.PlayerState.Rowing) return;
+
 		_capturedPlayerNode = hitPlayer;
 		int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
 		_capturedPlayerNode.SetCapturedByLifepreserver(true);
