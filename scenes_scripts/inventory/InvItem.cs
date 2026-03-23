@@ -8,7 +8,6 @@ public partial class InvItem : Resource
   [Export] public string Name = "ItemDefault";
   [Export] public Texture Icon = null;
   [Export] public int MaxStackSize = 1;
-  [Export] public string Hint = "";
   [Export] public string Description = "ItemDefault";
 
   [ExportGroup("3D Visuals")]
@@ -17,4 +16,10 @@ public partial class InvItem : Resource
 
   [ExportGroup("Functionality")]
   [Export] public ItemAction UseAction { get; set; }
+
+  [ExportGroup("Hints")]
+  [Export] public string Hint1 = "";
+  [Export] public string Hint2 = "";
+  [Export] public string HintAlt1 = "";
+  [Export] public string HintAlt2 = "";
 }

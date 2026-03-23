@@ -27,7 +27,11 @@ public partial class ArmNode : MeshInstance3D
 	private Node3D _ropeRoot = null;
 	private MeshInstance3D _ropeMeshInstance = null;
 	private CylinderMesh _ropeMesh = null;
-	
+
+	// Hint labels
+	private Label _hint1;
+	private Label _hint2;
+
 	public override void _Ready()
 	{
 		Mesh = null;
@@ -55,6 +59,12 @@ public partial class ArmNode : MeshInstance3D
 		_ropeRoot.AddChild(_ropeMeshInstance);
 
 		_player = GetParent().GetParent<Player>();
+
+		// Get hint labels
+		_hint1 = GetNode<Label>("ControlHints/Control/VBoxContainer/Hint1");
+		_hint2 = GetNode<Label>("ControlHints/Control/VBoxContainer/Hint2");
+
+		HintLabels(false);
 	}
 
 	public override void _Process(double delta)
@@ -131,6 +141,16 @@ public partial class ArmNode : MeshInstance3D
 					}
 				}
 			}
+		}
+
+		// Hint text logic
+		if (_activeLifepreserverNode != null || _player.CurrPlayerState == Player.PlayerState.Rowing)
+		{
+			HintLabels(true);
+		}
+		else
+		{
+			HintLabels(false);
 		}
 	}
 
@@ -538,6 +558,33 @@ public partial class ArmNode : MeshInstance3D
 		if (itemObject != null)
 		{
 			Rpc(nameof(SetItem), itemObject.ResourcePath, itemCount);
+		}
+	}
+
+	private void HintLabels(bool alt)
+	{
+		// If not holding anything
+		if (Item == null || _player.CurrGameState == Player.GameState.Menu)
+		{
+			_hint1.Visible = false;
+			_hint2.Visible = false;
+			_hint1.Text = "";
+			_hint2.Text = "";
+		}
+		else
+		{
+			if (!alt)
+			{
+				_hint1.Text = Item.Data.Hint1;
+				_hint2.Text = Item.Data.Hint2;
+			}
+			else
+			{
+				_hint1.Text = Item.Data.HintAlt1;
+				_hint2.Text = Item.Data.HintAlt2;
+			}
+			_hint1.Visible = true;
+			_hint2.Visible = true;
 		}
 	}
 }
