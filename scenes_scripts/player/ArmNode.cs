@@ -107,7 +107,7 @@ public partial class ArmNode : MeshInstance3D
 
 		if (GetParent().GetParent<Node>().IsMultiplayerAuthority())
 		{
-			if (Input.IsActionPressed("right_click"))
+			if (Input.IsActionPressed("right_click") && _player.CurrPlayerState == Player.PlayerState.Standing)
 			{
 				// Get uncapped platform velocity from the player's moving platform (e.g. boat)
 				CharacterBody3D player = GetParent().GetParent<CharacterBody3D>();
@@ -144,7 +144,8 @@ public partial class ArmNode : MeshInstance3D
 		}
 
 		// Hint text logic
-		if (_activeLifepreserverNode != null || _player.CurrPlayerState == Player.PlayerState.Rowing)
+		if (_activeLifepreserverNode != null || 
+			_player.CurrPlayerState == Player.PlayerState.Rowing && Item.Data.UseAction is Oar)
 		{
 			HintLabels(true);
 		}
