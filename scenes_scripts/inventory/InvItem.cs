@@ -13,6 +13,8 @@ public partial class InvItem : Resource
   [ExportGroup("3D Visuals")]
   [Export] public Mesh ItemMesh { get; set; }
   [Export] public Shape3D ItemCollider { get; set; }
+  [Export] public Vector3 InHandPosition = Vector3.Zero;
+  [Export] public Vector3 InHandRotation = Vector3.Zero;
 
   [ExportGroup("Functionality")]
   [Export] public ItemAction UseAction { get; set; }

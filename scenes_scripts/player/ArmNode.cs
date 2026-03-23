@@ -96,6 +96,15 @@ public partial class ArmNode : MeshInstance3D
 				}
 				else
 				{
+					if (Item.Data.InHandPosition == Vector3.Zero)
+					{
+						Position = new Vector3(0.0f, 0.23f, -1.4f);
+					}
+					else
+					{
+						Position = Item.Data.InHandPosition;
+					}
+					Rotation = Item.Data.InHandRotation;
 					Mesh = Item.Data.ItemMesh;
 				}
 			}

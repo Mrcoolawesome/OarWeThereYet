@@ -63,7 +63,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 Player = NodePath("../../../..")
 
 [node name="ArmNode" type="MeshInstance3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39999998, -1.4)
 skeleton = NodePath("../..")
 script = ExtResource("7_csk1d")
 
