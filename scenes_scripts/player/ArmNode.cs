@@ -145,7 +145,7 @@ public partial class ArmNode : MeshInstance3D
 
 		// Hint text logic
 		if (_activeLifepreserverNode != null || 
-			_player.CurrPlayerState == Player.PlayerState.Rowing && Item.Data.UseAction is Oar)
+			_player.CurrPlayerState == Player.PlayerState.Rowing && Item?.Data.UseAction is Oar)
 		{
 			HintLabels(true);
 		}
