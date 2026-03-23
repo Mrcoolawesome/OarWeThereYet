@@ -59,12 +59,14 @@ public partial class ArmNode : MeshInstance3D
 		_ropeRoot.AddChild(_ropeMeshInstance);
 
 		_player = GetParent().GetParent<Player>();
+		SetMultiplayerAuthority(int.Parse(_player.Name.ToString()));
 
 		// Get hint labels
 		_hint1 = GetNode<Label>("ControlHints/Control/VBoxContainer/Hint1");
 		_hint2 = GetNode<Label>("ControlHints/Control/VBoxContainer/Hint2");
 
-		HintLabels(false);
+		_hint1.Visible = false;
+		_hint2.Visible = false;
 	}
 
 	public override void _Process(double delta)
@@ -564,6 +566,8 @@ public partial class ArmNode : MeshInstance3D
 
 	private void HintLabels(bool alt)
 	{
+		if (!IsMultiplayerAuthority()) return;
+
 		// If not holding anything
 		if (Item == null || _player.CurrGameState == Player.GameState.Menu)
 		{
