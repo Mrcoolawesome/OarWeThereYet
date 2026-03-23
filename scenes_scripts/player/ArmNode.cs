@@ -475,7 +475,7 @@ public partial class ArmNode : MeshInstance3D
 	{
 		for (Node curr = body; curr != null; curr = curr.GetParent())
 		{
-			if (curr is Player player)
+			if (curr is Player player && player.Name != _player.Name)
 			{
 				return player;
 			}
