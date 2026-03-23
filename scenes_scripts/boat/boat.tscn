@@ -236,6 +236,37 @@ collision_layer = 8
 
 [node name="Inventory" type="Node" parent="DryBox"]
 script = ExtResource("4_s60o4")
+NetworkInventory = Array[Dictionary]([{
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/lifepreserver/lifepreserver.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}, {
+"amount": 1,
+"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+}])
 
 [node name="OarsContainer" parent="." instance=ExtResource("4_li7rg")]
 transform = Transform3D(-1, 0, 8.742277e-08, 0, 1, 0, -8.742277e-08, 0, -1, 0, 1, 0)
