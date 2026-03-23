@@ -3,10 +3,6 @@ using System;
 
 public partial class ArmNode : MeshInstance3D
 {
-	// Node for the rope visual
-	private Node3D _ropeRoot = null;
-	private MeshInstance3D _ropeMeshInstance = null;
-	private CylinderMesh _ropeMesh = null;
 	[Export] public float MaxThrowVelocity = 7.0f;
 	[Export] public float LifepreserverThrowVelocity = 10.0f;
 	[Export] public float MaxLifepreserverRange = 10.0f;
@@ -27,7 +23,11 @@ public partial class ArmNode : MeshInstance3D
 	// Current range of life preserver
 	private float _currLifepreserverRange = 0.0f;
 
-	// Called when the node enters the scene tree for the first time.
+	// Node for the rope visual
+	private Node3D _ropeRoot = null;
+	private MeshInstance3D _ropeMeshInstance = null;
+	private CylinderMesh _ropeMesh = null;
+	
 	public override void _Ready()
 	{
 		Mesh = null;
@@ -57,7 +57,6 @@ public partial class ArmNode : MeshInstance3D
 		_player = GetParent().GetParent<Player>();
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
 		// Compute the arm's velocity from its change in global position
@@ -95,35 +94,6 @@ public partial class ArmNode : MeshInstance3D
 			// Hide the rope mesh
 			_ropeMeshInstance.Visible = false;
 		}
-
-	// Draws a line between the arm and the active lifepreserver
-	void UpdateRopeMesh()
-	{
-		if (_activeLifepreserverNode == null || !IsInstanceValid(_activeLifepreserverNode))
-		{
-			_ropeMeshInstance.Visible = false;
-			return;
-		}
-		Vector3 start = GlobalPosition;
-		Vector3 end = _activeLifepreserverNode.GlobalPosition;
-		Vector3 mid = (start + end) * 0.5f;
-		Vector3 dir = end - start;
-		float length = dir.Length();
-		if (length < 0.01f)
-		{
-			_ropeMeshInstance.Visible = false;
-			return;
-		}
-		_ropeMeshInstance.Visible = true;
-		_ropeMesh.Height = length;
-		_ropeMeshInstance.GlobalPosition = mid;
-		// Align the cylinder with the direction vector (default cylinder points up, so align Vector3.Up to dir)
-		var up = Vector3.Up;
-		var axis = up.Cross(dir.Normalized());
-		float angle = Mathf.Acos(up.Dot(dir.Normalized()));
-		var rotation = axis.LengthSquared() > 0.0001f ? new Quaternion(axis.Normalized(), angle) : Quaternion.Identity;
-		_ropeMeshInstance.GlobalTransform = new Transform3D(new Basis(rotation), mid);
-	}
 
 		if (GetParent().GetParent<Node>().IsMultiplayerAuthority())
 		{
@@ -164,6 +134,35 @@ public partial class ArmNode : MeshInstance3D
 		}
 	}
 
+	// Draws a line between the arm and the active lifepreserver
+	void UpdateRopeMesh()
+	{
+		if (_activeLifepreserverNode == null || !IsInstanceValid(_activeLifepreserverNode))
+		{
+			_ropeMeshInstance.Visible = false;
+			return;
+		}
+		Vector3 start = GlobalPosition;
+		Vector3 end = _activeLifepreserverNode.GlobalPosition;
+		Vector3 mid = (start + end) * 0.5f;
+		Vector3 dir = end - start;
+		float length = dir.Length();
+		if (length < 0.01f)
+		{
+			_ropeMeshInstance.Visible = false;
+			return;
+		}
+		_ropeMeshInstance.Visible = true;
+		_ropeMesh.Height = length;
+		_ropeMeshInstance.GlobalPosition = mid;
+		// Align the cylinder with the direction vector (default cylinder points up, so align Vector3.Up to dir)
+		var up = Vector3.Up;
+		var axis = up.Cross(dir.Normalized());
+		float angle = Mathf.Acos(up.Dot(dir.Normalized()));
+		var rotation = axis.LengthSquared() > 0.0001f ? new Quaternion(axis.Normalized(), angle) : Quaternion.Identity;
+		_ropeMeshInstance.GlobalTransform = new Transform3D(new Basis(rotation), mid);
+	}
+
 	public override void _PhysicsProcess(double delta)
 	{
 		// Host authoritative simulation: clients only render replicated state.
@@ -187,7 +186,7 @@ public partial class ArmNode : MeshInstance3D
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
 		}
 
-		if (_capturedPlayerNode != null && _activeLifepreserverNode != null && _capturedPlayerNode.CurrPlayerState == Player.PlayerState.Standing) 
+		if (_capturedPlayerNode != null && _activeLifepreserverNode != null && _capturedPlayerNode.CurrPlayerState == Player.PlayerState.Standing)
 		{
 			_capturedPlayerNode.GlobalPosition = _activeLifepreserverNode.GlobalPosition;
 			_capturedPlayerNode.GlobalRotation = _activeLifepreserverNode.GlobalRotation;
@@ -199,20 +198,19 @@ public partial class ArmNode : MeshInstance3D
 		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNode?.Name.ToString() ?? "", activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity, activeLifepreserver.GlobalRotation);
 	}
 
-	   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	   private void SyncWorldItemState(string nodeName, Vector3 globalPosition, Vector3 linearVelocity, Vector3 globalRotation)
-	   {
-		   if (string.IsNullOrEmpty(nodeName)) return;
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void SyncWorldItemState(string nodeName, Vector3 globalPosition, Vector3 linearVelocity, Vector3 globalRotation)
+	{
+		if (string.IsNullOrEmpty(nodeName)) return;
 
-		   Node itemContainer = GetItemContainerNode();
-		   UniversalInWorld itemNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
-		   if (itemNode == null) return;
+		Node itemContainer = GetItemContainerNode();
+		UniversalInWorld itemNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
+		if (itemNode == null) return;
 
-		   itemNode.GlobalPosition = globalPosition;
-		   itemNode.LinearVelocity = linearVelocity;
-		   itemNode.GlobalRotation = globalRotation;
-	   }
-
+		itemNode.GlobalPosition = globalPosition;
+		itemNode.LinearVelocity = linearVelocity;
+		itemNode.GlobalRotation = globalRotation;
+	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void SetItem(string itemPath, int itemCount)
@@ -234,12 +232,6 @@ public partial class ArmNode : MeshInstance3D
 		}
 	}
 
-	public void RequestToggleLifepreserverThrow(Vector3 throwDirection)
-	{
-		if (!IsMultiplayerAuthority()) return;
-		RpcId(1, MethodName.ToggleLifepreserverThrow, throwDirection);
-	}
-
 	private void RequestPullLifepreserver()
 	{
 		if (!IsMultiplayerAuthority()) return;
@@ -258,6 +250,12 @@ public partial class ArmNode : MeshInstance3D
 		{
 			RetractLifepreserver();
 		}
+	}
+
+	public void RequestToggleLifepreserverThrow(Vector3 throwDirection)
+	{
+		if (!IsMultiplayerAuthority()) return;
+		RpcId(1, MethodName.ToggleLifepreserverThrow, throwDirection);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -315,41 +313,41 @@ public partial class ArmNode : MeshInstance3D
 		Rpc(nameof(SetActiveLifepreserverNode), uniqueName);
 	}
 
-	   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	   private void SetActiveLifepreserverNode(string nodeName)
-	   {
-		   if (string.IsNullOrEmpty(nodeName))
-		   {
-			   _activeLifepreserverNode = null;
-			   if (_capturedPlayerNode != null)
-			   {
-				   int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
-				   _capturedPlayerNode.SetCapturedByLifepreserver(false);
-				   if (capturedAuthorityId != Multiplayer.GetUniqueId())
-				   {
-					   _capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
-				   }
-				   // Spawn the player slightly above the last preserver position to avoid ground collision
-				   _capturedPlayerNode.GlobalPosition += new Vector3(0, PlayerSpawnOffset, 0);
-				   _capturedPlayerNode.GlobalRotation = Vector3.Zero;
-			   }
-			   _capturedPlayerNode = null;
-			   return;
-		   }
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void SetActiveLifepreserverNode(string nodeName)
+	{
+		if (string.IsNullOrEmpty(nodeName))
+		{
+			_activeLifepreserverNode = null;
+			if (_capturedPlayerNode != null)
+			{
+				int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
+				_capturedPlayerNode.SetCapturedByLifepreserver(false);
+				if (capturedAuthorityId != Multiplayer.GetUniqueId())
+				{
+					_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
+				}
+				// Spawn the player slightly above the last preserver position to avoid ground collision
+				_capturedPlayerNode.GlobalPosition += new Vector3(0, PlayerSpawnOffset, 0);
+				_capturedPlayerNode.GlobalRotation = Vector3.Zero;
+			}
+			_capturedPlayerNode = null;
+			return;
+		}
 
-		   Node itemContainer = GetItemContainerNode();
-		   _activeLifepreserverNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
-		   // Hide the arm mesh when the lifepreserver is thrown
-		   Mesh = null;
-		   // Show rope mesh if preserver is active
-		   if (!string.IsNullOrEmpty(nodeName))
-		   {
-			   _ropeMeshInstance.Visible = true;
-		   }
-		   else
-		   {
-			   _ropeMeshInstance.Visible = false;
-		   }
+		Node itemContainer = GetItemContainerNode();
+		_activeLifepreserverNode = itemContainer?.GetNodeOrNull<UniversalInWorld>(nodeName);
+		// Hide the arm mesh when the lifepreserver is thrown
+		Mesh = null;
+		// Show rope mesh if preserver is active
+		if (!string.IsNullOrEmpty(nodeName))
+		{
+			_ropeMeshInstance.Visible = true;
+		}
+		else
+		{
+			_ropeMeshInstance.Visible = false;
+		}
 	}
 
 	private void RequestDropItem(Vector3 dropVelocity)
@@ -500,46 +498,46 @@ public partial class ArmNode : MeshInstance3D
 		return player.Velocity + player.GetPlatformVelocity();
 	}
 
-	   private void RetractLifepreserver()
-	   {
-		   UniversalInWorld activePreserver = GetActiveLifepreserverNode();
-		   if (activePreserver == null) return;
+	private void RetractLifepreserver()
+	{
+		UniversalInWorld activePreserver = GetActiveLifepreserverNode();
+		if (activePreserver == null) return;
 
-		   // Teleport captured player to the holder's position plus offset, then reset rotation and node
-		   if (_capturedPlayerNode != null)
-		   {
-			   // Get the player holding the preserver (the parent of this ArmNode)
-			   Player holder = GetParent()?.GetParent<Player>();
-			   Vector3 newPosition = _capturedPlayerNode.GlobalPosition;
-			   if (holder != null)
-			   {
-				   newPosition = holder.GlobalPosition + new Vector3(0, PlayerSpawnOffset, 0);
-				   _capturedPlayerNode.GlobalPosition = newPosition;
-			   }
-			   int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
-			   _capturedPlayerNode.SetCapturedByLifepreserver(false);
-			   if (capturedAuthorityId != Multiplayer.GetUniqueId())
-			   {
-				   _capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
-				   // Tell the client to sync their position and rotation
-				   _capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SyncCapturedTransform), newPosition, Vector3.Zero);
-			   }
-			   _capturedPlayerNode.GlobalRotation = Vector3.Zero;
-		   }
-		   _capturedPlayerNode = null;
+		// Teleport captured player to the holder's position plus offset, then reset rotation and node
+		if (_capturedPlayerNode != null)
+		{
+			// Get the player holding the preserver (the parent of this ArmNode)
+			Player holder = GetParent()?.GetParent<Player>();
+			Vector3 newPosition = _capturedPlayerNode.GlobalPosition;
+			if (holder != null)
+			{
+				newPosition = holder.GlobalPosition + new Vector3(0, PlayerSpawnOffset, 0);
+				_capturedPlayerNode.GlobalPosition = newPosition;
+			}
+			int capturedAuthorityId = _capturedPlayerNode.GetMultiplayerAuthority();
+			_capturedPlayerNode.SetCapturedByLifepreserver(false);
+			if (capturedAuthorityId != Multiplayer.GetUniqueId())
+			{
+				_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SetCapturedByLifepreserver), false);
+				// Tell the client to sync their position and rotation
+				_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SyncCapturedTransform), newPosition, Vector3.Zero);
+			}
+			_capturedPlayerNode.GlobalRotation = Vector3.Zero;
+		}
+		_capturedPlayerNode = null;
 
-		   // Store the item info before deletion
-		   InvItem itemObject = activePreserver.ItemObject;
-		   int itemCount = activePreserver.ItemCount;
+		// Store the item info before deletion
+		InvItem itemObject = activePreserver.ItemObject;
+		int itemCount = activePreserver.ItemCount;
 
-		   // Delete the preserver from the world and clear active state
-		   Rpc(nameof(DeleteWorldItemByName), activePreserver.Name.ToString());
-		   Rpc(nameof(SetActiveLifepreserverNode), "");
+		// Delete the preserver from the world and clear active state
+		Rpc(nameof(DeleteWorldItemByName), activePreserver.Name.ToString());
+		Rpc(nameof(SetActiveLifepreserverNode), "");
 
-		   // Return the item to the player's hand
-		   if (itemObject != null)
-		   {
-			   Rpc(nameof(SetItem), itemObject.ResourcePath, itemCount);
-		   }
-	   }
+		// Return the item to the player's hand
+		if (itemObject != null)
+		{
+			Rpc(nameof(SetItem), itemObject.ResourcePath, itemCount);
+		}
+	}
 }
