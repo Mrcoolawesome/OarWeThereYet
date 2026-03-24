@@ -15,12 +15,15 @@ func _ready() -> void:
   GlobalSignalServer.HostGameEnet.connect(become_host_enet)
   GlobalSignalServer.JoinGame.connect(join_lobby)
   GlobalSignalServer.GoToMainMenu.connect(back_to_main_menu)
+  GlobalSignalServer.DoneLoadingMap.connect(remove_ui)
+
+func remove_ui() -> void:
+  main_menu_ui.queue_free()
 
 func become_host_steam(is_public: bool, lobbyName: String):
   # get the new instance of the main menu ui and scene
   set_new_main_menu_instances()
   # remove the main menu ui
-  main_menu_ui.queue_free()
   menu_3d_scene.queue_free()
   $MultiplayerManager.become_host_steam(is_public, lobbyName) # call the generic become host function
 
@@ -28,7 +31,6 @@ func become_host_enet():
   # get the new instance of the main menu ui and scene
   set_new_main_menu_instances()
   # remove the main menu ui
-  main_menu_ui.queue_free()
   menu_3d_scene.queue_free()
   $MultiplayerManager.become_host() # call the generic become host function
 
@@ -36,7 +38,6 @@ func join_lobby(lobby_id):
   # get the new instance of the main menu ui and scene
   set_new_main_menu_instances()
   # remove the main menu ui
-  main_menu_ui.queue_free()
   menu_3d_scene.queue_free()
   $MultiplayerManager.join_as_client(lobby_id)
 
