@@ -37,7 +37,8 @@ func join_as_client(_lobby_id):
   multiplayer.multiplayer_peer = multiplayer_peer
 
 func _load_game_and_player(given_player_id: int) -> void:
-  # just need to set global variables so the loading stuff in '_process' can run
+  # just need to set global variables so the loading stuff in '_process' can run and start the loading process
+  ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
   loading = true
   player_id = given_player_id
 
@@ -68,9 +69,6 @@ func _add_level():
   var test_level = level.instantiate()
   test_level.set("SaveSlot", GlobalVariables.save_slot)
   level_container.add_child(test_level)
-
-func _request_level_load() -> void:
-  ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
 
 func _add_player_to_game(id: int):
   # this is where we have to add them properly to the level	
