@@ -28,6 +28,7 @@ func _on_join_button_pressed() -> void:
 		_show_menu(MenuType.JOIN_MENU)
 		join_menu_container._look_for_lobbies(0) # looks for the lobbies, 0 is the default which is friends lobbies
 	else:
+		GlobalSignalServer.emit_signal("ShowLoadingScreen")
 		GlobalSignalServer.emit_signal("JoinGame", 0) # lobby id doesn't matter for ENet network
 
 func _on_settings_button_pressed() -> void:

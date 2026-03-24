@@ -9,4 +9,5 @@ func initalize(given_lobby_id: int, given_lobby_name: String) -> void:
 
 func _on_join_lobby_button_pressed() -> void:
 	# join the lobby with the given id
+	GlobalSignalServer.emit_signal("ShowLoadingScreen")
 	GlobalSignalServer.emit_signal("JoinGame", lobby_id)

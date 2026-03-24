@@ -37,6 +37,9 @@ func join_as_client(_lobby_id):
   multiplayer.multiplayer_peer = multiplayer_peer
 
 func _load_game_and_player(given_player_id: int) -> void:
+  # need to let the loading screen show up, so wait for like two frames
+  await get_tree().process_frame 
+  await get_tree().process_frame 
   # just need to set global variables so the loading stuff in '_process' can run and start the loading process
   ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
   loading = true
