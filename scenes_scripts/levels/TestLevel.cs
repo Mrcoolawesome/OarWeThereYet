@@ -144,6 +144,8 @@ public partial class TestLevel : Node
 		// Set new checkpoint
 		_gameSaves.CheckpointNum = checkpointNum;
 
+		SetBoatSpawn();
+
 		// Collect held items as world items positioned at the boat
 		var heldItems = new Array<Dictionary<string, Variant>>();
 		foreach (Node player in GetTree().GetNodesInGroup("players"))
@@ -156,9 +158,9 @@ public partial class TestLevel : Node
 					{ "name",  $"held_{player.Name}" },
 					{ "path",  arm.Item.Data.ResourcePath },
 					{ "count", arm.Item.Amount },
-					{ "pos_x", _boat.GlobalPosition.X },
-					{ "pos_y", _boat.GlobalPosition.Y + 1},
-					{ "pos_z", _boat.GlobalPosition.Z },
+					{ "pos_x", _boat.BoatResetPosition.X },
+					{ "pos_y", _boat.BoatResetPosition.Y + 1},
+					{ "pos_z", _boat.BoatResetPosition.Z },
 				});
 			}
 		}

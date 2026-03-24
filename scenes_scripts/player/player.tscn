@@ -1,9 +1,10 @@
-[gd_scene load_steps=16 format=3 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=17 format=3 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
 [ext_resource type="PackedScene" uid="uid://drdil87ecc2qr" path="res://art/models/character2.blend" id="3_rgyib"]
 [ext_resource type="PackedScene" uid="uid://b2yilq5mplalt" path="res://art/models/character-local.blend" id="4_hg6s5"]
+[ext_resource type="Theme" uid="uid://dujaq66w8tdw7" path="res://art/themes/dongleFont.tres" id="4_uwfgf"]
 [ext_resource type="PackedScene" uid="uid://rwsu0iw4awvo" path="res://scenes_scripts/UI/pause_ui/pause_ui.tscn" id="5_8t03j"]
 [ext_resource type="Material" uid="uid://d0v5pv2hfg3nt" path="res://scenes_scripts/levels/stylized-map/misc-stuff/outline.tres" id="5_sfgrd"]
 [ext_resource type="PackedScene" uid="uid://dyjf8cl7dhrr5" path="res://scenes_scripts/UI/hud/hud.tscn" id="6_2ieo8"]
@@ -62,9 +63,48 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 Player = NodePath("../../../..")
 
 [node name="ArmNode" type="MeshInstance3D" parent="Head"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.39999998, -1.4)
 skeleton = NodePath("../..")
 script = ExtResource("7_csk1d")
+
+[node name="ControlHints" type="CanvasLayer" parent="Head/ArmNode"]
+
+[node name="Control" type="Control" parent="Head/ArmNode/ControlHints"]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Head/ArmNode/ControlHints/Control"]
+layout_direction = 2
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -236.0
+offset_right = -39.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Hint1" type="Label" parent="Head/ArmNode/ControlHints/Control/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("4_uwfgf")
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 80
+
+[node name="Hint2" type="Label" parent="Head/ArmNode/ControlHints/Control/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("4_uwfgf")
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 80
 
 [node name="AimLook" type="Node" parent="."]
 
@@ -164,6 +204,14 @@ settings/0/gravity/direction = Vector3(0, -1, 0)
 settings/0/enable_all_child_collisions = true
 settings/0/exclude_collision_count = 0
 
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="FullPlayerModel/Armature/Skeleton3D" index="10"]
+transform = Transform3D(-2.1918778e-07, -0.99678516, -0.08011978, 0.9999998, -6.120127e-08, -4.658333e-07, 4.492699e-07, -0.08011973, 0.99678487, -1.458127, 1.0468539, -0.1132061)
+bone_name = "hand.R"
+bone_idx = 14
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/Armature/Skeleton3D/BoneAttachment3D"]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+
 [node name="LocalPlayerModel" parent="." instance=ExtResource("4_hg6s5")]
 transform = Transform3D(-0.5, 0, 4.371139e-08, 0, 0.5, 0, -4.371139e-08, 0, -0.5, 0, -1, 0)
 visible = false
@@ -174,6 +222,7 @@ visible = false
 [node name="PauseUI" parent="PauseCanvas" instance=ExtResource("5_8t03j")]
 
 [node name="InventoryUI" parent="." instance=ExtResource("8_a5pl4")]
+visible = false
 
 [node name="HUD" parent="." instance=ExtResource("6_2ieo8")]
 visible = false

@@ -44,46 +44,43 @@ public partial class Inventory : Node
   public Array<Dictionary<string, Variant>> SerializeInventory()
   {
     var networkArray = new Array<Dictionary<string, Variant>>();
-
-    foreach (InvSlot slot in Slots)
+    // Always serialize exactly Capacity slots
+    for (int i = 0; i < Capacity; i++)
     {
+      InvSlot slot = (i < Slots.Count) ? Slots[i] : new InvSlot(null, 0);
       var slotData = new Dictionary<string, Variant>();
-
-      if (slot.Data != null)
-      {
-        slotData["id"] = slot.Data.ResourcePath;
-      }
-      else
-      {
-        slotData["id"] = "";
-      }
-
+      slotData["id"] = slot.Data != null ? slot.Data.ResourcePath : "";
       slotData["amount"] = slot.Amount;
-
-      networkArray.Add(slotData); 
+      networkArray.Add(slotData);
     }
-
     return networkArray;
   }
 
   public void DeserializeInventory(Array<Dictionary<string, Variant>> networkArray)
   {
     Slots.Clear();
-
-    foreach (Dictionary<string, Variant> slotData in networkArray)
+    // Only use up to Capacity slots from the serialized data
+    int count = networkArray.Count;
+    for (int i = 0; i < Capacity; i++)
     {
-      string path = (string)slotData["id"];
-      int amount = (int)slotData["amount"];
-
-      InvItem item = null;
-      if (path != "")
+      if (i < count)
       {
-        item = GD.Load<InvItem>(path);
+        Dictionary<string, Variant> slotData = networkArray[i];
+        string path = (string)slotData["id"];
+        int amount = (int)slotData["amount"];
+        InvItem item = null;
+        if (!string.IsNullOrEmpty(path))
+        {
+          item = GD.Load<InvItem>(path);
+        }
+        Slots.Add(new InvSlot(item, amount));
       }
-
-      Slots.Add(new InvSlot(item, amount));
+      else
+      {
+        // Fill remaining slots with empty
+        Slots.Add(new InvSlot(null, 0));
+      }
     }
-
     EmitSignal(SignalName.InventoryUpdated);
   }
 

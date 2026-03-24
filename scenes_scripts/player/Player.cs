@@ -137,6 +137,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// get the arm node
 	private ArmNode _armNode;
 
+	// Get the terrain
+	private Node3D _terrain;
+	private GodotObject _terrainData;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -178,6 +182,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     _waterPhysics = GetNode<WaterPhysics>("WaterPhysics");
 		_riverFloatSystem = GetParent().GetNode<RiverFloatSystem>("RiverManager/RiverFloatSystem");
 		_waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
+		
+		// Get terrain
+		_terrain = GetNode<Node3D>("../Terrain3D");
+		_terrainData = _terrain.Get("data").AsGodotObject();
 
 		// get the armnode
 		_armNode = GetNode<ArmNode>("Head/ArmNode");
@@ -286,6 +294,16 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				_interactRay.Enabled = false;
 				RowingStateProcess();
 				break;
+		}
+
+		// If player falls below terrain, teleport them back up
+		if (_terrainData != null)
+		{
+			float terrainHeight = _terrainData.Call("get_height", GlobalPosition).AsSingle();
+			if (GlobalPosition.Y - terrainHeight < -2.0f || GlobalPosition.Y <= -110)
+			{
+				RequestSitInSeat(-1);
+			}
 		}
   }
 
