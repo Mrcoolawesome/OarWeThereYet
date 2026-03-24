@@ -53,6 +53,10 @@ public partial class GlobalSignalServer : Node
   public delegate void LoadGameEventHandler();
   [Signal]
   public delegate void GoToMainMenuEventHandler();
+  [Signal]
+  public delegate void ShowLoadingScreenEventHandler();
+  [Signal]
+  public delegate void DoneLoadingMapEventHandler();
 
   public int Health { get; set; }
 
