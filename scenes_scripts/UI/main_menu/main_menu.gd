@@ -8,8 +8,9 @@ extends Control
 @onready var join_menu_container: Control = $JoinGamePopUpMenu
 @onready var settings_menu_container: Control = $SettingsContainer
 @onready var select_save_menu: Control = $SelectSavePopupMenu
+@onready var loading_screen: Control = $LoadingScreen
 
-enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU, SAVE_MENU}
+enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU, SAVE_MENU, LOADING_SCREEN}
 
 func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
@@ -49,6 +50,9 @@ func _on_select_save_button_pressed() -> void:
 func _on_select_save_popup_menu_deleted_save() -> void:
 	_show_menu(MenuType.SAVE_MENU)
 
+func _show_loading_screen() -> void:
+	_show_menu(MenuType.LOADING_SCREEN)
+
 func _show_menu(menu: MenuType) -> void:
 	# make them all invisible except for one
 	join_menu_container.visible = false
@@ -56,6 +60,7 @@ func _show_menu(menu: MenuType) -> void:
 	main_menu_container.visible = false
 	settings_menu_container.visible = false
 	select_save_menu.visible = false
+	loading_screen.visible = false
 
 	# make the specified menu visible
 	match menu:
@@ -69,4 +74,6 @@ func _show_menu(menu: MenuType) -> void:
 			main_menu_container.visible = true
 		MenuType.SAVE_MENU:
 			select_save_menu.visible = true
+		MenuType.LOADING_SCREEN:
+			loading_screen.visible = true
 

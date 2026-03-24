@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://d34pgbgxmrpd5"]
+[gd_scene load_steps=11 format=3 uid="uid://d34pgbgxmrpd5"]
 
 [ext_resource type="Script" uid="uid://c6yprd4vlj76t" path="res://scenes_scripts/UI/main_menu/main_menu.gd" id="1_4cwpn"]
 [ext_resource type="Texture2D" uid="uid://clw8cwtrtug24" path="res://art/Images/steam.webp" id="4_ev3b6"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://caadborm3nbjt" path="res://scenes_scripts/UI/pop_up_menu/join_popup_menu/join_game_pop_up_menu.tscn" id="7_rps2o"]
 [ext_resource type="StyleBox" uid="uid://660ef4736dm7" path="res://scenes_scripts/UI/shader/blur_stylebox.tres" id="7_s46lk"]
 [ext_resource type="PackedScene" uid="uid://cwoh3ayn5hlr1" path="res://scenes_scripts/UI/settings_menu/settings_menu.tscn" id="8_s46lk"]
+[ext_resource type="PackedScene" uid="uid://2kw5prrsjwae" path="res://scenes_scripts/UI/loading_screen/loading-screen.tscn" id="10_380h7"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -99,6 +100,10 @@ theme_override_styles/panel = ExtResource("7_s46lk")
 [node name="SettingsMenu" parent="SettingsContainer" instance=ExtResource("8_s46lk")]
 layout_mode = 1
 reset_menu_visible = false
+
+[node name="LoadingScreen" parent="." instance=ExtResource("10_380h7")]
+visible = false
+layout_mode = 1
 
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]
