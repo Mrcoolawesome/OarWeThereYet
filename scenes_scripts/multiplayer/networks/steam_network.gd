@@ -7,10 +7,14 @@ var _max_lobby_members = 4
 # we're just gonna hardcode the lobby name for now
 var LOBBY_NAME = "gaming"
 
-# player scene and test level scene
+# player scene and level scene path
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
-var level_scene = preload("res://scenes_scripts/levels/stylized-map/stylized-map.tscn")
+const LEVEL_SCENE_PATH = "res://scenes_scripts/levels/stylized-map/stylized-map.tscn"
 var level_name = "DemoLevel"
+
+# global values to load the level in
+var loading: bool = false
+var player_id: int = -1
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
 @onready var main_root_scene = get_tree().current_scene
@@ -35,6 +39,22 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
   Steam.run_callbacks() # this is so that i can run stuff outside of this with steam
 
+  # level loading logic
+  if (loading):
+    # for some reason the progress is returned as a 1 element array with the percentage completed
+    var progress = []
+    var status = ResourceLoader.load_threaded_get_status(LEVEL_SCENE_PATH, progress)
+    
+    if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
+      # done loading
+      loading = false
+      # actually load the level in
+      _add_level()
+      # put the player in the world now that it's done loading
+      _add_player_to_game(player_id)
+      # we can remove the main menu ui now
+      GlobalSignalServer.emit_signal("DoneLoadingMap")
+
 func become_host(is_public: bool, lobby_name: String):
   # create a public or private lobby with a max player count of 4
   if is_public:
@@ -55,29 +75,34 @@ func become_host(is_public: bool, lobby_name: String):
   multiplayer.peer_connected.connect(_add_player_to_game)
   multiplayer.peer_disconnected.connect(_remove_player)
 
-  # add the level first
-  _add_level()
-
-  # add the server's player to the game and set its id to 1
-  _add_player_to_game(1)
+  # add the level and player in
+  _load_game_and_player(1)
 
 func join_as_client(lobby_id):
   # connect the current instance's peer to the lobby given the lobbies id
   is_client = true
   Steam.joinLobby(lobby_id)
 
+func _load_game_and_player(given_player_id: int) -> void:
+  # need to let the loading screen show up, so wait for like two frames
+  await get_tree().process_frame 
+  await get_tree().process_frame 
+  # just need to set global variables so the loading stuff in '_process' can run and start the loading process
+  ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
+  loading = true
+  player_id = given_player_id
+
 func _add_level():
-  # only add the level if the current instance is the server
-  if multiplayer.is_server():
-    # load the level
-    var test_level = level_scene.instantiate()
-    test_level.set("SaveSlot", GlobalVariables.save_slot)
-    level_container.add_child(test_level)
+  # load the level
+  var level: Resource = ResourceLoader.load_threaded_get(LEVEL_SCENE_PATH)
+  var test_level = level.instantiate()
+  test_level.set("SaveSlot", GlobalVariables.save_slot)
+  level_container.add_child(test_level)
 
 '''
   this just prints their lobby id and then also sets the lobby metadata
 '''
-func _on_lobby_created(result: int, lobby_id):	
+func _on_lobby_created(result: int, lobby_id):  
   if result == Steam.Result.RESULT_OK:
     # set the global id
     _hosted_lobby_id = lobby_id
@@ -89,7 +114,7 @@ func _on_lobby_created(result: int, lobby_id):
     Steam.setLobbyData(_hosted_lobby_id, "name", LOBBY_NAME)
 
 func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
-  # if they 
+  # if they aren't a client don't let them join as one
   if !is_client:
     return
   
@@ -112,7 +137,11 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _respons
   # reset this 
   is_client = false
 
-func _add_player_to_game(id: int):	
+  # Now that the peer is fully connected, grab our actual ID and start loading
+  var my_actual_id = multiplayer.get_unique_id()
+  _load_game_and_player(my_actual_id)
+
+func _add_player_to_game(id: int):  
   # the Level container should always be there, just need to check if it has a level actually loaded (as a child) in it
   if level_container.get_child_count() > 0:
     # Get the actual map node (the first child of the Level container)
@@ -136,7 +165,7 @@ func _add_player_to_game(id: int):
   else:
       print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
 
-@rpc("authority", "reliable")
+@rpc("authority", "reliable", "call_local")
 func _assign_camera(id: int) -> void:
   var current_map = level_container.get_child(0)
   # Check if the player we just spawned is OUR local player
@@ -157,7 +186,7 @@ func _assign_camera(id: int) -> void:
 '''
   find the player we're looking to remove, and remove their instance.
 '''
-func _remove_player(id : int):		
+func _remove_player(id : int):    
   ProxChat.stop_voice()
 
   # recursively looks for the player
