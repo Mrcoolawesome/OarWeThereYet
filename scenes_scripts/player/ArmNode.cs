@@ -15,6 +15,7 @@ public partial class ArmNode : MeshInstance3D
 	private UniversalInWorld _activeLifepreserverNode = null;
 	private Player _capturedPlayerNode = null;
 	private Player _player;
+	private MeshInstance3D _playerHandBone;
 
 	// Used to compute the arm's velocity from frame-to-frame position changes
 	private Vector3 _previousGlobalPosition;
@@ -34,7 +35,7 @@ public partial class ArmNode : MeshInstance3D
 
 	public override void _Ready()
 	{
-		Mesh = null;
+		SetMesh(null);
 		_previousGlobalPosition = GlobalPosition;
 
 		// Create a root node for the rope mesh at the world origin
@@ -59,6 +60,7 @@ public partial class ArmNode : MeshInstance3D
 		_ropeRoot.AddChild(_ropeMeshInstance);
 
 		_player = GetParent().GetParent<Player>();
+		_playerHandBone = _player.GetNodeOrNull<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/BoneAttachment3D/MeshInstance3D");
 		SetMultiplayerAuthority(int.Parse(_player.Name.ToString()));
 
 		// Get hint labels
@@ -81,7 +83,7 @@ public partial class ArmNode : MeshInstance3D
 		// Hide the mesh if the lifepreserver is active
 		if (_activeLifepreserverNode != null)
 		{
-			Mesh = null;
+			SetMesh(null);
 			// Show and update the rope mesh
 			_ropeMeshInstance.Visible = true;
 			UpdateRopeMesh();
@@ -92,7 +94,7 @@ public partial class ArmNode : MeshInstance3D
 			{
 				if (Item.Data.UseAction is Oar && _player.CurrPlayerState == Player.PlayerState.Rowing)
 				{
-					Mesh = null;
+					SetMesh(null);
 				}
 				else
 				{
@@ -105,12 +107,12 @@ public partial class ArmNode : MeshInstance3D
 						Position = Item.Data.InHandPosition;
 					}
 					Rotation = Item.Data.InHandRotation;
-					Mesh = Item.Data.ItemMesh;
+					SetMesh(Item.Data.ItemMesh);
 				}
 			}
 			else
 			{
-				Mesh = null;
+				SetMesh(null);
 			}
 			// Hide the rope mesh
 			_ropeMeshInstance.Visible = false;
@@ -126,6 +128,9 @@ public partial class ArmNode : MeshInstance3D
 
 				// Subtract platform contribution so we only cap the player's own throw velocity
 				Vector3 throwVelocity = (_armVelocity - platformVelocity).LimitLength(MaxThrowVelocity);
+
+				// Reset holding position
+				Position = new Vector3(0.0f, 0.23f, -1.4f);
 
 				// Add uncapped platform velocity back on top
 				RequestDropItem(throwVelocity + platformVelocity);
@@ -602,6 +607,21 @@ public partial class ArmNode : MeshInstance3D
 			}
 			_hint1.Visible = true;
 			_hint2.Visible = true;
+		}
+	}
+
+	private new void SetMesh(Mesh meshVar)
+	{
+		if (IsMultiplayerAuthority())
+		{
+			Mesh = meshVar;
+		}
+		else
+		{
+			if (_playerHandBone != null)
+			{
+				_playerHandBone.Mesh = meshVar;
+			}
 		}
 	}
 }

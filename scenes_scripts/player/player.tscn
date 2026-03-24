@@ -202,6 +202,14 @@ settings/0/gravity/direction = Vector3(0, -1, 0)
 settings/0/enable_all_child_collisions = true
 settings/0/exclude_collision_count = 0
 
+[node name="BoneAttachment3D" type="BoneAttachment3D" parent="FullPlayerModel/Armature/Skeleton3D" index="10"]
+transform = Transform3D(-2.1918778e-07, -0.99678516, -0.08011978, 0.9999998, -6.120127e-08, -4.658333e-07, 4.492699e-07, -0.08011973, 0.99678487, -1.458127, 1.0468539, -0.1132061)
+bone_name = "hand.R"
+bone_idx = 14
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/Armature/Skeleton3D/BoneAttachment3D"]
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+
 [node name="LocalPlayerModel" parent="." instance=ExtResource("4_hg6s5")]
 transform = Transform3D(-0.5, 0, 4.371139e-08, 0, 0.5, 0, -4.371139e-08, 0, -0.5, 0, -1, 0)
 visible = false
