@@ -208,6 +208,9 @@ spawn_limit = 4
 environment = SubResource("Environment_lnqtx")
 camera_attributes = SubResource("CameraAttributesPractical_lnqtx")
 
+[node name="Rock60" parent="SunAndSky/WorldEnvironment" instance=ExtResource("9_sfwft")]
+transform = Transform3D(-9.061039, -3.5493145, -4.6609054, -5.7609625, 6.9578753, 5.9011335, 1.0644133, 7.4440885, -7.738002, 2512.4211, -90.62412, 166.83618)
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SunAndSky"]
 transform = Transform3D(1, 0, 0, 0, 0.658335, 0.7527252, 0, -0.7527252, 0.658335, 0, 0, 0)
 light_energy = 0.6
@@ -440,9 +443,6 @@ transform = Transform3D(2.9871187, 1.1425881, -4.357249, -1.9608521, 5.0367174, 
 
 [node name="Rock59" parent="Rocks" instance=ExtResource("9_sfwft")]
 transform = Transform3D(-6.2184424, -2.4358366, -3.1987038, -2.6864219, 6.9004436, -0.032198712, 2.9913442, 1.1334021, -6.678419, 2451.7903, -87.367966, 178.33987)
-
-[node name="Rock60" parent="Rocks" instance=ExtResource("9_sfwft")]
-transform = Transform3D(-9.061039, -3.5493145, -4.6609054, -5.7609625, 6.9578753, 5.9011335, 1.0644133, 7.4440885, -7.738002, 2512.4211, -90.62412, 166.83618)
 
 [node name="Rock35" parent="Rocks" instance=ExtResource("9_sfwft")]
 transform = Transform3D(-4.541251, -1.4567721, -6.235168, -2.438475, 7.4615865, 0.032700706, 5.920587, 1.9557714, -4.769076, 1779.4086, -27.226936, 646.8281)

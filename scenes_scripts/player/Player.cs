@@ -300,7 +300,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		if (_terrainData != null)
 		{
 			float terrainHeight = _terrainData.Call("get_height", GlobalPosition).AsSingle();
-			if (GlobalPosition.Y - terrainHeight < -2.0f)
+			if (GlobalPosition.Y - terrainHeight < -2.0f || GlobalPosition.Y <= -110)
 			{
 				RequestSitInSeat(-1);
 			}
