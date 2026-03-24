@@ -59,6 +59,8 @@ func _process(_delta: float) -> void:
       _add_level()
       # put the player in the world now that it's done loading
       _add_player_to_game(player_id)
+      # we can remove the main menu ui now
+      GlobalSignalServer.emit_signal("DoneLoadingMap")
 
 func _add_level():
   # load the level

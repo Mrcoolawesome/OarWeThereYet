@@ -12,6 +12,9 @@ extends Control
 
 enum MenuType {HOST_MENU, JOIN_MENU, SETTINGS_MENU, MAIN_MENU, SAVE_MENU, LOADING_SCREEN}
 
+func _ready() -> void:
+	GlobalSignalServer.ShowLoadingScreen.connect(_show_loading_screen)
+
 func _on_id_prompt_text_changed(new_text: String) -> void:
 	join_button.disabled = new_text.length() == 0
 
