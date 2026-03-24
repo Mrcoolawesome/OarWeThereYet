@@ -30,11 +30,20 @@ public partial class PauseUi : Control
 		{
 			// if they're the server then tell everyone to go to the main menu
 			Rpc(nameof(BroadcastCloseGame));
+
+			// go to the main menu locally
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
+
+			// destroy this server peer
+			Multiplayer.MultiplayerPeer.Close();
 		} 
 		else
 		{
 			// if they're not the server then just emit the goto menu signal locally
 			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
+
+			// remove their multiplayer peer, which will trigger the _remove_player function in the network scripts
+      Multiplayer.MultiplayerPeer.Close();
 		}
 	}
 

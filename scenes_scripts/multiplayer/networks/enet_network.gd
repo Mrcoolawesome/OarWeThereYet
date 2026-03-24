@@ -6,7 +6,6 @@ const SERVER_IP = "127.0.0.1"
 var multiplayer_peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
 const LEVEL_SCENE_PATH = "res://scenes_scripts/levels/stylized-map/stylized-map.tscn"
-var level_name = "DemoLevel"
 
 # global values to load the level in
 var loading: bool = false
@@ -131,8 +130,8 @@ func _assign_camera(id: int) -> void:
 '''
 func _remove_player(id : int):    
   # recursively looks for the player
-  var active_level = level_container.get_node_or_null(level_name)
-  var player_node = active_level.get_node_or_null(str(id))
+  var active_level = level_container.get_children()[0];
+  var player_node = active_level.get_node_or_null(str(id)) # recursively looks for the player
   
   if player_node:
     # Player drops item if they're holding it
