@@ -23,19 +23,17 @@ public partial class PauseUi : Control
 		EmitSignal(SignalName.Resume);
 	}
 
-	private void OnExitButtonPressed()
+	private async void OnExitButtonPressed()
 	{
 		// tell the signal server to tell the game manager to kill the level put the main menu back
 		if (Multiplayer.IsServer())
 		{
-			// if they're the server then tell everyone to go to the main menu
+			// if they're the server then tell everyone to go to the main menu, which will make us go to the main menu too
 			Rpc(nameof(BroadcastCloseGame));
-
-			// go to the main menu locally
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
 
 			// destroy this server peer
 			Multiplayer.MultiplayerPeer.Close();
+			Multiplayer.MultiplayerPeer = null; // yes we actually have to manually do this
 		} 
 		else
 		{
@@ -44,6 +42,7 @@ public partial class PauseUi : Control
 
 			// remove their multiplayer peer, which will trigger the _remove_player function in the network scripts
       Multiplayer.MultiplayerPeer.Close();
+			Multiplayer.MultiplayerPeer = null;
 		}
 	}
 
@@ -52,6 +51,14 @@ public partial class PauseUi : Control
 	private void BroadcastCloseGame()
 	{
 		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
+
+		// NEW: If we are a client and the server just told us to close, 
+    // we MUST destroy our local peer so we don't become a ghost!
+    if (!Multiplayer.IsServer())
+    {
+			Multiplayer.MultiplayerPeer.Close();
+			Multiplayer.MultiplayerPeer = null;
+    }
 	}
 
 	private void OnSettingsButtonPressed()
