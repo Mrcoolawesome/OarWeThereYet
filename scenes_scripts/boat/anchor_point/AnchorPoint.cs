@@ -6,7 +6,8 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 {
   [Export] public string PromptMessage { get; set; } = "Reset Anchor";
 	public string PromptInput { get; set; } = "action_key";
-  public StaticBody3D _anchor;
+  private StaticBody3D _anchor;
+  private bool _deployed = false;
 
   public override void _Ready()
   {
@@ -20,7 +21,18 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
 	public void Interact(Player player)
 	{
-		_anchor.Visible = !_anchor.Visible;
-    player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
+    if (_deployed)
+    {
+      // Remove anchor from world or hand
+      _anchor.Visible = true;
+    }
+    else
+    {
+      player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
+      _anchor.Visible = false;
+
+    }
+
+    _deployed = !_deployed;
 	}
 }
