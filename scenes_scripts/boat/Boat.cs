@@ -312,6 +312,13 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     // we need to use integrate forces to get the exact position of the colliding object 
     public override void _IntegrateForces(PhysicsDirectBodyState3D state)
     {
+        // If the peer is missing, OR if the ENet socket is closed/disconnected, bail out immediately!
+        if (Multiplayer.MultiplayerPeer == null || 
+            Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Disconnected) 
+        {
+            return;
+        }
+
         // Process Pending Resets FIRST
         if (_resetPending)
         {

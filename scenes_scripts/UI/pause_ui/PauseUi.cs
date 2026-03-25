@@ -16,50 +16,43 @@ public partial class PauseUi : Control
 		// get the stuff from the tree
 		_settingsMenu = GetNode<Control>("PanelContainer/SettingsMenu");
 		_mainContainer = GetNode<MarginContainer>("PanelContainer/PauseButtonMainContainer");
+
+		Multiplayer.ServerDisconnected += OnServerDisconnected;
 	}
 
 	private void OnResumeButtonPressed()
-	{
-		EmitSignal(SignalName.Resume);
-	}
+  {
+    EmitSignal(SignalName.Resume);
+  }
 
-	private async void OnExitButtonPressed()
-	{
-		// tell the signal server to tell the game manager to kill the level put the main menu back
-		if (Multiplayer.IsServer())
-		{
-			// if they're the server then tell everyone to go to the main menu, which will make us go to the main menu too
-			Rpc(nameof(BroadcastCloseGame));
+  private void OnExitButtonPressed()
+  {
+    // Whether we are the Host or the Client, the process is now exactly the same!
+    // 1. Tell the local game manager to go to the main menu
+    GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
 
-			// destroy this server peer
-			Multiplayer.MultiplayerPeer.Close();
-			Multiplayer.MultiplayerPeer = null; // yes we actually have to manually do this
-		} 
-		else
-		{
-			// if they're not the server then just emit the goto menu signal locally
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
-
-			// remove their multiplayer peer, which will trigger the _remove_player function in the network scripts
-      Multiplayer.MultiplayerPeer.Close();
-			Multiplayer.MultiplayerPeer = null;
-		}
-	}
-
-	// this runs on everyone's machine so everybody goes to the main menu, only the server should be able to call this
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void BroadcastCloseGame()
-	{
-		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
-
-		// NEW: If we are a client and the server just told us to close, 
-    // we MUST destroy our local peer so we don't become a ghost!
-    if (!Multiplayer.IsServer())
+    // 2. Nuke the network connection
+    // (If we are the Host, this triggers "OnServerDisconnected" on all connected clients automatically!)
+    if (Multiplayer.MultiplayerPeer != null)
     {
-			Multiplayer.MultiplayerPeer.Close();
-			Multiplayer.MultiplayerPeer = null;
+      Multiplayer.MultiplayerPeer.Close();
+      Multiplayer.MultiplayerPeer = null;
     }
-	}
+  }
+
+  // This fires automatically on the CLIENT if the HOST closes their game or loses internet
+  private void OnServerDisconnected()
+  {
+    // Force the client back to the main menu
+    GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
+
+    // Clean up their local peer so they don't become a ghost
+    if (Multiplayer.MultiplayerPeer != null)
+    {
+      Multiplayer.MultiplayerPeer.Close();
+      Multiplayer.MultiplayerPeer = null;
+    }
+  }
 
 	private void OnSettingsButtonPressed()
 	{
