@@ -21,5 +21,6 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 	public void Interact(Player player)
 	{
 		_anchor.Visible = !_anchor.Visible;
+    player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
 	}
 }
