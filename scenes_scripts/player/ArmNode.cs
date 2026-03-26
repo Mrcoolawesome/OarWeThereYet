@@ -424,8 +424,9 @@ public partial class ArmNode : MeshInstance3D
 			string uniqueName = $"DroppedItem_{Multiplayer.GetUniqueId()}_{_dropCounter++}";
 
 			// Tell all peers to spawn the item and clear the arm
-			Rpc(nameof(SpawnDroppedItem), itemPath, itemCount, dropPosition, uniqueName, dropVelocity);
+			// We clear the item first so its SetAnchor("") signal doesn't override the new item's signal
 			Rpc(nameof(SetItem), "", 0);
+			Rpc(nameof(SpawnDroppedItem), itemPath, itemCount, dropPosition, uniqueName, dropVelocity);
 		}
 	}
 
