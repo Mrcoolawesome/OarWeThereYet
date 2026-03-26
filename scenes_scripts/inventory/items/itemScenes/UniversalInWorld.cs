@@ -131,7 +131,7 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   }
 
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void DeleteItem()
+	public void DeleteItem()
   {
     QueueFree();
   }

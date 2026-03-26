@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 public partial class AnchorPoint : StaticBody3D, Interactable
 {
@@ -35,27 +36,36 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     if (_deployed)
     {
       // Remove anchor from world or hand
+      RpcId(1, nameof(DeleteAnchor));
+      _deployedAnchor = null;
       _anchor.Visible = true;
     }
     else
     {
       player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
       _anchor.Visible = false;
-
     }
 
     _deployed = !_deployed;
   }
 
-  public void GetAnchorPosition()
-  {
-    // Get the position of UniversalInWorld or player hand bone
-  }
-
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   public void DeleteAnchor()
   {
+    if (!Multiplayer.IsServer()) return;
+
     // Remove item from world or remove from player's ArmNode
     // Make sure you use the proper rpc calls to do this
+    if (_deployedAnchor is MeshInstance3D)
+    {
+      ArmNode arm = _deployedAnchor.GetNode<ArmNode>("../../../../../Head/ArmNode");
+      arm.Rpc(nameof(arm.SetItem), "", 0);
+    }
+
+    if (_deployedAnchor is UniversalInWorld anchorInWorld)
+    {
+      anchorInWorld.Rpc(nameof(anchorInWorld.DeleteItem));
+    }
   }
 
   public void RequestSetAnchor(string anchorNodePath)
@@ -63,11 +73,12 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 		RpcId(1, nameof(SetAnchor), anchorNodePath);
 	}
 	
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   public void SetAnchor(string anchorNodePath)
   {
+    if (!Multiplayer.IsServer()) return;
+
     // Set anchor to be the UniversalInWorld or ArmNode
-    GD.Print(anchorNodePath);
     _deployedAnchor = GetNode<Node3D>(anchorNodePath);
   }
 }
