@@ -40,6 +40,12 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     _waterPhysics = GetNode<WaterPhysics>("WaterPhysics");
 		_riverFloatSystem = GetNode<RiverFloatSystem>("../../RiverManager/RiverFloatSystem");
 		_waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
+
+    // If anchor, emit setanchor signal
+    if (Item?.Data.Name == "Anchor")
+    {
+      GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), GetPath());
+    }
   }
 
   public override void _Process(double delta)

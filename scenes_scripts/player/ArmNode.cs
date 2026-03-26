@@ -266,6 +266,13 @@ public partial class ArmNode : MeshInstance3D
 		else
 		{
 			Item = new InvSlot(GD.Load<InvItem>(itemPath), itemCount);
+
+			// If anchor emit SetAnchor signal
+			if (Item?.Data.Name == "Anchor")
+			{
+				GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), 
+				_player.GetNode("FullPlayerModel/Armature/Skeleton3D/BoneAttachment3D/MeshInstance3D").GetPath());
+			}
 		}
 	}
 

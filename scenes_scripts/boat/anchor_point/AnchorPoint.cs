@@ -8,10 +8,13 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 	public string PromptInput { get; set; } = "action_key";
   private StaticBody3D _anchor;
   private bool _deployed = false;
+  private Node3D _deployedAnchor;
 
   public override void _Ready()
   {
     _anchor = GetNode<StaticBody3D>("Anchor");
+
+    GlobalSignalServer.Instance.SetAnchor += RequestSetAnchor;
   }
 
   public override void _Process(double delta)
@@ -21,6 +24,14 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
 	public void Interact(Player player)
 	{
+    Rpc(nameof(ToggleAnchor), player.GetPath());
+	}
+
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  public void ToggleAnchor(string playerPath)
+  {
+    Player player = GetNode<Player>(playerPath);
+
     if (_deployed)
     {
       // Remove anchor from world or hand
@@ -34,5 +45,29 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     }
 
     _deployed = !_deployed;
+  }
+
+  public void GetAnchorPosition()
+  {
+    // Get the position of UniversalInWorld or player hand bone
+  }
+
+  public void DeleteAnchor()
+  {
+    // Remove item from world or remove from player's ArmNode
+    // Make sure you use the proper rpc calls to do this
+  }
+
+  public void RequestSetAnchor(string anchorNodePath)
+	{
+		RpcId(1, nameof(SetAnchor), anchorNodePath);
 	}
+	
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+  public void SetAnchor(string anchorNodePath)
+  {
+    // Set anchor to be the UniversalInWorld or ArmNode
+    GD.Print(anchorNodePath);
+    _deployedAnchor = GetNode<Node3D>(anchorNodePath);
+  }
 }
