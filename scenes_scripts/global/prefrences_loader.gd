@@ -22,6 +22,11 @@ func apply_graphics_settings(user_prefs: UserSettingPrefrences) -> void:
     DisplayServer.window_set_mode(user_prefs.display_mode)
     DisplayServer.window_set_flag(user_prefs.display_flag, user_prefs.borderless_enable) # this sets the gvien flag to false or true
     get_window().size = user_prefs.resolution # this is the correct way of doing it so that godot knows that the resolution has been changed
+    
+    # apply new graphics settings
+    DisplayServer.window_set_vsync_mode(user_prefs.vsync_mode)
+    Engine.max_fps = int(user_prefs.max_fps)
+    get_viewport().scaling_3d_scale = user_prefs.render_scale
 
 # applies only audio settings
 func apply_audio_settings(user_prefs: UserSettingPrefrences) -> void:

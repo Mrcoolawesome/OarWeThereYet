@@ -69,22 +69,26 @@ theme = ExtResource("1_823ys")
 theme_type_variation = &"SubMenuSelectionButtons"
 text = "Graphics"
 
-[node name="AudioMenu" parent="MainContainer/HBoxContainer" instance=ExtResource("2_mjx27")]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MainContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AudioMenu" parent="MainContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("2_mjx27")]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ResetMenu" parent="MainContainer/HBoxContainer" instance=ExtResource("4_yjekq")]
+[node name="ResetMenu" parent="MainContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("4_yjekq")]
 visible = false
 layout_mode = 2
 
-[node name="GraphicsMenu" parent="MainContainer/HBoxContainer" instance=ExtResource("6_daqcr")]
+[node name="GraphicsMenu" parent="MainContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("6_daqcr")]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="ApplySettingsButton" type="Button" parent="MainContainer"]
+[node name="ApplySettingsButton" type="Button" parent="MainContainer/HBoxContainer/VBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
@@ -97,4 +101,4 @@ text = "Apply Settings"
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/AudioMenuButton" to="." method="_on_audio_menu_button_pressed"]
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/ResetMenuButton" to="." method="_on_reset_menu_button_pressed"]
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/GraphicsMenuButton" to="." method="_on_graphics_menu_button_pressed"]
-[connection signal="pressed" from="MainContainer/ApplySettingsButton" to="." method="_on_apply_settings_button_pressed"]
+[connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer2/ApplySettingsButton" to="." method="_on_apply_settings_button_pressed"]

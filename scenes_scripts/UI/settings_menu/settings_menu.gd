@@ -4,12 +4,12 @@ extends Control
 @export var reset_menu_visible: bool = true
 
 # submenus
-@onready var audio_menu: Control = $MainContainer/HBoxContainer/AudioMenu
-@onready var reset_menu: Control = $MainContainer/HBoxContainer/ResetMenu
-@onready var graphics_menu: Control = $MainContainer/HBoxContainer/GraphicsMenu
+@onready var audio_menu: Control = $MainContainer/HBoxContainer/VBoxContainer2/AudioMenu
+@onready var reset_menu: Control = $MainContainer/HBoxContainer/VBoxContainer2/ResetMenu
+@onready var graphics_menu: Control = $MainContainer/HBoxContainer/VBoxContainer2/GraphicsMenu
 
 # buttons
-@onready var audio_button: Button = $MainContainer/ApplySettingsButton
+@onready var audio_button: Button = $MainContainer/HBoxContainer/VBoxContainer2/ApplySettingsButton
 @onready var reset_button: Button = $MainContainer/HBoxContainer/VBoxContainer/ResetMenuButton
 
 enum SubMenuVisibility {AUDIO, RESET, GRAPHICS}
