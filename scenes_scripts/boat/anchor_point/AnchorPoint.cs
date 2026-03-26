@@ -8,7 +8,8 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
 	public string PromptInput { get; set; } = "action_key";
   private StaticBody3D _anchor;
-  private bool _deployed = false;
+  [Export] private bool _deployed = false;
+  [Export] private string _deployedAnchorPath = "";
   private Node3D _deployedAnchor;
 
   // Node for the rope visual
@@ -47,6 +48,22 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
   public override void _Process(double delta)
   {
+    // Sync _deployedAnchor from _deployedAnchorPath if they differ
+    if (!string.IsNullOrEmpty(_deployedAnchorPath))
+    {
+      if (_deployedAnchor == null || _deployedAnchor.GetPath() != (NodePath)_deployedAnchorPath)
+      {
+        _deployedAnchor = GetNodeOrNull<Node3D>(_deployedAnchorPath);
+      }
+    }
+    else
+    {
+      _deployedAnchor = null;
+    }
+
+    // Hide/show the placeholder anchor mesh based on deployment
+    _anchor.Visible = !_deployed;
+
     if (_deployed && IsInstanceValid(_deployedAnchor))
     {
       UpdateRopeMesh();
@@ -116,12 +133,14 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
 	public void Interact(Player player)
 	{
-    Rpc(nameof(ToggleAnchor), player.GetPath());
+    RpcId(1, nameof(ToggleAnchor), player.GetPath());
 	}
 
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   public void ToggleAnchor(string playerPath)
   {
+    if (!Multiplayer.IsServer()) return; // State managed by server via synchronizer
+
     Player player = GetNode<Player>(playerPath);
 
     if (_deployed)
@@ -131,7 +150,6 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     else
     {
       player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
-      _anchor.Visible = false;
       _deployed = true;
     }
   }
@@ -166,25 +184,31 @@ public partial class AnchorPoint : StaticBody3D, Interactable
       if (Multiplayer.IsServer())
       {
         DeleteAnchor();
+        _deployedAnchorPath = "";
+        _deployed = false;
       }
       _deployedAnchor = null;
-      _anchor.Visible = true;
-      _deployed = false;
-      if (_ropeMeshInstance != null)
-      {
-        _ropeMeshInstance.Visible = false;
-      }
     }
   }
 
   public void RequestSetAnchor(string anchorNodePath)
 	{
-		Rpc(nameof(SetAnchor), anchorNodePath);
+		if (Multiplayer.IsServer())
+    {
+      SetAnchor(anchorNodePath);
+    }
+    else
+    {
+      RpcId(1, nameof(SetAnchor), anchorNodePath);
+    }
 	}
 	
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   public void SetAnchor(string anchorNodePath)
   {
+    if (!Multiplayer.IsServer()) return;
+
+    _deployedAnchorPath = anchorNodePath;
     if (string.IsNullOrEmpty(anchorNodePath))
     {
       _deployedAnchor = null;

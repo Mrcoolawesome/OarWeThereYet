@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://ds5xru6fctkkj"]
+[gd_scene load_steps=7 format=3 uid="uid://ds5xru6fctkkj"]
 
 [ext_resource type="Script" uid="uid://cqewywluv021g" path="res://scenes_scripts/boat/anchor_point/AnchorPoint.cs" id="1_widv8"]
 [ext_resource type="ArrayMesh" uid="uid://dpasaaaw6s7ie" path="res://scenes_scripts/inventory/items/itemResources/anchor/anchorMesh.res" id="3_y0a6k"]
@@ -11,6 +11,14 @@ material = SubResource("StandardMaterial3D_y8qi5")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_y8qi5"]
 size = Vector3(0.7, 0.7, 0.6)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_8vmau"]
+properties/0/path = NodePath(".:_deployed")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:_deployedAnchorPath")
+properties/1/spawn = true
+properties/1/replication_mode = 1
 
 [node name="AnchorPoint" type="StaticBody3D"]
 collision_layer = 8
@@ -30,3 +38,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Anchor"]
 mesh = ExtResource("3_y0a6k")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_8vmau")
