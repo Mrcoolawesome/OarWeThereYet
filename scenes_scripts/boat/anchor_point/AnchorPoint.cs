@@ -1,11 +1,11 @@
 using Godot;
 using System;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 
 public partial class AnchorPoint : StaticBody3D, Interactable
 {
   [Export] public string PromptMessage { get; set; } = "Reset Anchor";
+  [Export] public float MaxRopeRange = 10.0f;
+
 	public string PromptInput { get; set; } = "action_key";
   private StaticBody3D _anchor;
   private bool _deployed = false;
@@ -20,8 +20,19 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
   public override void _Process(double delta)
   {
+    if (_deployed)
+    {
+      // Display rope from this node to _deployedAnchor
+    }
   }
 
+  public override void _PhysicsProcess(double delta)
+  {
+    if (_deployed)
+    {
+      // Keep boat within MaxRopeRange
+    }
+  }
 
 	public void Interact(Player player)
 	{
