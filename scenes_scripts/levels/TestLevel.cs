@@ -26,50 +26,90 @@ public partial class TestLevel : Node
 
 	private RiverFloatSystem _river;
 
+	private bool _hostNetworkInitialized = false;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
-	{
-		_checkpointContainer = GetNode<Node3D>("CheckpointContainer");
-		_itemContainer = GetNode<ItemContainer>("ItemContainer");
+  {
+    _checkpointContainer = GetNode<Node3D>("CheckpointContainer");
+    _itemContainer = GetNode<ItemContainer>("ItemContainer");
 
-		// load or create save slot
-		_gameSaves = GameSaves.LoadOrCreate(SaveSlot);
-		if (_gameSaves.CheckpointNum <= 0)
-			_gameSaves.CheckpointNum = 1;
-		
-		// attach the reset function to the signal from the signal server script
-		GlobalSignalServer.Instance.ResetLevel += LoadGame;
-		GlobalSignalServer.Instance.BoatDeath += LoadGame;
+    // load or create save slot
+    _gameSaves = GameSaves.LoadOrCreate(SaveSlot);
+    if (_gameSaves.CheckpointNum <= 0)
+      _gameSaves.CheckpointNum = 1;
+    
+    // attach the reset function to the signal from the signal server script
+    GlobalSignalServer.Instance.ResetLevel += LoadGame;
+    GlobalSignalServer.Instance.BoatDeath += LoadGame;
 
-		GlobalSignalServer.Instance.LoadGame += LoadGame;
-		GlobalSignalServer.Instance.SaveGame += SaveGame;
+    GlobalSignalServer.Instance.LoadGame += LoadGame;
+    GlobalSignalServer.Instance.SaveGame += SaveGame;
 
-		// Get river
-		_river = GetNode<RiverFloatSystem>("RiverManager/RiverFloatSystem");
+    // Get river
+    _river = GetNode<RiverFloatSystem>("RiverManager/RiverFloatSystem");
 
-		// load and spawn boat
-		if (BoatScene == null)
-		{
-			GD.PushError("BoatScene is not assigned on TestLevel.");
-			return;
-		}
+    if (BoatScene == null)
+    {
+      GD.PushError("BoatScene is not assigned on TestLevel.");
+      return;
+    }
+    
+    // 1. Instantiate the boat
+    _boat = BoatScene.Instantiate<Boat>();
+    _boat.River = _river;
+    
+    // 2. Give it a name and authority (crucial for manual spawning!)
+    _boat.Name = "Boat";
+    _boat.SetMultiplayerAuthority(1);
+    
+    // 3. ADD IT TO THE TREE IMMEDIATELY. 
+    // No RPCs can happen until this is done!
+    AddChild(_boat);
+    
+    _inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
 
-		_boat = BoatScene.Instantiate<Boat>();
-		_boat.River = _river;
-		SetBoatSpawn();
-		AddChild(_boat);
-		_inventory = _boat.GetNode<Inventory>("DryBox/Inventory");
+    IsBoatReady = true;
+    EmitSignal(SignalName.BoatReady);
 
-		IsBoatReady = true;
-		EmitSignal(SignalName.BoatReady);
+    // 4. We DO NOT call LoadGame() here anymore. We wait for _Process to see the network.
+    
+    if (!Multiplayer.IsServer())
+    {
+			// Let clients know to wait for their connection before asking for world state
+			Multiplayer.ConnectedToServer += OnClientConnected;
+    }
+  }
 
-		if (Multiplayer.IsServer())
-			LoadGame();
+	public override void _Process(double delta)
+  {
+    // The Host doesn't fire a "Connected" signal for itself, so we check 
+    // manually until the server peer is fully spun up by the GameManager.
+    if (!_hostNetworkInitialized && Multiplayer.HasMultiplayerPeer() && Multiplayer.IsServer())
+    {
+        _hostNetworkInitialized = true;
+        
+        // NOW we can safely load the game, move the boat, and fire RPCs!
+        LoadGame(); 
+    }
+  }
 
-		// late-joining clients ask the server for the current world state
-		if (!Multiplayer.IsServer())
-			GetNode<ItemContainer>("ItemContainer").RpcId(1, nameof(ItemContainer.RequestWorldState));
-	}
+  private void OnClientConnected()
+  {
+    // The client runs this the exact millisecond they connect to the host
+    GetNode<ItemContainer>("ItemContainer").RpcId(1, nameof(ItemContainer.RequestWorldState));
+  }
+
+  public override void _ExitTree()
+  {
+    // Always clean up your singletons to prevent memory leaks on re-hosting!
+    GlobalSignalServer.Instance.ResetLevel -= LoadGame;
+    GlobalSignalServer.Instance.BoatDeath -= LoadGame;
+    GlobalSignalServer.Instance.LoadGame -= LoadGame;
+    GlobalSignalServer.Instance.SaveGame -= SaveGame;
+    
+    Multiplayer.ConnectedToServer -= OnClientConnected;
+  }
 
 	// ───────────────────────────────────────────────
 	// Reset

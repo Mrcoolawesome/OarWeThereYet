@@ -6,44 +6,37 @@ const SERVER_IP = "127.0.0.1"
 var multiplayer_peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
 const LEVEL_SCENE_PATH = "res://scenes_scripts/levels/stylized-map/stylized-map.tscn"
-var level_name = "DemoLevel"
 
 # global values to load the level in
 var loading: bool = false
 var player_id: int = -1
+
+# State tracking to delay network connection until AFTER loading
+var is_hosting: bool = false
+var is_joining: bool = false
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
 @onready var level_container = get_tree().current_scene.get_node_or_null("Level")
 
 # become host for ENet server
 func become_host():
-  # create the server and set the peer of this instance to be the server peer
-  multiplayer_peer.create_server(SERVER_PORT)
-  multiplayer.multiplayer_peer = multiplayer_peer
-
-  # connect the the callback functions to run when a signal is sent for when a player disconnects or connects
-  multiplayer.peer_connected.connect(_add_player_to_game)
-  multiplayer.peer_disconnected.connect(_remove_player)
-
-  # add the level and player in
-  _load_game_and_player(1)
+  is_hosting = true
+  # Start the background loading. We will create the server AFTER it finishes.
+  _request_level_load()
 
 # this is the function that's called by the multiplayer manager
 func join_as_client(_lobby_id):
-  # load the map
-  _load_game_and_player(-1)
-  # set the peer of the current instance to be a peer
-  multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
-  multiplayer.multiplayer_peer = multiplayer_peer
+  is_joining = true
+  # Start the background loading. We will create the client AFTER it finishes.
+  _request_level_load()
 
-func _load_game_and_player(given_player_id: int) -> void:
+func _request_level_load() -> void:
   # need to let the loading screen show up, so wait for like two frames
   await get_tree().process_frame 
   await get_tree().process_frame 
-  # just need to set global variables so the loading stuff in '_process' can run and start the loading process
+  # start the loading process
   ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
   loading = true
-  player_id = given_player_id
 
 func _process(_delta: float) -> void:
   # level loading logic
@@ -51,18 +44,34 @@ func _process(_delta: float) -> void:
     # for some reason the progress is returned as a 1 element array with the percentage completed
     var progress = []
     var status = ResourceLoader.load_threaded_get_status(LEVEL_SCENE_PATH, progress)
-
-    # # don't really need this now that we don't have a progress bar, but i wanna keep it here in case we change our mind later and add one back
-    # if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-    #   loading_progress_value = progress[0] * 100.0
     
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       # done loading
       loading = false
       # actually load the level in
       _add_level()
-      # put the player in the world now that it's done loading
-      _add_player_to_game(player_id)
+
+      # --- NETWORK INITIALIZATION ---
+      if is_hosting:
+        # Now that the map is fully loaded, start the server
+        multiplayer_peer.create_server(SERVER_PORT)
+        multiplayer.multiplayer_peer = multiplayer_peer
+        
+        # connect the callback functions
+        multiplayer.peer_connected.connect(_add_player_to_game)
+        multiplayer.peer_disconnected.connect(_remove_player)
+        
+        # add the host player to the game
+        _add_player_to_game(1) 
+        is_hosting = false
+        
+      elif is_joining:
+        # Now that the map is fully loaded, connect to the server
+        multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
+        multiplayer.multiplayer_peer = multiplayer_peer
+        is_joining = false
+      # ------------------------------
+
       # we can remove the main menu ui now
       GlobalSignalServer.emit_signal("DoneLoadingMap")
 
@@ -74,7 +83,7 @@ func _add_level():
   level_container.add_child(test_level)
 
 func _add_player_to_game(id: int):
-  # this is where we have to add them properly to the level	
+  # this is where we have to add them properly to the level 
   # the Level container should always be there, just need to check if it has a level actually loaded (as a child) in it
   if level_container.get_child_count() > 0:
     # Get the actual map node (the first child of the Level container)
@@ -119,10 +128,10 @@ func _assign_camera(id: int) -> void:
 '''
   find the player we're looking to remove, and remove their instance.
 '''
-func _remove_player(id : int):		
+func _remove_player(id : int):    
   # recursively looks for the player
-  var active_level = level_container.get_node_or_null(level_name)
-  var player_node = active_level.get_node_or_null(str(id))
+  var active_level = level_container.get_children()[0];
+  var player_node = active_level.get_node_or_null(str(id)) # recursively looks for the player
   
   if player_node:
     # Player drops item if they're holding it

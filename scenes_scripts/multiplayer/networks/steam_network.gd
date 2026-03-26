@@ -183,9 +183,8 @@ func _assign_camera(id: int) -> void:
 func _remove_player(id : int):    
   ProxChat.stop_voice()
 
-  # recursively looks for the player
-  var active_level = level_container.get_node_or_null(level_name)
-  var player_node = active_level.get_node_or_null(str(id))
+  var active_level = level_container.get_children()[0];
+  var player_node = active_level.get_node_or_null(str(id)) # recursively looks for the player
   
   if player_node:
     # Player drops item if they're holding it

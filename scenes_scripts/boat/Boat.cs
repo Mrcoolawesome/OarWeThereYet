@@ -312,6 +312,13 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     // we need to use integrate forces to get the exact position of the colliding object 
     public override void _IntegrateForces(PhysicsDirectBodyState3D state)
     {
+        // If the peer is missing, OR if the ENet socket is closed/disconnected, bail out immediately!
+        if (Multiplayer.MultiplayerPeer == null || 
+            Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Disconnected) 
+        {
+            return;
+        }
+
         // Process Pending Resets FIRST
         if (_resetPending)
         {
@@ -378,7 +385,12 @@ public partial class Boat : RigidBody3D, ISyncBuffer
                 // teleport to inital position given by the host
                 state.Transform = _newPositionState;
                 _clientSpawning = false; // we're done with the inital spawn of the boat
+
+                // Turn off the lerp flags so we don't accidentally run the lerp code below!
+                _applyNewPositionState = false;
+                _applyNewRotationState = false;
             }
+            
             // get the 'speed' at which we lerp at 
             float weight = state.Step * LerpSpeed; // state.Step is like the 'delta' parameters given from Process
             // apply the updated state variable if any changes were made
@@ -485,6 +497,12 @@ public partial class Boat : RigidBody3D, ISyncBuffer
                 // this is where the new transformation is 'returned'
                 _newPositionState = new Transform3D(Basis, syncedPosition);
                 _applyNewPositionState = true;
+
+                // Force the flag back to true so the boat snaps instantly instead of lerping!
+                if (posDiff > 10.0f) 
+                {
+                    _clientSpawning = true;
+                }
             }
 
             // we want this to just always happen when we're updated
