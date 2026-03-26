@@ -126,13 +126,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
     if (_deployed)
     {
-      // Remove anchor from world or hand
-      if (Multiplayer.IsServer())
-      {
-        DeleteAnchor();
-      }
-      _deployedAnchor = null;
-      _anchor.Visible = true;
+      ResetAnchor();
     }
     else
     {
@@ -159,6 +153,24 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     if (_deployedAnchor is UniversalInWorld anchorInWorld)
     {
       anchorInWorld.Rpc(nameof(anchorInWorld.DeleteItem));
+    }
+  }
+
+  public void ResetAnchor()
+  {
+    if (_deployed)
+    {
+      if (Multiplayer.IsServer())
+      {
+        DeleteAnchor();
+      }
+      _deployedAnchor = null;
+      _anchor.Visible = true;
+      _deployed = false;
+      if (_ropeMeshInstance != null)
+      {
+        _ropeMeshInstance.Visible = false;
+      }
     }
   }
 

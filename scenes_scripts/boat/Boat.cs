@@ -64,6 +64,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private Node3D _frontLeftOar;
     private Node3D _backRightOar;
     private Node3D _backLeftOar;
+    private AnchorPoint _anchorPoint;
 
   /*
       front left localShapeIndex: 0
@@ -93,6 +94,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         _backRightOar = GetNode<Node3D>("OarsContainer/OarBackRight");
         _frontRightOar = GetNode<Node3D>("OarsContainer/OarFrontRight");
         _frontLeftOar = GetNode<Node3D>("OarsContainer/OarFrontLeft");
+        _anchorPoint = GetNode<AnchorPoint>("AnchorPoint");
 
         // subscribe to the Rowing signal from the singleton script
         GlobalSignalServer.Instance.Rowing += OnPlayerRowing;
@@ -302,6 +304,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         
         // Reset Oar visuals
         HasOarInSeat = [false, false, false, false];
+
+        _anchorPoint.ResetAnchor();
 
         // reset the boat health
         _healthComponent.ResetHealth();
