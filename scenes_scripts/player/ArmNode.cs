@@ -253,6 +253,8 @@ public partial class ArmNode : MeshInstance3D
 	public void SetItem(string itemPath, int itemCount)
 	{
 		string currentItemPath = Item?.Data?.ResourcePath ?? "";
+		bool wasAnchor = Item?.Data?.Name == "Anchor";
+
 		if (Multiplayer.IsServer() && currentItemPath != itemPath && _activeLifepreserverNode != null)
 		{
 			Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNode.Name.ToString());
@@ -267,12 +269,18 @@ public partial class ArmNode : MeshInstance3D
 		{
 			Item = new InvSlot(GD.Load<InvItem>(itemPath), itemCount);
 
-			// If anchor emit SetAnchor signal
-			if (Item?.Data.Name == "Anchor")
+			// If anchor emit SetAnchor signal (only on server to avoid redundant RPCs)
+			if (Multiplayer.IsServer() && Item?.Data.Name == "Anchor")
 			{
 				GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), 
 				_player.GetNode("FullPlayerModel/Armature/Skeleton3D/BoneAttachment3D/MeshInstance3D").GetPath());
 			}
+		}
+
+		// If it's no longer an anchor, clear it in AnchorPoint (only on server to avoid redundant RPCs)
+		if (Multiplayer.IsServer() && wasAnchor && (Item == null || Item.Data.Name != "Anchor"))
+		{
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), "");
 		}
 	}
 

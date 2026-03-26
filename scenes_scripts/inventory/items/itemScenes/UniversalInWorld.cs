@@ -41,8 +41,8 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 		_riverFloatSystem = GetNode<RiverFloatSystem>("../../RiverManager/RiverFloatSystem");
 		_waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
 
-    // If anchor, emit setanchor signal
-    if (Item?.Data.Name == "Anchor")
+    // If anchor, emit setanchor signal (only on server to avoid redundant RPCs)
+    if (Multiplayer.IsServer() && Item?.Data.Name == "Anchor")
     {
       GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), GetPath());
     }
