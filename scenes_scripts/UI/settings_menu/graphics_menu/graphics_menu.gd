@@ -1,5 +1,8 @@
 extends Control
 
+# NEW SIGNAL: Lets parent know a change happened
+signal setting_changed
+
 # get the sliders so we can edit their display properly
 @onready var msaa_slider = $MarginContainer/ScrollContainer/VBoxContainer/MSAASlider
 # get the screen mode dropdown menu
@@ -23,6 +26,8 @@ extends Control
 var settings_prefrences: UserSettingPrefrences
 # backup settings object to safely hold the old settings before confirming
 var cached_settings: UserSettingPrefrences
+
+var is_loading_ui: bool = false # Prevents signals from firing when UI boots
 
 # all the resolutions they're able to select
 var resolutions_array: Array[Vector2i] = [
@@ -67,6 +72,9 @@ func _ready() -> void:
   _load_ui_stuff()
 
 func _load_ui_stuff() -> void:
+  # Lock the signals while we load the UI
+  is_loading_ui = true
+
   # MSAA SLIDER
   # set the number display to what they already have by default
   # this is type casting to an int because the .msaa_mode value is an enum
@@ -127,6 +135,9 @@ func _load_ui_stuff() -> void:
   # Set initial visibility of the upscaler dropdown upon loading in
   upscaler_dropdown.visible = settings_prefrences.render_scale < 1.0
 
+  # Unlock the signals now that the UI is done setting up
+  is_loading_ui = false
+
 func _on_msaa_slider_slider_changed(new_value: float) -> void:
   var converted_value: Viewport.MSAA = int(new_value) as Viewport.MSAA # get the value in terms of the MSAA enum
   settings_prefrences.msaa_mode = converted_value # store the value in the temp settings object
@@ -145,6 +156,9 @@ func _on_msaa_slider_slider_changed(new_value: float) -> void:
 
   # change the number display to the display string
   msaa_slider.change_number_display_tag(display_string)
+  
+  if !is_loading_ui:
+    setting_changed.emit()
 
 # sets the dropdown value in the settings object
 func _on_screen_mode_dropdown_item_selected(item: int) -> void:
@@ -174,10 +188,16 @@ func _on_screen_mode_dropdown_item_selected(item: int) -> void:
   settings_prefrences.display_flag = new_display_flag
   settings_prefrences.borderless_enable = borderless_enable
 
+  if !is_loading_ui:
+    setting_changed.emit()
+
 func _on_resolution_dropdown_item_selected(item: int) -> void:
   # get the resoluiton and put it into the prefrences object
   var new_resolution: Vector2i = resolutions_array[item]
   settings_prefrences.resolution = new_resolution
+  
+  if !is_loading_ui:
+    setting_changed.emit()
 
 # function to pass in all the resolutions into the resolution selection dropdown
 func _load_all_resolutions() -> void:
@@ -197,6 +217,9 @@ func _load_all_resolutions() -> void:
 func _on_vsync_dropdown_item_selected(item: int) -> void:
   var converted_value: DisplayServer.VSyncMode = item as DisplayServer.VSyncMode
   settings_prefrences.vsync_mode = converted_value
+  
+  if !is_loading_ui:
+    setting_changed.emit()
 
 func _on_max_fps_slider_slider_changed(new_value: float) -> void:
   settings_prefrences.max_fps = new_value
@@ -208,6 +231,9 @@ func _on_max_fps_slider_slider_changed(new_value: float) -> void:
     display_string = str(int(new_value))
     
   max_fps_slider.change_number_display_tag(display_string)
+
+  if !is_loading_ui:
+    setting_changed.emit()
 
 func _on_render_scale_slider_slider_changed(new_value: float) -> void:
   settings_prefrences.render_scale = new_value
@@ -227,21 +253,39 @@ func _on_render_scale_slider_slider_changed(new_value: float) -> void:
     # Reveal the dropdown if they drop below 100%
     upscaler_dropdown.visible = true
 
+  if !is_loading_ui:
+    setting_changed.emit()
+
 func _on_shadow_dropdown_item_selected(item: int) -> void:
   settings_prefrences.shadow_quality = item
+  
+  if !is_loading_ui:
+    setting_changed.emit()
 
 func _on_taa_toggle_toggled(toggled_on: bool) -> void:
   if settings_prefrences != null:
     settings_prefrences.taa_enable = toggled_on
+    
+  if !is_loading_ui:
+    setting_changed.emit()
 
 func _on_upscaler_dropdown_item_selected(item: int) -> void:
   settings_prefrences.upscaler_mode = item as Viewport.Scaling3DMode
+  
+  if !is_loading_ui:
+    setting_changed.emit()
 
 func _on_ssao_dropdown_item_selected(item: int) -> void:
   settings_prefrences.ssao_quality = item as RenderingServer.EnvironmentSSAOQuality
+  
+  if !is_loading_ui:
+    setting_changed.emit()
 
 func _on_sdfgi_dropdown_item_selected(item: int) -> void:
   settings_prefrences.sdfgi_quality = item
+  
+  if !is_loading_ui:
+    setting_changed.emit()
 
 
 # --- DATA MANAGEMENT LOGIC ---

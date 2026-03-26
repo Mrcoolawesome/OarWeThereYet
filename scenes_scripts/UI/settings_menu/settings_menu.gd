@@ -21,17 +21,34 @@ enum SubMenuVisibility {AUDIO, RESET, GRAPHICS}
 # keep track of the current menu
 var curr_menu: SubMenuVisibility = SubMenuVisibility.AUDIO
 
+# --- STATE TRACKERS ---
+var unsaved_audio: bool = false
+var unsaved_graphics: bool = false
+var waiting_to_exit: bool = false # Tracks if we hit the Back button and are waiting for the revert timer
+
 signal back_button_pressed
 
 func _ready() -> void:
   # make the reset button visible depending on if they want it or not
   reset_button.visible = reset_menu_visible
+  
+  # Connect the new signals from our child menus
+  audio_menu.setting_changed.connect(_on_audio_setting_changed)
+  graphics_menu.setting_changed.connect(_on_graphics_setting_changed)
 
 # updates our countdown label every frame
 func _process(_delta: float) -> void:
   if confirm_prompt.visible:
     confirm_prompt.set_countdown_label_text("Reverting in " + str(int(revert_timer.time_left)) + " seconds...")
 
+# --- SIGNAL RECEIVERS FROM CHILD MENUS ---
+func _on_audio_setting_changed() -> void:
+  unsaved_audio = true
+
+func _on_graphics_setting_changed() -> void:
+  unsaved_graphics = true
+
+# --- MENU NAVIGATION ---
 func _on_audio_menu_button_pressed() -> void:
   _show_menu(SubMenuVisibility.AUDIO)
 
@@ -40,10 +57,6 @@ func _on_reset_menu_button_pressed() -> void:
 
 func _on_graphics_menu_button_pressed() -> void:
   _show_menu(SubMenuVisibility.GRAPHICS)
-
-func _on_back_button_pressed() -> void:
-  # emit the back button being pressed signal so the parent node can see it
-  back_button_pressed.emit() 
 
 # make only the given menu visible and all others invisible
 func _show_menu(menu: SubMenuVisibility) -> void:
@@ -66,12 +79,34 @@ func _show_menu(menu: SubMenuVisibility) -> void:
       graphics_menu.visible = true
       curr_menu = SubMenuVisibility.GRAPHICS
 
+# --- BACK BUTTON / EXIT LOGIC ---
+func _on_back_button_pressed() -> void:
+  if unsaved_audio or unsaved_graphics:
+    waiting_to_exit = true
+    
+    # Save audio immediately if dirty (no prompt needed for audio)
+    if unsaved_audio:
+      audio_menu.apply_settings()
+      unsaved_audio = false
+    
+    # Trigger graphics prompt if dirty
+    if unsaved_graphics:
+      graphics_menu.apply_settings()
+      confirm_prompt.visible = true
+      revert_timer.start(15.0)
+    else:
+      # If only audio was unsaved, it's saved now, so exit safely
+      back_button_pressed.emit()
+  else:
+    # No unsaved changes, just exit normally
+    back_button_pressed.emit() 
+
 func _on_apply_settings_button_pressed() -> void:
   # run the apply settings function for the specific submenu
-  # just make sure that the function name is 'apply_settings()' for every submenu node
   match curr_menu:
     SubMenuVisibility.AUDIO:
       audio_menu.apply_settings()
+      unsaved_audio = false # Changes saved, clear the flag
     SubMenuVisibility.GRAPHICS:
       graphics_menu.apply_settings()
       # Trigger the visual prompt specifically for graphics changes
@@ -79,12 +114,15 @@ func _on_apply_settings_button_pressed() -> void:
       revert_timer.start(15.0)
 
 # --- CONFIRM / REVERT SIGNALS ---
-
 func _on_confirm_button_pressed() -> void:
   revert_timer.stop()
   confirm_prompt.visible = false
-  # Tell the graphics menu to permanently save the tested settings
   graphics_menu.confirm_settings()
+  
+  unsaved_graphics = false # Changes confirmed, clear the flag
+  
+  if waiting_to_exit:
+    back_button_pressed.emit()
 
 func _on_revert_button_pressed() -> void:
   _revert_routine()
@@ -95,5 +133,10 @@ func _on_revert_timer_timeout() -> void:
 func _revert_routine() -> void:
   revert_timer.stop()
   confirm_prompt.visible = false
-  # Tell the graphics menu to roll back to its safe backup
   graphics_menu.revert_settings()
+  
+  unsaved_graphics = false # Changes reverted, clear the flag
+  
+  if waiting_to_exit:
+    waiting_to_exit = false
+    back_button_pressed.emit()

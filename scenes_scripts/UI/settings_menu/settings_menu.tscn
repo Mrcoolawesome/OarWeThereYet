@@ -108,6 +108,8 @@ layout_mode = 1
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/AudioMenuButton" to="." method="_on_audio_menu_button_pressed"]
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/ResetMenuButton" to="." method="_on_reset_menu_button_pressed"]
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer/GraphicsMenuButton" to="." method="_on_graphics_menu_button_pressed"]
+[connection signal="setting_changed" from="MainContainer/HBoxContainer/VBoxContainer2/AudioMenu" to="." method="_on_audio_setting_changed"]
+[connection signal="setting_changed" from="MainContainer/HBoxContainer/VBoxContainer2/GraphicsMenu" to="." method="_on_graphics_setting_changed"]
 [connection signal="pressed" from="MainContainer/HBoxContainer/VBoxContainer2/ApplySettingsButton" to="." method="_on_apply_settings_button_pressed"]
 [connection signal="ConfirmButtonPressed" from="ConfirmPage" to="." method="_on_confirm_button_pressed"]
 [connection signal="RevertButtonPressed" from="ConfirmPage" to="." method="_on_revert_button_pressed"]
