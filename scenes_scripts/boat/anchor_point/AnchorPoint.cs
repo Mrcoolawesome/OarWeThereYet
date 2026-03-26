@@ -132,22 +132,25 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     {
       player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
       _anchor.Visible = false;
+      _deployed = true;
     }
-
-    _deployed = !_deployed;
   }
 
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   public void DeleteAnchor()
   {
     if (!Multiplayer.IsServer()) return;
+    if (!IsInstanceValid(_deployedAnchor)) return;
 
     // Remove item from world or remove from player's ArmNode
     // Make sure you use the proper rpc calls to do this
     if (_deployedAnchor is MeshInstance3D)
     {
-      ArmNode arm = _deployedAnchor.GetNode<ArmNode>("../../../../../Head/ArmNode");
-      arm.Rpc(nameof(arm.SetItem), "", 0);
+      ArmNode arm = _deployedAnchor.GetNodeOrNull<ArmNode>("../../../../../Head/ArmNode");
+      if (arm != null)
+      {
+        arm.Rpc(nameof(arm.SetItem), "", 0);
+      }
     }
 
     if (_deployedAnchor is UniversalInWorld anchorInWorld)
