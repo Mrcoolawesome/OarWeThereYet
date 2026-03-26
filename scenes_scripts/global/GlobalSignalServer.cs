@@ -55,6 +55,9 @@ public partial class GlobalSignalServer : Node
   public delegate void GoToMainMenuEventHandler();
   [Signal]
   public delegate void SetAnchorEventHandler(string anchorNodePath);
+  public delegate void ShowLoadingScreenEventHandler();
+  [Signal]
+  public delegate void DoneLoadingMapEventHandler();
 
   public int Health { get; set; }
 

@@ -16,34 +16,43 @@ public partial class PauseUi : Control
 		// get the stuff from the tree
 		_settingsMenu = GetNode<Control>("PanelContainer/SettingsMenu");
 		_mainContainer = GetNode<MarginContainer>("PanelContainer/PauseButtonMainContainer");
+
+		Multiplayer.ServerDisconnected += OnServerDisconnected;
 	}
 
 	private void OnResumeButtonPressed()
-	{
-		EmitSignal(SignalName.Resume);
-	}
+  {
+    EmitSignal(SignalName.Resume);
+  }
 
-	private void OnExitButtonPressed()
-	{
-		// tell the signal server to tell the game manager to kill the level put the main menu back
-		if (Multiplayer.IsServer())
-		{
-			// if they're the server then tell everyone to go to the main menu
-			Rpc(nameof(BroadcastCloseGame));
-		} 
-		else
-		{
-			// if they're not the server then just emit the goto menu signal locally
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
-		}
-	}
+  private void OnExitButtonPressed()
+  {
+    // Whether we are the Host or the Client, the process is now exactly the same!
+    // 1. Tell the local game manager to go to the main menu
+    GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
 
-	// this runs on everyone's machine so everybody goes to the main menu, only the server should be able to call this
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void BroadcastCloseGame()
-	{
-		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
-	}
+    // 2. Nuke the network connection
+    // (If we are the Host, this triggers "OnServerDisconnected" on all connected clients automatically!)
+    if (Multiplayer.MultiplayerPeer != null)
+    {
+      Multiplayer.MultiplayerPeer.Close();
+      Multiplayer.MultiplayerPeer = null;
+    }
+  }
+
+  // This fires automatically on the CLIENT if the HOST closes their game or loses internet
+  private void OnServerDisconnected()
+  {
+    // Force the client back to the main menu
+    GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
+
+    // Clean up their local peer so they don't become a ghost
+    if (Multiplayer.MultiplayerPeer != null)
+    {
+      Multiplayer.MultiplayerPeer.Close();
+      Multiplayer.MultiplayerPeer = null;
+    }
+  }
 
 	private void OnSettingsButtonPressed()
 	{

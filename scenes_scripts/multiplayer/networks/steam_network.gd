@@ -7,10 +7,14 @@ var _max_lobby_members = 4
 # we're just gonna hardcode the lobby name for now
 var LOBBY_NAME = "gaming"
 
-# player scene and test level scene
+# player scene and level scene path
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
-var level_scene = preload("res://scenes_scripts/levels/stylized-map/stylized-map.tscn")
+const LEVEL_SCENE_PATH = "res://scenes_scripts/levels/stylized-map/stylized-map.tscn"
 var level_name = "DemoLevel"
+
+# global values to load the level in
+var loading: bool = false
+var player_id: int = -1
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
 @onready var main_root_scene = get_tree().current_scene
@@ -18,6 +22,8 @@ var level_name = "DemoLevel"
 
 # we DO NEED THIS to make sure that only clients can join servers
 var is_client = false
+var is_hosting: bool = false
+var pending_host_id: int = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -33,51 +39,92 @@ func _ready() -> void:
   Steam.lobby_joined.connect(_on_lobby_join)
 
 func _process(_delta: float) -> void:
-  Steam.run_callbacks() # this is so that i can run stuff outside of this with steam
+  Steam.run_callbacks()
+
+  # level loading logic
+  if (loading):
+    var progress = []
+    var status = ResourceLoader.load_threaded_get_status(LEVEL_SCENE_PATH, progress)
+    
+    if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
+      loading = false
+      _add_level() # The map is officially in the SceneTree now!
+
+      # --- NETWORK INITIALIZATION ---
+      if is_hosting:
+        # Now that the host has the map loaded, start the server
+        multiplayer_peer.server_relay = true
+        multiplayer_peer.create_host()
+        multiplayer.multiplayer_peer = multiplayer_peer
+        
+        multiplayer.peer_connected.connect(_add_player_to_game)
+        multiplayer.peer_disconnected.connect(_remove_player)
+        
+        _add_player_to_game(1) # Spawn the host
+        is_hosting = false
+
+      elif pending_host_id != 0:
+        # Now that the client has the map loaded, connect to the server
+        multiplayer_peer = SteamMultiplayerPeer.new()
+        multiplayer_peer.server_relay = true 
+        var error = multiplayer_peer.create_client(pending_host_id)
+        
+        if error == OK:
+          multiplayer.multiplayer_peer = multiplayer_peer
+        else:
+          print("Failed to create client: ", error)
+          
+        pending_host_id = 0
+      # ------------------------------
+
+      GlobalSignalServer.emit_signal("DoneLoadingMap")
 
 func become_host(is_public: bool, lobby_name: String):
-  # create a public or private lobby with a max player count of 4
+  is_hosting = true
+  # create a public or private lobby
   if is_public:
     Steam.createLobby(Steam.LOBBY_TYPE_PUBLIC, _max_lobby_members)
   else:
     Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, _max_lobby_members)
 
-  # set the attribute for the lobby name
   LOBBY_NAME = lobby_name if lobby_name != null else Steam.getPersonaName()
-  # set SERVER relay to be enabled
-  multiplayer_peer.server_relay = true
-  multiplayer_peer.create_host()
-
-  # set the current instance's peer to be the new multiplayer peer with 
-  multiplayer.multiplayer_peer = multiplayer_peer
-
-  # connect the signals to the callback functions to add a player and remove a player
-  multiplayer.peer_connected.connect(_add_player_to_game)
-  multiplayer.peer_disconnected.connect(_remove_player)
-
-  # add the level first
-  _add_level()
-
-  # add the server's player to the game and set its id to 1
-  _add_player_to_game(1)
+  
+  # Start loading the map immediately. 
+  # We will create the Godot host AFTER it loads.
+  _request_level_load()
 
 func join_as_client(lobby_id):
-  # connect the current instance's peer to the lobby given the lobbies id
   is_client = true
   Steam.joinLobby(lobby_id)
 
+func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
+  if !is_client:
+    return
+  
+  # Save the host ID for later, but DON'T connect Godot multiplayer yet!
+  pending_host_id = Steam.getLobbyOwner(lobby_id)
+  is_client = false
+  
+  # Start loading the map
+  _request_level_load()
+
+func _request_level_load() -> void:
+  await get_tree().process_frame 
+  await get_tree().process_frame 
+  ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
+  loading = true
+
 func _add_level():
-  # only add the level if the current instance is the server
-  if multiplayer.is_server():
-    # load the level
-    var test_level = level_scene.instantiate()
-    test_level.set("SaveSlot", GlobalVariables.save_slot)
-    level_container.add_child(test_level)
+  # load the level
+  var level: Resource = ResourceLoader.load_threaded_get(LEVEL_SCENE_PATH)
+  var test_level = level.instantiate()
+  test_level.set("SaveSlot", GlobalVariables.save_slot)
+  level_container.add_child(test_level)
 
 '''
   this just prints their lobby id and then also sets the lobby metadata
 '''
-func _on_lobby_created(result: int, lobby_id):	
+func _on_lobby_created(result: int, lobby_id):  
   if result == Steam.Result.RESULT_OK:
     # set the global id
     _hosted_lobby_id = lobby_id
@@ -88,31 +135,7 @@ func _on_lobby_created(result: int, lobby_id):
     # setting metadata is just setting your own variables for the lobby, there's no specific parameters
     Steam.setLobbyData(_hosted_lobby_id, "name", LOBBY_NAME)
 
-func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
-  # if they 
-  if !is_client:
-    return
-  
-  # get the lobby id
-  var host_id = Steam.getLobbyOwner(lobby_id)
-
-  # set the peer variable to be a new SteamMultiplayerPeer
-  multiplayer_peer = SteamMultiplayerPeer.new()
-  multiplayer_peer.server_relay = true # enable Steam relay
-
-  # attempt to make a client for the given host/server
-  var error = multiplayer_peer.create_client(host_id)
-  if error != OK:
-    print("Failed to create client: ", error)
-    return
-  
-  # if all goes well connect the peer to godot's internal multiplayer api
-  multiplayer.multiplayer_peer = multiplayer_peer
-
-  # reset this 
-  is_client = false
-
-func _add_player_to_game(id: int):	
+func _add_player_to_game(id: int):  
   # the Level container should always be there, just need to check if it has a level actually loaded (as a child) in it
   if level_container.get_child_count() > 0:
     # Get the actual map node (the first child of the Level container)
@@ -136,7 +159,7 @@ func _add_player_to_game(id: int):
   else:
       print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
 
-@rpc("authority", "reliable")
+@rpc("authority", "reliable", "call_local")
 func _assign_camera(id: int) -> void:
   var current_map = level_container.get_child(0)
   # Check if the player we just spawned is OUR local player
@@ -157,12 +180,11 @@ func _assign_camera(id: int) -> void:
 '''
   find the player we're looking to remove, and remove their instance.
 '''
-func _remove_player(id : int):		
+func _remove_player(id : int):    
   ProxChat.stop_voice()
 
-  # recursively looks for the player
-  var active_level = level_container.get_node_or_null(level_name)
-  var player_node = active_level.get_node_or_null(str(id))
+  var active_level = level_container.get_children()[0];
+  var player_node = active_level.get_node_or_null(str(id)) # recursively looks for the player
   
   if player_node:
     # Player drops item if they're holding it
