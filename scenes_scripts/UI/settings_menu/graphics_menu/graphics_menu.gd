@@ -15,12 +15,14 @@ extends Control
 
 # lighting and advanced graphics nodes
 @onready var taa_toggle = $MarginContainer/ScrollContainer/VBoxContainer/TAAToggle # CheckBox/CheckButton
-@onready var upscaler_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/UpscalerDropdown # 0: Bilinear, 1: FSR 1.0, 2: FSR 2.2
+@onready var upscaler_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/UpscalerDropdown # 0: Disabled, 1: FSR 1.0, 2: FSR 2.2
 @onready var ssao_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/SSAODropdown # 0: Very Low, 1: Low, 2: Medium, 3: High
 @onready var sdfgi_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/SDFGIDropdown # 0: Low, 1: High
 
 # the settings object
 var settings_prefrences: UserSettingPrefrences
+# backup settings object to safely hold the old settings before confirming
+var cached_settings: UserSettingPrefrences
 
 # all the resolutions they're able to select
 var resolutions_array: Array[Vector2i] = [
@@ -57,6 +59,9 @@ var resolutions_array: Array[Vector2i] = [
 func _ready() -> void:
   # load their settings to see what they already have saved
   settings_prefrences = UserSettingPrefrences.load_or_create()
+  
+  # make a safe deep copy of the settings so we have something to revert back to
+  cached_settings = settings_prefrences.duplicate(true)
 
   # update all the ui upon loading in
   _load_ui_stuff()
@@ -118,6 +123,9 @@ func _load_ui_stuff() -> void:
   upscaler_dropdown.DefaultItem = int(settings_prefrences.upscaler_mode)
   ssao_dropdown.DefaultItem = int(settings_prefrences.ssao_quality)
   sdfgi_dropdown.DefaultItem = int(settings_prefrences.sdfgi_quality)
+  
+  # Set initial visibility of the upscaler dropdown upon loading in
+  upscaler_dropdown.visible = settings_prefrences.render_scale < 1.0
 
 func _on_msaa_slider_slider_changed(new_value: float) -> void:
   var converted_value: Viewport.MSAA = int(new_value) as Viewport.MSAA # get the value in terms of the MSAA enum
@@ -223,7 +231,8 @@ func _on_shadow_dropdown_item_selected(item: int) -> void:
   settings_prefrences.shadow_quality = item
 
 func _on_taa_toggle_toggled(toggled_on: bool) -> void:
-  settings_prefrences.taa_enable = toggled_on
+  if settings_prefrences != null:
+    settings_prefrences.taa_enable = toggled_on
 
 func _on_upscaler_dropdown_item_selected(item: int) -> void:
   settings_prefrences.upscaler_mode = item as Viewport.Scaling3DMode
@@ -234,10 +243,26 @@ func _on_ssao_dropdown_item_selected(item: int) -> void:
 func _on_sdfgi_dropdown_item_selected(item: int) -> void:
   settings_prefrences.sdfgi_quality = item
 
+
+# --- DATA MANAGEMENT LOGIC ---
+
 # settings are only applied when this button is pressed
-# TODO: have a confirm page that resets the settings to the previous values either if they choose to revert them, or if 15 sec has gone by without any input
 # this is ran by the parent settings script
 func apply_settings() -> void:
-  # just save and apply all the settings
-  settings_prefrences.save()
+  # Apply the settings visually to the engine so the player can see the changes
   PrefrencesLoader.apply_graphics_settings(settings_prefrences)
+
+# Called by parent if the player clicks "Confirm"
+func confirm_settings() -> void:
+  settings_prefrences.save()
+  # Update our safe backup to match the newly confirmed settings
+  cached_settings = settings_prefrences.duplicate(true)
+
+# Called by parent if the player clicks "Revert" or the timer runs out
+func revert_settings() -> void:
+  # Overwrite our dirty settings with our safe backup
+  settings_prefrences = cached_settings.duplicate(true)
+  # Apply the safe backup settings back to the engine
+  PrefrencesLoader.apply_graphics_settings(settings_prefrences)
+  # Visually update the sliders/dropdowns to reflect the rollback
+  _load_ui_stuff()
