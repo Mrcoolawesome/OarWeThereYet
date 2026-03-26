@@ -60,7 +60,10 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
   public override void _PhysicsProcess(double delta)
   {
-    FloatingPhysicsProcess(delta);
+    if (Item?.Data.Name != "Anchor")
+    {
+      FloatingPhysicsProcess(delta);
+    }
   }
 
 
