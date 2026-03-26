@@ -23,10 +23,38 @@ func apply_graphics_settings(user_prefs: UserSettingPrefrences) -> void:
     DisplayServer.window_set_flag(user_prefs.display_flag, user_prefs.borderless_enable) # this sets the gvien flag to false or true
     get_window().size = user_prefs.resolution # this is the correct way of doing it so that godot knows that the resolution has been changed
     
-    # apply new graphics settings
+    # apply basic graphics settings
     DisplayServer.window_set_vsync_mode(user_prefs.vsync_mode)
     Engine.max_fps = int(user_prefs.max_fps)
     get_viewport().scaling_3d_scale = user_prefs.render_scale
+    
+    # apply advanced viewport settings
+    get_viewport().use_taa = user_prefs.taa_enable
+    get_viewport().scaling_3d_mode = user_prefs.upscaler_mode
+    
+    # apply shadow quality settings
+    # maps 0, 1, 2, 3 to resolution sizes for the shadow atlases
+    var shadow_size: int = 0
+    match user_prefs.shadow_quality:
+        0: shadow_size = 1024 # Low
+        1: shadow_size = 2048 # Medium
+        2: shadow_size = 4096 # High
+        3: shadow_size = 8192 # Ultra
+        
+    # Set Omni/SpotLight shadow resolution
+    get_viewport().positional_shadow_atlas_size = shadow_size
+    # Set DirectionalLight (Sun) shadow resolution
+    RenderingServer.directional_shadow_atlas_set_size(shadow_size, true)
+
+    # apply lighting quality settings (Requires the level's WorldEnvironment to have these enabled to be seen)
+    # SSAO Mapping: 0=Very Low, 1=Low, 2=Medium, 3=High
+    RenderingServer.environment_set_ssao_quality(user_prefs.ssao_quality, true, 0.5, 2, 50.0, 300.0)
+    
+    # SDFGI Mapping: 0=Low(16 rays), 1=High(64 rays) 
+    var sdfgi_rays = RenderingServer.ENV_SDFGI_RAY_COUNT_16
+    if user_prefs.sdfgi_quality == 1:
+        sdfgi_rays = RenderingServer.ENV_SDFGI_RAY_COUNT_64
+    RenderingServer.environment_set_sdfgi_ray_count(sdfgi_rays)
 
 # applies only audio settings
 func apply_audio_settings(user_prefs: UserSettingPrefrences) -> void:

@@ -11,6 +11,13 @@ extends Control
 @onready var vsync_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/VSyncDropdown
 @onready var max_fps_slider = $MarginContainer/ScrollContainer/VBoxContainer/MaxFPSSlider
 @onready var render_scale_slider = $MarginContainer/ScrollContainer/VBoxContainer/RenderScaleSlider
+@onready var shadow_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/ShadowDropdown
+
+# lighting and advanced graphics nodes
+@onready var taa_toggle = $MarginContainer/ScrollContainer/VBoxContainer/TAAToggle # CheckBox/CheckButton
+@onready var upscaler_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/UpscalerDropdown # 0: Bilinear, 1: FSR 1.0, 2: FSR 2.2
+@onready var ssao_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/SSAODropdown # 0: Very Low, 1: Low, 2: Medium, 3: High
+@onready var sdfgi_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/SDFGIDropdown # 0: Low, 1: High
 
 # the settings object
 var settings_prefrences: UserSettingPrefrences
@@ -34,7 +41,16 @@ var resolutions_array: Array[Vector2i] = [
   # 21:9 resolutions (Ultrawide Monitors)
   Vector2i(5120, 2160), # 5K2K / WUHD (Ultrawide 4K equivalent)
   Vector2i(3440, 1440), # UWQHD (Ultrawide 1440p)
-  Vector2i(2560, 1080)  # UWFHD (Ultrawide 1080p)
+  Vector2i(2560, 1080), # UWFHD (Ultrawide 1080p)
+
+  # 3:2 resolutions (Common on Surface / Productivity laptops)
+  Vector2i(2160, 1440), # 1440p 3:2
+  Vector2i(1920, 1280), # 1280p 3:2
+
+  # 4:3 resolutions (Retro/CRT monitors)
+  Vector2i(1600, 1200), # UXGA
+  Vector2i(1024, 768),  # XGA
+  Vector2i(800, 600)    # SVGA
 ]
 
 # Called when the node enters the scene tree for the first time.
@@ -93,6 +109,15 @@ func _load_ui_stuff() -> void:
   _on_render_scale_slider_slider_changed(settings_prefrences.render_scale)
   render_scale_slider.StartingValue = settings_prefrences.render_scale
 
+  # SHADOW QUALITY DROPDOWN
+  # 0 = Low, 1 = Medium, 2 = High, 3 = Ultra
+  shadow_dropdown.DefaultItem = settings_prefrences.shadow_quality
+
+  # ADVANCED GRAPHICS
+  taa_toggle.button_pressed = settings_prefrences.taa_enable
+  upscaler_dropdown.DefaultItem = int(settings_prefrences.upscaler_mode)
+  ssao_dropdown.DefaultItem = int(settings_prefrences.ssao_quality)
+  sdfgi_dropdown.DefaultItem = int(settings_prefrences.sdfgi_quality)
 
 func _on_msaa_slider_slider_changed(new_value: float) -> void:
   var converted_value: Viewport.MSAA = int(new_value) as Viewport.MSAA # get the value in terms of the MSAA enum
@@ -182,6 +207,21 @@ func _on_render_scale_slider_slider_changed(new_value: float) -> void:
   # change the float into a percentage string (e.g. 0.75 becomes 75%)
   var display_string: String = str(int(new_value * 100)) + "%"
   render_scale_slider.change_number_display_tag(display_string)
+
+func _on_shadow_dropdown_item_selected(item: int) -> void:
+  settings_prefrences.shadow_quality = item
+
+func _on_taa_toggle_toggled(toggled_on: bool) -> void:
+  settings_prefrences.taa_enable = toggled_on
+
+func _on_upscaler_dropdown_item_selected(item: int) -> void:
+  settings_prefrences.upscaler_mode = item as Viewport.Scaling3DMode
+
+func _on_ssao_dropdown_item_selected(item: int) -> void:
+  settings_prefrences.ssao_quality = item as RenderingServer.EnvironmentSSAOQuality
+
+func _on_sdfgi_dropdown_item_selected(item: int) -> void:
+  settings_prefrences.sdfgi_quality = item
 
 # settings are only applied when this button is pressed
 # TODO: have a confirm page that resets the settings to the previous values either if they choose to revert them, or if 15 sec has gone by without any input

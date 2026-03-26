@@ -13,6 +13,13 @@ class_name UserSettingPrefrences extends Resource
 @export var vsync_mode: DisplayServer.VSyncMode = DisplayServer.VSYNC_ENABLED
 @export var max_fps: float = 0.0
 @export var render_scale: float = 1.0
+@export var shadow_quality: int = 2 # Default High (2)
+
+# ADVANCED GRAPHICS / LIGHTING
+@export var taa_enable: bool = false
+@export var upscaler_mode: Viewport.Scaling3DMode = Viewport.SCALING_3D_MODE_BILINEAR
+@export var ssao_quality: RenderingServer.EnvironmentSSAOQuality = RenderingServer.ENV_SSAO_QUALITY_MEDIUM
+@export var sdfgi_quality: int = 0 # 0 for Low, 1 for High
 
 # VOLUME SETTINGS
 @export var voicechat_volume: float = 1.0

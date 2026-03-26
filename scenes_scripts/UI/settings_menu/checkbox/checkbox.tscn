@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://bjjn70dunjut4"]
+
+[ext_resource type="Script" uid="uid://b1j1cnq37s2dk" path="res://scenes_scripts/UI/settings_menu/checkbox/checkbox.gd" id="1_cspki"]
+[ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="1_dkdol"]
+[ext_resource type="Theme" uid="uid://c5pba66n7wibx" path="res://scenes_scripts/UI/settings_menu/checkbox/settings_checkbox.tres" id="3_cspki"]
+
+[node name="Checkbox" type="Control"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_cspki")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("1_dkdol")
+theme_override_constants/outline_size = 20
+theme_override_font_sizes/font_size = 64
+text = "Placeholder"
+
+[node name="CheckBox" type="CheckBox" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 6.06
+theme = ExtResource("3_cspki")
