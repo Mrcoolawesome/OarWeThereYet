@@ -114,7 +114,7 @@ func _load_ui_stuff() -> void:
   shadow_dropdown.DefaultItem = settings_prefrences.shadow_quality
 
   # ADVANCED GRAPHICS
-  taa_toggle.button_pressed = settings_prefrences.taa_enable
+  taa_toggle.DefaultState = settings_prefrences.taa_enable
   upscaler_dropdown.DefaultItem = int(settings_prefrences.upscaler_mode)
   ssao_dropdown.DefaultItem = int(settings_prefrences.ssao_quality)
   sdfgi_dropdown.DefaultItem = int(settings_prefrences.sdfgi_quality)
@@ -207,6 +207,17 @@ func _on_render_scale_slider_slider_changed(new_value: float) -> void:
   # change the float into a percentage string (e.g. 0.75 becomes 75%)
   var display_string: String = str(int(new_value * 100)) + "%"
   render_scale_slider.change_number_display_tag(display_string)
+
+  # UX LOGIC: Hide and reset the upscaler if render scale is 100% or higher
+  if new_value >= 1.0:
+    upscaler_dropdown.visible = false
+    # Force the backend setting to Bilinear (0) to avoid Godot warnings
+    settings_prefrences.upscaler_mode = Viewport.SCALING_3D_MODE_BILINEAR
+    # Visually update the dropdown to default back to index 0 ("Disabled")
+    upscaler_dropdown.DefaultItem = 0 
+  else:
+    # Reveal the dropdown if they drop below 100%
+    upscaler_dropdown.visible = true
 
 func _on_shadow_dropdown_item_selected(item: int) -> void:
   settings_prefrences.shadow_quality = item

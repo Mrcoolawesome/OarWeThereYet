@@ -15,6 +15,7 @@ grow_vertical = 2
 script = ExtResource("1_cspki")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 1
 anchors_preset = 14
 anchor_top = 0.5
@@ -22,6 +23,8 @@ anchor_right = 1.0
 anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -39,3 +42,5 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 6.06
 theme = ExtResource("3_cspki")
+
+[connection signal="toggled" from="MarginContainer/HBoxContainer/CheckBox" to="." method="_on_check_box_toggled"]
