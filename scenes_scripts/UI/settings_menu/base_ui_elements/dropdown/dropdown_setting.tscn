@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://ru85ii48jmmk" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/dropdown/dropdown_setting.gd" id="1_jpha4"]
 
 [node name="DropdownSetting" type="Control"]
+custom_minimum_size = Vector2(0, 200)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
