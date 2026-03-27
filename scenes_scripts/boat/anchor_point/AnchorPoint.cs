@@ -149,9 +149,11 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     }
     else
     {
-      // TODO: check if player is holding item before giving them anchor
-      player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
-      _deployed = true;
+      if (player.ArmNode.Item == null)
+      {
+        player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
+        _deployed = true;
+      }
     }
   }
 
