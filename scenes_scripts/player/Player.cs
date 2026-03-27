@@ -803,7 +803,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			RequestSitInSeat(-1);
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void OpenInventory(Inventory inventory)
 	{
 		_invUI.Open(inventory);
