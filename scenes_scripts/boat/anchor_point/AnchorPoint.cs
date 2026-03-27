@@ -3,7 +3,7 @@ using System;
 
 public partial class AnchorPoint : StaticBody3D, Interactable
 {
-  [Export] public string PromptMessage { get; set; } = "Reset Anchor";
+  [Export] public string PromptMessage { get; set; } = "Pick Up Anchor";
   [Export] public float MaxRopeRange = 10.0f;
 
 	public string PromptInput { get; set; } = "action_key";
@@ -48,6 +48,16 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
   public override void _Process(double delta)
   {
+    // Change Propt message depending on deployed
+    if (_deployed)
+    {
+      PromptMessage = "Reset Anchor";
+    }
+    else
+    {
+      PromptMessage = "Pick Up Anchor";
+    }
+
     // Sync _deployedAnchor from _deployedAnchorPath if they differ
     if (!string.IsNullOrEmpty(_deployedAnchorPath))
     {
