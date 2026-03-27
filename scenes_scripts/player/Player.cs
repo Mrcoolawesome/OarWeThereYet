@@ -288,7 +288,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		switch(CurrPlayerState)
 		{
 			case PlayerState.Standing:
-				_interactRay.Enabled = true;
+				_interactRay.Enabled = CurrGameState == GameState.Playing;
 				break;
 			case PlayerState.Rowing:
 				_interactRay.Enabled = false;
@@ -312,7 +312,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_pauseUICanvas.Visible = false;
 		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
-		_interactRay.Enabled = true;
 
 		// Menu logic
 		// We use IsActionJustPressed because it's a trigger and not a continuous input event
@@ -339,7 +338,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		if (!_invUI.isOpen()) { _pauseUICanvas.Visible = true; };
 		_hud.Visible = false;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
-		_interactRay.Enabled = false;
 	}
 
 	// Rowing state input handling
@@ -805,8 +803,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	public void OpenInventory(Inventory inventory)
 	{
-		_invUI.Open(inventory);
 		CurrGameState = GameState.Menu;
+		_invUI.Open(inventory);
 	}
 
 	// Helper functions
