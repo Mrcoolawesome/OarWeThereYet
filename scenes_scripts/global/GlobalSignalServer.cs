@@ -62,6 +62,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void ApplyPlayerLookSpeedEventHandler(float multiplier);
 
+  // signal to set the player's gamertag
+  [Signal]
+  public delegate void AssignGamertagEventHandler(string gamertag);
+
   public int Health { get; set; }
 
   public override void _Ready()

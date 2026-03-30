@@ -24,12 +24,16 @@ var player_id: int = -1
 var is_client = false
 var is_hosting: bool = false
 var pending_host_id: int = 0
+var steam_username: String = "Unknown"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
   # initalize steam
   Steam.steamInit(480, true)
   Steam.initRelayNetworkAccess() # start steam relay
+
+  # get their name and set it to the global variable
+  steam_username = Steam.getPersonaName()
 
   # initialize voice
   ProxChat.initialize_voice()
@@ -149,9 +153,12 @@ func _add_player_to_game(id: int):
     # instantiate a new player object
     var player = player_scene.instantiate()
     player.name = str(id) # set the name of the player to be their client id
-    
+
     # Add the player as a child of the LOADED MAP
     current_map.add_child(player, true) # that second boolean is important because it keeps the name of the player to be the one that we set for it
+
+    # Send an RPC call ONLY to the client who owns this player node
+    rpc_id(id, "_receive_gamertag", steam_username)
 
     # assign the camera to the player for the terrain3d addon
     rpc_id(id, "_assign_camera", id)
@@ -176,6 +183,13 @@ func _assign_camera(id: int) -> void:
       print("Successfully linked local camera to Terrain3D!")
     else:
       print("Could not link camera. Terrain or Camera node missing.")
+
+# "authority" means only the server can call this. 
+# "call_local" ensures it also runs for the Host's own player.
+@rpc("authority", "reliable", "call_local")
+func _receive_gamertag(gamertag: String) -> void:
+  # Emit your global signal for the C# script to catch
+  GlobalSignalServer.emit_signal("AssignGamertag", gamertag)
 
 '''
   find the player we're looking to remove, and remove their instance.

@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Godot.Collections;
 using Waterways;
@@ -141,6 +142,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private Node3D _terrain;
 	private GodotObject _terrainData;
 
+  // Store the Steam Username
+	private Label3D _gamerTag;
+	public String SteamUsername;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -194,6 +199,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
 		// subscribe to the signal that changes the mouse sensitivity from the settings menu
 		GlobalSignalServer.Instance.ApplyPlayerLookSpeed += ChangePlayerLookSpeed;
+		// subscribe to setting the gamertag
+		GlobalSignalServer.Instance.AssignGamertag += SetUsername;
 
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
@@ -203,6 +210,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		// set the state array from the server's perspective
 		SetStateArray();
+
+		// set their gamertag
+		_gamerTag = GetNode<Label3D>("GamerTag");
 
 		// client code for when setting up their camera and stuff
 		// if we are the player, then use the camera for this player
@@ -1062,6 +1072,19 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		if (IsMultiplayerAuthority())
 		{
 			MouseSens = newSpeed;
+		}
+	}
+
+	// function to set their gamertag
+	public void SetUsername(string username)
+	{
+		if (_gamerTag != null)
+		{
+			_gamerTag.Text = username;
+		}
+		if (IsMultiplayerAuthority())
+		{
+			_gamerTag.Visible = false; // don't wanna see it locally
 		}
 	}
 }
