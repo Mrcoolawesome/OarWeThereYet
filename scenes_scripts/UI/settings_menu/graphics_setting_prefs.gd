@@ -25,6 +25,9 @@ class_name UserSettingPrefrences extends Resource
 @export var voicechat_volume: float = 1.0
 @export var master_volume: float = 1.0
 
+# CONTROLS SETTINGS
+@export var look_speed: float = 0.4 # Default value (same as the default value for MouseSens in the Player.cs file)
+
 # saves the current instance of the class (self) into a file called 'user_settings_prefs.tres'
 func save() -> void:
   ResourceSaver.save(self, "user://user_settings_prefs.tres")

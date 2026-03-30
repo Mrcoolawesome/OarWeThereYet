@@ -58,6 +58,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void DoneLoadingMapEventHandler();
 
+  // signal to apply the look speed for the player
+  [Signal]
+  public delegate void ApplyPlayerLookSpeedEventHandler(float multiplier);
+
   public int Health { get; set; }
 
   public override void _Ready()

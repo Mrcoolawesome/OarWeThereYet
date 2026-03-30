@@ -192,6 +192,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
+		// subscribe to the signal that changes the mouse sensitivity from the settings menu
+		GlobalSignalServer.Instance.ApplyPlayerLookSpeed += ChangePlayerLookSpeed;
 
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
@@ -1052,4 +1054,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       rb.ApplyCentralImpulse(pushDirection * ObjectKnockbackForce); 
     }
   }
+
+	// this changes the player look speed
+	private void ChangePlayerLookSpeed(float newSpeed)
+	{
+		// make sure this is the current player's instance
+		if (IsMultiplayerAuthority())
+		{
+			MouseSens = newSpeed;
+		}
+	}
 }
