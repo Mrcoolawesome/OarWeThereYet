@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=9 format=3 uid="uid://chyq2g3h1geyf"]
+[gd_resource type="Theme" load_steps=10 format=3 uid="uid://chyq2g3h1geyf"]
 
 [ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="1_fmctm"]
 [ext_resource type="Texture2D" uid="uid://fdqunx3m2gre" path="res://art/icons/settings_menu_icons/icons 04 PillShapedSliderDefault.svg" id="1_snsg7"]
@@ -7,15 +7,39 @@
 [ext_resource type="Texture2D" uid="uid://xmql31bvh8py" path="res://art/icons/settings_menu_icons/icons 06 SliderTicks.svg" id="3_peyo1"]
 [ext_resource type="StyleBox" uid="uid://dx0julebsqqke" path="res://scenes_scripts/UI/settings_menu/themes/actual_slider_background_empty.tres" id="4_l7q22"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y6sgu"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_peyo1"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fmctm"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_peyo1"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+expand_margin_left = 5.0
+expand_margin_right = 5.0
 
 [resource]
 ApplySettingsButton/base_type = &"Button"
 ApplySettingsButton/constants/outline_size = 20
 ApplySettingsButton/font_sizes/font_size = 64
-ApplySettingsButton/styles/normal = SubResource("StyleBoxEmpty_peyo1")
+ApplySettingsButton/styles/normal = SubResource("StyleBoxFlat_y6sgu")
 Button/fonts/font = ExtResource("1_fmctm")
 HSlider/constants/center_grabber = 1
 HSlider/icons/grabber = ExtResource("1_snsg7")
@@ -29,4 +53,5 @@ SubMenuSelectionButtons/base_type = &"Button"
 SubMenuSelectionButtons/constants/outline_size = 25
 SubMenuSelectionButtons/font_sizes/font_size = 100
 SubMenuSelectionButtons/fonts/font = ExtResource("1_fmctm")
-SubMenuSelectionButtons/styles/normal = SubResource("StyleBoxEmpty_fmctm")
+SubMenuSelectionButtons/styles/hover = SubResource("StyleBoxEmpty_peyo1")
+SubMenuSelectionButtons/styles/normal = SubResource("StyleBoxFlat_peyo1")
