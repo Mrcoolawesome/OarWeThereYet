@@ -33,6 +33,11 @@ func on_check_box_toggled(toggled_on: bool) -> void:
 func on_line_edit_text_changed(new_text: String) -> void:
 	lobby_name = new_text
 
+# NEW: Connected to the LineEdit's "text_submitted" signal (fires on pressing Enter)
+func on_line_edit_text_submitted(new_text: String) -> void:
+	lobby_name = new_text # Just to be safe, make sure we have the absolute latest text
+	on_host_button_pressed() # Act exactly as if the Host button was clicked
+
 
 # Triggered when the HOST button is pressed
 func on_host_button_pressed() -> void:
