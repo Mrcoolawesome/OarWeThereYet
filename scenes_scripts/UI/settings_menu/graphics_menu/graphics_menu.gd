@@ -10,6 +10,9 @@ signal setting_changed
 # resolution drop down menu
 @onready var resolution_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/ResolutionDropdown
 
+# scroll bar item
+@onready var scroll_container = $MarginContainer/ScrollContainer
+
 # new dropdowns and sliders for the added settings
 @onready var vsync_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/VSyncDropdown
 @onready var max_fps_slider = $MarginContainer/ScrollContainer/VBoxContainer/MaxFPSSlider
@@ -60,7 +63,6 @@ var resolutions_array: Array[Vector2i] = [
   Vector2i(800, 600)    # SVGA
 ]
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
   # load their settings to see what they already have saved
   settings_prefrences = UserSettingPrefrences.load_or_create()
@@ -70,6 +72,14 @@ func _ready() -> void:
 
   # update all the ui upon loading in
   _load_ui_stuff()
+  
+  # NEW: Connect the visibility signal
+  visibility_changed.connect(_on_visibility_changed)
+
+# NEW: Snap the scrollbar back to the top when opened
+func _on_visibility_changed() -> void:
+  if visible and scroll_container:
+    scroll_container.scroll_vertical = 0
 
 func _load_ui_stuff() -> void:
   # Lock the signals while we load the UI

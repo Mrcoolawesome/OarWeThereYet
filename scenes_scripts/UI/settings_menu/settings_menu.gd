@@ -37,7 +37,15 @@ func _ready() -> void:
 	# Connect the new signals from our child menus
 	audio_menu.setting_changed.connect(_on_audio_setting_changed)
 	graphics_menu.setting_changed.connect(_on_graphics_setting_changed)
-	controls_menu.setting_changed.connect(_on_controls_setting_changed) # NEW: Connect controls signal
+	controls_menu.setting_changed.connect(_on_controls_setting_changed)
+	
+	# NEW: Connect the visibility signal to reset the menu state
+	visibility_changed.connect(_on_visibility_changed)
+
+# NEW: When the menu opens, force it back to the Audio tab
+func _on_visibility_changed() -> void:
+	if visible:
+		_show_menu(SubMenuVisibility.AUDIO)
 
 # updates our countdown label every frame
 func _process(_delta: float) -> void:
