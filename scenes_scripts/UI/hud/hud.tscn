@@ -1,18 +1,90 @@
-[gd_scene load_steps=3 format=3 uid="uid://dyjf8cl7dhrr5"]
+[gd_scene load_steps=7 format=3 uid="uid://dyjf8cl7dhrr5"]
 
-[ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="1_ahhtf"]
 [ext_resource type="Script" uid="uid://bu8lx7h5m8frd" path="res://scenes_scripts/UI/hud/Hud.cs" id="1_oo0fn"]
+[ext_resource type="Script" uid="uid://dosr3xd78lnhp" path="res://scenes_scripts/UI/hud/boat_health_bar.gd" id="2_usjff"]
+[ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="3_4wu0i"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opnk5"]
+bg_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+expand_margin_top = 35.0
+expand_margin_bottom = 35.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h0y0o"]
+bg_color = Color(0.90588236, 0.89411765, 0.41568628, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+expand_margin_top = 35.0
+expand_margin_bottom = 35.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u5sva"]
+bg_color = Color(0.90588236, 0.89411765, 0.41568628, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+expand_margin_top = 35.0
+expand_margin_bottom = 35.0
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_oo0fn")
 
-[node name="BoatHealthLabel" type="Label" parent="."]
+[node name="BoatHealthBar" type="Control" parent="."]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+script = ExtResource("2_usjff")
+StartingValue = 100.0
+
+[node name="MarginContainer" type="MarginContainer" parent="BoatHealthBar"]
+layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 23.0
+offset_left = -525.0
+offset_right = 525.0
+offset_bottom = 94.0
 grow_horizontal = 2
-theme = ExtResource("1_ahhtf")
-text = "Boat Health: 100"
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_right = 25
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BoatHealthBar/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 29
+alignment = 1
+
+[node name="Slider" type="HSlider" parent="BoatHealthBar/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(1000, 0)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 4
+theme = ExtResource("3_4wu0i")
+theme_override_constants/grabber_offset = 2000
+theme_override_styles/slider = SubResource("StyleBoxFlat_opnk5")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_h0y0o")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_u5sva")
+ticks_on_borders = true
+ticks_position = 3
+
+[connection signal="value_changed" from="BoatHealthBar/MarginContainer/HBoxContainer/Slider" to="BoatHealthBar" method="_on_slider_value_changed"]
