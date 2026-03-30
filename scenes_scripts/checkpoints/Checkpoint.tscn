@@ -12,6 +12,8 @@ script = ExtResource("1_70jua")
 
 [node name="BoatSpawn" type="Node3D" parent="."]
 
+[node name="AnchorSpawn" type="Node3D" parent="."]
+
 [node name="CheckpointCollision" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_hfxjx")
 
