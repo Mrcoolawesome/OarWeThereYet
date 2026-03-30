@@ -312,7 +312,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void PlayingStateProcess()
 	{
 		_pauseUICanvas.Visible = false;
-		// _hud.Visible = true;
+		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
 		_interactRay.Enabled = true;
 

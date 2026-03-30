@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://657bxsni64f3"]
+[gd_scene load_steps=6 format=3 uid="uid://657bxsni64f3"]
 
 [ext_resource type="PackedScene" uid="uid://c6n6ct037x4n2" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.tscn" id="1_teee5"]
 [ext_resource type="Script" uid="uid://dphvpqnr087pj" path="res://scenes_scripts/UI/pop_up_menu/host_popup_menu/host_game_pop_up_menu.gd" id="2_lyev8"]
 [ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="3_mhkqq"]
 [ext_resource type="Theme" uid="uid://b2bjemh6aq227" path="res://art/themes/buttons.tres" id="4_v2hjm"]
+[ext_resource type="PackedScene" uid="uid://6epc5ibp31kh" path="res://scenes_scripts/UI/settings_menu/confirm_page/confirm_page.tscn" id="5_lyev8"]
 
 [node name="HostGamePopUpMenu" instance=ExtResource("1_teee5")]
 script = ExtResource("2_lyev8")
@@ -79,7 +80,23 @@ theme = ExtResource("3_mhkqq")
 theme_type_variation = &"FlatButton"
 text = "Host"
 
+[node name="DeletionConfirmPage" parent="." index="1" instance=ExtResource("5_lyev8")]
+layout_mode = 1
+
+[node name="Label" parent="DeletionConfirmPage/GreyBackground/Panel/MarginContainer/VBoxContainer" index="0"]
+theme_override_font_sizes/font_size = 80
+text = "Confirm Save Deletion"
+
+[node name="CountdownLabel" parent="DeletionConfirmPage/GreyBackground/Panel/MarginContainer/VBoxContainer" index="1"]
+theme_override_font_sizes/font_size = 40
+
+[node name="RevertButton" parent="DeletionConfirmPage/GreyBackground/Panel/MarginContainer/VBoxContainer/HBoxContainer/RevertButtonMargin" index="0"]
+text = "Cancel
+"
+
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer/Button" to="." method="_delete_save_button_pressed"]
 [connection signal="toggled" from="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer/CheckBox" to="." method="on_check_box_toggled"]
 [connection signal="text_changed" from="PanelContainer/VBoxContainer/LobbyNameContainer/LineEdit" to="." method="on_line_edit_text_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer3/HostButton" to="." method="on_host_button_pressed"]
+
+[editable path="DeletionConfirmPage"]

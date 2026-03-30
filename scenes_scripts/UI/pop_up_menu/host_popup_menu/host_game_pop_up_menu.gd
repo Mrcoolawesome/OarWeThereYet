@@ -10,6 +10,19 @@ signal delete_save
 # In GDScript, @onready is the cleanest way to grab nodes. It automatically fetches the node right before _ready() is called.
 @onready var _text_box_container: MarginContainer = $PanelContainer/VBoxContainer/LobbyNameContainer
 
+# the deletion confirm page
+@onready var deletion_confirm_page: Control = $DeletionConfirmPage
+
+
+func _ready() -> void:
+	# Make sure the confirm page is hidden by default
+	deletion_confirm_page.visible = false
+	
+	# Connect the signals from the confirm page to functions in this script
+	deletion_confirm_page.ConfirmButtonPressed.connect(_on_confirm_deletion)
+	deletion_confirm_page.RevertButtonPressed.connect(_on_cancel_deletion)
+
+
 # This is connected to the checkbox to make it a public lobby or not
 func on_check_box_toggled(toggled_on: bool) -> void:
 	is_public = toggled_on
@@ -35,5 +48,21 @@ func on_host_button_pressed() -> void:
 		GlobalSignalServer.emit_signal("ShowLoadingScreen")
 
 
+# Triggered when the initial "Delete Save" button is pressed
 func _delete_save_button_pressed() -> void:
+	# Update the text on the confirm page and show it
+	deletion_confirm_page.set_countdown_label_text("Are you sure you want to delete this save?")
+	deletion_confirm_page.visible = true
+
+
+# --- CONFIRM PAGE SIGNAL HANDLERS ---
+
+func _on_confirm_deletion() -> void:
+	# Hide the confirm page and actually emit the deletion signal
+	deletion_confirm_page.visible = false
 	delete_save.emit()
+
+
+func _on_cancel_deletion() -> void:
+	# Just hide the confirm page, doing nothing else
+	deletion_confirm_page.visible = false
