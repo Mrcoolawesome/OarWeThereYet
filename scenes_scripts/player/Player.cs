@@ -377,10 +377,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
     // ONLY the Authority should automatically decay the target back to 1.0.
     // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
-    if (IsMultiplayerAuthority())
-    {
-      TargetHeadScale = Mathf.Lerp(TargetHeadScale, 1.0f, (float)delta * 10.0f);
-    }
+		TargetHeadScale = Mathf.Lerp(TargetHeadScale, 1.0f, (float)delta * 10.0f);
   }
 
 	private void PlayingStateProcess()
