@@ -69,6 +69,9 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void AssignPlayerColorEventHandler(string colorHex);
 
+  [Signal] 
+  public delegate void PlayerLoudnessEventHandler(int peerId, float loudness);
+
   public int Health { get; set; }
 
   public override void _Ready()

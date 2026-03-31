@@ -280,7 +280,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
 [node name="GamerTag" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0174274, 0)
 billboard = 1
-alpha_cut = 1
 text = "Placeholder"
 font = ExtResource("12_33s6o")
 font_size = 50
