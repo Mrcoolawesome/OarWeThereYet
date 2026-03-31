@@ -1,6 +1,6 @@
 # OarWeThereYet: Project Mandates & Standards
 
-This project is a multiplayer rafting game built with **Godot 4.5** and **C# (Mono)**. Adherence to these standards ensures consistency across the codebase
+This project is a multiplayer rafting game built with **Godot 4.5** and **C# (Mono)**. Adherence to these standards ensures consistency across the codebase. If you learn information that you think would be useful to know in the future, add it to this file.
 
 ## Technical Stack
 - **Engine:** Godot 4.5 (Forward Plus renderer)
