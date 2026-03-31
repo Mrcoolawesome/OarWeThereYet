@@ -163,7 +163,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   private string _lastAppliedColor = "";
 
 	// loudness caling variables
-  [Export] public float TargetHeadScale = 1.0f;
+  public float _targetHeadScale = 1.0f;
   private float _currentHeadScale = 1.0f;
 
   public override void _EnterTree()
@@ -318,8 +318,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   //PROCESS CODE AND ALL ASSOCIATED FUNCTIONS
   public override void _Process(double delta)
   {
-		HeadAnimationProcess(delta);
-
 		// If we are looking at someone else, and their synced color just arrived over the network:
     if (!IsMultiplayerAuthority() && CurrentColorHex != _lastAppliedColor && CurrentColorHex != "")
     {
@@ -363,7 +361,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void HeadAnimationProcess(double delta)
   {
     // Smoothly interpolate the scale towards the target
-    _currentHeadScale = Mathf.Lerp(_currentHeadScale, TargetHeadScale, (float)delta * 20.0f);
+    _currentHeadScale = Mathf.Lerp(_currentHeadScale, _targetHeadScale, (float)delta * 20.0f);
     
     // Create the XZ scale vector (Y remains 1.0 so they don't get taller)
     Vector3 newScale = new Vector3(_currentHeadScale, 1.0f, _currentHeadScale);
@@ -377,7 +375,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
     // ONLY the Authority should automatically decay the target back to 1.0.
     // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
-		TargetHeadScale = Mathf.Lerp(TargetHeadScale, 1.0f, (float)delta * 10.0f);
+		_targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
   }
 
 	private void PlayingStateProcess()
@@ -487,6 +485,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Logic for movement depending on player state
 	public override void _PhysicsProcess(double delta)
 	{
+		HeadAnimationProcess(delta);
+
 		// do all the movement and stuff if we're the owner of this instance, we'll sync it to the clients 
 		if (IsMultiplayerAuthority())
 		{
@@ -1201,16 +1201,23 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     }
   }
 
-	// --- LOUDNESS FUNCTIONS ---
+	// --- LOUDNESS RPC FUNCTIONS ---
   private void OnPlayerLoudness(float loudness)
   {
     // ONLY the local player listens to their own mic volume signal.
-    // Because they are the authority, changing this [Export] variable 
-    // will instantly push the new scale to every other client!
-    
-		// Average loudness is usually a small float (like 0.05 to 0.2).
-		// Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
-		TargetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
-    
+    if (IsMultiplayerAuthority())
+    {
+      // Tell EVERYONE (including ourselves via CallLocal) to change the target scale
+      Rpc(nameof(RpcUpdateHeadScale), loudness);
+    }
+  }
+
+  // CallLocal = true ensures the host also sees their own head expand
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void RpcUpdateHeadScale(float loudness)
+  {
+    // Average loudness is usually a small float (like 0.05 to 0.2).
+    // Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
+    _targetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
   }
 }
