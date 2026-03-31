@@ -163,8 +163,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   private string _lastAppliedColor = "";
 
 	// loudness caling variables
-  private float _targetHeadScale = 1.0f;
-  [Export] private float _currentHeadScale = 1.0f;
+  [Export] public float TargetHeadScale = 1.0f;
+  private float _currentHeadScale = 1.0f;
 
   public override void _EnterTree()
 	{
@@ -363,7 +363,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void HeadAnimationProcess(double delta)
   {
     // Smoothly interpolate the scale towards the target
-    _currentHeadScale = Mathf.Lerp(_currentHeadScale, _targetHeadScale, (float)delta * 20.0f);
+    _currentHeadScale = Mathf.Lerp(_currentHeadScale, TargetHeadScale, (float)delta * 20.0f);
     
     // Create the XZ scale vector (Y remains 1.0 so they don't get taller)
     Vector3 newScale = new Vector3(_currentHeadScale, 1.0f, _currentHeadScale);
@@ -379,7 +379,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
     if (IsMultiplayerAuthority())
     {
-      _targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
+      TargetHeadScale = Mathf.Lerp(TargetHeadScale, 1.0f, (float)delta * 10.0f);
     }
   }
 
@@ -1214,7 +1214,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     {
       // Average loudness is usually a small float (like 0.05 to 0.2).
       // Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
-      _targetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
+      TargetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
     }
   }
 }
