@@ -38,8 +38,18 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
     // get the water physics node and set its parameters
     _waterPhysics = GetNode<WaterPhysics>("WaterPhysics");
-		_riverFloatSystem = GetNode<RiverFloatSystem>("../../RiverManager/RiverFloatSystem");
-		_waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
+		_riverFloatSystem = GetNodeOrNull<RiverFloatSystem>("../../RiverManager/RiverFloatSystem");
+		
+    if (_riverFloatSystem != null)
+    {
+      _waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
+    }
+
+    // If anchor, emit setanchor signal (only on server to avoid redundant RPCs)
+    if (Multiplayer.IsServer() && Item?.Data.Name == "Anchor")
+    {
+      GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), GetPath());
+    }
   }
 
   public override void _Process(double delta)
@@ -50,7 +60,10 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
   public override void _PhysicsProcess(double delta)
   {
-    FloatingPhysicsProcess(delta);
+    if (Item?.Data.Name != "Anchor")
+    {
+      FloatingPhysicsProcess(delta);
+    }
   }
 
 
@@ -125,7 +138,7 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   }
 
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void DeleteItem()
+	public void DeleteItem()
   {
     QueueFree();
   }

@@ -27,6 +27,9 @@ public partial class TestLevel : Node
 	private RiverFloatSystem _river;
 
 	private bool _hostNetworkInitialized = false;
+	private bool _clientNetworkInitialized = false;
+
+  private string _anchorSpawnPath = null;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -72,13 +75,9 @@ public partial class TestLevel : Node
     IsBoatReady = true;
     EmitSignal(SignalName.BoatReady);
 
-    // 4. We DO NOT call LoadGame() here anymore. We wait for _Process to see the network.
-    
-    if (!Multiplayer.IsServer())
-    {
-			// Let clients know to wait for their connection before asking for world state
-			Multiplayer.ConnectedToServer += OnClientConnected;
-    }
+    // 4. Subscribe to connection signals. 
+    // We subscribe regardless of IsServer() here because IsServer() is true when peer is null.
+    Multiplayer.ConnectedToServer += OnClientConnected;
   }
 
 	public override void _Process(double delta)
@@ -92,12 +91,25 @@ public partial class TestLevel : Node
         // NOW we can safely load the game, move the boat, and fire RPCs!
         LoadGame(); 
     }
+
+    // Fallback for clients: if we are connected but haven't initialized yet
+    if (!_clientNetworkInitialized && Multiplayer.HasMultiplayerPeer() && !Multiplayer.IsServer())
+    {
+        if (Multiplayer.GetUniqueId() != 1 && Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connected)
+        {
+            _clientNetworkInitialized = true;
+            OnClientConnected(); }
+    }
   }
 
   private void OnClientConnected()
   {
-    // The client runs this the exact millisecond they connect to the host
-    GetNode<ItemContainer>("ItemContainer").RpcId(1, nameof(ItemContainer.RequestWorldState));
+    // The client runs this when they connect to the host
+    // We use a flag to ensure it only runs once
+    if (Multiplayer.IsServer()) return; 
+    
+    _clientNetworkInitialized = true;
+    _itemContainer.RpcId(1, nameof(ItemContainer.RequestWorldState));
   }
 
   public override void _ExitTree()
@@ -131,7 +143,7 @@ public partial class TestLevel : Node
 		_boat.Reset();
 
 		// reset the players by calling the 'ResetToStart' function on all of them
-		GetTree().CallGroup("players", "Reset");
+		GetTree().CallGroup("players", "Reset", _anchorSpawnPath);
 	}
 
 	private void SetBoatSpawn()
@@ -151,6 +163,15 @@ public partial class TestLevel : Node
 			if (child.CheckpointNum == _gameSaves.CheckpointNum)
 			{
 				boatSpawn = childBoatSpawn;
+        if (child.UseAnchor)
+        {
+          _boat.AnchorPoint.Deployed = true;
+          _anchorSpawnPath = child.GetNodeOrNull<Node3D>("AnchorSpawn").GetPath();
+        }
+        else
+        {
+          _anchorSpawnPath = null;
+        }
 				break;
 			}
 		}

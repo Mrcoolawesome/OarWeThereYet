@@ -71,6 +71,14 @@ public partial class ArmNode : MeshInstance3D
 		_hint2.Visible = false;
 	}
 
+	public override void _ExitTree()
+	{
+		if (IsInstanceValid(_ropeRoot))
+		{
+			_ropeRoot.QueueFree();
+		}
+	}
+
 	public override void _Process(double delta)
 	{
 		// Compute the arm's velocity from its change in global position
@@ -81,7 +89,7 @@ public partial class ArmNode : MeshInstance3D
 		_previousGlobalPosition = GlobalPosition;
 
 		// Hide the mesh if the lifepreserver is active
-		if (_activeLifepreserverNode != null)
+		if (IsInstanceValid(_activeLifepreserverNode))
 		{
 			SetMesh(null);
 			// Show and update the rope mesh
@@ -139,7 +147,7 @@ public partial class ArmNode : MeshInstance3D
 			if (Input.IsActionPressed("left_click"))
 			{
 				// If preserver is active, hold left_click to pull it closer continuously
-				if (_activeLifepreserverNode != null)
+				if (IsInstanceValid(_activeLifepreserverNode))
 				{
 					RequestPullLifepreserver();
 				}
@@ -148,7 +156,7 @@ public partial class ArmNode : MeshInstance3D
 			if (Input.IsActionJustPressed("left_click"))
 			{
 				// If no preserver is active, use the item on fresh click
-				if (_activeLifepreserverNode == null && Item?.Data?.UseAction != null)
+				if (!IsInstanceValid(_activeLifepreserverNode) && Item?.Data?.UseAction != null)
 				{
 					Player player = GetParent().GetParent<Player>();
 					if (player.CurrGameState == Player.GameState.Playing)
@@ -160,7 +168,7 @@ public partial class ArmNode : MeshInstance3D
 		}
 
 		// Hint text logic
-		if (_activeLifepreserverNode != null || 
+		if (IsInstanceValid(_activeLifepreserverNode) || 
 			_player.CurrPlayerState == Player.PlayerState.Rowing && Item?.Data.UseAction is Oar)
 		{
 			HintLabels(true);
@@ -174,7 +182,7 @@ public partial class ArmNode : MeshInstance3D
 	// Draws a line between the arm and the active lifepreserver
 	void UpdateRopeMesh()
 	{
-		if (_activeLifepreserverNode == null || !IsInstanceValid(_activeLifepreserverNode))
+		if (!IsInstanceValid(_activeLifepreserverNode))
 		{
 			_ropeMeshInstance.Visible = false;
 			return;
@@ -223,7 +231,7 @@ public partial class ArmNode : MeshInstance3D
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
 		}
 
-		if (_capturedPlayerNode != null && _activeLifepreserverNode != null && _capturedPlayerNode.CurrPlayerState == Player.PlayerState.Standing)
+		if (_capturedPlayerNode != null && IsInstanceValid(_activeLifepreserverNode) && _capturedPlayerNode.CurrPlayerState == Player.PlayerState.Standing)
 		{
 			_capturedPlayerNode.GlobalPosition = _activeLifepreserverNode.GlobalPosition;
 			_capturedPlayerNode.GlobalRotation = _activeLifepreserverNode.GlobalRotation;
@@ -232,7 +240,7 @@ public partial class ArmNode : MeshInstance3D
 			_capturedPlayerNode.RpcId(capturedAuthorityId, nameof(Player.SyncCapturedTransform), _activeLifepreserverNode.GlobalPosition, _activeLifepreserverNode.GlobalRotation);
 		}
 
-		Rpc(nameof(SyncWorldItemState), _activeLifepreserverNode?.Name.ToString() ?? "", activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity, activeLifepreserver.GlobalRotation);
+		Rpc(nameof(SyncWorldItemState), activeLifepreserver.Name.ToString(), activeLifepreserver.GlobalPosition, activeLifepreserver.LinearVelocity, activeLifepreserver.GlobalRotation);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -253,7 +261,9 @@ public partial class ArmNode : MeshInstance3D
 	public void SetItem(string itemPath, int itemCount)
 	{
 		string currentItemPath = Item?.Data?.ResourcePath ?? "";
-		if (Multiplayer.IsServer() && currentItemPath != itemPath && _activeLifepreserverNode != null)
+		bool wasAnchor = Item?.Data?.Name == "Anchor";
+
+		if (Multiplayer.IsServer() && currentItemPath != itemPath && IsInstanceValid(_activeLifepreserverNode))
 		{
 			Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNode.Name.ToString());
 			Rpc(nameof(SetActiveLifepreserverNode), "");
@@ -266,6 +276,19 @@ public partial class ArmNode : MeshInstance3D
 		else
 		{
 			Item = new InvSlot(GD.Load<InvItem>(itemPath), itemCount);
+
+			// If anchor emit SetAnchor signal (only on server to avoid redundant RPCs)
+			if (Multiplayer.IsServer() && Item?.Data.Name == "Anchor")
+			{
+				GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), 
+				_player.GetNode("FullPlayerModel/Armature/Skeleton3D/BoneAttachment3D/MeshInstance3D").GetPath());
+			}
+		}
+
+		// If it's no longer an anchor, clear it in AnchorPoint (only on server to avoid redundant RPCs)
+		if (Multiplayer.IsServer() && wasAnchor && (Item == null || Item.Data.Name != "Anchor"))
+		{
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), "");
 		}
 	}
 
@@ -279,7 +302,7 @@ public partial class ArmNode : MeshInstance3D
 	private void PullLifepreserver()
 	{
 		if (!Multiplayer.IsServer()) return;
-		if (_activeLifepreserverNode == null) return;
+		if (!IsInstanceValid(_activeLifepreserverNode)) return;
 
 		_currLifepreserverRange -= PullStrength;
 
@@ -317,7 +340,7 @@ public partial class ArmNode : MeshInstance3D
 		if (itemContainer == null) return;
 
 		// Toggle-off path: if one is already active, delete it and clear active state.
-		if (_activeLifepreserverNode != null)
+		if (IsInstanceValid(_activeLifepreserverNode))
 		{
 			if (itemContainer.GetNodeOrNull(_activeLifepreserverNode.Name.ToString()) != null)
 			{
@@ -397,7 +420,7 @@ public partial class ArmNode : MeshInstance3D
 	{
 		if (Item != null)
 		{
-			if (_activeLifepreserverNode != null)
+			if (IsInstanceValid(_activeLifepreserverNode))
 			{
 				Rpc(nameof(DeleteWorldItemByName), _activeLifepreserverNode.Name.ToString());
 				Rpc(nameof(SetActiveLifepreserverNode), "");
@@ -409,13 +432,14 @@ public partial class ArmNode : MeshInstance3D
 			string uniqueName = $"DroppedItem_{Multiplayer.GetUniqueId()}_{_dropCounter++}";
 
 			// Tell all peers to spawn the item and clear the arm
-			Rpc(nameof(SpawnDroppedItem), itemPath, itemCount, dropPosition, uniqueName, dropVelocity);
+			// We clear the item first so its SetAnchor("") signal doesn't override the new item's signal
 			Rpc(nameof(SetItem), "", 0);
+			Rpc(nameof(SpawnDroppedItem), itemPath, itemCount, dropPosition, uniqueName, dropVelocity);
 		}
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void SpawnDroppedItem(string itemPath, int itemCount, Vector3 position, string nodeName, Vector3 dropVelocity)
+	public void SpawnDroppedItem(string itemPath, int itemCount, Vector3 position, string nodeName, Vector3 dropVelocity)
 	{
 		PackedScene inWorldScene = GD.Load<PackedScene>("res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn");
 		UniversalInWorld inWorldNode = inWorldScene.Instantiate<UniversalInWorld>();
@@ -470,7 +494,7 @@ public partial class ArmNode : MeshInstance3D
 	private void OnLifepreserverBodyEntered(Node body)
 	{
 		if (!Multiplayer.IsServer()) return;
-		if (_activeLifepreserverNode == null) return;
+		if (!IsInstanceValid(_activeLifepreserverNode)) return;
 		if (_capturedPlayerNode != null) return;
 
 		Player hitPlayer = ResolvePlayerFromCollisionBody(body);
@@ -519,7 +543,6 @@ public partial class ArmNode : MeshInstance3D
 
 	private UniversalInWorld GetActiveLifepreserverNode()
 	{
-		if (_activeLifepreserverNode == null) return null;
 		if (!IsInstanceValid(_activeLifepreserverNode))
 		{
 			_activeLifepreserverNode = null;

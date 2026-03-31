@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="InvItem" load_steps=4 format=3 uid="uid://1wgugddvccen"]
+
+[ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_2je5x"]
+[ext_resource type="Shape3D" uid="uid://cl44hd3c5hvls" path="res://scenes_scripts/inventory/items/itemResources/anchor/anchorCollision.tres" id="1_vvq2h"]
+[ext_resource type="ArrayMesh" uid="uid://dpasaaaw6s7ie" path="res://scenes_scripts/inventory/items/itemResources/anchor/anchorMesh.res" id="2_flgwt"]
+
+[resource]
+script = ExtResource("1_2je5x")
+Name = "Anchor"
+ItemMesh = ExtResource("2_flgwt")
+ItemCollider = ExtResource("1_vvq2h")
+InHandPosition = Vector3(0.925, 0.32, -1.185)
+InHandRotation = Vector3(-0.20943952, 1.9809487, 2.5569074)
+Hint2 = "[LMB] Drop"
+metadata/_custom_type_script = "uid://5qqoau1yt53x"

@@ -33,7 +33,7 @@ public partial class ItemContainer : Node3D
 	{
 		foreach (Node child in GetChildren())
 		{
-			if (child is UniversalInWorld item && item.Item != null && item.CanBePickedUp)
+			if (child is UniversalInWorld item && item.Item != null && item.CanBePickedUp && item.Name != "Anchor")
 			{
 				items.Add(new Dictionary<string, Variant>
 				{
