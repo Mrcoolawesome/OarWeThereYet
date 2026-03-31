@@ -195,11 +195,8 @@ func _fetch_and_apply_gamertag() -> void:
   # getPersonaName() will grab THEIR local Steam profile name!
   var my_steam_name = Steam.getPersonaName()
   
-  # Grab their local peer ID
-  var my_peer_id = multiplayer.get_unique_id()
-  
   # Emit the global signal so their local C# Player script catches it
-  GlobalSignalServer.emit_signal("AssignGamertag", my_peer_id, my_steam_name)
+  GlobalSignalServer.emit_signal("AssignGamertag", my_steam_name)
 
 @rpc("authority", "reliable", "call_local")
 func _receive_player_color(color_hex: String) -> void:
