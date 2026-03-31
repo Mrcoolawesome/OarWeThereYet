@@ -163,7 +163,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   private string _lastAppliedColor = "";
 
 	// loudness caling variables
-  private float _targetHeadScale = 1.0f;
+  [Export] private float _targetHeadScale = 1.0f;
   private float _currentHeadScale = 1.0f;
 
   public override void _EnterTree()
@@ -361,8 +361,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   }
 
 	private void HeadAnimationProcess(double delta)
-	{
-		// Smoothly interpolate the scale towards the target
+  {
+    // Smoothly interpolate the scale towards the target
     _currentHeadScale = Mathf.Lerp(_currentHeadScale, _targetHeadScale, (float)delta * 20.0f);
     
     // Create the XZ scale vector (Y remains 1.0 so they don't get taller)
@@ -375,9 +375,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     if (_pupilEyeLeft != null) _pupilEyeLeft.Scale = newScale;
     if (_pupilEyeRight != null) _pupilEyeRight.Scale = newScale;
 
-    // Constantly decay the target back to 1.0 so the head smoothly shrinks back when they stop talking
-    _targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
-	}
+    // ONLY the Authority should automatically decay the target back to 1.0.
+    // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
+    if (IsMultiplayerAuthority())
+    {
+      _targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
+    }
+  }
 
 	private void PlayingStateProcess()
 	{
@@ -1200,22 +1204,17 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     }
   }
 
-	// --- LOUDNESS RPC FUNCTIONS ---
+	// --- LOUDNESS FUNCTIONS ---
   private void OnPlayerLoudness(int peerId, float loudness)
   {
     // ONLY the local player listens to their own mic volume signal.
-    // They then order all the other clients to scale their head!
+    // Because they are the authority, changing this [Export] variable 
+    // will instantly push the new scale to every other client!
     if (Name == peerId.ToString() && IsMultiplayerAuthority())
     {
-      Rpc(nameof(RpcUpdateHeadScale), loudness);
+      // Average loudness is usually a small float (like 0.05 to 0.2).
+      // Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
+      _targetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
     }
-  }
-
-  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-  public void RpcUpdateHeadScale(float loudness)
-  {
-    // Average loudness is usually a small float (like 0.05 to 0.2).
-    // Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
-    _targetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
   }
 }
