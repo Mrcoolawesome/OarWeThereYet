@@ -161,9 +161,7 @@ func _add_player_to_game(id: int):
     rpc_id(id, "_receive_player_color", color_hex)
 
     # --- THE FIX: Fetch their actual Steam name dynamically ---
-    var actual_steam_name = get_steam_name_from_peer_id(id)
-    # Send an RPC call ONLY to the client who owns this player node
-    rpc_id(id, "_receive_gamertag", actual_steam_name)
+    rpc_id(id, "_fetch_and_apply_gamertag")
 
     # assign the camera to the player for the terrain3d addon
     rpc_id(id, "_assign_camera", id)
@@ -192,9 +190,16 @@ func _assign_camera(id: int) -> void:
 # "authority" means only the server can call this. 
 # "call_local" ensures it also runs for the Host's own player.
 @rpc("authority", "reliable", "call_local")
-func _receive_gamertag(gamertag: String) -> void:
-  # Emit your global signal for the C# script to catch
-  GlobalSignalServer.emit_signal("AssignGamertag", gamertag)
+func _fetch_and_apply_gamertag() -> void:
+  # Because this is running on the specific client's machine, 
+  # getPersonaName() will grab THEIR local Steam profile name!
+  var my_steam_name = Steam.getPersonaName()
+  
+  # Grab their local peer ID
+  var my_peer_id = multiplayer.get_unique_id()
+  
+  # Emit the global signal so their local C# Player script catches it
+  GlobalSignalServer.emit_signal("AssignGamertag", my_peer_id, my_steam_name)
 
 @rpc("authority", "reliable", "call_local")
 func _receive_player_color(color_hex: String) -> void:
@@ -220,15 +225,3 @@ func _remove_player(id : int):
     player_node.queue_free()
   else:
     print("Could not find player with ID: ", id)
-
-# Grabs the Steam username based on the Godot multiplayer peer ID
-func get_steam_name_from_peer_id(peer_id: int) -> String:
-  # If the requested peer is our own local machine, just return our local Steam name
-  if peer_id == multiplayer.get_unique_id():
-    return Steam.getPersonaName()
-  
-  # Otherwise, get their 64-bit Steam ID from the multiplayer peer
-  var steam_id = multiplayer_peer.get_current_steam_id()
-  
-  # Fetch their actual Steam profile name
-  return Steam.getFriendPersonaName(steam_id)
