@@ -1208,9 +1208,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // Because they are the authority, changing this [Export] variable 
     // will instantly push the new scale to every other client!
     
-  
 		// Average loudness is usually a small float (like 0.05 to 0.2).
 		// Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
 		TargetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
+    
   }
 }

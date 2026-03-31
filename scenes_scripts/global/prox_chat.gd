@@ -55,7 +55,7 @@ func _process(_delta: float) -> void:
             var decompressed_voice = Steam.decompressVoice(raw_buffer, current_sample_rate)
             if decompressed_voice['result'] == Steam.VOICE_RESULT_OK and decompressed_voice['size'] > 0:
                 var loudness = calculate_loudness(decompressed_voice['uncompressed'], decompressed_voice['size'])
-                GlobalSignalServer.emit_signal("PlayerLoudness", multiplayer.get_unique_id(), loudness)
+                GlobalSignalServer.emit_signal("PlayerLoudness", loudness)
             # -----------------------------------------------------
         else:
             break
