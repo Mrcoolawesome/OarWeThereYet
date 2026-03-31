@@ -142,8 +142,25 @@ public partial class TestLevel : Node
 
 		_boat.Reset();
 
-		// reset the players by calling the 'ResetToStart' function on all of them
-		GetTree().CallGroup("players", "Reset", _anchorSpawnPath);
+    // Spawn Anchor once if needed
+    if (!string.IsNullOrEmpty(_anchorSpawnPath))
+    {
+      var players = GetTree().GetNodesInGroup("players");
+      if (players.Count > 0)
+      {
+        Player p = (Player)players[0];
+        Node3D anchorSpawnNode = GetNodeOrNull<Node3D>(_anchorSpawnPath);
+        if (anchorSpawnNode != null)
+        {
+          p.ArmNode.Rpc(nameof(p.ArmNode.SpawnDroppedItem),
+            "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres",
+            1, anchorSpawnNode.GlobalPosition, "Anchor", Vector3.Zero);
+        }
+      }
+    }
+
+		// reset the players by calling the 'Reset' function on all of them
+		GetTree().CallGroup("players", "Reset");
 	}
 
 	private void SetBoatSpawn()

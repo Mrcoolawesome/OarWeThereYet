@@ -770,20 +770,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), seat, direction, startStop);
 	}
 
-	public void Reset(string anchorSpawnPath)
+	public void Reset()
 	{
 		// Only the server should issue this command
 		if (Multiplayer.IsServer())
 		{
-      // Spawn Anchor
-      if (!string.IsNullOrEmpty(anchorSpawnPath))
-      {
-        Node3D anchorSpawnNode = GetNodeOrNull<Node3D>(anchorSpawnPath);
-        ArmNode.Rpc(nameof(ArmNode.SpawnDroppedItem),
-          "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres",
-          1, anchorSpawnNode.GlobalPosition, "SpawnedAnchor", Vector3.Zero);
-      }
-
 			// Tell EVERYONE (including the server) to run the SyncReset function
 			Rpc(nameof(SyncReset));
 
