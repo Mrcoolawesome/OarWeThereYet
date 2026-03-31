@@ -254,12 +254,13 @@ metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 [node name="Checkpoint" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.835167, 0, 1374.0201)
 CheckpointNum = 1
+UseAnchor = false
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint" index="0"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
 [node name="AnchorSpawn" parent="CheckpointContainer/Checkpoint" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2162733, 0.26613605, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2162733, 2.0516498, 0)
 
 [node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.960175, 1.5957031, 3.8066406)

@@ -29,6 +29,8 @@ public partial class TestLevel : Node
 	private bool _hostNetworkInitialized = false;
 	private bool _clientNetworkInitialized = false;
 
+  private string _anchorSpawnPath = null;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
   {
@@ -96,8 +98,7 @@ public partial class TestLevel : Node
         if (Multiplayer.GetUniqueId() != 1 && Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connected)
         {
             _clientNetworkInitialized = true;
-            OnClientConnected();
-        }
+            OnClientConnected(); }
     }
   }
 
@@ -142,7 +143,7 @@ public partial class TestLevel : Node
 		_boat.Reset();
 
 		// reset the players by calling the 'ResetToStart' function on all of them
-		GetTree().CallGroup("players", "Reset");
+		GetTree().CallGroup("players", "Reset", _anchorSpawnPath);
 	}
 
 	private void SetBoatSpawn()
@@ -162,6 +163,11 @@ public partial class TestLevel : Node
 			if (child.CheckpointNum == _gameSaves.CheckpointNum)
 			{
 				boatSpawn = childBoatSpawn;
+        if (child.UseAnchor)
+        {
+          _boat.AnchorPoint.Deployed = true;
+          _anchorSpawnPath = child.GetNodeOrNull<Node3D>("AnchorSpawn").GetPath();
+        }
 				break;
 			}
 		}
