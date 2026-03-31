@@ -163,8 +163,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   private string _lastAppliedColor = "";
 
 	// loudness caling variables
-  [Export] private float _targetHeadScale = 1.0f;
-  private float _currentHeadScale = 1.0f;
+  private float _targetHeadScale = 1.0f;
+  [Export] private float _currentHeadScale = 1.0f;
 
   public override void _EnterTree()
 	{
