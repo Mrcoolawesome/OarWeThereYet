@@ -46,6 +46,14 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     _ropeRoot.AddChild(_ropeMeshInstance);
   }
 
+  public override void _ExitTree()
+  {
+    if (IsInstanceValid(_ropeRoot))
+    {
+      _ropeRoot.QueueFree();
+    }
+  }
+
   public override void _Process(double delta)
   {
     // Change Propt message depending on deployed
@@ -61,7 +69,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     // Sync _deployedAnchor from _deployedAnchorPath if they differ
     if (!string.IsNullOrEmpty(_deployedAnchorPath))
     {
-      if (_deployedAnchor == null || _deployedAnchor.GetPath() != (NodePath)_deployedAnchorPath)
+      if (!IsInstanceValid(_deployedAnchor) || _deployedAnchor.GetPath() != (NodePath)_deployedAnchorPath)
       {
         _deployedAnchor = GetNodeOrNull<Node3D>(_deployedAnchorPath);
       }
