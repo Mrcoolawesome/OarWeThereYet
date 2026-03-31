@@ -1202,16 +1202,15 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   }
 
 	// --- LOUDNESS FUNCTIONS ---
-  private void OnPlayerLoudness(int peerId, float loudness)
+  private void OnPlayerLoudness(float loudness)
   {
     // ONLY the local player listens to their own mic volume signal.
     // Because they are the authority, changing this [Export] variable 
     // will instantly push the new scale to every other client!
-    if (Name == peerId.ToString() && IsMultiplayerAuthority())
-    {
-      // Average loudness is usually a small float (like 0.05 to 0.2).
-      // Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
-      TargetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
-    }
+    
+  
+		// Average loudness is usually a small float (like 0.05 to 0.2).
+		// Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
+		TargetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
   }
 }

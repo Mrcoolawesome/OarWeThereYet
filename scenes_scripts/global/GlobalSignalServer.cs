@@ -70,7 +70,7 @@ public partial class GlobalSignalServer : Node
   public delegate void AssignPlayerColorEventHandler(string colorHex);
 
   [Signal] 
-  public delegate void PlayerLoudnessEventHandler(int peerId, float loudness);
+  public delegate void PlayerLoudnessEventHandler(float loudness);
 
   public int Health { get; set; }
 
