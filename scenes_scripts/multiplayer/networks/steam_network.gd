@@ -228,7 +228,7 @@ func get_steam_name_from_peer_id(peer_id: int) -> String:
     return Steam.getPersonaName()
   
   # Otherwise, get their 64-bit Steam ID from the multiplayer peer
-  var steam_id = multiplayer_peer.get_steam64_from_peer(peer_id)
+  var steam_id = multiplayer_peer.get_current_steam_id()
   
   # Fetch their actual Steam profile name
   return Steam.getFriendPersonaName(steam_id)
