@@ -17,6 +17,7 @@ var is_joining: bool = false
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
 @onready var level_container = get_tree().current_scene.get_node_or_null("Level")
+
 const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
 
 # become host for ENet server

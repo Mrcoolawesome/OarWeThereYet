@@ -26,6 +26,8 @@ var is_hosting: bool = false
 var pending_host_id: int = 0
 var steam_username: String = "Unknown"
 
+const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
   # initalize steam
@@ -157,6 +159,11 @@ func _add_player_to_game(id: int):
     # Add the player as a child of the LOADED MAP
     current_map.add_child(player, true) # that second boolean is important because it keeps the name of the player to be the one that we set for it
 
+    # Pick a color based on their ID to ensure variety
+    var color_hex = PLAYER_COLORS[id % PLAYER_COLORS.size()]
+    # Send an RPC call ONLY to the client who owns this player node
+    rpc_id(id, "_receive_player_color", color_hex)
+
     # Send an RPC call ONLY to the client who owns this player node
     rpc_id(id, "_receive_gamertag", steam_username)
 
@@ -190,6 +197,11 @@ func _assign_camera(id: int) -> void:
 func _receive_gamertag(gamertag: String) -> void:
   # Emit your global signal for the C# script to catch
   GlobalSignalServer.emit_signal("AssignGamertag", gamertag)
+
+@rpc("authority", "reliable", "call_local")
+func _receive_player_color(color_hex: String) -> void:
+  # Emit your global signal for the C# script to catch
+  GlobalSignalServer.emit_signal("AssignPlayerColor", color_hex)
 
 '''
   find the player we're looking to remove, and remove their instance.
