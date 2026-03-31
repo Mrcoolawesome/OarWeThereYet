@@ -22,6 +22,10 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 	private Vector3 _waterPhysicsForce;
 	private Vector3 _waterPhysicsForcePosition;
 
+	// Get the terrain
+	private Node3D _terrain;
+	private GodotObject _terrainData;
+
   public override void _Ready()
   {
     if (ItemObject == null) return;
@@ -50,12 +54,26 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     {
       GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.SetAnchor), GetPath());
     }
+		
+		// Get terrain
+		_terrain = GetNode<Node3D>("../../Terrain3D");
+		_terrainData = _terrain.Get("data").AsGodotObject();
   }
 
   public override void _Process(double delta)
   {
     if (Item == null) return;
     PromptMessage = CanBePickedUp ? "Pick Up (" + Item.Amount + ")" : "";
+
+		// If player falls below terrain, teleport them back up
+		if (_terrainData != null)
+		{
+			float terrainHeight = _terrainData.Call("get_height", GlobalPosition).AsSingle();
+			if (GlobalPosition.Y - terrainHeight < -0.5f)
+			{
+				GlobalPosition = new Vector3(GlobalPosition.X, terrainHeight + 1, GlobalPosition.Z);
+			}
+		}
   }
 
   public override void _PhysicsProcess(double delta)
