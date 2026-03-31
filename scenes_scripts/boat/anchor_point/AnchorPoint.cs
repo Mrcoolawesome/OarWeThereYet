@@ -8,7 +8,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
 	public string PromptInput { get; set; } = "action_key";
   private StaticBody3D _anchor;
-  [Export] private bool _deployed = false;
+  [Export] public bool Deployed = false;
   [Export] private string _deployedAnchorPath = "";
   private Node3D _deployedAnchor;
 
@@ -49,7 +49,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
   public override void _Process(double delta)
   {
     // Change Propt message depending on deployed
-    if (_deployed)
+    if (Deployed)
     {
       PromptMessage = "Reset Anchor";
     }
@@ -72,9 +72,9 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     }
 
     // Hide/show the placeholder anchor mesh based on deployment
-    _anchor.Visible = !_deployed;
+    _anchor.Visible = !Deployed;
 
-    if (_deployed && IsInstanceValid(_deployedAnchor))
+    if (Deployed && IsInstanceValid(_deployedAnchor))
     {
       UpdateRopeMesh();
     }
@@ -88,7 +88,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
   {
     if (!Multiplayer.IsServer()) return;
 
-    if (_deployed && IsInstanceValid(_deployedAnchor))
+    if (Deployed && IsInstanceValid(_deployedAnchor))
     {
       float distance = GlobalPosition.DistanceTo(_deployedAnchor.GlobalPosition);
 
@@ -153,7 +153,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
     Player player = GetNode<Player>(playerPath);
 
-    if (_deployed)
+    if (Deployed)
     {
       ResetAnchor();
     }
@@ -162,7 +162,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
       if (player.ArmNode.Item == null)
       {
         player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
-        _deployed = true;
+        Deployed = true;
       }
     }
   }
@@ -192,13 +192,13 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
   public void ResetAnchor()
   {
-    if (_deployed)
+    if (Deployed)
     {
       if (Multiplayer.IsServer())
       {
         DeleteAnchor();
         _deployedAnchorPath = "";
-        _deployed = false;
+        Deployed = false;
       }
       _deployedAnchor = null;
     }
