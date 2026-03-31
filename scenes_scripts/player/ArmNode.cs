@@ -33,6 +33,10 @@ public partial class ArmNode : MeshInstance3D
 	private Label _hint1;
 	private Label _hint2;
 
+	// Get the terrain
+	private Node3D _terrain;
+	private GodotObject _terrainData;
+
 	public override void _Ready()
 	{
 		SetMesh(null);
@@ -62,6 +66,13 @@ public partial class ArmNode : MeshInstance3D
 		_player = GetParent().GetParent<Player>();
 		_playerHandBone = _player.GetNodeOrNull<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/BoneAttachment3D/MeshInstance3D");
 		SetMultiplayerAuthority(int.Parse(_player.Name.ToString()));
+
+		// Get terrain
+		_terrain = GetNodeOrNull<Node3D>("../../../Terrain3D");
+		if (_terrain != null)
+		{
+			_terrainData = _terrain.Get("data").AsGodotObject();
+		}
 
 		// Get hint labels
 		_hint1 = GetNode<Label>("ControlHints/Control/VBoxContainer/Hint1");
@@ -447,7 +458,18 @@ public partial class ArmNode : MeshInstance3D
 		inWorldNode.Name = nodeName;
 		inWorldNode.ItemObject = GD.Load<InvItem>(itemPath);
 		inWorldNode.ItemCount = itemCount;
-		inWorldNode.Position = position;
+
+		// Check terrain height and adjust if necessary
+		Vector3 spawnPosition = position;
+		if (_terrainData != null)
+		{
+			float terrainHeight = _terrainData.Call("get_height", spawnPosition).AsSingle();
+			if (spawnPosition.Y < terrainHeight)
+			{
+				spawnPosition.Y = terrainHeight + 1;
+			}
+		}
+		inWorldNode.Position = spawnPosition;
 		inWorldNode.LinearVelocity = dropVelocity;
 
 		// Remove MultiplayerSynchronizer — items spawned via RPC (not MultiplayerSpawner)
@@ -469,7 +491,18 @@ public partial class ArmNode : MeshInstance3D
 		inWorldNode.Name = nodeName;
 		inWorldNode.ItemObject = GD.Load<InvItem>(itemPath);
 		inWorldNode.ItemCount = 1;
-		inWorldNode.Position = position;
+
+		// Check terrain height and adjust if necessary
+		Vector3 spawnPosition = position;
+		if (_terrainData != null)
+		{
+			float terrainHeight = _terrainData.Call("get_height", spawnPosition).AsSingle();
+			if (spawnPosition.Y < terrainHeight)
+			{
+				spawnPosition.Y = terrainHeight + 0.5f;
+			}
+		}
+		inWorldNode.Position = spawnPosition;
 		inWorldNode.LinearVelocity = launchVelocity;
 		// Player is on physics layer 4; include it so the hook can attach on contact.
 		inWorldNode.CollisionMask |= 1u << 2;
