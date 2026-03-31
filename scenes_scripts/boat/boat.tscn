@@ -241,8 +241,8 @@ NetworkInventory = Array[Dictionary]([{
 "amount": 1,
 "id": "res://scenes_scripts/inventory/items/itemResources/lifepreserver/lifepreserver.tres"
 }, {
-"amount": 1,
-"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+"amount": 5,
+"id": "res://scenes_scripts/inventory/items/itemResources/patch/patch.tres"
 }, {
 "amount": 1,
 "id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
