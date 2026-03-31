@@ -1087,4 +1087,26 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			_gamerTag.Visible = false; // don't wanna see it locally
 		}
 	}
+
+	// This built-in function automatically runs the exact moment the node is queued for deletion
+  public override void _ExitTree()
+  {
+    // If the player was rowing when they disconnected/were deleted
+    if (CurrPlayerState == PlayerState.Rowing && _boat != null)
+    {
+      // 1. Manually free the seat in the boat arrays locally for every client
+      _boat.OccupiedSeats[(int)_seat] = false;
+      _boat.HasOarInSeat[(int)_seat] = false;
+
+      // 2. Stop the rowing physics (Only the server needs to emit this)
+      if (Multiplayer.IsServer())
+      {
+        GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, false, false);
+      }
+
+      // 3. Stop the oar animation locally for everyone
+      // (Using 1 for direction is fine just to trigger the stop command)
+      GlobalSignalServer.Instance.EmitSignal("AnimateOar", (int)_seat, 1, false);
+    }
+  }
 }
