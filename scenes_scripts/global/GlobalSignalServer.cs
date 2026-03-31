@@ -66,6 +66,9 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void AssignGamertagEventHandler(string gamertag);
 
+  [Signal]
+  public delegate void AssignPlayerColorEventHandler(string colorHex);
+
   public int Health { get; set; }
 
   public override void _Ready()

@@ -17,6 +17,7 @@ var is_joining: bool = false
 
 # this gets the main scene and then get's the node named 'Level' under that main scene
 @onready var level_container = get_tree().current_scene.get_node_or_null("Level")
+const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
 
 # become host for ENet server
 func become_host():
@@ -103,6 +104,11 @@ func _add_player_to_game(id: int):
 
     # Send an RPC call ONLY to the client who owns this player node
     rpc_id(id, "_receive_gamertag", str(id))
+
+    # Pick a color based on their ID to ensure variety
+    var color_hex = PLAYER_COLORS[id % PLAYER_COLORS.size()]
+    # Send an RPC call ONLY to the client who owns this player node
+    rpc_id(id, "_receive_player_color", color_hex)
     
     # assign the camera to the player for the terrain3d addon
     rpc_id(id, "_assign_camera", id)
@@ -132,8 +138,13 @@ func _assign_camera(id: int) -> void:
 # "call_local" ensures it also runs for the Host's own player.
 @rpc("authority", "reliable", "call_local")
 func _receive_gamertag(gamertag: String) -> void:
-    # Emit your global signal for the C# script to catch
-    GlobalSignalServer.emit_signal("AssignGamertag", gamertag)
+  # Emit your global signal for the C# script to catch
+  GlobalSignalServer.emit_signal("AssignGamertag", gamertag)
+
+@rpc("authority", "reliable", "call_local")
+func _receive_player_color(color_hex: String) -> void:
+  # Emit your global signal for the C# script to catch
+  GlobalSignalServer.emit_signal("AssignPlayerColor", color_hex)
 
 '''
   find the player we're looking to remove, and remove their instance.

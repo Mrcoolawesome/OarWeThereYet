@@ -146,6 +146,15 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private Label3D _gamerTag;
 	public String SteamUsername;
 
+	// body and head meshes
+	private MeshInstance3D _headMesh;
+	private MeshInstance3D _bodyMesh;
+
+	// You MUST add this variable to your MultiplayerSynchronizer!
+  [Export] public string CurrentColorHex = ""; 
+  // Used locally by puppets to know when the authority changed the color
+  private string _lastAppliedColor = "";
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -195,12 +204,18 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// get the armnode
 		_armNode = GetNode<ArmNode>("Head/ArmNode");
 
+		// get the meshes
+		_bodyMesh = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/body");
+		_headMesh = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/head");
+
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
 		// subscribe to the signal that changes the mouse sensitivity from the settings menu
 		GlobalSignalServer.Instance.ApplyPlayerLookSpeed += ChangePlayerLookSpeed;
 		// subscribe to setting the gamertag
 		GlobalSignalServer.Instance.AssignGamertag += SetUsername;
+		// subscribe to change colors
+		GlobalSignalServer.Instance.AssignPlayerColor += SetPlayerColor;
 
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
@@ -286,6 +301,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   //PROCESS CODE AND ALL ASSOCIATED FUNCTIONS
   public override void _Process(double delta)
   {
+		// If we are looking at someone else, and their synced color just arrived over the network:
+    if (!IsMultiplayerAuthority() && CurrentColorHex != _lastAppliedColor && CurrentColorHex != "")
+    {
+      ApplyMaterialColor(CurrentColorHex);
+      _lastAppliedColor = CurrentColorHex;
+    }
+
     // Hide/Unhide PauseUI depending on game state
 		switch(CurrGameState)
 		{
@@ -1107,6 +1129,36 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       // 3. Stop the oar animation locally for everyone
       // (Using 1 for direction is fine just to trigger the stop command)
       GlobalSignalServer.Instance.EmitSignal("AnimateOar", (int)_seat, 1, false);
+    }
+  }
+
+	// function to set their color from the RPC
+  public void SetPlayerColor(string colorHex)
+  {
+    // Only the authority actually captures the signal and sets the official color
+		CurrentColorHex = colorHex;
+		ApplyMaterialColor(colorHex);
+		_lastAppliedColor = colorHex;
+  }
+
+  // Helper function to actually change the 3D meshes
+  private void ApplyMaterialColor(string colorHex)
+  {
+    Color newColor = new Color(colorHex);
+
+    // We MUST duplicate the material! Otherwise, changing one player's color changes ALL players.
+    if (_bodyMesh.GetActiveMaterial(0) is StandardMaterial3D baseBodyMat)
+    {
+      StandardMaterial3D bodyMat = baseBodyMat.Duplicate() as StandardMaterial3D;
+      bodyMat.AlbedoColor = newColor;
+      _bodyMesh.SetSurfaceOverrideMaterial(0, bodyMat);
+    }
+
+    if (_headMesh.GetActiveMaterial(0) is StandardMaterial3D baseHeadMat)
+    {
+      StandardMaterial3D headMat = baseHeadMat.Duplicate() as StandardMaterial3D;
+      headMat.AlbedoColor = newColor;
+      _headMesh.SetSurfaceOverrideMaterial(0, headMat);
     }
   }
 }
