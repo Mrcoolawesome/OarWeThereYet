@@ -169,7 +169,7 @@ func _add_player_to_game(id: int):
     rpc_id(id, "_assign_camera", id)
     
   else:
-      print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
+    print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
 
 @rpc("authority", "reliable", "call_local")
 func _assign_camera(id: int) -> void:
@@ -228,7 +228,7 @@ func get_steam_name_from_peer_id(peer_id: int) -> String:
     return Steam.getPersonaName()
   
   # Otherwise, get their 64-bit Steam ID from the multiplayer peer
-  var steam_id = multiplayer_peer.get_steam64_from_peer_id(peer_id)
+  var steam_id = multiplayer_peer.get_steam64_from_peer(peer_id)
   
   # Fetch their actual Steam profile name
   return Steam.getFriendPersonaName(steam_id)
