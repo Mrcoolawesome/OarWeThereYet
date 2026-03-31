@@ -24,7 +24,6 @@ var player_id: int = -1
 var is_client = false
 var is_hosting: bool = false
 var pending_host_id: int = 0
-var steam_username: String = "Unknown"
 
 const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
 
@@ -33,9 +32,6 @@ func _ready() -> void:
   # initalize steam
   Steam.steamInit(480, true)
   Steam.initRelayNetworkAccess() # start steam relay
-
-  # get their name and set it to the global variable
-  steam_username = Steam.getPersonaName()
 
   # initialize voice
   ProxChat.initialize_voice()
@@ -164,8 +160,10 @@ func _add_player_to_game(id: int):
     # Send an RPC call ONLY to the client who owns this player node
     rpc_id(id, "_receive_player_color", color_hex)
 
+    # --- THE FIX: Fetch their actual Steam name dynamically ---
+    var actual_steam_name = get_steam_name_from_peer_id(id)
     # Send an RPC call ONLY to the client who owns this player node
-    rpc_id(id, "_receive_gamertag", steam_username)
+    rpc_id(id, "_receive_gamertag", actual_steam_name)
 
     # assign the camera to the player for the terrain3d addon
     rpc_id(id, "_assign_camera", id)
@@ -222,3 +220,15 @@ func _remove_player(id : int):
     player_node.queue_free()
   else:
     print("Could not find player with ID: ", id)
+
+# Grabs the Steam username based on the Godot multiplayer peer ID
+func get_steam_name_from_peer_id(peer_id: int) -> String:
+  # If the requested peer is our own local machine, just return our local Steam name
+  if peer_id == multiplayer.get_unique_id():
+    return Steam.getPersonaName()
+  
+  # Otherwise, get their 64-bit Steam ID from the multiplayer peer
+  var steam_id = multiplayer_peer.get_steam64_from_peer_id(peer_id)
+  
+  # Fetch their actual Steam profile name
+  return Steam.getFriendPersonaName(steam_id)
