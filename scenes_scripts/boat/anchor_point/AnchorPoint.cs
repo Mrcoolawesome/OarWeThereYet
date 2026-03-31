@@ -233,10 +233,12 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     if (string.IsNullOrEmpty(anchorNodePath))
     {
       _deployedAnchor = null;
+      Deployed = false;
     }
     else
     {
       _deployedAnchor = GetNodeOrNull<Node3D>(anchorNodePath);
+      Deployed = true;
     }
   }
 }

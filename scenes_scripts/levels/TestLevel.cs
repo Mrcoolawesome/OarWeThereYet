@@ -165,7 +165,6 @@ public partial class TestLevel : Node
 				boatSpawn = childBoatSpawn;
         if (child.UseAnchor)
         {
-          _boat.AnchorPoint.Deployed = true;
           _anchorSpawnPath = child.GetNodeOrNull<Node3D>("AnchorSpawn").GetPath();
         }
         else
