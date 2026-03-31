@@ -9,6 +9,7 @@ size = Vector3(35.673492, 11.671143, 15.140625)
 collision_layer = 0
 collision_mask = 2
 script = ExtResource("1_70jua")
+UseAnchor = false
 
 [node name="BoatSpawn" type="Node3D" parent="."]
 

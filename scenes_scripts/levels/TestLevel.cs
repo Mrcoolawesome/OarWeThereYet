@@ -168,6 +168,10 @@ public partial class TestLevel : Node
           _boat.AnchorPoint.Deployed = true;
           _anchorSpawnPath = child.GetNodeOrNull<Node3D>("AnchorSpawn").GetPath();
         }
+        else
+        {
+          _anchorSpawnPath = null;
+        }
 				break;
 			}
 		}
