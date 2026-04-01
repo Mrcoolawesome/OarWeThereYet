@@ -141,8 +141,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private Node3D _terrain;
 	private GodotObject _terrainData;
 
-	// get the animation player
+	// get the animation player and current animation tracker
 	private AnimationPlayer _animationPlayer;
+	// Animation tracking to prevent network spam
+  private string _currentAnim = "restPose";
 
   public override void _EnterTree()
 	{
@@ -528,17 +530,18 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			velocity.X = _direction.X * _currSpeed;
 			velocity.Z = _direction.Z * _currSpeed;
 
+			string targetAnim = "restPose";
 			// animation logic
 			if (inputDir != Vector2.Zero) 
       {
         // If they are pressing movement keys, play the walk cycle
-        _animationPlayer.Play("kneesWalk");
+        targetAnim = "kneesWalk";
       }
-      else
+      // ONLY fire the network RPC if the state actually changed!
+      if (_currentAnim != targetAnim)
       {
-        // If they let go of the keys, play idle so they don't walk in place!
-        // (Make sure to replace "Idle" with your actual idle animation name)
-        _animationPlayer.Play("restPose"); 
+        _currentAnim = targetAnim;
+        Rpc(nameof(SyncPlayerAnimation), targetAnim);
       }
 		} 
 		else
@@ -1069,6 +1072,16 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     {
       // Now rigidbodies will fly away from the oar swing properly too!
       rb.ApplyCentralImpulse(pushDirection * ObjectKnockbackForce); 
+    }
+  }
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void SyncPlayerAnimation(string animName)
+  {
+    // Extra safety check so we don't restart an animation that's already playing
+    if (_animationPlayer.CurrentAnimation != animName)
+    {
+      _animationPlayer.Play(animName);
     }
   }
 }
