@@ -141,6 +141,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private Node3D _terrain;
 	private GodotObject _terrainData;
 
+	// get the animation player
+	private AnimationPlayer _animationPlayer;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -195,6 +198,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
+
+		// get the animation player
+		_animationPlayer = GetNode<AnimationPlayer>("FullPlayerModel/AnimationPlayer");
 
 		// Add the player to the 'players' group
 		AddToGroup("players");
@@ -521,6 +527,19 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
 			velocity.X = _direction.X * _currSpeed;
 			velocity.Z = _direction.Z * _currSpeed;
+
+			// animation logic
+			if (inputDir != Vector2.Zero) 
+      {
+        // If they are pressing movement keys, play the walk cycle
+        _animationPlayer.Play("kneesWalk");
+      }
+      else
+      {
+        // If they let go of the keys, play idle so they don't walk in place!
+        // (Make sure to replace "Idle" with your actual idle animation name)
+        _animationPlayer.Play("restPose"); 
+      }
 		} 
 		else
 		{
