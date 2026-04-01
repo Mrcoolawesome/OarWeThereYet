@@ -317,7 +317,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // only update the server so the CallLocal should be false i think
 	private void SyncReset()
 	{
-		// set the player into the standing state and reset their position and velocity
+	  // set the player into the standing state and reset their position and velocity
 		_rowingStates = [false, false, false, false];
 
         // Reset occupied seats
@@ -327,6 +327,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         HasOarInSeat = [false, false, false, false];
 
         AnchorPoint.ResetAnchor();
+
+        ResetHoles();
 
         // reset the boat health
         _healthComponent.ResetHealth();
@@ -569,5 +571,15 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         // Use legible names (true) to ensure unique, consistent naming across the network
         HoleLocation.AddChild(hole, true);
       }
+    }
+
+    public void ResetHoles()
+    {
+        if (!Multiplayer.IsServer()) return;
+
+        foreach (Hole hole in HoleLocation.GetChildren().OfType<Hole>())
+        {
+            hole.QueueFree();
+        }
     }
 }
