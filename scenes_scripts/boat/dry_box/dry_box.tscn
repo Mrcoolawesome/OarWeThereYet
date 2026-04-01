@@ -4,10 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://cegj4xdw5ihm0" path="res://art/models/drybox.blend" id="1_ymuao"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ymuao"]
-size = Vector3(2, 1, 1)
 
 [node name="DryBox" type="StaticBody3D"]
-collision_layer = 10
+collision_layer = 8
 collision_mask = 0
 script = ExtResource("1_4amak")
 
