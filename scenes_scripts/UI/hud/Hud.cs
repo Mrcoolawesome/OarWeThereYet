@@ -14,6 +14,9 @@ public partial class Hud : CanvasLayer
 
 		// Subscribe to the boat health update
 		GlobalSignalServer.Instance.UpdateBoatHealth += UpdateBoatHealthUi;
+
+		// Initialize with current health
+		UpdateBoatHealthUi(GlobalSignalServer.Instance.Health);
 	}
 
 	// Updates the boat health ui

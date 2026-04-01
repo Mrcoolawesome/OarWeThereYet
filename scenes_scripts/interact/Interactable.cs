@@ -24,4 +24,6 @@ public interface Interactable
 	}
 
 	public void Interact(Player player);
+	public void StartInteract(Player player) {}
+	public void StopInteract(Player player) {}
 }

@@ -53,6 +53,7 @@ public partial class Health : Node
 		// set the max health
 		_maxHealth = maxHealth;
 		_currHealth = maxHealth;
+		EmitSignal(nameof(HealthChanged), _currHealth);
 	}
 
 	// this gets ran as soon as someone connects
@@ -105,6 +106,11 @@ public partial class Health : Node
 	{
 		// update their health
 		_currHealth += healthChange;
+
+        if (_currHealth > _maxHealth)
+        {
+            _currHealth = _maxHealth;
+        }
 
 		// check if they're out of health
 		if (_currHealth <= 0)

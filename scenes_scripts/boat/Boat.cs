@@ -30,7 +30,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private Vector3 _collisionObjectPosition; // position of the object that is colliding with us
     private Node _expectedCollisionObject; // collision object given when an object enters our collision
     // THIS NEVER GETS RESET WHICH IS PROBABLY BAD
-    private Health _healthComponent = new Health();
+    public Health HealthComponent = new Health();
 
     // booleans to apply rowing force to specific spots on the boat
     private bool[] _rowingStates = new bool[4]; // state to say if one of the oars is rowing or not
@@ -90,9 +90,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         _boatFloatProbesContainer = GetNode<Node3D>("BoatFloatProbesContainer");
         _oarProbesContainer = GetNode<Node3D>("OarProbesContainer");
         _gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
-        _healthComponent.Name = "HealthComponent"; 
+        HealthComponent.Name = "HealthComponent"; 
         _damageDelayTimer = GetNode<Timer>("DamageDelayTimer");
-        AddChild(_healthComponent);
+        AddChild(HealthComponent);
 
         // get all the oars
         _backLeftOar = GetNode<Node3D>("OarsContainer/OarBackLeft");
@@ -106,15 +106,15 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         // subscribe to the Rowing signal from the singleton script
         GlobalSignalServer.Instance.Rowing += OnPlayerRowing;
 
-        // initalize the health stuff
-        _healthComponent.Initalize(MaxHealth); // initalize with 100 health
-
         // listen to the health changed signal sent from the health component
         // AnnounceHealthUpdate will send a signal to the server that updates the ui to show the new health
-        _healthComponent.HealthChanged += AnnounceHealthUpdate;
+        HealthComponent.HealthChanged += AnnounceHealthUpdate;
 
         // announce if the boat died
-        _healthComponent.Die += AnnounceDeath;
+        HealthComponent.Die += AnnounceDeath;
+
+        // initalize the health stuff
+        HealthComponent.Initalize(MaxHealth); // initalize with 100 health
 
         // need to enable these things to enable collision detection
         ContactMonitor = true;
@@ -159,7 +159,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
       foreach (Hole hole in HoleLocation.GetChildren().OfType<Hole>())
       {
         // update our health, this automatically sends out a signal that the health has been updated
-        _healthComponent.UpdateHealth(-HoleLeakRate);
+        HealthComponent.UpdateHealth(-HoleLeakRate);
       }
     }
   }
@@ -331,7 +331,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         ResetHoles();
 
         // reset the boat health
-        _healthComponent.ResetHealth();
+        HealthComponent.ResetHealth();
 
         _resetPending = true; // need to do the reset in the integrate forces function so that you don't have to spam the reset button to get the boat to respawn
 	}
@@ -469,6 +469,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     // this is just to update the ui, the health component already updates everyone's local health variables automatically
     public void AnnounceHealthUpdate(int newHealth)
     {
+        // update the global health value so it can be read by UI on _Ready
+        GlobalSignalServer.Instance.Health = newHealth;
         // announce this update to the signal server to update the ui
         GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.UpdateBoatHealth), newHealth);
     }
