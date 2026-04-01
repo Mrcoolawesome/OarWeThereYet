@@ -106,15 +106,15 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         // subscribe to the Rowing signal from the singleton script
         GlobalSignalServer.Instance.Rowing += OnPlayerRowing;
 
-        // initalize the health stuff
-        HealthComponent.Initalize(MaxHealth); // initalize with 100 health
-
         // listen to the health changed signal sent from the health component
         // AnnounceHealthUpdate will send a signal to the server that updates the ui to show the new health
         HealthComponent.HealthChanged += AnnounceHealthUpdate;
 
         // announce if the boat died
         HealthComponent.Die += AnnounceDeath;
+
+        // initalize the health stuff
+        HealthComponent.Initalize(MaxHealth); // initalize with 100 health
 
         // need to enable these things to enable collision detection
         ContactMonitor = true;
@@ -469,6 +469,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     // this is just to update the ui, the health component already updates everyone's local health variables automatically
     public void AnnounceHealthUpdate(int newHealth)
     {
+        // update the global health value so it can be read by UI on _Ready
+        GlobalSignalServer.Instance.Health = newHealth;
         // announce this update to the signal server to update the ui
         GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.UpdateBoatHealth), newHealth);
     }
