@@ -106,6 +106,11 @@ public partial class Health : Node
 		// update their health
 		_currHealth += healthChange;
 
+        if (_currHealth > _maxHealth)
+        {
+            _currHealth = _maxHealth;
+        }
+
 		// check if they're out of health
 		if (_currHealth <= 0)
 		{
