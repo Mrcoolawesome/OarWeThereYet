@@ -1,6 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://dn0x6hwxryba0"]
+[gd_scene load_steps=6 format=3 uid="uid://dn0x6hwxryba0"]
 
 [ext_resource type="Script" uid="uid://betpfjbdewch4" path="res://scenes_scripts/boat/holes/Hole.cs" id="1_a6qvs"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_a6qvs"]
+properties/0/path = NodePath(".:transform")
+properties/0/spawn = true
+properties/0/replication_mode = 1
 
 [sub_resource type="PrismMesh" id="PrismMesh_o0cyt"]
 size = Vector3(0.5, 0.5, 0.25)
@@ -10,6 +15,9 @@ size = Vector3(0.6, 0.6, 0.4)
 
 [node name="Hole" type="Node3D"]
 script = ExtResource("1_a6qvs")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_a6qvs")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(-1, -8.742278e-08, 0, 8.742278e-08, -1, 0, 0, 0, 1, 0, 0.19999999, 0)

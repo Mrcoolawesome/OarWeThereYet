@@ -105,6 +105,10 @@ ImpactVelocityThreshold = 5.0
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_0063d")
 
+[node name="HoleSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://dn0x6hwxryba0")
+spawn_path = NodePath("../HoleLocation")
+
 [node name="DamageDelayTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 3.0
