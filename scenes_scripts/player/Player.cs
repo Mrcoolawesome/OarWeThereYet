@@ -144,7 +144,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// get the animation player and current animation tracker
 	private AnimationPlayer _animationPlayer;
 	// Animation tracking to prevent network spam
-  private string _currentAnim = "restPose";
+  private string _currentAnim = "idleStanding";
+
+	// Animation tracking
+  private double _crouchStillTimer = 0.0;
+  private RayCast3D _groundDetectionRay;
 
   public override void _EnterTree()
 	{
@@ -194,6 +198,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		// get the armnode
 		_armNode = GetNode<ArmNode>("Head/ArmNode");
+
+		// this is for seeing how far we are from the ground
+		_groundDetectionRay = GetNode<RayCast3D>("GroundDetectionRay");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -529,20 +536,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			_direction = _direction.MoveToward(targetDirection, (float)delta * LerpSpeed);
 			velocity.X = _direction.X * _currSpeed;
 			velocity.Z = _direction.Z * _currSpeed;
-
-			string targetAnim = "restPose";
-			// animation logic
-			if (inputDir != Vector2.Zero) 
-      {
-        // If they are pressing movement keys, play the walk cycle
-        targetAnim = "kneesWalk";
-      }
-      // ONLY fire the network RPC if the state actually changed!
-      if (_currentAnim != targetAnim)
-      {
-        _currentAnim = targetAnim;
-        Rpc(nameof(SyncPlayerAnimation), targetAnim);
-      }
 		} 
 		else
 		{
@@ -551,6 +544,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			velocity.Z = _direction.Z * _currSpeed + _initialVelocity.Z;
 		}
 
+		// do the animation stuff
+		AnimationManager(velocity, inputDir, delta);
+
 		// Handle mouse input while standing
 		PlayerRotation();
 
@@ -558,6 +554,90 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		Velocity = velocity;
 	}
+
+	private void AnimationManager(Vector3 velocity, Vector2 inputDir, double delta)
+  {
+    string targetAnim = "idleStanding";
+
+    // 1. JUMPING AND FALLING LOGIC
+    if (!IsOnFloor() && !_applyWaterPhysicsForce)
+    {
+      _crouchStillTimer = 0.0; // Reset crouch timer if we're in the air
+
+      if (velocity.Y > 0)
+      {
+        targetAnim = "initalJump";
+      }
+      else
+      {
+        // We are falling. Check if we are about to hit the ground.
+        if (_groundDetectionRay != null && _groundDetectionRay.IsColliding())
+        {
+          targetAnim = "landingJump";
+        }
+        else
+        {
+          targetAnim = "falling";
+        }
+      }
+    }
+    // 2. GROUNDED LOGIC
+    else
+    {
+      bool isCrouching = Input.IsActionPressed("crouch");
+      
+      // Use LengthSquared to account for controller stick drift/deadzones.
+      // Micro-inputs will no longer constantly reset the crouch timer!
+      if (inputDir.LengthSquared() < 0.01f)
+      {
+        if (isCrouching)
+        {
+          _crouchStillTimer += delta;
+          
+          if (_crouchStillTimer >= 5.0) 
+          {
+            targetAnim = "bouncingOnIt";
+          }
+          else
+          {
+            targetAnim = "crouchingStill";
+          }
+        }
+        else
+        {
+          _crouchStillTimer = 0.0;
+          targetAnim = "idleStanding";
+        }
+      }
+      // They are moving on the ground
+      else
+      {
+        _crouchStillTimer = 0.0; // Reset timer because they moved
+        
+        // Positive Y means pulling back (the 'S' key). 
+        // We check > 0.1f instead of > 0 to prevent sideways drift from triggering it
+        bool isMovingBackwards = inputDir.Y > 0.1f;
+
+        if (isCrouching)
+        {
+          targetAnim = isMovingBackwards ? "crouchWalkingBackward" : "crouchWalking";
+        }
+        else
+        {
+          // Make sure "back walking" EXACTLY matches your animation name. 
+          // If it doesn't match, Godot ignores it and stays in Idle!
+          targetAnim = isMovingBackwards ? "backWalking" : "kneesWalk"; 
+        }
+      }
+    }
+
+    // ONLY fire the network RPC if the state actually changed!
+    if (_currentAnim != targetAnim)
+    {
+      _currentAnim = targetAnim;
+      Rpc(nameof(SyncPlayerAnimation), targetAnim);
+    }
+  }
 
 	private void CrouchSprintPhysicsProcess(double delta)
 	{
@@ -1081,7 +1161,31 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // Extra safety check so we don't restart an animation that's already playing
     if (_animationPlayer.CurrentAnimation != animName)
     {
-      _animationPlayer.Play(animName);
+      float animSpeed = 1.0f; // 1.0 is the default 100% speed
+
+      // Tweak individual speeds right here!
+      switch (animName)
+      {
+				case "kneesWalk":
+					animSpeed = 1.5f;
+					break;
+        case "backWalking":
+					animSpeed = 10.0f;
+					break;
+        case "crouchWalkingBackward":
+          animSpeed = 10.0f; // 2x as fast
+          break;
+				case "crouchWalking":
+					animSpeed = 10.0f;
+					break;
+        case "initalJump":
+        case "landingJump":
+          animSpeed = 7.0f; 
+          break;
+      }
+
+      // The second parameter '-1' tells Godot to use the default animation blending
+      _animationPlayer.Play(animName, -1, animSpeed);
     }
   }
 }

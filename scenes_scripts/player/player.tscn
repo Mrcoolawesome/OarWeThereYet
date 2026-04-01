@@ -115,23 +115,25 @@ transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.39621035e-08, 1.4612839, -0.09246683)
 
 [node name="Skeleton3D" parent="FullPlayerModel/Armature" index="0"]
-bones/0/position = Vector3(0, -0.005615098, 0.06960358)
-bones/0/rotation = Quaternion(-0.047097664, -0.04181159, -0.0049209585, 0.99800277)
-bones/1/rotation = Quaternion(0.12651367, -0.00078325556, 0.026567161, 0.99160874)
-bones/7/rotation = Quaternion(0.099222206, 0.08560411, -0.85841495, 0.49593407)
-bones/8/rotation = Quaternion(-0.089646325, -0.5763514, -0.1290904, 0.8019466)
-bones/9/rotation = Quaternion(0.6870171, 0.37970057, -0.37120286, 0.49602777)
-bones/10/rotation = Quaternion(-0.2247518, 0.009635541, 0.098538816, 0.969373)
-bones/11/rotation = Quaternion(0.06991535, -0.109739155, 0.8837162, 0.4495719)
-bones/12/rotation = Quaternion(-0.0923058, -0.19028594, 0.19009694, 0.9587148)
-bones/13/rotation = Quaternion(0.6861829, 0.11138168, -0.12336903, 0.708186)
-bones/14/rotation = Quaternion(-0.10284743, 0.09224748, 0.0152482465, 0.9902931)
-bones/15/rotation = Quaternion(-0.029885357, 0.28978682, 0.94889057, -0.12139647)
-bones/16/rotation = Quaternion(-0.7170739, 0.04380963, -0.021027057, 0.6953012)
-bones/17/rotation = Quaternion(0.40342066, 0.0705053, -0.1535162, 0.899285)
-bones/18/rotation = Quaternion(0.031784028, 0.3635947, 0.9309969, 0.00577775)
-bones/19/rotation = Quaternion(-0.5327054, -0.037182435, 0.0782755, 0.8418524)
-bones/20/rotation = Quaternion(0.26693043, -0.044419285, 0.2251355, 0.9359963)
+bones/0/position = Vector3(0, -1.0188329, -0.28368562)
+bones/0/rotation = Quaternion(0.14243777, -0.055637073, -0.0077046314, 0.9882089)
+bones/1/rotation = Quaternion(0.046343897, 0.00046080162, -0.011648234, 0.9988576)
+bones/2/rotation = Quaternion(0.28027403, 0.027283896, -0.012296198, 0.95945346)
+bones/3/rotation = Quaternion(-0.4630051, 0.02724029, 0.0037224751, 0.8859291)
+bones/7/rotation = Quaternion(0.101323046, -0.006199478, -0.8543613, 0.50966847)
+bones/8/rotation = Quaternion(0.36283803, -0.6434433, -0.25463963, 0.62408984)
+bones/9/rotation = Quaternion(0.50216484, 0.41186833, -0.2625384, 0.71363056)
+bones/10/rotation = Quaternion(-0.040423986, -0.29284775, 0.25988415, 0.919275)
+bones/11/rotation = Quaternion(0.12111244, 0.043618944, 0.8409636, 0.5255562)
+bones/12/rotation = Quaternion(0.51378775, 0.0514969, 0.007923726, 0.85633373)
+bones/13/rotation = Quaternion(0.5222766, 0.17690633, -0.0641232, 0.83175695)
+bones/14/rotation = Quaternion(0.03482095, 0.26851037, -0.2048594, 0.9405969)
+bones/15/rotation = Quaternion(0.009692839, 0.8802239, 0.31707573, -0.35295174)
+bones/16/rotation = Quaternion(-0.9636102, 0.059860248, 0.02009943, 0.25974667)
+bones/17/rotation = Quaternion(0.43978947, 0.24168915, -0.31819105, 0.8043172)
+bones/18/rotation = Quaternion(-0.015249541, 0.91387063, 0.3518137, 0.20207658)
+bones/19/rotation = Quaternion(-0.9629312, -0.055154238, -0.07216833, 0.25399494)
+bones/20/rotation = Quaternion(0.49254385, -0.1539351, 0.2191575, 0.8280547)
 
 [node name="body" parent="FullPlayerModel/Armature/Skeleton3D" index="0"]
 material_overlay = ExtResource("5_sfgrd")
@@ -160,7 +162,7 @@ settings/0/enable_all_child_collisions = true
 settings/0/exclude_collision_count = 0
 
 [node name="SpringBoneCollisionCapsule3D" type="SpringBoneCollisionCapsule3D" parent="FullPlayerModel/Armature/Skeleton3D/HeadMovement"]
-transform = Transform3D(0.99508274, -0.067792065, -0.07221124, 0.04716074, 0.9654077, -0.2564441, 0.087098196, 0.25177768, 0.96385765, -0.057602316, -0.7234812, 0.24426168)
+transform = Transform3D(0.9999652, 0.0073197074, 0.0040200315, -0.007372733, 0.9998838, 0.013333678, -0.003921952, -0.013362765, 0.99990296, 0.008699041, -1.8236907, 0.2319161)
 bone_name = "head_2"
 bone = 3
 position_offset = Vector3(0, 0, 0)
@@ -224,7 +226,7 @@ material_overlay = ExtResource("5_sfgrd")
 material_overlay = SubResource("StandardMaterial3D_sfgrd")
 
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="FullPlayerModel/Armature/Skeleton3D" index="10"]
-transform = Transform3D(-0.93648046, -0.2113091, 0.27991483, 0.33896148, -0.75023943, 0.5676667, 0.09005, 0.6264893, 0.77421045, -0.6821929, 0.24902114, 0.19744837)
+transform = Transform3D(-0.9988903, 0.033202264, -0.033396155, -0.017178118, 0.40339383, 0.9148649, 0.043847412, 0.91442364, -0.40237582, -0.2702677, -0.2299647, 1.0302603)
 bone_name = "hand.R"
 bone_idx = 14
 
@@ -232,8 +234,7 @@ bone_idx = 14
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="AnimationPlayer" parent="FullPlayerModel" index="1"]
-autoplay = "restPose"
-speed_scale = 2.0
+autoplay = "idleStanding"
 
 [node name="LocalPlayerModel" parent="." instance=ExtResource("4_hg6s5")]
 transform = Transform3D(-0.5, 0, 4.371139e-08, 0, 0.5, 0, -4.371139e-08, 0, -0.5, 0, -1, 0)
@@ -265,6 +266,9 @@ ProbeContainer = NodePath("../ProbeContainer")
 
 [node name="Marker3D" type="Marker3D" parent="ProbeContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+
+[node name="GroundDetectionRay" type="RayCast3D" parent="."]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]
