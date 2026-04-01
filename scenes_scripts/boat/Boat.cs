@@ -543,12 +543,12 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
     public void SpawnHole()
     {
-      PathFollow3D holeSpawnPath = GetNode<PathFollow3D>("HoleLocation/HoleSpawn");
+      Node3D holeLocation = GetNode<Node3D>("HoleLocation");
+      PathFollow3D holeSpawnPath = holeLocation.GetNode<PathFollow3D>("HoleSpawn");
       holeSpawnPath.ProgressRatio = GD.Randf();
 
       Hole hole = HoleScene.Instantiate<Hole>();
-      hole.Position = holeSpawnPath.Position;
-
-      holeSpawnPath.AddChild(hole);
+      holeLocation.AddChild(hole);
+      hole.Transform = holeSpawnPath.Transform;
     }
 }
