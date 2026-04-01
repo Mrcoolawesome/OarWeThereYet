@@ -543,9 +543,20 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
     public void SpawnHole()
     {
+      // Only the server determines the random position to ensure consistency
+      if (Multiplayer.IsServer())
+      {
+        float progressRatio = GD.Randf();
+        Rpc(nameof(SyncSpawnHole), progressRatio);
+      }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+    private void SyncSpawnHole(float progressRatio)
+    {
       Node3D holeLocation = GetNode<Node3D>("HoleLocation");
       PathFollow3D holeSpawnPath = holeLocation.GetNode<PathFollow3D>("HoleSpawn");
-      holeSpawnPath.ProgressRatio = GD.Randf();
+      holeSpawnPath.ProgressRatio = progressRatio;
 
       Hole hole = HoleScene.Instantiate<Hole>();
       holeLocation.AddChild(hole);
