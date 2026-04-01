@@ -8,7 +8,17 @@ extends Node
 var main_menu_scene: PackedScene = preload("res://scenes_scripts/main_menu_scene/main_menu_scene.tscn")
 var main_menu_ui_scene: PackedScene = preload("res://scenes_scripts/UI/main_menu/main_menu.tscn")
 
-# i want to make them the server host if they press the host button
+# --- OS WINDOW NOTIFICATIONS (ANTI-LAG FIX) ---
+func _notification(what: int) -> void:
+  # When the host alt-tabs away from the game
+  if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+    DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+    Engine.max_fps = 60 # Keep the game ticking at 60FPS for the network
+      
+  # When the host tabs back into the game
+  elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
+    DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+    Engine.max_fps = 0 # 0 means uncapped (or set to your default max FPS)
 
 func _ready() -> void:
   GlobalSignalServer.HostGameSteam.connect(become_host_steam)

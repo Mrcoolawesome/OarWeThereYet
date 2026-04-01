@@ -26,6 +26,8 @@ text = "Select Save"
 
 [node name="SaveContainer1" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="1"]
 layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
 
 [node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer1" index="0"]
 layout_mode = 2
@@ -35,6 +37,8 @@ text = "Save 1"
 
 [node name="SaveContainer2" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="2"]
 layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
 
 [node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer2" index="0"]
 layout_mode = 2
@@ -44,6 +48,8 @@ text = "Save 2"
 
 [node name="SaveContainer3" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="3"]
 layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
 
 [node name="Button" type="Button" parent="PanelContainer/VBoxContainer/SaveContainer3" index="0"]
 layout_mode = 2

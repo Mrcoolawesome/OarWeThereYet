@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bpn5ktwj4flev"
-path="res://.godot/imported/Checkbox Checked.svg-84e06f1af48441ea46c754b215e3e47d.ctex"
+uid="uid://df68lkayn5iou"
+path="res://.godot/imported/Checkbox Normal - Smaller.svg-cb465dc4fc2add75df9c706ef603def7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/icons/checkbox/Checkbox Checked.svg"
-dest_files=["res://.godot/imported/Checkbox Checked.svg-84e06f1af48441ea46c754b215e3e47d.ctex"]
+source_file="res://art/icons/checkbox/smaller/Checkbox Normal - Smaller.svg"
+dest_files=["res://.godot/imported/Checkbox Normal - Smaller.svg-cb465dc4fc2add75df9c706ef603def7.ctex"]
 
 [params]
 
@@ -38,6 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=2.0
+svg/scale=1.0
 editor/scale_with_editor_scale=false
 editor/convert_colors_with_editor_theme=false
