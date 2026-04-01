@@ -139,7 +139,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   private Vector3 _knockbackVelocity = Vector3.Zero;
 
 	// get the arm node
-	private ArmNode _armNode;
+	public ArmNode ArmNode;
 
 	// Get the terrain
 	private Node3D _terrain;
@@ -213,7 +213,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_terrainData = _terrain.Get("data").AsGodotObject();
 
 		// get the armnode
-		_armNode = GetNode<ArmNode>("Head/ArmNode");
+		ArmNode = GetNode<ArmNode>("Head/ArmNode");
 
 		// get the meshes
 		_bodyMesh = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/body");
@@ -339,7 +339,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		switch(CurrPlayerState)
 		{
 			case PlayerState.Standing:
-				_interactRay.Enabled = true;
+				_interactRay.Enabled = CurrGameState == GameState.Playing;
 				break;
 			case PlayerState.Rowing:
 				_interactRay.Enabled = false;
@@ -383,7 +383,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_pauseUICanvas.Visible = false;
 		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
-		_interactRay.Enabled = true;
 
 		// Menu logic
 		// We use IsActionJustPressed because it's a trigger and not a continuous input event
@@ -410,7 +409,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		if (!_invUI.isOpen()) { _pauseUICanvas.Visible = true; };
 		_hud.Visible = false;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
-		_interactRay.Enabled = false;
 	}
 
 	// Rowing state input handling
@@ -438,7 +436,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
 
-		if (_armNode?.Item?.Data?.UseAction is not Oar)
+		if (ArmNode?.Item?.Data?.UseAction is not Oar)
 		{
 			return;
 		}
@@ -771,11 +769,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		// Broadcast occupied seat
 		_boat.OccupiedSeats[seatIdx] = isSitting;
-		if (_armNode?.Item?.Data?.UseAction == null)
+		if (ArmNode?.Item?.Data?.UseAction == null)
 		{
 			_boat.HasOarInSeat[seatIdx] = false;
 		}
-		else if (_armNode.Item.Data.UseAction is Oar)
+		else if (ArmNode.Item.Data.UseAction is Oar)
     {
 			_boat.HasOarInSeat[seatIdx] = isSitting;
     }
@@ -876,11 +874,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			RequestSitInSeat(-1);
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void OpenInventory(Inventory inventory)
 	{
-		_invUI.Open(inventory);
 		CurrGameState = GameState.Menu;
+		_invUI.Open(inventory);
 	}
 
 	// Helper functions

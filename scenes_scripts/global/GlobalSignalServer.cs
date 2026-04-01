@@ -43,8 +43,6 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void AnimateOarEventHandler(int seat, int direction, bool startStop);
 
-  [Signal]
-  public delegate void OpenInventoryEventHandler(int playerID);
 
   // Saving and loading games
   [Signal]
@@ -53,6 +51,8 @@ public partial class GlobalSignalServer : Node
   public delegate void LoadGameEventHandler();
   [Signal]
   public delegate void GoToMainMenuEventHandler();
+  [Signal]
+  public delegate void SetAnchorEventHandler(string anchorNodePath);
   [Signal]
   public delegate void ShowLoadingScreenEventHandler();
   [Signal]

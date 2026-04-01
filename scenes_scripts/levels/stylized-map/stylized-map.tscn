@@ -254,11 +254,15 @@ metadata/_custom_type_script = "uid://dw3yrisbnd4me"
 [node name="Checkpoint" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.835167, 0, 1374.0201)
 CheckpointNum = 1
+UseAnchor = true
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint" index="0"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
-[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint" index="1"]
+[node name="AnchorSpawn" parent="CheckpointContainer/Checkpoint" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2162733, 2.0516498, 0)
+
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.960175, 1.5957031, 3.8066406)
 
 [node name="Checkpoint2" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
@@ -266,39 +270,45 @@ transform = Transform3D(0.1417651, 0, 0.98990035, 0, 1, 0, -0.98990035, 0, 0.141
 CheckpointNum = 2
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint2" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7592163, 0, 4.1397705)
+transform = Transform3D(0.6189706, 0, 0.7854142, 0, 1, 0, -0.7854142, 0, 0.6189706, 6.758484, -9.536743e-07, 8.353149)
 
-[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint2" index="1"]
+[node name="AnchorSpawn" parent="CheckpointContainer/Checkpoint2" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.848511, 2.0861168, 5.239624)
+
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint2" index="2"]
 transform = Transform3D(0.44652596, 0, 0.894771, 0, 1, 0, -0.894771, 0, 0.44652596, -7.7955933, 0.3149414, 6.869385)
 
 [node name="Checkpoint3" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1458.8381, -29.17074, 834.4896)
 CheckpointNum = 3
+UseAnchor = true
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint3" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5006104, 2.2708473, -4.091675)
 
-[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint3" index="1"]
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint3" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.271606, 4.845337, 0.32702637)
 
 [node name="Checkpoint4" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(0.81344604, 0, 0.58164036, 0, 1, 0, -0.58164036, 0, 0.81344604, 1854.2428, -62.155045, 449.6166)
 CheckpointNum = 4
+UseAnchor = true
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint4" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.445465, 0)
 
-[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint4" index="1"]
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint4" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.271606, 4.845337, 0.32702637)
 
 [node name="Checkpoint5" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(0.9625499, 0, 0.27110448, 0, 1, 0, -0.27110448, 0, 0.9625499, 2496.9272, -88.49762, 169.63)
 CheckpointNum = 5
+UseAnchor = true
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint5" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.367676, 0, 0.7364502)
 
-[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint5" index="1"]
+[node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint5" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.271606, 4.845337, 0.32702637)
 
 [node name="Rocks" type="Node3D" parent="."]
