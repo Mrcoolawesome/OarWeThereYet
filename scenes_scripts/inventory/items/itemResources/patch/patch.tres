@@ -1,5 +1,6 @@
-[gd_resource type="Resource" script_class="InvItem" load_steps=6 format=3 uid="uid://b3bbs6o1nmyoi"]
+[gd_resource type="Resource" script_class="InvItem" load_steps=7 format=3 uid="uid://b3bbs6o1nmyoi"]
 
+[ext_resource type="Texture2D" uid="uid://cnd02sw15411s" path="res://scenes_scripts/inventory/items/itemResources/patch/patchTexture.png" id="1_4a6tu"]
 [ext_resource type="Shape3D" uid="uid://rn1753hvxqxb" path="res://scenes_scripts/inventory/items/itemResources/patch/patchCollision.tres" id="1_cwwj0"]
 [ext_resource type="Script" uid="uid://5qqoau1yt53x" path="res://scenes_scripts/inventory/InvItem.cs" id="1_ng776"]
 [ext_resource type="ArrayMesh" uid="uid://bbwwtjrr4p6j2" path="res://scenes_scripts/inventory/items/itemResources/patch/patchMesh.res" id="2_seuem"]
@@ -12,6 +13,7 @@ metadata/_custom_type_script = "uid://ulyatwn8r6q0"
 [resource]
 script = ExtResource("1_ng776")
 Name = "Cork"
+Icon = ExtResource("1_4a6tu")
 MaxStackSize = 5
 Description = "Plug up any holes you get in your raft"
 ItemMesh = ExtResource("2_seuem")
