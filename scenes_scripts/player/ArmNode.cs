@@ -152,7 +152,7 @@ public partial class ArmNode : MeshInstance3D
 				Position = new Vector3(0.0f, 0.23f, -1.4f);
 
 				// Add uncapped platform velocity back on top
-				RequestDropItem(throwVelocity + platformVelocity);
+				RequestDropItem(GlobalPosition, throwVelocity + platformVelocity);
 			}
 
 			if (Input.IsActionPressed("left_click"))
@@ -323,14 +323,14 @@ public partial class ArmNode : MeshInstance3D
 		}
 	}
 
-	public void RequestToggleLifepreserverThrow(Vector3 throwDirection)
+	public void RequestToggleLifepreserverThrow(Vector3 throwPosition, Vector3 throwDirection)
 	{
 		if (!IsMultiplayerAuthority()) return;
-		RpcId(1, MethodName.ToggleLifepreserverThrow, throwDirection);
+		RpcId(1, MethodName.ToggleLifepreserverThrow, throwPosition, throwDirection);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void ToggleLifepreserverThrow(Vector3 throwDirection)
+	private void ToggleLifepreserverThrow(Vector3 throwPosition, Vector3 throwDirection)
 	{
 		if (!Multiplayer.IsServer()) return;
 
@@ -380,7 +380,7 @@ public partial class ArmNode : MeshInstance3D
 		string uniqueName = $"LifepreserverThrown_{senderId}_{_dropCounter++}";
 
 		// Spawn on all peers and store the active node name so the next toggle can retract it.
-		Rpc(nameof(SpawnThrownLifepreserver), Item.Data.ResourcePath, GlobalPosition, uniqueName, launchVelocity);
+		Rpc(nameof(SpawnThrownLifepreserver), Item.Data.ResourcePath, throwPosition, uniqueName, launchVelocity);
 		Rpc(nameof(SetActiveLifepreserverNode), uniqueName);
 	}
 
@@ -421,13 +421,13 @@ public partial class ArmNode : MeshInstance3D
 		}
 	}
 
-	private void RequestDropItem(Vector3 dropVelocity)
+	private void RequestDropItem(Vector3 dropPosition, Vector3 dropVelocity)
 	{
-		RpcId(1, MethodName.DropItem, dropVelocity);
+		RpcId(1, MethodName.DropItem, dropPosition, dropVelocity);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	public void DropItem(Vector3 dropVelocity)
+	public void DropItem(Vector3 dropPosition, Vector3 dropVelocity)
 	{
 		if (Item != null)
 		{
@@ -439,7 +439,6 @@ public partial class ArmNode : MeshInstance3D
 
 			string itemPath = Item.Data.ResourcePath;
 			int itemCount = Item.Amount;
-			Vector3 dropPosition = GlobalPosition;
 			string uniqueName = $"DroppedItem_{Multiplayer.GetUniqueId()}_{_dropCounter++}";
 
 			// Tell all peers to spawn the item and clear the arm

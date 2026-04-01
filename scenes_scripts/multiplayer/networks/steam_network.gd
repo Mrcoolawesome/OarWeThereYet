@@ -216,7 +216,7 @@ func _remove_player(id : int):
     # Player drops item if they're holding it
     var arm_node = player_node.get_node_or_null("Head/ArmNode")
     if arm_node:
-      arm_node.DropItem(Vector3.ZERO)
+      arm_node.DropItem(arm_node.global_position, Vector3.ZERO)
 
     # Free player
     player_node.queue_free()
