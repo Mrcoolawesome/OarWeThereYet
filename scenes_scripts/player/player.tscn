@@ -238,6 +238,12 @@ settings/0/gravity/direction = Vector3(0, -1, 0)
 settings/0/enable_all_child_collisions = true
 settings/0/exclude_collision_count = 0
 
+[node name="head" parent="FullPlayerModel/Armature/Skeleton3D" index="6"]
+material_overlay = ExtResource("5_sfgrd")
+
+[node name="life vest" parent="FullPlayerModel/Armature/Skeleton3D" index="7"]
+material_overlay = SubResource("StandardMaterial3D_sfgrd")
+
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="FullPlayerModel/Armature/Skeleton3D" index="10"]
 transform = Transform3D(-2.1918778e-07, -0.99678516, -0.08011978, 0.9999998, -6.120127e-08, -4.658333e-07, 4.492699e-07, -0.08011973, 0.99678487, -1.458127, 1.0468539, -0.1132061)
 bone_name = "hand.R"

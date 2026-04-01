@@ -15,7 +15,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     [Export] public float RowForce = 10.0f;
     [Export] public float ImpactVelocityThreshold = 10.0f;
     [Export] public int MaxHealth = 100;
-    [Export] public int ImpactDamage = 10;
+    [Export] public int HoleLeakRate = 1;
     [Export] public Array<Variant> State {get; set;} // position, quaternionRotation, LinearVelocity, AngularVelocity
     [Export] public float LerpSpeed = 1.0f;
     // the reset position and rotation for the boat
@@ -58,6 +58,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private Timer _damageDelayTimer = new Timer();
     // boolean to act as a gate to allow for more damage to be taken
     private bool _damageAllowed = true;
+    private double _timer = 0.0;
 
     // get all the oar objects
     private Node3D _frontRightOar;
@@ -66,6 +67,9 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private Node3D _backLeftOar;
 
     public AnchorPoint AnchorPoint;
+
+		public PackedScene HoleScene = GD.Load<PackedScene>("res://scenes_scripts/boat/holes/hole.tscn");
+    public Node3D HoleLocation;
 
   /*
       front left localShapeIndex: 0
@@ -96,6 +100,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         _frontRightOar = GetNode<Node3D>("OarsContainer/OarFrontRight");
         _frontLeftOar = GetNode<Node3D>("OarsContainer/OarFrontLeft");
         AnchorPoint = GetNode<AnchorPoint>("AnchorPoint");
+
+        HoleLocation = GetNode<Node3D>("HoleLocation");
 
         // subscribe to the Rowing signal from the singleton script
         GlobalSignalServer.Instance.Rowing += OnPlayerRowing;
@@ -142,6 +148,20 @@ public partial class Boat : RigidBody3D, ISyncBuffer
   public override void _Process(double delta)
   {
     ChangeOarVisibiltiy();
+
+    if (!Multiplayer.IsServer()) return;
+
+    // This code runs once a second
+    if ((_timer += delta) >= 1.0) 
+    {
+      _timer -= 1.0;
+
+      foreach (Hole hole in HoleLocation.GetChildren().OfType<Hole>())
+      {
+        // update our health, this automatically sends out a signal that the health has been updated
+        _healthComponent.UpdateHealth(-HoleLeakRate);
+      }
+    }
   }
 
     // does the bouyancy stuff for the probes
@@ -297,7 +317,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)] // only update the server so the CallLocal should be false i think
 	private void SyncReset()
 	{
-		// set the player into the standing state and reset their position and velocity
+	  // set the player into the standing state and reset their position and velocity
 		_rowingStates = [false, false, false, false];
 
         // Reset occupied seats
@@ -307,6 +327,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         HasOarInSeat = [false, false, false, false];
 
         AnchorPoint.ResetAnchor();
+
+        ResetHoles();
 
         // reset the boat health
         _healthComponent.ResetHealth();
@@ -371,11 +393,10 @@ public partial class Boat : RigidBody3D, ISyncBuffer
                 // if the impact velocity at that point is greater than the threshold then remove health points from the boat health
                 if (impactVelocity > ImpactVelocityThreshold && _damageAllowed) // damageAllowed is switched to true when the _damageDelayTimer is done
                 {
-                    // update our health, this automatically sends out a signal that the health has been updated
-                    _healthComponent.UpdateHealth(-ImpactDamage);
-
                     // damage is no longer allowed until the timer ends
                     _damageAllowed = false;
+
+                    SpawnHole();
 
                     // also start the delay timer so they don't take damage during this time
                     _damageDelayTimer.Start(); // the delay time is set in the timer node in godot (you can also set it (the time delay) here but i didn't)
@@ -535,5 +556,30 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     public bool IsSeatAvailable(int seat)
     {
         return !OccupiedSeats[seat];
+    }
+
+    public void SpawnHole()
+    {
+      if (Multiplayer.IsServer())
+      {
+        PathFollow3D holeSpawnPath = HoleLocation.GetNode<PathFollow3D>("HoleSpawn");
+        holeSpawnPath.ProgressRatio = GD.Randf();
+
+        Hole hole = HoleScene.Instantiate<Hole>();
+        // Set transform BEFORE adding to the tree so it's captured by the spawner's initial state
+        hole.Transform = holeSpawnPath.Transform;
+        // Use legible names (true) to ensure unique, consistent naming across the network
+        HoleLocation.AddChild(hole, true);
+      }
+    }
+
+    public void ResetHoles()
+    {
+        if (!Multiplayer.IsServer()) return;
+
+        foreach (Hole hole in HoleLocation.GetChildren().OfType<Hole>())
+        {
+            hole.QueueFree();
+        }
     }
 }
