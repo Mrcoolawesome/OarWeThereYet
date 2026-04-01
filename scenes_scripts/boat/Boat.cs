@@ -149,6 +149,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
   {
     ChangeOarVisibiltiy();
 
+    if (!Multiplayer.IsServer()) return;
+
     // This code runs once a second
     if ((_timer += delta) >= 1.0) 
     {
