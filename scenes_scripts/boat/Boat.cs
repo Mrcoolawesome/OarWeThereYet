@@ -67,6 +67,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
     public AnchorPoint AnchorPoint;
 
+		public PackedScene HoleScene = GD.Load<PackedScene>("res://scenes_scripts/boat/holes/hole.tscn");
+
   /*
       front left localShapeIndex: 0
       front right localShapeIndex: 1
@@ -377,6 +379,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
                     // damage is no longer allowed until the timer ends
                     _damageAllowed = false;
 
+                    SpawnHole();
+
                     // also start the delay timer so they don't take damage during this time
                     _damageDelayTimer.Start(); // the delay time is set in the timer node in godot (you can also set it (the time delay) here but i didn't)
                 }
@@ -535,5 +539,16 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     public bool IsSeatAvailable(int seat)
     {
         return !OccupiedSeats[seat];
+    }
+
+    public void SpawnHole()
+    {
+      PathFollow3D holeSpawnPath = GetNode<PathFollow3D>("HoleLocation/HoleSpawn");
+      holeSpawnPath.ProgressRatio = GD.Randf();
+
+      Hole hole = HoleScene.Instantiate<Hole>();
+      hole.Position = holeSpawnPath.Position;
+
+      holeSpawnPath.AddChild(hole);
     }
 }
