@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dn0x6hwxryba0"]
+[gd_scene load_steps=5 format=3 uid="uid://dn0x6hwxryba0"]
 
 [ext_resource type="Script" uid="uid://betpfjbdewch4" path="res://scenes_scripts/boat/holes/Hole.cs" id="1_a6qvs"]
 
@@ -13,7 +13,9 @@ size = Vector3(0.5, 0.5, 0.25)
 [sub_resource type="BoxShape3D" id="BoxShape3D_a6qvs"]
 size = Vector3(0.6, 0.6, 0.4)
 
-[node name="Hole" type="Node3D"]
+[node name="Hole" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
 script = ExtResource("1_a6qvs")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
