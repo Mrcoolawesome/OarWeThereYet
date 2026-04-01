@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://di3bvya4pxuod"]
+[gd_scene load_steps=5 format=3 uid="uid://di3bvya4pxuod"]
 
 [ext_resource type="Script" uid="uid://ctw3v5c2w3lg3" path="res://scenes_scripts/UI/settings_menu/graphics_menu/graphics_menu.gd" id="1_3uo4k"]
 [ext_resource type="PackedScene" uid="uid://0fqe1khyldg5" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/slider/setting_slider.tscn" id="1_gw3us"]
 [ext_resource type="PackedScene" uid="uid://di3iyb18rny5e" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/dropdown/dropdown_setting.tscn" id="3_fsw1q"]
+[ext_resource type="PackedScene" uid="uid://bjjn70dunjut4" path="res://scenes_scripts/UI/settings_menu/checkbox/checkbox.tscn" id="4_fsw1q"]
 
 [node name="GraphicsMenu" type="Control"]
 layout_mode = 3
@@ -23,12 +24,46 @@ grow_vertical = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
 layout_mode = 2
+horizontal_scroll_mode = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
+
+[node name="ScreenModeDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+layout_mode = 2
+size_flags_vertical = 3
+LabelText = "Screen Mode"
+DropdownItems = Array[String](["Fullscreen", "Borderless", "Windowed"])
+
+[node name="MaxFPSSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_gw3us")]
+layout_mode = 2
+MaxValue = 360.0
+SliderLabelText = "Max FPS"
+
+[node name="VSyncDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+layout_mode = 2
+LabelText = "VSync"
+DropdownItems = Array[String](["Disabled", "Enabled", "Adaptive", "Mailbox"])
+
+[node name="ResolutionDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+layout_mode = 2
+size_flags_vertical = 3
+LabelText = "Resolution"
+
+[node name="RenderScaleSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_gw3us")]
+layout_mode = 2
+MaxValue = 2.0
+Step = 0.01
+StartingValue = 1.0
+SliderLabelText = "Render Scale"
+
+[node name="UpscalerDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+layout_mode = 2
+LabelText = "Upscale Mode"
+DropdownItems = Array[String](["Bilinear/Disabled", "FSR 1.0", "FSR 2.2"])
 
 [node name="MSAASlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("1_gw3us")]
 layout_mode = 2
@@ -37,17 +72,33 @@ MaxValue = 3.0
 SliderLabelText = "MSAA"
 TickCount = 4
 
-[node name="ScreenModeDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+[node name="TAAToggle" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("4_fsw1q")]
 layout_mode = 2
-size_flags_vertical = 3
-LabelText = "Screen Mode"
-DropdownItems = Array[String](["Fullscreen", "Borderless", "Windowed"])
+LabelText = "TAA"
 
-[node name="ResolutionDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+[node name="ShadowDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
 layout_mode = 2
-size_flags_vertical = 3
-LabelText = "Resolution"
+LabelText = "Shadow"
+DropdownItems = Array[String](["Low", "Medium", "High", "Ultra"])
 
-[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MSAASlider" to="." method="_on_msaa_slider_slider_changed"]
+[node name="SSAODropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+layout_mode = 2
+LabelText = "SSAO Mode"
+DropdownItems = Array[String](["Very Low", "Low", "Medium", "High"])
+
+[node name="SDFGIDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_fsw1q")]
+layout_mode = 2
+LabelText = "SDFGI Mode"
+DropdownItems = Array[String](["Low", "High"])
+
 [connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/ScreenModeDropdown" to="." method="_on_screen_mode_dropdown_item_selected"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MaxFPSSlider" to="." method="_on_max_fps_slider_slider_changed"]
+[connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/VSyncDropdown" to="." method="_on_vsync_dropdown_item_selected"]
 [connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/ResolutionDropdown" to="." method="_on_resolution_dropdown_item_selected"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/RenderScaleSlider" to="." method="_on_render_scale_slider_slider_changed"]
+[connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/UpscalerDropdown" to="." method="_on_upscaler_dropdown_item_selected"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MSAASlider" to="." method="_on_msaa_slider_slider_changed"]
+[connection signal="toggled" from="MarginContainer/ScrollContainer/VBoxContainer/TAAToggle" to="." method="_on_taa_toggle_toggled"]
+[connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/ShadowDropdown" to="." method="_on_shadow_dropdown_item_selected"]
+[connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/SSAODropdown" to="." method="_on_ssao_dropdown_item_selected"]
+[connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/SDFGIDropdown" to="." method="_on_sdfgi_dropdown_item_selected"]

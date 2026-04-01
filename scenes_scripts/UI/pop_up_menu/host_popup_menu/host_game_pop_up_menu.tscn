@@ -1,9 +1,61 @@
-[gd_scene load_steps=5 format=3 uid="uid://657bxsni64f3"]
+[gd_scene load_steps=9 format=3 uid="uid://657bxsni64f3"]
 
 [ext_resource type="PackedScene" uid="uid://c6n6ct037x4n2" path="res://scenes_scripts/UI/pop_up_menu/base_pop_up_menu.tscn" id="1_teee5"]
 [ext_resource type="Script" uid="uid://dphvpqnr087pj" path="res://scenes_scripts/UI/pop_up_menu/host_popup_menu/host_game_pop_up_menu.gd" id="2_lyev8"]
 [ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="3_mhkqq"]
 [ext_resource type="Theme" uid="uid://b2bjemh6aq227" path="res://art/themes/buttons.tres" id="4_v2hjm"]
+[ext_resource type="PackedScene" uid="uid://6epc5ibp31kh" path="res://scenes_scripts/UI/settings_menu/confirm_page/confirm_page.tscn" id="5_lyev8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5cajk"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.101960786, 0.101960786, 0.101960786, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vvfuo"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lyev8"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.101960786, 0.101960786, 0.101960786, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
 
 [node name="HostGamePopUpMenu" instance=ExtResource("1_teee5")]
 script = ExtResource("2_lyev8")
@@ -13,11 +65,16 @@ text = "Host A Game"
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="1"]
 layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
 [node name="Button" type="Button" parent="PanelContainer/VBoxContainer/MarginContainer" index="0"]
 layout_mode = 2
 theme = ExtResource("3_mhkqq")
 theme_type_variation = &"FlatButton"
+theme_override_styles/normal = SubResource("StyleBoxFlat_5cajk")
 text = "Delete Save"
 
 [node name="CheckboxContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="2"]
@@ -62,6 +119,7 @@ size_flags_horizontal = 8
 size_flags_vertical = 4
 theme = ExtResource("3_mhkqq")
 theme_override_constants/minimum_character_width = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_vvfuo")
 placeholder_text = "Gaming"
 alignment = 1
 emoji_menu_enabled = false
@@ -69,6 +127,8 @@ emoji_menu_enabled = false
 [node name="MarginContainer3" type="MarginContainer" parent="PanelContainer/VBoxContainer" index="4"]
 layout_mode = 2
 size_flags_vertical = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_bottom = 10
 
 [node name="HostButton" type="Button" parent="PanelContainer/VBoxContainer/MarginContainer3" index="0"]
 custom_minimum_size = Vector2(300, 100)
@@ -77,9 +137,28 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 theme = ExtResource("3_mhkqq")
 theme_type_variation = &"FlatButton"
+theme_override_styles/normal = SubResource("StyleBoxFlat_lyev8")
 text = "Host"
+
+[node name="DeletionConfirmPage" parent="." index="1" instance=ExtResource("5_lyev8")]
+visible = false
+layout_mode = 1
+
+[node name="Label" parent="DeletionConfirmPage/GreyBackground/Panel/MarginContainer/VBoxContainer" index="0"]
+theme_override_font_sizes/font_size = 80
+text = "Confirm Save Deletion"
+
+[node name="CountdownLabel" parent="DeletionConfirmPage/GreyBackground/Panel/MarginContainer/VBoxContainer" index="1"]
+theme_override_font_sizes/font_size = 40
+
+[node name="RevertButton" parent="DeletionConfirmPage/GreyBackground/Panel/MarginContainer/VBoxContainer/HBoxContainer/RevertButtonMargin" index="0"]
+text = "Cancel
+"
 
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer/Button" to="." method="_delete_save_button_pressed"]
 [connection signal="toggled" from="PanelContainer/VBoxContainer/CheckboxContainer/HBoxContainer/CheckBox" to="." method="on_check_box_toggled"]
 [connection signal="text_changed" from="PanelContainer/VBoxContainer/LobbyNameContainer/LineEdit" to="." method="on_line_edit_text_changed"]
+[connection signal="text_submitted" from="PanelContainer/VBoxContainer/LobbyNameContainer/LineEdit" to="." method="on_line_edit_text_submitted"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/MarginContainer3/HostButton" to="." method="on_host_button_pressed"]
+
+[editable path="DeletionConfirmPage"]

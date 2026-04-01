@@ -1,7 +1,7 @@
 [gd_resource type="Theme" load_steps=5 format=3 uid="uid://b2bjemh6aq227"]
 
-[ext_resource type="Texture2D" uid="uid://bpn5ktwj4flev" path="res://art/icons/checkbox/Checkbox Checked.svg" id="1_ohjuy"]
-[ext_resource type="Texture2D" uid="uid://c1yij37hp2pqx" path="res://art/icons/checkbox/Checkbox Normal.svg" id="2_0fstc"]
+[ext_resource type="Texture2D" uid="uid://bpn5ktwj4flev" path="res://art/icons/checkbox/normal/Checkbox Checked.svg" id="1_ohjuy"]
+[ext_resource type="Texture2D" uid="uid://c1yij37hp2pqx" path="res://art/icons/checkbox/normal/Checkbox Normal.svg" id="2_0fstc"]
 [ext_resource type="Texture2D" uid="uid://ckp2gjbfp3yh4" path="res://art/icons/exitButton/ExitButtonRoundNormal.svg" id="3_0fstc"]
 [ext_resource type="StyleBox" uid="uid://g1xlflxwlghj" path="res://art/styles/exitButton/exitButtonNormalStyle.tres" id="4_erg30"]
 

@@ -45,17 +45,19 @@ corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 corner_detail = 5
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_747vg"]
-content_margin_left = 4.0
-content_margin_top = 4.0
-content_margin_right = 4.0
-content_margin_bottom = 4.0
-bg_color = Color(0.101960786, 0.101960786, 0.101960786, 0)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-corner_detail = 5
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_la453"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+expand_margin_left = 10.0
+expand_margin_right = 10.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1q0su"]
 content_margin_left = 4.0
@@ -153,7 +155,7 @@ Button/fonts/font = ExtResource("1_la453")
 Button/styles/disabled = SubResource("StyleBoxFlat_wvbon")
 Button/styles/focus = SubResource("StyleBoxFlat_thw1s")
 Button/styles/hover = SubResource("StyleBoxFlat_d67e7")
-Button/styles/normal = SubResource("StyleBoxFlat_747vg")
+Button/styles/normal = SubResource("StyleBoxFlat_la453")
 Button/styles/pressed = SubResource("StyleBoxFlat_1q0su")
 CheckButton/colors/button_checked_color = Color(1, 1, 1, 1)
 CheckButton/colors/button_unchecked_color = Color(1, 1, 1, 1)

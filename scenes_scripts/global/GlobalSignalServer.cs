@@ -58,6 +58,20 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void DoneLoadingMapEventHandler();
 
+  // signal to apply the look speed for the player
+  [Signal]
+  public delegate void ApplyPlayerLookSpeedEventHandler(float multiplier);
+
+  // signal to set the player's gamertag
+  [Signal]
+  public delegate void AssignGamertagEventHandler(string gamertag);
+
+  [Signal]
+  public delegate void AssignPlayerColorEventHandler(string colorHex);
+
+  [Signal] 
+  public delegate void PlayerLoudnessEventHandler(float loudness);
+
   public int Health { get; set; }
 
   public override void _Ready()
