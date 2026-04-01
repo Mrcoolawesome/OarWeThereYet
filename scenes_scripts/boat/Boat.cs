@@ -15,7 +15,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     [Export] public float RowForce = 10.0f;
     [Export] public float ImpactVelocityThreshold = 10.0f;
     [Export] public int MaxHealth = 100;
-    [Export] public int ImpactDamage = 10;
+    [Export] public int HoleLeakRate = 1;
     [Export] public Array<Variant> State {get; set;} // position, quaternionRotation, LinearVelocity, AngularVelocity
     [Export] public float LerpSpeed = 1.0f;
     // the reset position and rotation for the boat
@@ -58,6 +58,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     private Timer _damageDelayTimer = new Timer();
     // boolean to act as a gate to allow for more damage to be taken
     private bool _damageAllowed = true;
+    private double _timer = 0.0;
 
     // get all the oar objects
     private Node3D _frontRightOar;
@@ -68,6 +69,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     public AnchorPoint AnchorPoint;
 
 		public PackedScene HoleScene = GD.Load<PackedScene>("res://scenes_scripts/boat/holes/hole.tscn");
+    public Node3D HoleLocation;
 
   /*
       front left localShapeIndex: 0
@@ -98,6 +100,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         _frontRightOar = GetNode<Node3D>("OarsContainer/OarFrontRight");
         _frontLeftOar = GetNode<Node3D>("OarsContainer/OarFrontLeft");
         AnchorPoint = GetNode<AnchorPoint>("AnchorPoint");
+
+        HoleLocation = GetNode<Node3D>("HoleLocation");
 
         // subscribe to the Rowing signal from the singleton script
         GlobalSignalServer.Instance.Rowing += OnPlayerRowing;
@@ -144,6 +148,18 @@ public partial class Boat : RigidBody3D, ISyncBuffer
   public override void _Process(double delta)
   {
     ChangeOarVisibiltiy();
+
+    // This code runs once a second
+    if ((_timer += delta) >= 1.0) 
+    {
+      _timer -= 1.0;
+
+      foreach (Hole hole in HoleLocation.GetChildren().OfType<Hole>())
+      {
+        // update our health, this automatically sends out a signal that the health has been updated
+        _healthComponent.UpdateHealth(-HoleLeakRate);
+      }
+    }
   }
 
     // does the bouyancy stuff for the probes
@@ -373,9 +389,6 @@ public partial class Boat : RigidBody3D, ISyncBuffer
                 // if the impact velocity at that point is greater than the threshold then remove health points from the boat health
                 if (impactVelocity > ImpactVelocityThreshold && _damageAllowed) // damageAllowed is switched to true when the _damageDelayTimer is done
                 {
-                    // update our health, this automatically sends out a signal that the health has been updated
-                    _healthComponent.UpdateHealth(-ImpactDamage);
-
                     // damage is no longer allowed until the timer ends
                     _damageAllowed = false;
 
@@ -545,15 +558,14 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     {
       if (Multiplayer.IsServer())
       {
-        Node3D holeLocation = GetNode<Node3D>("HoleLocation");
-        PathFollow3D holeSpawnPath = holeLocation.GetNode<PathFollow3D>("HoleSpawn");
+        PathFollow3D holeSpawnPath = HoleLocation.GetNode<PathFollow3D>("HoleSpawn");
         holeSpawnPath.ProgressRatio = GD.Randf();
 
         Hole hole = HoleScene.Instantiate<Hole>();
         // Set transform BEFORE adding to the tree so it's captured by the spawner's initial state
         hole.Transform = holeSpawnPath.Transform;
         // Use legible names (true) to ensure unique, consistent naming across the network
-        holeLocation.AddChild(hole, true);
+        HoleLocation.AddChild(hole, true);
       }
     }
 }
