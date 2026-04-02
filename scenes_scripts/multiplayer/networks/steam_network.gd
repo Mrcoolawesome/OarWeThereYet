@@ -30,7 +30,7 @@ const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
   # initalize steam
-  Steam.steamInit(480, true)
+  Steam.steamInit(4563080, true)
   Steam.initRelayNetworkAccess() # start steam relay
 
   # initialize voice
