@@ -63,7 +63,7 @@ script = ExtResource("1_vvssr")
 FloatForce = 40.0
 RiverSpeed = 35.0
 WaterDrag = 15.0
-RowForce = 200.0
+RowForce = 100.0
 ImpactVelocityThreshold = 5.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
@@ -122,7 +122,7 @@ collision_mask = 0
 script = ExtResource("2_kgk83")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontLeftCollision"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09603202, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.064383745, 0)
 mesh = SubResource("BoxMesh_0063d")
 
 [node name="FrontLeftSeatCollision" type="CollisionShape3D" parent="SeatContainer/FrontLeftCollision"]
@@ -136,7 +136,7 @@ script = ExtResource("2_kgk83")
 seatIndex = 1
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontRightCollision"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09603202, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.064383745, 0)
 mesh = SubResource("BoxMesh_0063d")
 
 [node name="FrontRightSeatCollision" type="CollisionShape3D" parent="SeatContainer/FrontRightCollision"]
@@ -150,7 +150,7 @@ script = ExtResource("2_kgk83")
 seatIndex = 3
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackLeftCollision"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09603202, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.064383745, 0)
 mesh = SubResource("BoxMesh_0063d")
 
 [node name="BackLeftSeatCollision" type="CollisionShape3D" parent="SeatContainer/BackLeftCollision"]
@@ -164,7 +164,7 @@ script = ExtResource("2_kgk83")
 seatIndex = 2
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackRightCollision"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09603202, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.064383745, 0)
 mesh = SubResource("BoxMesh_0063d")
 
 [node name="BackRightSeatCollision" type="CollisionShape3D" parent="SeatContainer/BackRightCollision"]

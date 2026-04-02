@@ -166,6 +166,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private MeshInstance3D _pupilEyeLeft;
 
 	// You MUST add this variable to your MultiplayerSynchronizer!
+	[ExportGroup("DO NOT TOUCH")]
   [Export] public string CurrentColorHex = ""; 
   // Used locally by puppets to know when the authority changed the color
   private string _lastAppliedColor = "";
@@ -372,26 +373,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
   }
 
-	private void HeadAnimationProcess(double delta)
-  {
-    // Smoothly interpolate the scale towards the target
-    _currentHeadScale = Mathf.Lerp(_currentHeadScale, _targetHeadScale, (float)delta * 20.0f);
-    
-    // Create the XZ scale vector (Y remains 1.0 so they don't get taller)
-    Vector3 newScale = new Vector3(_currentHeadScale, 1.0f, _currentHeadScale);
-    
-    // Apply to the meshes
-    if (_headMesh != null) _headMesh.Scale = newScale;
-    if (_eyesWhitesLeft != null) _eyesWhitesLeft.Scale = newScale;
-    if (_eyesWhitesRight != null) _eyesWhitesRight.Scale = newScale;
-    if (_pupilEyeLeft != null) _pupilEyeLeft.Scale = newScale;
-    if (_pupilEyeRight != null) _pupilEyeRight.Scale = newScale;
-
-    // ONLY the Authority should automatically decay the target back to 1.0.
-    // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
-		_targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
-  }
-
 	private void PlayingStateProcess()
 	{
 		_pauseUICanvas.Visible = false;
@@ -497,7 +478,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Logic for movement depending on player state
 	public override void _PhysicsProcess(double delta)
 	{
-		HeadAnimationProcess(delta);
+		// this is done on the physics process because this isn't disabled for the puppets unlike the regular process function
+		HeadAnimationPhysicsProcess(delta);
 
 		// do all the movement and stuff if we're the owner of this instance, we'll sync it to the clients 
 		if (IsMultiplayerAuthority())
@@ -624,6 +606,26 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		Velocity = velocity;
 	}
+
+	private void HeadAnimationPhysicsProcess(double delta)
+  {
+    // Smoothly interpolate the scale towards the target
+    _currentHeadScale = Mathf.Lerp(_currentHeadScale, _targetHeadScale, (float)delta * 20.0f);
+    
+    // Create the XZ scale vector (Y remains 1.0 so they don't get taller)
+    Vector3 newScale = new Vector3(_currentHeadScale, 1.0f, _currentHeadScale);
+    
+    // Apply to the meshes
+    if (_headMesh != null) _headMesh.Scale = newScale;
+    if (_eyesWhitesLeft != null) _eyesWhitesLeft.Scale = newScale;
+    if (_eyesWhitesRight != null) _eyesWhitesRight.Scale = newScale;
+    if (_pupilEyeLeft != null) _pupilEyeLeft.Scale = newScale;
+    if (_pupilEyeRight != null) _pupilEyeRight.Scale = newScale;
+
+    // ONLY the Authority should automatically decay the target back to 1.0.
+    // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
+		_targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
+  }
 
 	private void AnimationManager(Vector3 velocity, Vector2 inputDir, double delta)
   {
@@ -801,7 +803,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_applyWaterPhysicsForce = true;
 
 		// then set the global force and forcePosition variables so that they can be seen by PhysicsProcess
-		_waterPhysicsForce = force;
+		// Filter out the Y-axis force immediately
+    _waterPhysicsForce = force;
 		_waterPhysicsForcePosition = relativePosition;
 	}
 
@@ -1287,6 +1290,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 		if (IsMultiplayerAuthority())
 		{
+			// Set the exported variable so it broadcasts to all other clients!
 			_gamerTag.Visible = false; // don't wanna see it locally
 		}
 	}

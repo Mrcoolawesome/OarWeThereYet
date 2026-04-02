@@ -51,35 +51,48 @@ public partial class WaterPhysics : Node3D
 	}
 
 	private void ProbeBuoyancyPhysicsProcess()
-	{
-		// Fetch the velocities once per frame rather than inside the loop
-		Vector3 parentLinearVelocity = GetParentLinearVelocity();
-		Vector3 parentAngularVelocity = GetParentAngularVelocity();
+  {
+    // Fetch the velocities once per frame rather than inside the loop
+    Vector3 parentLinearVelocity = GetParentLinearVelocity();
+    Vector3 parentAngularVelocity = GetParentAngularVelocity();
 
-		foreach (Marker3D probe in ProbeContainer.GetChildren().OfType<Marker3D>())
-		{
-			Vector3 globalPos = probe.GlobalPosition;
-			Vector3 relativePos = globalPos - _parentBody.GlobalPosition; 
-			Vector3 flowDirection = _river.GetWaterFlowDirection(globalPos);
+    foreach (Marker3D probe in ProbeContainer.GetChildren().OfType<Marker3D>())
+    {
+      Vector3 globalPos = probe.GlobalPosition;
+      Vector3 relativePos = globalPos - _parentBody.GlobalPosition; 
+      Vector3 flowDirection = _river.GetWaterFlowDirection(globalPos);
 
-			float waterHeight = _river.GetWaterHeight(globalPos);
-			float depth = waterHeight - globalPos.Y;
-			float buoyancyMultiplier = 2 - Mathf.Exp(-depth + 0.6f);
-			Vector3 buoyancyForce = WaterNormal(globalPos) * _gravity * _floatForce * buoyancyMultiplier;
+      // --- THE FIX: FLATTEN THE CURRENT PUSH ---
+      // We strip out the Y axis and normalize it so the current ONLY pushes horizontally
+      Vector3 flatFlowDirection = new Vector3(flowDirection.X, 0, flowDirection.Z);
+      
+      // Prevent division by zero if the flow was perfectly vertical
+      if (flatFlowDirection.LengthSquared() > 0.001f) {
+				flatFlowDirection = flatFlowDirection.Normalized();
+      }
 
-			// Calculate current velocity at the exact probe position using our safely extracted velocities
-			Vector3 currentVelocity = parentLinearVelocity + parentAngularVelocity.Cross(relativePos);
-			Vector3 frictionForce = -currentVelocity * depth * _waterDrag;
+      float waterHeight = _river.GetWaterHeight(globalPos);
+      float depth = waterHeight - globalPos.Y;
+      float buoyancyMultiplier = 2 - Mathf.Exp(-depth + 0.6f);
+      
+      // Note: Replaced WaterNormal() with Vector3.Up. 
+      // Real buoyancy always fights gravity straight up! Using the surface normal 
+      // on a steep waterfall pushes the player horizontally out of the water.
+      Vector3 buoyancyForce = Vector3.Up * _gravity * _floatForce * buoyancyMultiplier;
 
-			if (depth > 0)
-			{
-				// Combine the forces so we only send one signal per probe per frame
-				Vector3 finalForce = buoyancyForce + frictionForce + (flowDirection * _riverSpeed);
-				
-				EmitSignal(SignalName.ApplyWaterForce, finalForce, relativePos);
-			}
-		}
-	}
+      // Calculate current velocity at the exact probe position using our safely extracted velocities
+      Vector3 currentVelocity = parentLinearVelocity + parentAngularVelocity.Cross(relativePos);
+      Vector3 frictionForce = -currentVelocity * depth * _waterDrag;
+
+      if (depth > 0)
+      {
+        // Apply the flatFlowDirection here so the river speed never touches the Y axis
+        Vector3 finalForce = buoyancyForce + frictionForce + (flatFlowDirection * _riverSpeed);
+        
+        EmitSignal(SignalName.ApplyWaterForce, finalForce, relativePos);
+      }
+    }
+  }
 
 	// --- Helper Methods for Safe Velocity Extraction ---
 
