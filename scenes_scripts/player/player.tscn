@@ -85,6 +85,7 @@ MouseSens = 0.5
 ObjectKnockbackForce = 200.0
 LerpSpeed = 5.0
 CrouchLerpSpeed = 7.5
+VoiceScaleMultiplier = 2.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_qhqgy")

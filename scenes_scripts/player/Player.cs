@@ -166,6 +166,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private MeshInstance3D _pupilEyeLeft;
 
 	// You MUST add this variable to your MultiplayerSynchronizer!
+	[ExportGroup("DO NOT TOUCH")]
   [Export] public string CurrentColorHex = ""; 
   // Used locally by puppets to know when the authority changed the color
   private string _lastAppliedColor = "";
@@ -802,7 +803,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_applyWaterPhysicsForce = true;
 
 		// then set the global force and forcePosition variables so that they can be seen by PhysicsProcess
-		_waterPhysicsForce = force;
+		// Filter out the Y-axis force immediately
+    _waterPhysicsForce = force;
 		_waterPhysicsForcePosition = relativePosition;
 	}
 
