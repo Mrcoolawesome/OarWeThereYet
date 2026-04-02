@@ -145,6 +145,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private Node3D _terrain;
 	private GodotObject _terrainData;
 
+	// get the animation player and current animation tracker
+	private AnimationPlayer _animationPlayer;
+	// Animation tracking to prevent network spam
+  private string _currentAnim = "idleStanding";
+
+	// Animation tracking
+  private double _crouchStillTimer = 0.0;
+  private RayCast3D _groundDetectionRay;
   // Store the Steam Username
 	private Label3D _gamerTag;
 	public String SteamUsername;
@@ -223,6 +231,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_pupilEyeLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilLeft");
 		_pupilEyeRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilRight");
 
+		// this is for seeing how far we are from the ground
+		_groundDetectionRay = GetNode<RayCast3D>("GroundDetectionRay");
+
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
 		// subscribe to the signal that changes the mouse sensitivity from the settings menu
@@ -236,6 +247,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
+
+		// get the animation player
+		_animationPlayer = GetNode<AnimationPlayer>("FullPlayerModel/AnimationPlayer");
 
 		// Add the player to the 'players' group
 		AddToGroup("players");
@@ -600,6 +614,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			velocity.Z = _direction.Z * _currSpeed + _initialVelocity.Z;
 		}
 
+		// do the animation stuff
+		AnimationManager(velocity, inputDir, delta);
+
 		// Handle mouse input while standing
 		PlayerRotation();
 
@@ -607,6 +624,93 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		Velocity = velocity;
 	}
+
+	private void AnimationManager(Vector3 velocity, Vector2 inputDir, double delta)
+  {
+    string targetAnim = "idleStanding";
+
+    // 1. SWIMMING LOGIC
+    // We check this first so it overrides falling if they are in the water
+    if (_applyWaterPhysicsForce)
+    {
+      targetAnim = "swimming";
+      _crouchStillTimer = 0.0;
+    }
+    // 2. JUMPING AND FALLING LOGIC
+    else if (!IsOnFloor())
+    {
+      _crouchStillTimer = 0.0; // Reset crouch timer if we're in the air
+
+      if (velocity.Y > 0)
+      {
+        targetAnim = "initalJump";
+      }
+      else
+      {
+        // We are falling. Check if we are about to hit the ground.
+        if (_groundDetectionRay != null && _groundDetectionRay.IsColliding())
+        {
+          targetAnim = "landingJump";
+        }
+        else
+        {
+          targetAnim = "falling";
+        }
+      }
+    }
+    // 3. GROUNDED LOGIC
+    else
+    {
+      bool isCrouching = Input.IsActionPressed("crouch");
+      
+      // Use LengthSquared to account for controller stick drift/deadzones.
+      if (inputDir.LengthSquared() < 0.01f)
+      {
+        if (isCrouching)
+        {
+          _crouchStillTimer += delta;
+          
+          if (_crouchStillTimer >= 5.0) 
+          {
+            targetAnim = "bouncingOnIt";
+          }
+          else
+          {
+            targetAnim = "crouchingStill";
+          }
+        }
+        else
+        {
+          _crouchStillTimer = 0.0;
+          targetAnim = "idleStanding";
+        }
+      }
+      // They are moving on the ground
+      else
+      {
+        _crouchStillTimer = 0.0; // Reset timer because they moved
+        
+        bool isMovingBackwards = inputDir.Y > 0.1f;
+
+        if (isCrouching)
+        {
+          targetAnim = isMovingBackwards ? "crouchWalkingBackward" : "crouchWalking";
+        }
+        else
+        {
+          // Regular walking now uses 'kneesWalk' for BOTH forward and backward!
+          targetAnim = "kneesWalk"; 
+        }
+      }
+    }
+
+    // ONLY fire the network RPC if the state actually changed!
+    if (_currentAnim != targetAnim)
+    {
+      _currentAnim = targetAnim;
+      Rpc(nameof(SyncPlayerAnimation), targetAnim);
+    }
+  }
 
 	private void CrouchSprintPhysicsProcess(double delta)
 	{
@@ -654,14 +758,22 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	}
 
 	private void RowingStatePhysicsProcess()
-	{
-		// Set their global transform to be that of the boat seat they're sitting on
-		StaticBody3D seatCollision = GetCurrentSeat();
-		GlobalPosition = seatCollision.GlobalPosition;
+  {
+    // Set their global transform to be that of the boat seat they're sitting on
+    StaticBody3D seatCollision = GetCurrentSeat();
+    GlobalPosition = seatCollision.GlobalPosition;
 
-		// Handle mouse input while sitting
-		PlayerRotation();
-	}
+    // Handle mouse input while sitting
+    PlayerRotation();
+
+    // Trigger the sitting animation!
+    string targetAnim = "sittingLegsKicking";
+    if (_currentAnim != targetAnim)
+    {
+      _currentAnim = targetAnim;
+      Rpc(nameof(SyncPlayerAnimation), targetAnim);
+    }
+  }
 
 	private void FloatingPhysicsProcess(double delta)
 	{
@@ -1123,6 +1235,39 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     }
   }
 
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void SyncPlayerAnimation(string animName)
+  {
+    // Extra safety check so we don't restart an animation that's already playing
+    if (_animationPlayer.CurrentAnimation != animName)
+    {
+      float animSpeed = 1.0f; // 1.0 is the default 100% speed
+
+      // Tweak individual speeds right here!
+      switch (animName)
+      {
+				case "kneesWalk":
+					animSpeed = 1.5f;
+					break;
+        case "backWalking":
+					animSpeed = 10.0f;
+					break;
+        case "crouchWalkingBackward":
+          animSpeed = 10.0f; // 2x as fast
+          break;
+				case "crouchWalking":
+					animSpeed = 10.0f;
+					break;
+        case "initalJump":
+        case "landingJump":
+          animSpeed = 7.0f; 
+          break;
+      }
+
+      // The second parameter '-1' tells Godot to use the default animation blending
+      _animationPlayer.Play(animName, -1, animSpeed);
+    }
+  }
 	// this changes the player look speed
 	private void ChangePlayerLookSpeed(float newSpeed)
 	{

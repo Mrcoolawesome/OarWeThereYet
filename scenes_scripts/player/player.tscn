@@ -147,6 +147,26 @@ transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 
 [node name="Armature" parent="FullPlayerModel" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.39621035e-08, 1.4612839, -0.09246683)
 
+[node name="Skeleton3D" parent="FullPlayerModel/Armature" index="0"]
+bones/0/rotation = Quaternion(-0.031060291, -0.011026269, -0.039165005, 0.99868906)
+bones/1/rotation = Quaternion(0.05879014, -0.0009239402, 0.017724307, 0.9981126)
+bones/2/rotation = Quaternion(0.29663622, -0.0023471406, 0.014794098, 0.9548731)
+bones/3/rotation = Quaternion(-0.3668552, 0.0011907711, 0.017594686, 0.93011093)
+bones/7/rotation = Quaternion(0.06541052, 0.057605937, -0.8779214, 0.4708047)
+bones/8/rotation = Quaternion(0.08438934, -0.55753815, -0.36696512, 0.7398421)
+bones/9/rotation = Quaternion(0.026888259, 0.5996078, -0.054291423, 0.7979975)
+bones/10/rotation = Quaternion(-0.032998655, 0.20820333, 0.1858669, 0.9596959)
+bones/11/rotation = Quaternion(0.045815516, -0.0761485, 0.8904865, 0.4462468)
+bones/12/rotation = Quaternion(0.093599245, -0.15979338, 0.27646962, 0.94301105)
+bones/13/rotation = Quaternion(0.055190112, 0.12738849, 0.019202005, 0.99013007)
+bones/14/rotation = Quaternion(-0.1537262, -0.08836364, -0.016260711, 0.9840202)
+bones/15/rotation = Quaternion(-0.03704166, -0.10293735, 0.98766816, -0.11199827)
+bones/16/rotation = Quaternion(-0.15142852, 0.006101658, -0.010830367, 0.9883901)
+bones/17/rotation = Quaternion(0.6021888, -0.0457736, -0.07934389, 0.79308134)
+bones/18/rotation = Quaternion(0.0063762814, 0.1558881, 0.9872334, 0.03207133)
+bones/19/rotation = Quaternion(-0.057590973, 0.00019895023, 0.0066258335, 0.9983183)
+bones/20/rotation = Quaternion(0.26653478, 0.050318837, 0.0745871, 0.9596166)
+
 [node name="body" parent="FullPlayerModel/Armature/Skeleton3D" index="0"]
 material_overlay = ExtResource("5_sfgrd")
 
@@ -174,7 +194,7 @@ settings/0/enable_all_child_collisions = true
 settings/0/exclude_collision_count = 0
 
 [node name="SpringBoneCollisionCapsule3D" type="SpringBoneCollisionCapsule3D" parent="FullPlayerModel/Armature/Skeleton3D/HeadMovement"]
-transform = Transform3D(1, 3.5527137e-14, -1.1368684e-13, -7.1054274e-15, 0.9999999, 8.940697e-08, 8.526513e-14, -2.9802322e-08, 0.9999998, 0, -0.69380784, 1.3411045e-07)
+transform = Transform3D(0.99865973, -0.013726238, -0.04990139, 0.018417355, 0.9953259, 0.09479874, 0.048366927, -0.09559065, 0.99424493, 0.060521223, -0.7072942, 0.17100021)
 bone_name = "head_2"
 bone = 3
 position_offset = Vector3(0, 0, 0)
@@ -239,12 +259,15 @@ mesh = SubResource("ArrayMesh_iwtuv")
 material_overlay = SubResource("StandardMaterial3D_sfgrd")
 
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="FullPlayerModel/Armature/Skeleton3D" index="10"]
-transform = Transform3D(-2.1918778e-07, -0.99678516, -0.08011978, 0.9999998, -6.120127e-08, -4.658333e-07, 4.492699e-07, -0.08011973, 0.99678487, -1.458127, 1.0468539, -0.1132061)
+transform = Transform3D(-0.8975359, -0.3925424, 0.20084587, 0.28136283, -0.86056316, -0.42457688, 0.33950514, -0.32456252, 0.88283324, -0.6306724, -0.055857092, -0.057800665)
 bone_name = "hand.R"
 bone_idx = 14
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="FullPlayerModel/Armature/Skeleton3D/BoneAttachment3D"]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="AnimationPlayer" parent="FullPlayerModel" index="1"]
+autoplay = "idleStanding"
 
 [node name="LocalPlayerModel" parent="." instance=ExtResource("4_hg6s5")]
 transform = Transform3D(-0.5, 0, 4.371139e-08, 0, 0.5, 0, -4.371139e-08, 0, -0.5, 0, -1, 0)
@@ -277,6 +300,8 @@ ProbeContainer = NodePath("../ProbeContainer")
 [node name="Marker3D" type="Marker3D" parent="ProbeContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
 
+[node name="GroundDetectionRay" type="RayCast3D" parent="."]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 [node name="GamerTag" type="Label3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0174274, 0)
 billboard = 1
