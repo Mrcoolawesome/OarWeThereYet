@@ -13,6 +13,6 @@ public partial class Lifepreserver : ItemAction
       ? -camera.GlobalTransform.Basis.Z
       : -player.GlobalTransform.Basis.Z;
 
-    arm.RequestToggleLifepreserverThrow(throwDirection);
+    arm.RequestToggleLifepreserverThrow(arm.GlobalPosition, throwDirection);
   }
 }

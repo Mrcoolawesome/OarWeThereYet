@@ -43,8 +43,6 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void AnimateOarEventHandler(int seat, int direction, bool startStop);
 
-  [Signal]
-  public delegate void OpenInventoryEventHandler(int playerID);
 
   // Saving and loading games
   [Signal]
@@ -54,9 +52,25 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void GoToMainMenuEventHandler();
   [Signal]
+  public delegate void SetAnchorEventHandler(string anchorNodePath);
+  [Signal]
   public delegate void ShowLoadingScreenEventHandler();
   [Signal]
   public delegate void DoneLoadingMapEventHandler();
+
+  // signal to apply the look speed for the player
+  [Signal]
+  public delegate void ApplyPlayerLookSpeedEventHandler(float multiplier);
+
+  // signal to set the player's gamertag
+  [Signal]
+  public delegate void AssignGamertagEventHandler(string gamertag);
+
+  [Signal]
+  public delegate void AssignPlayerColorEventHandler(string colorHex);
+
+  [Signal] 
+  public delegate void PlayerLoudnessEventHandler(float loudness);
 
   public int Health { get; set; }
 

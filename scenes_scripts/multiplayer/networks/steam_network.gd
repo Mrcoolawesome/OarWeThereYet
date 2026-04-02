@@ -25,10 +25,12 @@ var is_client = false
 var is_hosting: bool = false
 var pending_host_id: int = 0
 
+const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
   # initalize steam
-  Steam.steamInit(480, true)
+  Steam.steamInit(4563080, true)
   Steam.initRelayNetworkAccess() # start steam relay
 
   # initialize voice
@@ -149,15 +151,23 @@ func _add_player_to_game(id: int):
     # instantiate a new player object
     var player = player_scene.instantiate()
     player.name = str(id) # set the name of the player to be their client id
-    
+
     # Add the player as a child of the LOADED MAP
     current_map.add_child(player, true) # that second boolean is important because it keeps the name of the player to be the one that we set for it
+
+    # Pick a color based on their ID to ensure variety
+    var color_hex = PLAYER_COLORS[id % PLAYER_COLORS.size()]
+    # Send an RPC call ONLY to the client who owns this player node
+    rpc_id(id, "_receive_player_color", color_hex)
+
+    # --- THE FIX: Fetch their actual Steam name dynamically ---
+    rpc_id(id, "_fetch_and_apply_gamertag")
 
     # assign the camera to the player for the terrain3d addon
     rpc_id(id, "_assign_camera", id)
     
   else:
-      print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
+    print("Error: Cannot spawn player. No map is currently loaded in the Level node.")
 
 @rpc("authority", "reliable", "call_local")
 func _assign_camera(id: int) -> void:
@@ -177,6 +187,22 @@ func _assign_camera(id: int) -> void:
     else:
       print("Could not link camera. Terrain or Camera node missing.")
 
+# "authority" means only the server can call this. 
+# "call_local" ensures it also runs for the Host's own player.
+@rpc("authority", "reliable", "call_local")
+func _fetch_and_apply_gamertag() -> void:
+  # Because this is running on the specific client's machine, 
+  # getPersonaName() will grab THEIR local Steam profile name!
+  var my_steam_name = Steam.getPersonaName()
+  
+  # Emit the global signal so their local C# Player script catches it
+  GlobalSignalServer.emit_signal("AssignGamertag", my_steam_name)
+
+@rpc("authority", "reliable", "call_local")
+func _receive_player_color(color_hex: String) -> void:
+  # Emit your global signal for the C# script to catch
+  GlobalSignalServer.emit_signal("AssignPlayerColor", color_hex)
+
 '''
   find the player we're looking to remove, and remove their instance.
 '''
@@ -190,7 +216,7 @@ func _remove_player(id : int):
     # Player drops item if they're holding it
     var arm_node = player_node.get_node_or_null("Head/ArmNode")
     if arm_node:
-      arm_node.DropItem(Vector3.ZERO)
+      arm_node.DropItem(arm_node.global_position, Vector3.ZERO)
 
     # Free player
     player_node.queue_free()

@@ -3,29 +3,28 @@ using System;
 
 public partial class Hud : CanvasLayer
 {
-	// the label that shows the boat health
-	Label boatHealthLabel;
+	// Rename this to make more sense for your health bar
+	private Control _boatHealthBar;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		// set the boat health label
-		boatHealthLabel = GetNode<Label>("BoatHealthLabel");
+		// Grab the custom GDScript health bar node
+		_boatHealthBar = GetNode<Control>("BoatHealthBar");
 
-		// subscribe to the boat health update
+		// Subscribe to the boat health update
 		GlobalSignalServer.Instance.UpdateBoatHealth += UpdateBoatHealthUi;
+
+		// Initialize with current health
+		UpdateBoatHealthUi(GlobalSignalServer.Instance.Health);
 	}
 
-	// updates the boat health ui
+	// Updates the boat health ui
 	private void UpdateBoatHealthUi(int newHealth)
 	{
-		if (newHealth == 0)
-		{
-			boatHealthLabel.Text = "boat ded";
-		} 
-		else
-		{
-			boatHealthLabel.Text = $"Boat Health: {newHealth}";
-		}
+		// Call the GDScript function we just made.
+		// Argument 1: The target health (cast to float)
+		// Argument 2: The duration of the animation in seconds (e.g., 0.5f)
+		_boatHealthBar.Call("set_health_smoothly", (float)newHealth, 0.5f);
 	}
 }

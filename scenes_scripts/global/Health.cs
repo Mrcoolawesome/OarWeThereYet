@@ -20,12 +20,31 @@ public partial class Health : Node
 
   public override void _Ready()
   {
-    // if we're a client that's just connecting, request the current health from the server
-		if (!Multiplayer.IsServer())
-		{
-			// send a request to the server
-			RpcId(1, nameof(RequestHealthSync));
-		}
+    // Ensure this node has the same authority as the Boat it belongs to
+    if (GetParent() != null)
+    {
+        SetMultiplayerAuthority(GetParent().GetMultiplayerAuthority());
+    }
+
+    if (Multiplayer.IsServer())
+    {
+        // On the server, listen for new players so we can push the current health to them
+        Multiplayer.PeerConnected += OnPeerConnected;
+    }
+    else
+    {
+        // If we are a client, we still ask for a sync just in case we spawned 
+        // after the PeerConnected signal already fired
+        RpcId(1, nameof(RequestHealthSync));
+    }
+  }
+
+  public override void _ExitTree()
+  {
+    if (Multiplayer.IsServer())
+    {
+        Multiplayer.PeerConnected -= OnPeerConnected;
+    }
   }
 
 	// We don't use _Ready anymore, we use this initalize function first to connect the signal from the damaging/healing object
@@ -34,6 +53,7 @@ public partial class Health : Node
 		// set the max health
 		_maxHealth = maxHealth;
 		_currHealth = maxHealth;
+		EmitSignal(nameof(HealthChanged), _currHealth);
 	}
 
 	// this gets ran as soon as someone connects
@@ -86,6 +106,11 @@ public partial class Health : Node
 	{
 		// update their health
 		_currHealth += healthChange;
+
+        if (_currHealth > _maxHealth)
+        {
+            _currHealth = _maxHealth;
+        }
 
 		// check if they're out of health
 		if (_currHealth <= 0)

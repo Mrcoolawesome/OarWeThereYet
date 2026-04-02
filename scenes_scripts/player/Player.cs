@@ -1,3 +1,4 @@
+using System;
 using Godot;
 using Godot.Collections;
 using Waterways;
@@ -29,6 +30,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Export] public float FloatForce = 1.0f;
 	[Export] public float RiverSpeed = 250.0f;
 	[Export] public float WaterDrag = 2.0f;
+
+	[ExportGroup("Head talking animation setting")]
+  [Export] public float VoiceScaleMultiplier = 15.0f;
 
 	// Private variables
 	private float _currSpeed = 5.0f;
@@ -135,7 +139,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   private Vector3 _knockbackVelocity = Vector3.Zero;
 
 	// get the arm node
-	private ArmNode _armNode;
+	public ArmNode ArmNode;
 
 	// Get the terrain
 	private Node3D _terrain;
@@ -149,6 +153,26 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Animation tracking
   private double _crouchStillTimer = 0.0;
   private RayCast3D _groundDetectionRay;
+  // Store the Steam Username
+	private Label3D _gamerTag;
+	public String SteamUsername;
+
+	// character meshes meshes
+	private MeshInstance3D _headMesh;
+	private MeshInstance3D _bodyMesh;
+	private MeshInstance3D _eyesWhitesLeft;
+	private MeshInstance3D _eyesWhitesRight;
+	private MeshInstance3D _pupilEyeRight;
+	private MeshInstance3D _pupilEyeLeft;
+
+	// You MUST add this variable to your MultiplayerSynchronizer!
+  [Export] public string CurrentColorHex = ""; 
+  // Used locally by puppets to know when the authority changed the color
+  private string _lastAppliedColor = "";
+
+	// loudness caling variables
+  public float _targetHeadScale = 1.0f;
+  private float _currentHeadScale = 1.0f;
 
   public override void _EnterTree()
 	{
@@ -197,13 +221,29 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_terrainData = _terrain.Get("data").AsGodotObject();
 
 		// get the armnode
-		_armNode = GetNode<ArmNode>("Head/ArmNode");
+		ArmNode = GetNode<ArmNode>("Head/ArmNode");
+
+		// get the meshes
+		_bodyMesh = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/body");
+		_headMesh = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/head");
+		_eyesWhitesLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/eyeBallLeft");
+		_eyesWhitesRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/eyeBallRight");
+		_pupilEyeLeft = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilLeft");
+		_pupilEyeRight = GetNode<MeshInstance3D>("FullPlayerModel/Armature/Skeleton3D/pupilRight");
 
 		// this is for seeing how far we are from the ground
 		_groundDetectionRay = GetNode<RayCast3D>("GroundDetectionRay");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
+		// subscribe to the signal that changes the mouse sensitivity from the settings menu
+		GlobalSignalServer.Instance.ApplyPlayerLookSpeed += ChangePlayerLookSpeed;
+		// subscribe to setting the gamertag
+		GlobalSignalServer.Instance.AssignGamertag += SetUsername;
+		// subscribe to change colors
+		GlobalSignalServer.Instance.AssignPlayerColor += SetPlayerColor;
+		// Subscribe to mic loudness
+    GlobalSignalServer.Instance.PlayerLoudness += OnPlayerLoudness;
 
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
@@ -216,6 +256,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		// set the state array from the server's perspective
 		SetStateArray();
+
+		// set their gamertag
+		_gamerTag = GetNode<Label3D>("GamerTag");
 
 		// client code for when setting up their camera and stuff
 		// if we are the player, then use the camera for this player
@@ -289,6 +332,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   //PROCESS CODE AND ALL ASSOCIATED FUNCTIONS
   public override void _Process(double delta)
   {
+		// If we are looking at someone else, and their synced color just arrived over the network:
+    if (!IsMultiplayerAuthority() && CurrentColorHex != _lastAppliedColor && CurrentColorHex != "")
+    {
+      ApplyMaterialColor(CurrentColorHex);
+      _lastAppliedColor = CurrentColorHex;
+    }
+
     // Hide/Unhide PauseUI depending on game state
 		switch(CurrGameState)
 		{
@@ -303,7 +353,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		switch(CurrPlayerState)
 		{
 			case PlayerState.Standing:
-				_interactRay.Enabled = true;
+				_interactRay.Enabled = CurrGameState == GameState.Playing;
 				break;
 			case PlayerState.Rowing:
 				_interactRay.Enabled = false;
@@ -322,12 +372,31 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
   }
 
+	private void HeadAnimationProcess(double delta)
+  {
+    // Smoothly interpolate the scale towards the target
+    _currentHeadScale = Mathf.Lerp(_currentHeadScale, _targetHeadScale, (float)delta * 20.0f);
+    
+    // Create the XZ scale vector (Y remains 1.0 so they don't get taller)
+    Vector3 newScale = new Vector3(_currentHeadScale, 1.0f, _currentHeadScale);
+    
+    // Apply to the meshes
+    if (_headMesh != null) _headMesh.Scale = newScale;
+    if (_eyesWhitesLeft != null) _eyesWhitesLeft.Scale = newScale;
+    if (_eyesWhitesRight != null) _eyesWhitesRight.Scale = newScale;
+    if (_pupilEyeLeft != null) _pupilEyeLeft.Scale = newScale;
+    if (_pupilEyeRight != null) _pupilEyeRight.Scale = newScale;
+
+    // ONLY the Authority should automatically decay the target back to 1.0.
+    // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
+		_targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
+  }
+
 	private void PlayingStateProcess()
 	{
 		_pauseUICanvas.Visible = false;
 		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
-		_interactRay.Enabled = true;
 
 		// Menu logic
 		// We use IsActionJustPressed because it's a trigger and not a continuous input event
@@ -354,7 +423,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		if (!_invUI.isOpen()) { _pauseUICanvas.Visible = true; };
 		_hud.Visible = false;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
-		_interactRay.Enabled = false;
 	}
 
 	// Rowing state input handling
@@ -382,7 +450,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
 
-		if (_armNode?.Item?.Data?.UseAction is not Oar)
+		if (ArmNode?.Item?.Data?.UseAction is not Oar)
 		{
 			return;
 		}
@@ -429,6 +497,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Logic for movement depending on player state
 	public override void _PhysicsProcess(double delta)
 	{
+		HeadAnimationProcess(delta);
+
 		// do all the movement and stuff if we're the owner of this instance, we'll sync it to the clients 
 		if (IsMultiplayerAuthority())
 		{
@@ -811,11 +881,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		// Broadcast occupied seat
 		_boat.OccupiedSeats[seatIdx] = isSitting;
-		if (_armNode?.Item?.Data?.UseAction == null)
+		if (ArmNode?.Item?.Data?.UseAction == null)
 		{
 			_boat.HasOarInSeat[seatIdx] = false;
 		}
-		else if (_armNode.Item.Data.UseAction is Oar)
+		else if (ArmNode.Item.Data.UseAction is Oar)
     {
 			_boat.HasOarInSeat[seatIdx] = isSitting;
     }
@@ -916,11 +986,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			RequestSitInSeat(-1);
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void OpenInventory(Inventory inventory)
 	{
-		_invUI.Open(inventory);
 		CurrGameState = GameState.Menu;
+		_invUI.Open(inventory);
 	}
 
 	// Helper functions
@@ -1198,5 +1267,99 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       // The second parameter '-1' tells Godot to use the default animation blending
       _animationPlayer.Play(animName, -1, animSpeed);
     }
+  }
+	// this changes the player look speed
+	private void ChangePlayerLookSpeed(float newSpeed)
+	{
+		// make sure this is the current player's instance
+		if (IsMultiplayerAuthority())
+		{
+			MouseSens = newSpeed;
+		}
+	}
+
+	// function to set their gamertag
+	public void SetUsername(string username)
+	{
+		if (_gamerTag != null)
+		{
+			_gamerTag.Text = username;
+		}
+		if (IsMultiplayerAuthority())
+		{
+			_gamerTag.Visible = false; // don't wanna see it locally
+		}
+	}
+
+	// This built-in function automatically runs the exact moment the node is queued for deletion
+  public override void _ExitTree()
+  {
+    // If the player was rowing when they disconnected/were deleted
+    if (CurrPlayerState == PlayerState.Rowing && _boat != null)
+    {
+      // 1. Manually free the seat in the boat arrays locally for every client
+      _boat.OccupiedSeats[(int)_seat] = false;
+      _boat.HasOarInSeat[(int)_seat] = false;
+
+      // 2. Stop the rowing physics (Only the server needs to emit this)
+      if (Multiplayer.IsServer())
+      {
+        GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, (int)_seat, false, false);
+      }
+
+      // 3. Stop the oar animation locally for everyone
+      // (Using 1 for direction is fine just to trigger the stop command)
+      GlobalSignalServer.Instance.EmitSignal("AnimateOar", (int)_seat, 1, false);
+    }
+  }
+
+	// function to set their color from the RPC
+  public void SetPlayerColor(string colorHex)
+  {
+    // Only the authority actually captures the signal and sets the official color
+		CurrentColorHex = colorHex;
+		ApplyMaterialColor(colorHex);
+		_lastAppliedColor = colorHex;
+  }
+
+  // Helper function to actually change the 3D meshes
+  private void ApplyMaterialColor(string colorHex)
+  {
+    Color newColor = new Color(colorHex);
+
+    // We MUST duplicate the material! Otherwise, changing one player's color changes ALL players.
+    if (_bodyMesh.GetActiveMaterial(0) is StandardMaterial3D baseBodyMat)
+    {
+      StandardMaterial3D bodyMat = baseBodyMat.Duplicate() as StandardMaterial3D;
+      bodyMat.AlbedoColor = newColor;
+      _bodyMesh.SetSurfaceOverrideMaterial(0, bodyMat);
+    }
+
+    if (_headMesh.GetActiveMaterial(0) is StandardMaterial3D baseHeadMat)
+    {
+      StandardMaterial3D headMat = baseHeadMat.Duplicate() as StandardMaterial3D;
+      headMat.AlbedoColor = newColor;
+      _headMesh.SetSurfaceOverrideMaterial(0, headMat);
+    }
+  }
+
+	// --- LOUDNESS RPC FUNCTIONS ---
+  private void OnPlayerLoudness(float loudness)
+  {
+    // ONLY the local player listens to their own mic volume signal.
+    if (IsMultiplayerAuthority())
+    {
+      // Tell EVERYONE (including ourselves via CallLocal) to change the target scale
+      Rpc(nameof(RpcUpdateHeadScale), loudness);
+    }
+  }
+
+  // CallLocal = true ensures the host also sees their own head expand
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void RpcUpdateHeadScale(float loudness)
+  {
+    // Average loudness is usually a small float (like 0.05 to 0.2).
+    // Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
+    _targetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
   }
 }

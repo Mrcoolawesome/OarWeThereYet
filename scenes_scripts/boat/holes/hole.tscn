@@ -1,0 +1,64 @@
+[gd_scene load_steps=11 format=3 uid="uid://dn0x6hwxryba0"]
+
+[ext_resource type="Script" uid="uid://betpfjbdewch4" path="res://scenes_scripts/boat/holes/Hole.cs" id="1_a6qvs"]
+[ext_resource type="ArrayMesh" uid="uid://cuc0jdpi85skk" path="res://scenes_scripts/boat/holes/smoke.res" id="2_hlbsc"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_a6qvs"]
+properties/0/path = NodePath(".:transform")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a6qvs"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hlbsc"]
+transparency = 1
+vertex_color_use_as_albedo = true
+
+[sub_resource type="Curve" id="Curve_s0ujm"]
+_data = [Vector2(0, 1), 0.0, 3.1278768e-07, 0, 0, Vector2(0.60839164, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -6.0825934, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_ion1g"]
+curve = SubResource("Curve_s0ujm")
+
+[sub_resource type="Curve" id="Curve_hlbsc"]
+_data = [Vector2(0, 0.35038906), 0.0, 0.0, 0, 0, Vector2(1, 1), 1.4, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_s0ujm"]
+curve = SubResource("Curve_hlbsc")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_s0ujm"]
+particle_flag_rotate_y = true
+angle_min = -179.99998
+angle_max = 180.00002
+direction = Vector3(0, 1, 0)
+spread = 20.0
+initial_velocity_min = 1.0
+initial_velocity_max = 1.0
+gravity = Vector3(0, 0, 0)
+scale_min = 0.099999994
+scale_max = 0.29999998
+scale_curve = SubResource("CurveTexture_s0ujm")
+alpha_curve = SubResource("CurveTexture_ion1g")
+
+[node name="Hole" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_a6qvs")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_a6qvs")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.19999999, 2.2351742e-08)
+shape = SubResource("BoxShape3D_a6qvs")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+material_override = SubResource("StandardMaterial3D_hlbsc")
+amount = 20
+visibility_aabb = AABB(-0.5, 0, -0.5, 1, 1, 1)
+local_coords = true
+process_material = SubResource("ParticleProcessMaterial_s0ujm")
+draw_pass_1 = ExtResource("2_hlbsc")

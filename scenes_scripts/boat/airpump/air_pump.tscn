@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://dfu85f0xm7cia"]
+
+[ext_resource type="Script" uid="uid://psnv2osty7pb" path="res://scenes_scripts/boat/airpump/AirPump.cs" id="1_24h1e"]
+[ext_resource type="PackedScene" uid="uid://cwu6sv67qb4fn" path="res://art/models/airPump.blend" id="1_wr1ln"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wr1ln"]
+size = Vector3(0.6, 1.5, 0.6)
+
+[node name="AirPump" type="StaticBody3D"]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("1_24h1e")
+
+[node name="airPump" parent="." instance=ExtResource("1_wr1ln")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+shape = SubResource("BoxShape3D_wr1ln")
+
+[editable path="airPump"]

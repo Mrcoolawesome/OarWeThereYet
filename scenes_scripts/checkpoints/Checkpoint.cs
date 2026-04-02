@@ -5,6 +5,7 @@ using System.ComponentModel;
 public partial class Checkpoint : Area3D
 {
 	[Export] public int CheckpointNum;
+	[Export] public bool UseAnchor = true;
 
 	public void OnBodyEntered(Node3D body)
 	{

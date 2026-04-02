@@ -1,0 +1,21 @@
+[gd_resource type="Theme" load_steps=5 format=3 uid="uid://c5pba66n7wibx"]
+
+[ext_resource type="Texture2D" uid="uid://btrn15fq3utt6" path="res://art/icons/checkbox/smaller/Checkbox Checked - Smaller.svg" id="1_fplgy"]
+[ext_resource type="Texture2D" uid="uid://df68lkayn5iou" path="res://art/icons/checkbox/smaller/Checkbox Normal - Smaller.svg" id="2_0f2mp"]
+[ext_resource type="Texture2D" uid="uid://ckp2gjbfp3yh4" path="res://art/icons/exitButton/ExitButtonRoundNormal.svg" id="3_my73c"]
+[ext_resource type="StyleBox" uid="uid://g1xlflxwlghj" path="res://art/styles/exitButton/exitButtonNormalStyle.tres" id="4_m76ke"]
+
+[resource]
+CheckBox/colors/icon_hover_color = Color(0.5686275, 0.5686275, 0.5686275, 1)
+CheckBox/colors/icon_hover_pressed_color = Color(0.5686275, 0.5686275, 0.5686275, 1)
+CheckBox/icons/checked = ExtResource("1_fplgy")
+CheckBox/icons/unchecked = ExtResource("2_0f2mp")
+ExitButton/base_type = &"Button"
+ExitButton/colors/icon_hover_color = Color(0.6797701, 0.6797701, 0.67977005, 1)
+ExitButton/colors/icon_pressed_color = Color(0.3254902, 0.3254902, 0.3254902, 0.94509804)
+ExitButton/icons/icon = ExtResource("3_my73c")
+ExitButton/styles/disabled = ExtResource("4_m76ke")
+ExitButton/styles/focus = ExtResource("4_m76ke")
+ExitButton/styles/hover = ExtResource("4_m76ke")
+ExitButton/styles/normal = ExtResource("4_m76ke")
+ExitButton/styles/pressed = ExtResource("4_m76ke")

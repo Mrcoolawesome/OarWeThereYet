@@ -45,10 +45,18 @@ func _process(_delta: float) -> void:
 	while true:
 		var voice_data: Dictionary = Steam.getVoice()
 		if voice_data['result'] == Steam.VOICE_RESULT_OK and voice_data['written'] > 0:
-			send_voice.rpc(voice_data['buffer'])
+			var raw_buffer = voice_data['buffer']
+			send_voice.rpc(raw_buffer)
 			
 			if local_playback:
-				process_voice(voice_data['buffer'], multiplayer.get_unique_id())
+				process_voice(raw_buffer, multiplayer.get_unique_id())
+				
+			# --- NEW: CALCULATE LOCAL LOUDNESS AND EMIT SIGNAL ---
+			var decompressed_voice = Steam.decompressVoice(raw_buffer, current_sample_rate)
+			if decompressed_voice['result'] == Steam.VOICE_RESULT_OK and decompressed_voice['size'] > 0:
+				var loudness = calculate_loudness(decompressed_voice['uncompressed'], decompressed_voice['size'])
+				GlobalSignalServer.emit_signal("PlayerLoudness", loudness)
+			# -----------------------------------------------------
 		else:
 			break
 
@@ -132,3 +140,18 @@ func send_voice(voice_buffer: PackedByteArray):
 	var sender_id = multiplayer.get_remote_sender_id()
 	if sender_id != multiplayer.get_unique_id():
 		process_voice(voice_buffer, sender_id)
+
+
+# --- NEW: MATH HELPER FOR AUDIO VOLUME ---
+func calculate_loudness(voice_buffer: PackedByteArray, size: int) -> float:
+	var sum: float = 0.0
+	var num_samples = size / 2
+	for i in range(0, size, 2):
+		var raw_value: int = voice_buffer.decode_s16(i)
+		# Normalize to a 0.0 - 1.0 range based on the 16-bit audio limit
+		var amplitude: float = abs(float(raw_value) / 32768.0)
+		sum += amplitude
+	
+	if num_samples > 0:
+		return sum / float(num_samples)
+	return 0.0
