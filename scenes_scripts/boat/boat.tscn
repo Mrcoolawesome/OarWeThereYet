@@ -15,7 +15,7 @@ properties/1/spawn = true
 properties/1/replication_mode = 2
 
 [sub_resource type="BoxMesh" id="BoxMesh_0063d"]
-size = Vector3(1, 0.25, 1)
+size = Vector3(0.5, 0.25, 0.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_s60o4"]
 size = Vector3(1, 0.25, 1)
@@ -145,6 +145,7 @@ collision_mask = 0
 script = ExtResource("2_kgk83")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontLeftCollision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09603202, 0)
 mesh = SubResource("BoxMesh_0063d")
 
 [node name="FrontLeftSeatCollision" type="CollisionShape3D" parent="SeatContainer/FrontLeftCollision"]
@@ -158,6 +159,7 @@ script = ExtResource("2_kgk83")
 seatIndex = 1
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/FrontRightCollision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09603202, 0)
 mesh = SubResource("BoxMesh_0063d")
 
 [node name="FrontRightSeatCollision" type="CollisionShape3D" parent="SeatContainer/FrontRightCollision"]
@@ -171,6 +173,7 @@ script = ExtResource("2_kgk83")
 seatIndex = 3
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackLeftCollision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09603202, 0)
 mesh = SubResource("BoxMesh_0063d")
 
 [node name="BackLeftSeatCollision" type="CollisionShape3D" parent="SeatContainer/BackLeftCollision"]
@@ -184,6 +187,7 @@ script = ExtResource("2_kgk83")
 seatIndex = 2
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SeatContainer/BackRightCollision"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.09603202, 0)
 mesh = SubResource("BoxMesh_0063d")
 
 [node name="BackRightSeatCollision" type="CollisionShape3D" parent="SeatContainer/BackRightCollision"]

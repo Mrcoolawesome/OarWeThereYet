@@ -559,8 +559,15 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   {
     string targetAnim = "idleStanding";
 
-    // 1. JUMPING AND FALLING LOGIC
-    if (!IsOnFloor() && !_applyWaterPhysicsForce)
+    // 1. SWIMMING LOGIC
+    // We check this first so it overrides falling if they are in the water
+    if (_applyWaterPhysicsForce)
+    {
+      targetAnim = "swimming";
+      _crouchStillTimer = 0.0;
+    }
+    // 2. JUMPING AND FALLING LOGIC
+    else if (!IsOnFloor())
     {
       _crouchStillTimer = 0.0; // Reset crouch timer if we're in the air
 
@@ -581,13 +588,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
         }
       }
     }
-    // 2. GROUNDED LOGIC
+    // 3. GROUNDED LOGIC
     else
     {
       bool isCrouching = Input.IsActionPressed("crouch");
       
       // Use LengthSquared to account for controller stick drift/deadzones.
-      // Micro-inputs will no longer constantly reset the crouch timer!
       if (inputDir.LengthSquared() < 0.01f)
       {
         if (isCrouching)
@@ -614,8 +620,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       {
         _crouchStillTimer = 0.0; // Reset timer because they moved
         
-        // Positive Y means pulling back (the 'S' key). 
-        // We check > 0.1f instead of > 0 to prevent sideways drift from triggering it
         bool isMovingBackwards = inputDir.Y > 0.1f;
 
         if (isCrouching)
@@ -624,9 +628,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
         }
         else
         {
-          // Make sure "back walking" EXACTLY matches your animation name. 
-          // If it doesn't match, Godot ignores it and stays in Idle!
-          targetAnim = isMovingBackwards ? "backWalking" : "kneesWalk"; 
+          // Regular walking now uses 'kneesWalk' for BOTH forward and backward!
+          targetAnim = "kneesWalk"; 
         }
       }
     }
@@ -685,14 +688,22 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	}
 
 	private void RowingStatePhysicsProcess()
-	{
-		// Set their global transform to be that of the boat seat they're sitting on
-		StaticBody3D seatCollision = GetCurrentSeat();
-		GlobalPosition = seatCollision.GlobalPosition;
+  {
+    // Set their global transform to be that of the boat seat they're sitting on
+    StaticBody3D seatCollision = GetCurrentSeat();
+    GlobalPosition = seatCollision.GlobalPosition;
 
-		// Handle mouse input while sitting
-		PlayerRotation();
-	}
+    // Handle mouse input while sitting
+    PlayerRotation();
+
+    // Trigger the sitting animation!
+    string targetAnim = "sittingLegsKicking";
+    if (_currentAnim != targetAnim)
+    {
+      _currentAnim = targetAnim;
+      Rpc(nameof(SyncPlayerAnimation), targetAnim);
+    }
+  }
 
 	private void FloatingPhysicsProcess(double delta)
 	{
