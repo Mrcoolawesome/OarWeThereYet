@@ -99,6 +99,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	public enum GameState {
 		Playing,
 		Menu,
+		EndGame
 	}
 
 	// Game state default is menu
@@ -175,6 +176,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   public float _targetHeadScale = 1.0f;
   private float _currentHeadScale = 1.0f;
 
+	// END GAME UI
+	private Control _endGameUi;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -236,6 +240,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// this is for seeing how far we are from the ground
 		_groundDetectionRay = GetNode<RayCast3D>("GroundDetectionRay");
 
+		_endGameUi = GetNode<Control>("EndScreen");
+
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
 		// subscribe to the signal that changes the mouse sensitivity from the settings menu
@@ -246,6 +252,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		GlobalSignalServer.Instance.AssignPlayerColor += SetPlayerColor;
 		// Subscribe to mic loudness
     GlobalSignalServer.Instance.PlayerLoudness += OnPlayerLoudness;
+    // NEW: Subscribe to End Game signal
+    GlobalSignalServer.Instance.EndGame += OnEndGameTriggered;
 
 		// Get the camera reference
 		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
@@ -1351,26 +1359,50 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	// UI HANDLER STUFF
 	// This built-in function only catches inputs that UI menus haven't eaten yet!
-	public override void _UnhandledInput(InputEvent @event)
-	{
-		if (@event.IsActionPressed("ui_cancel"))
-		{
-			// If we are currently playing, pause the game
-			if (CurrGameState == GameState.Playing)
-			{
-				CurrGameState = GameState.Menu;
-			}
-			// If we are already in the menu (and the input made it this far)
-			else if (CurrGameState == GameState.Menu)
-			{
-				CurrGameState = GameState.Playing;
+  public override void _UnhandledInput(InputEvent @event)
+  {
+    // NEW: Completely ignore the Escape key if the game is ending
+    if (CurrGameState == GameState.EndGame)
+    {
+      return; 
+    }
 
-				// Hide Inventory if open
-				if (_invUI.isOpen())
-				{
-					_invUI.Close();
-				}
-			}
-		}
-	}
+    if (@event.IsActionPressed("ui_cancel"))
+    {
+      // If we are currently playing, pause the game
+      if (CurrGameState == GameState.Playing)
+      {
+        CurrGameState = GameState.Menu;
+      }
+      // If we are already in the menu (and the input made it this far)
+      else if (CurrGameState == GameState.Menu)
+      {
+        CurrGameState = GameState.Playing;
+
+        // Hide Inventory if open
+        if (_invUI.isOpen())
+        {
+          _invUI.Close();
+        }
+      }
+    }
+  }
+
+	// endgame trigger logic
+	private void OnEndGameTriggered()
+  {
+    // Put them in the EndGame state so they can't move or pause
+    CurrGameState = GameState.EndGame;
+    
+    // Hide the normal gameplay UI
+    _hud.Visible = false;
+    _pauseUICanvas.Visible = false;
+    Input.MouseMode = Input.MouseModeEnum.Visible; // Let them click the links!
+
+    if (IsMultiplayerAuthority())
+    {
+      // Trigger the GDScript function we just wrote!
+      _endGameUi.Call("start_end_game_sequence");
+    }
+  }
 }

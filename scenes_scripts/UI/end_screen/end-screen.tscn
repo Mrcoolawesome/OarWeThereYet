@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://cfvlihgonijke"]
+[gd_scene load_steps=6 format=3 uid="uid://cfvlihgonijke"]
 
 [ext_resource type="Texture2D" uid="uid://dl3oxrab0583x" path="res://art/Images/Instagram_icon.png" id="1_cgntv"]
 [ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="1_ogp13"]
+[ext_resource type="Script" uid="uid://cmmd76mlivh75" path="res://scenes_scripts/UI/end_screen/end_screen.gd" id="1_u55hy"]
 [ext_resource type="Texture2D" uid="uid://cy50kmnohjvw7" path="res://art/Images/discord-icon.png" id="2_ogp13"]
 [ext_resource type="Texture2D" uid="uid://ce2yhofgnxiia" path="res://art/Images/ticTok.png" id="3_u55hy"]
 
@@ -12,6 +13,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_u55hy")
 
 [node name="BlackBackground" type="ColorRect" parent="."]
 layout_mode = 1
@@ -117,3 +119,7 @@ offset_bottom = 994.0
 theme = ExtResource("1_ogp13")
 text = "CLICK AN ICON TO GET REDIRECTED TO OUR SOCIALS!!"
 horizontal_alignment = 1
+
+[connection signal="gui_input" from="PlugSocials/HBoxContainer/MarginContainer/TicTok" to="." method="_on_tic_tok_gui_input"]
+[connection signal="gui_input" from="PlugSocials/HBoxContainer/MarginContainer2/DiscordIcon" to="." method="_on_discord_icon_gui_input"]
+[connection signal="gui_input" from="PlugSocials/HBoxContainer/MarginContainer3/InstagramIcon" to="." method="_on_instagram_icon_gui_input"]

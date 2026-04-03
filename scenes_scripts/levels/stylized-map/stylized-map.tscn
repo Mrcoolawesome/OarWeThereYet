@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=3 uid="uid://3e1j5wcifl2m"]
+[gd_scene load_steps=45 format=3 uid="uid://3e1j5wcifl2m"]
 
 [ext_resource type="Terrain3DMaterial" uid="uid://dawexow81k0tj" path="res://scenes_scripts/levels/stylized-map/terrain3d-materials/stylized-map.tres" id="1_jsj3l"]
 [ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes_scripts/levels/TestLevel.cs" id="1_w3k0n"]
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" uid="uid://kwtfhiyv11ux" path="res://scenes_scripts/checkpoints/checkpoint_container.tscn" id="15_fjq28"]
 [ext_resource type="PackedScene" uid="uid://bg1o82hix6xue" path="res://scenes_scripts/checkpoints/Checkpoint.tscn" id="16_0b6ne"]
 [ext_resource type="PackedScene" uid="uid://buqw2lg62mn3i" path="res://scenes_scripts/environment/rock/silver-rock.tscn" id="19_0b6ne"]
+[ext_resource type="PackedScene" uid="uid://ktd51vqrxcf4" path="res://scenes_scripts/end_game_area_trigger/end-game-area-trigger.tscn" id="20_34k5s"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gspic"]
 sky_top_color = Color(0.27450982, 0.33333334, 0.5686275, 1)
@@ -634,8 +635,15 @@ transform = Transform3D(0.6441655, 0.90101665, 2.7341762, -0.20662048, 2.8090332
 [node name="SilverRock3" parent="Rocks" instance=ExtResource("19_0b6ne")]
 transform = Transform3D(2.6644144, 0.21977083, -1.2470336, 0.23171775, 2.7715461, 0.9835316, 1.244869, -0.98626983, 2.485975, 227.64412, -2.8164558, 1299.1909)
 
+[node name="EndGameAreaTrigger" parent="." instance=ExtResource("20_34k5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.670475, -1.1800475, 1370.3689)
+
+[node name="CollisionShape3D" parent="EndGameAreaTrigger" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.8446655, -1.173584)
+
 [editable path="CheckpointContainer/Checkpoint"]
 [editable path="CheckpointContainer/Checkpoint2"]
 [editable path="CheckpointContainer/Checkpoint3"]
 [editable path="CheckpointContainer/Checkpoint4"]
 [editable path="CheckpointContainer/Checkpoint5"]
+[editable path="EndGameAreaTrigger"]
