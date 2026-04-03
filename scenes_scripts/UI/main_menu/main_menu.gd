@@ -73,6 +73,9 @@ func _on_select_save_popup_menu_deleted_save() -> void:
 func _show_loading_screen() -> void:
   _show_menu(MenuType.LOADING_SCREEN)
 
+func _on_quit_button_pressed() -> void:
+  get_tree().quit()
+
 func _show_menu(menu: MenuType) -> void:
   # make them all invisible except for one
   join_menu_container.visible = false

@@ -64,6 +64,11 @@ layout_mode = 2
 theme = ExtResource("5_h7afs")
 text = "Settings"
 
+[node name="QuitButton" type="Button" parent="MainMenuContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("5_h7afs")
+text = "Quit"
+
 [node name="HostGamePopUpMenu" parent="." instance=ExtResource("6_f877t")]
 visible = false
 layout_mode = 1
@@ -107,11 +112,13 @@ visible = false
 layout_mode = 1
 
 [node name="SplashScreen" parent="." instance=ExtResource("2_dupl2")]
+visible = false
 layout_mode = 1
 
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/JoinButton" to="." method="_on_join_button_pressed"]
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/SettingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="MainMenuContainer/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
 [connection signal="delete_save" from="HostGamePopUpMenu" to="SelectSavePopupMenu" method="_on_host_game_pop_up_menu_delete_save"]
 [connection signal="go_back_button_pressed" from="HostGamePopUpMenu" to="." method="_on_host_pop_up_menu_go_back_button_pressed"]
 [connection signal="go_back_button_pressed" from="JoinGamePopUpMenu" to="." method="_on_join_game_pop_up_menu_go_back_button_pressed"]
