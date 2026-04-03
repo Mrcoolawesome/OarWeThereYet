@@ -638,10 +638,10 @@ transform = Transform3D(0.6441655, 0.90101665, 2.7341762, -0.20662048, 2.8090332
 transform = Transform3D(2.6644144, 0.21977083, -1.2470336, 0.23171775, 2.7715461, 0.9835316, 1.244869, -0.98626983, 2.485975, 227.64412, -2.8164558, 1299.1909)
 
 [node name="EndGameAreaTrigger" parent="." instance=ExtResource("20_34k5s")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45.670475, -1.1800475, 1370.3689)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2519.1936, -88.49762, 170.66534)
 
 [node name="CollisionShape3D" parent="EndGameAreaTrigger" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.8446655, -1.173584)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9733887, 5.8446655, -1.173584)
 
 [editable path="CheckpointContainer/Checkpoint"]
 [editable path="CheckpointContainer/Checkpoint2"]
