@@ -301,10 +301,9 @@ transform = Transform3D(0.55333334, 0, 0.83295983, 0, 1, 0, -0.83295983, 0, 0.55
 [node name="Checkpoint5" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(0.9625499, 0, 0.27110448, 0, 1, 0, -0.27110448, 0, 0.9625499, 2496.9272, -88.49762, 169.63)
 CheckpointNum = 5
-UseAnchor = true
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint5" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.367676, 0, 0.7364502)
+transform = Transform3D(-0.99894106, 0, 0.046008226, 0, 1, 0, -0.046008226, 0, -0.99894106, 6.270996, 0, 1.7120972)
 
 [node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint5" index="2"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.271606, 4.845337, 0.32702637)
