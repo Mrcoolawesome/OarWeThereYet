@@ -31,7 +31,9 @@ sky_material = SubResource("ProceduralSkyMaterial_gspic")
 background_mode = 2
 sky = SubResource("Sky_jsj3l")
 tonemap_mode = 2
-volumetric_fog_density = 0.286
+volumetric_fog_density = 0.0
+volumetric_fog_length = 5000.0
+volumetric_fog_temporal_reprojection_amount = 0.99
 
 [sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_lnqtx"]
 
