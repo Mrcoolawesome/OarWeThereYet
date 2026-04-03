@@ -634,64 +634,55 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	private void HandleAudioPhysicsProcess()
   {
-    // 1. JUMPING AUDIO (One-shot)
-    // We check if the jump button was just pressed AND verify they actually gained upward velocity.
-    // (This prevents the sound from playing if they mash spacebar while falling/swimming).
-    if (Input.IsActionJustPressed("ui_accept") && Velocity.Y > 0 && CurrPlayerState == PlayerState.Standing)
-    {
-      // Start playing at the 0.5 second mark
-      _jumpAudio.Play(0.5f);
-      
-      // Create a 0.25 second timer (0.75 - 0.50 = 0.25) that stops the audio when it finishes
-      GetTree().CreateTimer(0.25f).Timeout += _jumpAudio.Stop;
-    }
-		
     // 2. CONTINUOUS LOOPING AUDIO (Swimming & Walking)
-    // Determine if they are actively trying to move (so we don't play footsteps while standing still)
     Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
     bool isTryingToMove = inputDir.LengthSquared() > 0.01f;
 
-    // Check swimming first (using the synced animation state you already set up!)
+    // Check swimming
     if (_currentAnim == "swimming")
     {
       if (!_treadingWaterAudio.Playing) _treadingWaterAudio.Play();
-      
-      // Stop ground audios
       _walkingOnBoatAudio.Stop();
       _walkingOnGroundAudio.Stop();
     }
     // Check walking on ground/boat
     else if (IsOnFloor() && isTryingToMove && CurrPlayerState == PlayerState.Standing)
     {
-      // We are walking, stop swimming audio
       _treadingWaterAudio.Stop();
+
+      // Determine if they are crouch walking to set the speed to 10x
+      bool isCrouchWalking = _currentAnim == "crouchWalking" || _currentAnim == "crouchWalkingBackward";
+      float audioSpeed = isCrouchWalking ? 2.0f : 1.0f;
 
       bool isOnBoat = false;
       
-      // Check the floor raycast to see what we are standing on
+      // Check the floor raycast
       if (_groundDetectionRay != null && _groundDetectionRay.IsColliding())
       {
         GodotObject collider = _groundDetectionRay.GetCollider();
-        
-        // Check if the floor we are standing on is the Boat node or a child of the boat
         if (collider is Node colliderNode && (_boat == colliderNode || _boat.IsAncestorOf(colliderNode)))
         {
           isOnBoat = true;
         }
       }
 
+      // Apply the speed and play the correct audio
       if (isOnBoat)
       {
+        _walkingOnBoatAudio.PitchScale = audioSpeed;
         if (!_walkingOnBoatAudio.Playing) _walkingOnBoatAudio.Play();
+        
         _walkingOnGroundAudio.Stop();
       }
       else
       {
+        _walkingOnGroundAudio.PitchScale = audioSpeed;
         if (!_walkingOnGroundAudio.Playing) _walkingOnGroundAudio.Play();
+        
         _walkingOnBoatAudio.Stop();
       }
     }
-    // If they aren't swimming and aren't moving on the ground, silence all continuous sounds
+    // Silence everything if standing still or in the air
     else
     {
       _treadingWaterAudio.Stop();
