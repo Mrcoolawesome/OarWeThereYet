@@ -639,9 +639,13 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // (This prevents the sound from playing if they mash spacebar while falling/swimming).
     if (Input.IsActionJustPressed("ui_accept") && Velocity.Y > 0 && CurrPlayerState == PlayerState.Standing)
     {
-      _jumpAudio.Play();
+      // Start playing at the 0.5 second mark
+      _jumpAudio.Play(0.5f);
+      
+      // Create a 0.25 second timer (0.75 - 0.50 = 0.25) that stops the audio when it finishes
+      GetTree().CreateTimer(0.25f).Timeout += _jumpAudio.Stop;
     }
-
+		
     // 2. CONTINUOUS LOOPING AUDIO (Swimming & Walking)
     // Determine if they are actively trying to move (so we don't play footsteps while standing still)
     Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
