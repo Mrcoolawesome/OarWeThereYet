@@ -63,7 +63,7 @@ script = ExtResource("1_vvssr")
 FloatForce = 40.0
 RiverSpeed = 35.0
 WaterDrag = 15.0
-RowForce = 70.0
+RowForce = 100.0
 ImpactVelocityThreshold = 5.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]

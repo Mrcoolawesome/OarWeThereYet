@@ -82,10 +82,12 @@ blend_shape_mode = 0
 collision_layer = 4
 collision_mask = 3
 script = ExtResource("1_g6k8r")
+SwimmingSpeed = 3.0
 MouseSens = 0.5
 ObjectKnockbackForce = 200.0
 LerpSpeed = 5.0
 CrouchLerpSpeed = 7.5
+RiverSpeed = 200.0
 VoiceScaleMultiplier = 2.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
