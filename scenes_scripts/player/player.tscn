@@ -111,6 +111,9 @@ Player = NodePath("../../../..")
 [node name="ArmNode" type="MeshInstance3D" parent="Head"]
 skeleton = NodePath("../..")
 script = ExtResource("7_csk1d")
+LifepreserverThrowVelocity = 15.0
+MaxLifepreserverRange = 20.0
+PullStrength = 0.2
 
 [node name="ControlHints" type="CanvasLayer" parent="Head/ArmNode"]
 

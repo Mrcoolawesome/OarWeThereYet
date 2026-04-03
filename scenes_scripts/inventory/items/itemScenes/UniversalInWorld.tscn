@@ -18,7 +18,8 @@ continuous_cd = true
 script = ExtResource("1_81w8m")
 Mass = 1.0
 FloatForce = 100.0
-RiverSpeed = 100.0
+RiverSpeed = 170.0
+WaterDrag = 100.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 

@@ -63,7 +63,7 @@ script = ExtResource("1_vvssr")
 FloatForce = 40.0
 RiverSpeed = 35.0
 WaterDrag = 15.0
-RowForce = 100.0
+RowForce = 70.0
 ImpactVelocityThreshold = 5.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
@@ -223,11 +223,11 @@ NetworkInventory = Array[Dictionary]([{
 "amount": 5,
 "id": "res://scenes_scripts/inventory/items/itemResources/patch/patch.tres"
 }, {
-"amount": 1,
-"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+"amount": 5,
+"id": "res://scenes_scripts/inventory/items/itemResources/patch/patch.tres"
 }, {
-"amount": 1,
-"id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
+"amount": 5,
+"id": "res://scenes_scripts/inventory/items/itemResources/patch/patch.tres"
 }, {
 "amount": 1,
 "id": "res://scenes_scripts/inventory/items/itemResources/oar/oar.tres"
