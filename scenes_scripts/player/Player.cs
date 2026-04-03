@@ -1393,6 +1393,15 @@ public partial class Player : CharacterBody3D, ISyncBuffer
         }
       }
     }
+
+    if (@event.IsActionPressed("action_key"))
+    {
+      if (CurrGameState == GameState.Menu && _invUI.isOpen())
+      {
+        CurrGameState = GameState.Playing;
+        _invUI.Close();
+      }
+    }
   }
 
 	// endgame trigger logic
