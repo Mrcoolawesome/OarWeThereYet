@@ -131,6 +131,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private RiverFloatSystem _riverFloatSystem;
 	// variables to help apply water physics force
 	private bool _applyWaterPhysicsForce = false;
+	public bool IsSwimming { get; private set; } = false;
 	private Vector3 _waterPhysicsForce;
 	private Vector3 _waterPhysicsForcePosition;
 
@@ -468,6 +469,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Logic for movement depending on player state
 	public override void _PhysicsProcess(double delta)
 	{
+		// Capture the stable state for this whole frame
+		IsSwimming = _applyWaterPhysicsForce;
+
 		// this is done on the physics process because this isn't disabled for the puppets unlike the regular process function
 		HeadAnimationPhysicsProcess(delta);
 
@@ -526,6 +530,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       // Sync network data 
       SyncAndLerpClientDataProcess(delta); // this deals with the sitting state
 		}
+
+		// Reset for the NEXT frame's potential signal
+		_applyWaterPhysicsForce = false;
 	}
 
 	private void Gravity(double delta)
