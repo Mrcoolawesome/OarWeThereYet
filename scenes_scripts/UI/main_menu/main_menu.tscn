@@ -1,6 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://d34pgbgxmrpd5"]
+[gd_scene load_steps=12 format=3 uid="uid://d34pgbgxmrpd5"]
 
 [ext_resource type="Script" uid="uid://c6yprd4vlj76t" path="res://scenes_scripts/UI/main_menu/main_menu.gd" id="1_4cwpn"]
+[ext_resource type="PackedScene" uid="uid://c5tofjqoghvwp" path="res://scenes_scripts/UI/splash_screen/splash-screen.tscn" id="2_dupl2"]
 [ext_resource type="Texture2D" uid="uid://clw8cwtrtug24" path="res://art/Images/steam.webp" id="4_ev3b6"]
 [ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="5_h7afs"]
 [ext_resource type="PackedScene" uid="uid://657bxsni64f3" path="res://scenes_scripts/UI/pop_up_menu/host_popup_menu/host_game_pop_up_menu.tscn" id="6_f877t"]
@@ -103,6 +104,9 @@ reset_menu_visible = false
 
 [node name="LoadingScreen" parent="." instance=ExtResource("10_380h7")]
 visible = false
+layout_mode = 1
+
+[node name="SplashScreen" parent="." instance=ExtResource("2_dupl2")]
 layout_mode = 1
 
 [connection signal="pressed" from="MainMenuContainer/VBoxContainer/HostButton" to="." method="_on_host_button_pressed"]

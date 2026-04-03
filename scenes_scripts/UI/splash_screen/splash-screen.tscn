@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://c5tofjqoghvwp"]
+
+[ext_resource type="Script" uid="uid://b0xh2re42wp2l" path="res://scenes_scripts/UI/splash_screen/splash_screen.gd" id="1_bt6mn"]
+[ext_resource type="Texture2D" uid="uid://diaa1f7c443pw" path="res://art/SteamAssets/RenderedAssets/LibraryLogo.png" id="1_nc0kg"]
+
+[node name="SplashScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bt6mn")
+
+[node name="blackBackground" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="logo" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="LibraryLogo" type="TextureRect" parent="logo"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("1_nc0kg")
+stretch_mode = 2
