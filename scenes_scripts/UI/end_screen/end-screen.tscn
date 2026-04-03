@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://cfvlihgonijke"]
+[gd_scene load_steps=8 format=3 uid="uid://cfvlihgonijke"]
 
 [ext_resource type="Texture2D" uid="uid://dl3oxrab0583x" path="res://art/Images/Instagram_icon.png" id="1_cgntv"]
 [ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="1_ogp13"]
 [ext_resource type="Script" uid="uid://cmmd76mlivh75" path="res://scenes_scripts/UI/end_screen/end_screen.gd" id="1_u55hy"]
 [ext_resource type="Texture2D" uid="uid://cy50kmnohjvw7" path="res://art/Images/discord-icon.png" id="2_ogp13"]
+[ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="2_uxkw2"]
+[ext_resource type="FontFile" uid="uid://c2spru0tbvbyi" path="res://art/fonts/Dongle/Dongle-Bold.ttf" id="3_sknkn"]
 [ext_resource type="Texture2D" uid="uid://ce2yhofgnxiia" path="res://art/Images/ticTok.png" id="3_u55hy"]
 
 [node name="EndScreen" type="Control"]
@@ -31,21 +33,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_fonts/normal_font = ExtResource("2_uxkw2")
+theme_override_fonts/bold_font = ExtResource("3_sknkn")
+theme_override_font_sizes/normal_font_size = 25
+theme_override_font_sizes/bold_font_size = 25
 bbcode_enabled = true
 scroll_active = false
-
-[node name="TicTokBackground" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 193.0
-offset_top = 373.0
-offset_right = -1527.0
-offset_bottom = -507.0
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(1.5596006, 1.6210515)
 
 [node name="PlugSocials" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -81,8 +74,12 @@ size_flags_horizontal = 3
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_right = 20
 
+[node name="TicTokButton" type="Button" parent="PlugSocials/HBoxContainer/MarginContainer"]
+layout_mode = 2
+
 [node name="TicTok" type="TextureRect" parent="PlugSocials/HBoxContainer/MarginContainer"]
 layout_mode = 2
+mouse_filter = 0
 texture = ExtResource("3_u55hy")
 stretch_mode = 4
 
@@ -92,8 +89,12 @@ size_flags_horizontal = 3
 theme_override_constants/margin_left = 100
 theme_override_constants/margin_right = 100
 
+[node name="DiscordButton" type="Button" parent="PlugSocials/HBoxContainer/MarginContainer2"]
+layout_mode = 2
+
 [node name="DiscordIcon" type="TextureRect" parent="PlugSocials/HBoxContainer/MarginContainer2"]
 layout_mode = 2
+mouse_filter = 0
 texture = ExtResource("2_ogp13")
 expand_mode = 2
 stretch_mode = 4
@@ -102,8 +103,12 @@ stretch_mode = 4
 layout_mode = 2
 size_flags_horizontal = 3
 
+[node name="InstagramButton" type="Button" parent="PlugSocials/HBoxContainer/MarginContainer3"]
+layout_mode = 2
+
 [node name="InstagramIcon" type="TextureRect" parent="PlugSocials/HBoxContainer/MarginContainer3"]
 layout_mode = 2
+mouse_filter = 0
 texture = ExtResource("1_cgntv")
 expand_mode = 2
 stretch_mode = 4
@@ -120,6 +125,6 @@ theme = ExtResource("1_ogp13")
 text = "CLICK AN ICON TO GET REDIRECTED TO OUR SOCIALS!!"
 horizontal_alignment = 1
 
-[connection signal="gui_input" from="PlugSocials/HBoxContainer/MarginContainer/TicTok" to="." method="_on_tic_tok_gui_input"]
-[connection signal="gui_input" from="PlugSocials/HBoxContainer/MarginContainer2/DiscordIcon" to="." method="_on_discord_icon_gui_input"]
-[connection signal="gui_input" from="PlugSocials/HBoxContainer/MarginContainer3/InstagramIcon" to="." method="_on_instagram_icon_gui_input"]
+[connection signal="pressed" from="PlugSocials/HBoxContainer/MarginContainer/TicTokButton" to="." method="_on_tic_tok_button_pressed"]
+[connection signal="pressed" from="PlugSocials/HBoxContainer/MarginContainer2/DiscordButton" to="." method="_on_discord_button_pressed"]
+[connection signal="pressed" from="PlugSocials/HBoxContainer/MarginContainer3/InstagramButton" to="." method="_on_instagram_button_pressed"]
