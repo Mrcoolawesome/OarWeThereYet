@@ -53,7 +53,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	//Pause Menu canvas
 	private CanvasLayer _pauseUICanvas;
 	// Pause menu ui
-	private Control _pauseUI;
+	private PauseUi _pauseUI;
 	// HUD
 	private CanvasLayer _hud;
 	// Inventory Menu
@@ -190,6 +190,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 		_pauseUICanvas = GetNode<CanvasLayer>("PauseCanvas");
+		_pauseUI = GetNode<PauseUi>("PauseCanvas/PauseUI");
 		_boat = GetParent().GetNode<Boat>("Boat");
 		_hud = GetNode<CanvasLayer>("HUD");
 		_invUI = GetNode<InventoryUi>("InventoryUI");
@@ -378,29 +379,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_pauseUICanvas.Visible = false;
 		_hud.Visible = true;
 		Input.MouseMode = Input.MouseModeEnum.Captured;
-
-		// Menu logic
-		// We use IsActionJustPressed because it's a trigger and not a continuous input event
-		if (Input.IsActionJustPressed("ui_cancel")) 
-		{
-			CurrGameState = GameState.Menu;
-		}
 	}
 
 	private void MenuStateProcess()
 	{
-		if (Input.IsActionJustPressed("ui_cancel")) 
-		{
-			CurrGameState = GameState.Playing;			
-
-			// Hide Inventory if open
-			if (_invUI.isOpen())
-			{
-				_invUI.Close();
-			}
-			return; // Skip menu UI updates since we just transitioned to Playing
-		}
-
 		if (!_invUI.isOpen()) { _pauseUICanvas.Visible = true; };
 		_hud.Visible = false;
 		Input.MouseMode = Input.MouseModeEnum.Visible;
@@ -1366,4 +1348,29 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // Set the target scale (Base scale of 1.0 + the loudness multiplied by our custom multiplier)
     _targetHeadScale = 1.0f + (loudness * VoiceScaleMultiplier);
   }
+
+	// UI HANDLER STUFF
+	// This built-in function only catches inputs that UI menus haven't eaten yet!
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (@event.IsActionPressed("ui_cancel"))
+		{
+			// If we are currently playing, pause the game
+			if (CurrGameState == GameState.Playing)
+			{
+				CurrGameState = GameState.Menu;
+			}
+			// If we are already in the menu (and the input made it this far)
+			else if (CurrGameState == GameState.Menu)
+			{
+				CurrGameState = GameState.Playing;
+
+				// Hide Inventory if open
+				if (_invUI.isOpen())
+				{
+					_invUI.Close();
+				}
+			}
+		}
+	}
 }
