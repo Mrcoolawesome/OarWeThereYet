@@ -208,9 +208,6 @@ spawn_limit = 4
 environment = SubResource("Environment_lnqtx")
 camera_attributes = SubResource("CameraAttributesPractical_lnqtx")
 
-[node name="Rock60" parent="SunAndSky/WorldEnvironment" instance=ExtResource("9_sfwft")]
-transform = Transform3D(-9.061039, -3.5493145, -4.6609054, -5.7609625, 6.9578753, 5.9011335, 1.0644133, 7.4440885, -7.738002, 2512.4211, -90.62412, 166.83618)
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SunAndSky"]
 transform = Transform3D(1, 0, 0, 0, 0.658335, 0.7527252, 0, -0.7527252, 0.658335, 0, 0, 0)
 light_energy = 0.6
@@ -612,9 +609,6 @@ transform = Transform3D(-4.8665648, -1.7320907, -3.235032, 0.12779687, -5.450026
 
 [node name="SilverRock68" parent="Rocks" instance=ExtResource("19_0b6ne")]
 transform = Transform3D(-4.772933, -1.7844958, -3.3442025, 0.12779681, -5.4500256, 2.725787, -3.788374, 2.0644174, 4.3052783, 2382.9534, -89.52547, 189.35677)
-
-[node name="SilverRock72" parent="Rocks" instance=ExtResource("19_0b6ne")]
-transform = Transform3D(-9.3931675, -3.5119, -6.5814137, -6.8631067, 8.215566, 5.4113092, 2.9233894, 8.003191, -8.442912, 2523.9255, -89.52547, 172.42331)
 
 [node name="SilverRock108" parent="Rocks" instance=ExtResource("19_0b6ne")]
 transform = Transform3D(-3.1695015, 3.0495887, 0.24142814, 2.6584215, 2.917756, -1.9553804, -1.5136286, -1.2612404, -3.9398246, 1801.0245, -30.741692, 604.7348)
