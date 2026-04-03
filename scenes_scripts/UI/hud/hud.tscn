@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://dyjf8cl7dhrr5"]
+[gd_scene load_steps=8 format=3 uid="uid://dyjf8cl7dhrr5"]
 
 [ext_resource type="Script" uid="uid://bu8lx7h5m8frd" path="res://scenes_scripts/UI/hud/Hud.cs" id="1_oo0fn"]
 [ext_resource type="Script" uid="uid://dosr3xd78lnhp" path="res://scenes_scripts/UI/hud/boat_health_bar.gd" id="2_usjff"]
 [ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="3_4wu0i"]
+[ext_resource type="Texture2D" uid="uid://bcgksk8xwksmn" path="res://art/icons/boatSmall.png" id="4_4wu0i"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opnk5"]
 bg_color = Color(0, 0, 0, 1)
@@ -14,7 +15,7 @@ expand_margin_top = 35.0
 expand_margin_bottom = 35.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h0y0o"]
-bg_color = Color(0, 0.93333334, 0.2784314, 1)
+bg_color = Color(0, 1, 0, 1)
 border_width_left = 5
 border_width_top = 5
 border_width_right = 5
@@ -28,7 +29,7 @@ expand_margin_top = 35.0
 expand_margin_bottom = 35.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u5sva"]
-bg_color = Color(5.8719515e-06, 0.93175703, 0.27735716, 1)
+bg_color = Color(0, 1, 0, 1)
 border_width_left = 5
 border_width_top = 5
 border_width_right = 5
@@ -80,10 +81,11 @@ layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 4
 theme = ExtResource("3_4wu0i")
-theme_override_constants/grabber_offset = 2000
+theme_override_icons/grabber = ExtResource("4_4wu0i")
 theme_override_styles/slider = SubResource("StyleBoxFlat_opnk5")
 theme_override_styles/grabber_area = SubResource("StyleBoxFlat_h0y0o")
 theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_u5sva")
+value = 100.0
 ticks_on_borders = true
 ticks_position = 3
 

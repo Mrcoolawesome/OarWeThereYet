@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://ktd51vqrxcf4"]
+
+[ext_resource type="Script" uid="uid://v84gbteip71x" path="res://scenes_scripts/end_game_area_trigger/EndGameAreaTrigger.cs" id="1_8ay1r"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vcry4"]
+size = Vector3(1, 12.689331, 32.134155)
+
+[node name="EndGameAreaTrigger" type="Area3D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_8ay1r")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_vcry4")
