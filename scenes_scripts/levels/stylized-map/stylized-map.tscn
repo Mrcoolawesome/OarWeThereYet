@@ -291,13 +291,12 @@ transform = Transform3D(0.44444767, 0, 0.89580494, 0, 1, 0, -0.89580494, 0, 0.44
 [node name="Checkpoint4" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(0.81344604, 0, 0.58164036, 0, 1, 0, -0.58164036, 0, 0.81344604, 1854.2428, -62.155045, 449.6166)
 CheckpointNum = 4
-UseAnchor = true
 
 [node name="BoatSpawn" parent="CheckpointContainer/Checkpoint4" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.445465, 0)
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -17.112549, 5.445465, 3.307495)
 
 [node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint4" index="2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.271606, 4.845337, 0.32702637)
+transform = Transform3D(0.55333334, 0, 0.83295983, 0, 1, 0, -0.83295983, 0, 0.55333334, -15.707275, 11.965408, -3.1689453)
 
 [node name="Checkpoint5" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(0.9625499, 0, 0.27110448, 0, 1, 0, -0.27110448, 0, 0.9625499, 2496.9272, -88.49762, 169.63)
@@ -416,9 +415,6 @@ transform = Transform3D(-5.1164856, 2.1870852, -0.4800639, 2.1524782, 5.133989, 
 
 [node name="Rock39" parent="Rocks" instance=ExtResource("9_sfwft")]
 transform = Transform3D(-3.7927036, 1.6212232, -0.35585755, 1.5955701, 3.8056781, 0.33252013, 0.4573354, 0.16747695, -4.1112523, 1801.7777, -56.307236, 455.22745)
-
-[node name="Rock87" parent="Rocks" instance=ExtResource("9_sfwft")]
-transform = Transform3D(1.5420234, -0.31191447, -3.829422, 1.5955701, 3.8056781, 0.33252016, 3.495128, -1.5997256, 1.5377116, 1827.446, -56.307236, 466.2177)
 
 [node name="Rock40" parent="Rocks" instance=ExtResource("9_sfwft")]
 transform = Transform3D(-4.7637825, 2.0363193, -0.4469709, 1.6874315, 4.4208493, 2.1560767, 1.2243173, 1.830163, -4.7107906, 1885.9955, -56.307236, 421.0054)
