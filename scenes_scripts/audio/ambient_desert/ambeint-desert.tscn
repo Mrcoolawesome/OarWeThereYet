@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dexagqmcc6kvv"]
+
+[ext_resource type="AudioStream" uid="uid://c4kxnrfqxg51c" path="res://art/audio/ones-that-i-want/ambient/ambient-desert-fixed.wav" id="1_y5at4"]
+
+[node name="AmbeintDesert" type="AudioStreamPlayer"]
+stream = ExtResource("1_y5at4")
