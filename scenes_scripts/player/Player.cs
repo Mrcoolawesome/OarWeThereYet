@@ -1407,6 +1407,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// endgame trigger logic
 	private void OnEndGameTriggered()
   {
+    Rpc(nameof(EndGame));
+  }
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void EndGame ()
+  {
     // Put them in the EndGame state so they can't move or pause
     CurrGameState = GameState.EndGame;
     
