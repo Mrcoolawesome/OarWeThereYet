@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://y0hbn87bwqqa"
+path="res://.godot/imported/EQUIPSprt-EXT_Ski Gloves 03_WM_SKIRIDE.wav-db59517656b114fd75f5812af0e4de79.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/Wavemotion - Ski Ride/EQUIPSprt-EXT_Ski Gloves 03_WM_SKIRIDE.wav"
+dest_files=["res://.godot/imported/EQUIPSprt-EXT_Ski Gloves 03_WM_SKIRIDE.wav-db59517656b114fd75f5812af0e4de79.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

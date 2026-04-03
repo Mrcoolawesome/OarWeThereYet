@@ -179,6 +179,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// END GAME UI
 	private Control _endGameUi;
 
+	// audio players
+	private AudioStreamPlayer3D _jumpAudio;
+	private AudioStreamPlayer3D _walkingOnBoatAudio;
+	private AudioStreamPlayer3D _walkingOnGroundAudio;
+	private AudioStreamPlayer3D _treadingWaterAudio;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -241,6 +247,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_groundDetectionRay = GetNode<RayCast3D>("GroundDetectionRay");
 
 		_endGameUi = GetNode<Control>("EndScreen");
+
+		// set the audio
+		_jumpAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/Jump");
+		_walkingOnBoatAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/BoatWalking");
+		_walkingOnGroundAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/WorldWalkingSingle");
+		_treadingWaterAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/TreadingWater");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -504,6 +516,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			{
 				MoveAndSlide();
 			}
+
+			// do their audio stuff
+			HandleAudioPhysicsProcess();
 		}
 		else // if we're not the owner of this instance, then we're just gonna sync their position and stuff (this is for 'network puppets')
 		{
@@ -615,6 +630,70 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // ONLY the Authority should automatically decay the target back to 1.0.
     // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
 		_targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
+  }
+
+	private void HandleAudioPhysicsProcess()
+  {
+    // 1. JUMPING AUDIO (One-shot)
+    // We check if the jump button was just pressed AND verify they actually gained upward velocity.
+    // (This prevents the sound from playing if they mash spacebar while falling/swimming).
+    if (Input.IsActionJustPressed("ui_accept") && Velocity.Y > 0 && CurrPlayerState == PlayerState.Standing)
+    {
+      _jumpAudio.Play();
+    }
+
+    // 2. CONTINUOUS LOOPING AUDIO (Swimming & Walking)
+    // Determine if they are actively trying to move (so we don't play footsteps while standing still)
+    Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
+    bool isTryingToMove = inputDir.LengthSquared() > 0.01f;
+
+    // Check swimming first (using the synced animation state you already set up!)
+    if (_currentAnim == "swimming")
+    {
+      if (!_treadingWaterAudio.Playing) _treadingWaterAudio.Play();
+      
+      // Stop ground audios
+      _walkingOnBoatAudio.Stop();
+      _walkingOnGroundAudio.Stop();
+    }
+    // Check walking on ground/boat
+    else if (IsOnFloor() && isTryingToMove && CurrPlayerState == PlayerState.Standing)
+    {
+      // We are walking, stop swimming audio
+      _treadingWaterAudio.Stop();
+
+      bool isOnBoat = false;
+      
+      // Check the floor raycast to see what we are standing on
+      if (_groundDetectionRay != null && _groundDetectionRay.IsColliding())
+      {
+        GodotObject collider = _groundDetectionRay.GetCollider();
+        
+        // Check if the floor we are standing on is the Boat node or a child of the boat
+        if (collider is Node colliderNode && (_boat == colliderNode || _boat.IsAncestorOf(colliderNode)))
+        {
+          isOnBoat = true;
+        }
+      }
+
+      if (isOnBoat)
+      {
+        if (!_walkingOnBoatAudio.Playing) _walkingOnBoatAudio.Play();
+        _walkingOnGroundAudio.Stop();
+      }
+      else
+      {
+        if (!_walkingOnGroundAudio.Playing) _walkingOnGroundAudio.Play();
+        _walkingOnBoatAudio.Stop();
+      }
+    }
+    // If they aren't swimming and aren't moving on the ground, silence all continuous sounds
+    else
+    {
+      _treadingWaterAudio.Stop();
+      _walkingOnBoatAudio.Stop();
+      _walkingOnGroundAudio.Stop();
+    }
   }
 
 	private void AnimationManager(Vector3 velocity, Vector2 inputDir, double delta)

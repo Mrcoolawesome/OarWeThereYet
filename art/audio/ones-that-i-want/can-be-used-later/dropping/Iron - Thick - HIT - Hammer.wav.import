@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://svcdko355waj"
+path="res://.godot/imported/Iron - Thick - HIT - Hammer.wav-997d1ba5c1272a2d66207ca099a87687.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/dropping/Iron - Thick - HIT - Hammer.wav"
+dest_files=["res://.godot/imported/Iron - Thick - HIT - Hammer.wav-997d1ba5c1272a2d66207ca099a87687.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

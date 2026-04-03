@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b11kvm8vuwwe5"
+path="res://.godot/imported/BIRDMisc_Green Woodpeckers Calling On Lakeshore Far Away_JSE_FoN.wav-a846e2c85092db71fc5051582272e93f.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/ambient/BIRDMisc_Green Woodpeckers Calling On Lakeshore Far Away_JSE_FoN.wav"
+dest_files=["res://.godot/imported/BIRDMisc_Green Woodpeckers Calling On Lakeshore Far Away_JSE_FoN.wav-a846e2c85092db71fc5051582272e93f.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

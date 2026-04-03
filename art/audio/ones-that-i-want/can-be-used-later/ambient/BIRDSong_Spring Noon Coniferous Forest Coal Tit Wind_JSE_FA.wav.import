@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://fyfmogntuy7f"
+path="res://.godot/imported/BIRDSong_Spring Noon Coniferous Forest Coal Tit Wind_JSE_FA.wav-f1b73806c6ea3105653320436c61b9b6.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/ambient/BIRDSong_Spring Noon Coniferous Forest Coal Tit Wind_JSE_FA.wav"
+dest_files=["res://.godot/imported/BIRDSong_Spring Noon Coniferous Forest Coal Tit Wind_JSE_FA.wav-f1b73806c6ea3105653320436c61b9b6.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

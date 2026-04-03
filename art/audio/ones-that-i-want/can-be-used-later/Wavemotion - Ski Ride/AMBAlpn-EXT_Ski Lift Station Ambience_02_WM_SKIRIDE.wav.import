@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://douxvovm0bk6m"
+path="res://.godot/imported/AMBAlpn-EXT_Ski Lift Station Ambience_02_WM_SKIRIDE.wav-25373673fef78a9c19fbb3a98cc79449.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/Wavemotion - Ski Ride/AMBAlpn-EXT_Ski Lift Station Ambience_02_WM_SKIRIDE.wav"
+dest_files=["res://.godot/imported/AMBAlpn-EXT_Ski Lift Station Ambience_02_WM_SKIRIDE.wav-25373673fef78a9c19fbb3a98cc79449.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

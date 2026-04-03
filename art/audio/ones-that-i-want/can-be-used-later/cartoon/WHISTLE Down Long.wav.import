@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://cenb7b0bpsqk1"
+path="res://.godot/imported/WHISTLE Down Long.wav-dd79b81895dcd98972bafd83d952ed89.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/cartoon/WHISTLE Down Long.wav"
+dest_files=["res://.godot/imported/WHISTLE Down Long.wav-dd79b81895dcd98972bafd83d952ed89.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

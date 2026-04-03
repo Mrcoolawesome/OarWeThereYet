@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bcnqs5gp8t72k"
+path="res://.godot/imported/AMBForst_Morning Small Birch Forest Willow Warbler Singing Many Insects Humming_JSE_FoN_Quad.wav-20a33639534bfcdee5e987309d3e03b6.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/ambient/AMBForst_Morning Small Birch Forest Willow Warbler Singing Many Insects Humming_JSE_FoN_Quad.wav"
+dest_files=["res://.godot/imported/AMBForst_Morning Small Birch Forest Willow Warbler Singing Many Insects Humming_JSE_FoN_Quad.wav-20a33639534bfcdee5e987309d3e03b6.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

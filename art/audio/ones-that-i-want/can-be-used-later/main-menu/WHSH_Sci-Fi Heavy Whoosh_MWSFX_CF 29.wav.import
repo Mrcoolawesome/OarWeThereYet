@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bkhuo8kwhi1mq"
+path="res://.godot/imported/WHSH_Sci-Fi Heavy Whoosh_MWSFX_CF 29.wav-0115cf38827dfaa54676f8e499e143e8.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/main-menu/WHSH_Sci-Fi Heavy Whoosh_MWSFX_CF 29.wav"
+dest_files=["res://.godot/imported/WHSH_Sci-Fi Heavy Whoosh_MWSFX_CF 29.wav-0115cf38827dfaa54676f8e499e143e8.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2
