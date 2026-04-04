@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://b8k7md4rewckk"
+path="res://.godot/imported/UIClick_Operating System UI Cursor_RogueWaves_KawaiiUI.wav-3617b98b6f7c07ab0eafb2fe466ab2ba.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/ui/UIClick_Operating System UI Cursor_RogueWaves_KawaiiUI.wav"
+dest_files=["res://.godot/imported/UIClick_Operating System UI Cursor_RogueWaves_KawaiiUI.wav-3617b98b6f7c07ab0eafb2fe466ab2ba.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

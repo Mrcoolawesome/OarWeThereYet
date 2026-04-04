@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://dlflb3i5o133p"
+path="res://.godot/imported/Oil Barrel - HIT - Hammer - Take 2.wav-5596d62b53c4002ef935e7b233980d01.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/dropping/Oil Barrel - HIT - Hammer - Take 2.wav"
+dest_files=["res://.godot/imported/Oil Barrel - HIT - Hammer - Take 2.wav-5596d62b53c4002ef935e7b233980d01.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

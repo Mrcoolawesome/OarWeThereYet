@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bsow1nvoxq4y4"
+path="res://.godot/imported/RAINVege_Rain Mixed Forest Dropping On Leaves And Gravel Path_JSE_FoN_Quad.wav-6f9b52be1e63e45ffbce2eb0f266b139.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/ambient/RAINVege_Rain Mixed Forest Dropping On Leaves And Gravel Path_JSE_FoN_Quad.wav"
+dest_files=["res://.godot/imported/RAINVege_Rain Mixed Forest Dropping On Leaves And Gravel Path_JSE_FoN_Quad.wav-6f9b52be1e63e45ffbce2eb0f266b139.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

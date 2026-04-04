@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bifkncl7wc6x2"]
+
+[ext_resource type="AudioStream" uid="uid://dqll11fhl10jf" path="res://art/audio/ones-that-i-want/river/flow-medium.wav" id="1_xex4t"]
+
+[node name="AmbientRiverAudio" type="AudioStreamPlayer"]
+stream = ExtResource("1_xex4t")
+autoplay = true

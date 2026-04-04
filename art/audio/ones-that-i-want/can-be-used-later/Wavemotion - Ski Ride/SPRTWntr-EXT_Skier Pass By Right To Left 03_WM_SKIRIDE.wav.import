@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://duueiwkb0x2st"
+path="res://.godot/imported/SPRTWntr-EXT_Skier Pass By Right To Left 03_WM_SKIRIDE.wav-b247cdb5b89f4ef6c87b680a9f4e0063.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/Wavemotion - Ski Ride/SPRTWntr-EXT_Skier Pass By Right To Left 03_WM_SKIRIDE.wav"
+dest_files=["res://.godot/imported/SPRTWntr-EXT_Skier Pass By Right To Left 03_WM_SKIRIDE.wav-b247cdb5b89f4ef6c87b680a9f4e0063.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

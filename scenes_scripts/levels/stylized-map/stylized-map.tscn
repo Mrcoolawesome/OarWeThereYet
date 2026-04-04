@@ -25,6 +25,9 @@
 [ext_resource type="PackedScene" uid="uid://ktd51vqrxcf4" path="res://scenes_scripts/end_game_area_trigger/end-game-area-trigger.tscn" id="20_34k5s"]
 [ext_resource type="Resource" uid="uid://dpd6e10b0dpbb" path="res://scenes_scripts/inventory/items/itemResources/lifepreserver/lifepreserver.tres" id="20_tlher"]
 [ext_resource type="PackedScene" uid="uid://dn1sc0iq3xkwh" path="res://scenes_scripts/checkpoints/sign/Sign.tscn" id="23_6xmkq"]
+[ext_resource type="PackedScene" uid="uid://dexagqmcc6kvv" path="res://scenes_scripts/audio/ambient_desert/ambeint-desert.tscn" id="21_etdru"]
+[ext_resource type="PackedScene" uid="uid://bifkncl7wc6x2" path="res://scenes_scripts/audio/ambient-river/ambient_river_audio.tscn" id="22_hq8g2"]
+[ext_resource type="AudioStream" uid="uid://dnbujvgjjukoa" path="res://art/audio/ones-that-i-want/river/waterfall-fixed.wav" id="23_hq8g2"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gspic"]
 sky_top_color = Color(0.27450982, 0.33333334, 0.5686275, 1)
@@ -720,10 +723,43 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2496.9272, -88.49762, 169.63)
 
 [node name="CollisionShape3D" parent="EndGameAreaTrigger" index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6972656, 5.8446655, -0.15504456)
+[node name="AudioContainer" type="Node3D" parent="."]
+
+[node name="AmbeintDesert" parent="AudioContainer" instance=ExtResource("21_etdru")]
+autoplay = true
+
+[node name="AmbientRiverAudio" parent="AudioContainer" instance=ExtResource("22_hq8g2")]
+volume_db = 3.0
+
+[node name="WaterfallFixed" type="AudioStreamPlayer3D" parent="AudioContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 916.4987, -10.711754, 982.84656)
+stream = ExtResource("23_hq8g2")
+autoplay = true
+max_distance = 100.0
+
+[node name="WaterfallFixed2" type="AudioStreamPlayer3D" parent="AudioContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1415.3037, -20.536928, 817.57526)
+stream = ExtResource("23_hq8g2")
+unit_size = 40.0
+autoplay = true
+max_distance = 150.0
+
+[node name="WaterfallFixed3" type="AudioStreamPlayer3D" parent="AudioContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1794.6364, -39.77733, 470.51556)
+stream = ExtResource("23_hq8g2")
+unit_size = 70.0
+autoplay = true
+max_distance = 175.0
+
+[node name="WaterfallFixed4" type="AudioStreamPlayer3D" parent="AudioContainer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2090.3135, -68.93786, 424.19067)
+stream = ExtResource("23_hq8g2")
+unit_size = 80.0
+autoplay = true
+max_distance = 200.0
 
 [editable path="CheckpointContainer/Checkpoint"]
 [editable path="CheckpointContainer/Checkpoint2"]
 [editable path="CheckpointContainer/Checkpoint3"]
 [editable path="CheckpointContainer/Checkpoint4"]
 [editable path="CheckpointContainer/Checkpoint5"]
-[editable path="EndGameAreaTrigger"]

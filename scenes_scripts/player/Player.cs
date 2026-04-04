@@ -180,6 +180,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// END GAME UI
 	private Control _endGameUi;
 
+	// audio players
+	private AudioStreamPlayer3D _jumpAudio;
+	private AudioStreamPlayer3D _walkingOnBoatAudio;
+	private AudioStreamPlayer3D _walkingOnGroundAudio;
+	private AudioStreamPlayer3D _treadingWaterAudio;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -243,6 +249,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		_endGameUi = GetNode<Control>("EndScreen");
     _endGameUi.Visible = false;
+
+		// set the audio
+		_jumpAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/Jump");
+		_walkingOnBoatAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/BoatWalking");
+		_walkingOnGroundAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/WorldWalkingSingle");
+		_treadingWaterAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/TreadingWater");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -509,6 +521,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			{
 				MoveAndSlide();
 			}
+
+			// do their audio stuff
+			HandleAudioPhysicsProcess();
 		}
 		else // if we're not the owner of this instance, then we're just gonna sync their position and stuff (this is for 'network puppets')
 		{
@@ -623,6 +638,65 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // ONLY the Authority should automatically decay the target back to 1.0.
     // The puppets (other clients) will just receive the target scale perfectly from the Synchronizer.
 		_targetHeadScale = Mathf.Lerp(_targetHeadScale, 1.0f, (float)delta * 10.0f);
+  }
+
+	private void HandleAudioPhysicsProcess()
+  {
+    // 2. CONTINUOUS LOOPING AUDIO (Swimming & Walking)
+    Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
+    bool isTryingToMove = inputDir.LengthSquared() > 0.01f;
+
+    // Check swimming
+    if (_currentAnim == "swimming")
+    {
+      if (!_treadingWaterAudio.Playing) _treadingWaterAudio.Play();
+      _walkingOnBoatAudio.Stop();
+      _walkingOnGroundAudio.Stop();
+    }
+    // Check walking on ground/boat
+    else if (IsOnFloor() && isTryingToMove && CurrPlayerState == PlayerState.Standing)
+    {
+      _treadingWaterAudio.Stop();
+
+      // Determine if they are crouch walking to set the speed to 10x
+      bool isCrouchWalking = _currentAnim == "crouchWalking" || _currentAnim == "crouchWalkingBackward";
+      float audioSpeed = isCrouchWalking ? 2.0f : 1.0f;
+
+      bool isOnBoat = false;
+      
+      // Check the floor raycast
+      if (_groundDetectionRay != null && _groundDetectionRay.IsColliding())
+      {
+        GodotObject collider = _groundDetectionRay.GetCollider();
+        if (collider is Node colliderNode && (_boat == colliderNode || _boat.IsAncestorOf(colliderNode)))
+        {
+          isOnBoat = true;
+        }
+      }
+
+      // Apply the speed and play the correct audio
+      if (isOnBoat)
+      {
+        _walkingOnBoatAudio.PitchScale = audioSpeed;
+        if (!_walkingOnBoatAudio.Playing) _walkingOnBoatAudio.Play();
+        
+        _walkingOnGroundAudio.Stop();
+      }
+      else
+      {
+        _walkingOnGroundAudio.PitchScale = audioSpeed;
+        if (!_walkingOnGroundAudio.Playing) _walkingOnGroundAudio.Play();
+        
+        _walkingOnBoatAudio.Stop();
+      }
+    }
+    // Silence everything if standing still or in the air
+    else
+    {
+      _treadingWaterAudio.Stop();
+      _walkingOnBoatAudio.Stop();
+      _walkingOnGroundAudio.Stop();
+    }
   }
 
 	private void AnimationManager(Vector3 velocity, Vector2 inputDir, double delta)
