@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://dfu85f0xm7cia"]
+[gd_scene load_steps=5 format=3 uid="uid://dfu85f0xm7cia"]
 
 [ext_resource type="Script" uid="uid://psnv2osty7pb" path="res://scenes_scripts/boat/airpump/AirPump.cs" id="1_24h1e"]
 [ext_resource type="PackedScene" uid="uid://cwu6sv67qb4fn" path="res://art/models/airPump.blend" id="1_wr1ln"]
+[ext_resource type="AudioStream" uid="uid://bscdatdag4tvw" path="res://art/audio/ones-that-i-want/pumping-it/pumping-it.wav" id="3_dlk3q"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wr1ln"]
 size = Vector3(0.6, 1.5, 0.6)
@@ -16,5 +17,9 @@ script = ExtResource("1_24h1e")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
 shape = SubResource("BoxShape3D_wr1ln")
+
+[node name="PumpingIt" type="AudioStreamPlayer3D" parent="."]
+stream = ExtResource("3_dlk3q")
+max_distance = 10.0
 
 [editable path="airPump"]
