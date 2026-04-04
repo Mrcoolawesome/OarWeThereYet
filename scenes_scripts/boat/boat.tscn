@@ -64,8 +64,9 @@ script = ExtResource("1_vvssr")
 FloatForce = 40.0
 RiverSpeed = 35.0
 WaterDrag = 15.0
-RowForce = 70.0
-ImpactVelocityThreshold = 5.0
+RowForce = 100.0
+ImpactVelocityThreshold = 3.0
+HoleLeakRate = 2
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_0063d")
@@ -264,6 +265,8 @@ transform = Transform3D(-0.99993205, 0, 0.011657125, 0, 1, 0, -0.011657125, 0, -
 
 [node name="AirPump" parent="." instance=ExtResource("8_3b5xp")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.9, 0.70000005, -0.50000006)
+PromptMessage = "Hold to Pump Air"
+HealRate = 5
 
 [node name="DeflatingAudio" type="AudioStreamPlayer3D" parent="."]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)

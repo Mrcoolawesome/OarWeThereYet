@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://dn1sc0iq3xkwh"]
+
+[ext_resource type="PackedScene" uid="uid://dojhcpn5inpe6" path="res://art/models/sign.blend" id="1_4y1jg"]
+[ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="2_l2kks"]
+
+[node name="Sign" type="Node3D"]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="sign" parent="." instance=ExtResource("1_4y1jg")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(-8.742278e-08, 0, 2, 0, 2, 0, -2, 0, -8.742278e-08, 0.24280435, 1.3209078, 0)
+text = "Checkpoint"
+font = ExtResource("2_l2kks")
+font_size = 67
+
+[node name="Label3D2" type="Label3D" parent="."]
+transform = Transform3D(-8.742278e-08, 0, -2, 0, 2, 0, 2, 0, -8.742278e-08, -0.2416035, 1.3209078, 0)
+text = "Checkpoint"
+font = ExtResource("2_l2kks")
+font_size = 67

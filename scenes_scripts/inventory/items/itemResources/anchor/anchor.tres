@@ -11,5 +11,5 @@ ItemMesh = ExtResource("2_flgwt")
 ItemCollider = ExtResource("1_vvq2h")
 InHandPosition = Vector3(0.925, 0.32, -1.185)
 InHandRotation = Vector3(-0.20943952, 1.9809487, 2.5569074)
-Hint2 = "[LMB] Drop"
+Hint2 = "[RMB] Drop"
 metadata/_custom_type_script = "uid://5qqoau1yt53x"

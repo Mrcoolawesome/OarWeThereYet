@@ -16,34 +16,37 @@ public partial class InteractRay : RayCast3D
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _PhysicsProcess(double delta)
     {
-		_prompt.Text = "";
-        Interactable hitObject = null;
+      _prompt.Text = "";
+      Interactable hitObject = null;
 
-		if (IsColliding())
-		{
-			GodotObject collider = GetCollider();
+      if (IsColliding())
+      {
+        GodotObject collider = GetCollider();
 
-			if (collider is Interactable io)
-			{
-                hitObject = io;
-				_prompt.Text = hitObject.GetMessage();
-			
-				if (Input.IsActionJustPressed(hitObject.PromptInput))
-				{
-					hitObject.Interact(Player);
-                    hitObject.StartInteract(Player);
-                    _currentInteractable = hitObject;
-				}
-			}
-		}
-
-        if (_currentInteractable != null)
+        if (collider is Interactable io)
         {
-            if (Input.IsActionJustReleased(_currentInteractable.PromptInput) || hitObject != _currentInteractable)
-            {
-                _currentInteractable.StopInteract(Player);
-                _currentInteractable = null;
-            }
+          hitObject = io;
+
+          if (hitObject.PromptMessage == "Sit" && Player.IsSwimming) return;
+
+          _prompt.Text = hitObject.GetMessage();
+        
+          if (Input.IsActionJustPressed(hitObject.PromptInput))
+          {
+            hitObject.Interact(Player);
+                      hitObject.StartInteract(Player);
+                      _currentInteractable = hitObject;
+          }
         }
+      }
+
+      if (_currentInteractable != null)
+      {
+          if (Input.IsActionJustReleased(_currentInteractable.PromptInput) || hitObject != _currentInteractable)
+          {
+              _currentInteractable.StopInteract(Player);
+              _currentInteractable = null;
+          }
+      }
 	}
 }

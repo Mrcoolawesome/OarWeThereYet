@@ -131,6 +131,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private RiverFloatSystem _riverFloatSystem;
 	// variables to help apply water physics force
 	private bool _applyWaterPhysicsForce = false;
+	public bool IsSwimming { get; private set; } = false;
 	private Vector3 _waterPhysicsForce;
 	private Vector3 _waterPhysicsForcePosition;
 
@@ -247,6 +248,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_groundDetectionRay = GetNode<RayCast3D>("GroundDetectionRay");
 
 		_endGameUi = GetNode<Control>("EndScreen");
+    _endGameUi.Visible = false;
 
 		// set the audio
 		_jumpAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/Jump");
@@ -480,6 +482,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Logic for movement depending on player state
 	public override void _PhysicsProcess(double delta)
 	{
+		// Capture the stable state for this whole frame
+		IsSwimming = _applyWaterPhysicsForce;
+
 		// this is done on the physics process because this isn't disabled for the puppets unlike the regular process function
 		HeadAnimationPhysicsProcess(delta);
 
@@ -541,6 +546,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       // Sync network data 
       SyncAndLerpClientDataProcess(delta); // this deals with the sitting state
 		}
+
+		// Reset for the NEXT frame's potential signal
+		_applyWaterPhysicsForce = false;
 	}
 
 	private void Gravity(double delta)
@@ -1435,12 +1443,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// This built-in function only catches inputs that UI menus haven't eaten yet!
   public override void _UnhandledInput(InputEvent @event)
   {
-    // NEW: Completely ignore the Escape key if the game is ending
-    if (CurrGameState == GameState.EndGame)
-    {
-      return; 
-    }
-
     if (@event.IsActionPressed("ui_cancel"))
     {
       // If we are currently playing, pause the game
@@ -1460,23 +1462,32 @@ public partial class Player : CharacterBody3D, ISyncBuffer
         }
       }
     }
+
+    if (@event.IsActionPressed("action_key"))
+    {
+      if (CurrGameState == GameState.Menu && _invUI.isOpen())
+      {
+        CurrGameState = GameState.Playing;
+        _invUI.Close();
+      }
+    }
   }
 
 	// endgame trigger logic
 	private void OnEndGameTriggered()
   {
+    Rpc(nameof(EndGame));
+  }
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void EndGame ()
+  {
     // Put them in the EndGame state so they can't move or pause
-    CurrGameState = GameState.EndGame;
+    // CurrGameState = GameState.EndGame;
+    _endGameUi.Visible = true;
     
     // Hide the normal gameplay UI
     _hud.Visible = false;
     _pauseUICanvas.Visible = false;
-    Input.MouseMode = Input.MouseModeEnum.Visible; // Let them click the links!
-
-    if (IsMultiplayerAuthority())
-    {
-      // Trigger the GDScript function we just wrote!
-      _endGameUi.Call("start_end_game_sequence");
-    }
   }
 }
