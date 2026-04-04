@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://5g32dtlltgbj"
+path="res://.godot/imported/SPRTWntr-EXT_Skiing On Soft Snow 01_WM_SKIRIDE.wav-58791154e10aa17656c39ad7085318b5.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/Wavemotion - Ski Ride/SPRTWntr-EXT_Skiing On Soft Snow 01_WM_SKIRIDE.wav"
+dest_files=["res://.godot/imported/SPRTWntr-EXT_Skiing On Soft Snow 01_WM_SKIRIDE.wav-58791154e10aa17656c39ad7085318b5.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

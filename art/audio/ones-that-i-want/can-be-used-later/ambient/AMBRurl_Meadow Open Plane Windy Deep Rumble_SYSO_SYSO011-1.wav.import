@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://cr1eptshvx8h7"
+path="res://.godot/imported/AMBRurl_Meadow Open Plane Windy Deep Rumble_SYSO_SYSO011-1.wav-6180fd6bd34fc0c8d05ae0881f7d3830.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/ambient/AMBRurl_Meadow Open Plane Windy Deep Rumble_SYSO_SYSO011-1.wav"
+dest_files=["res://.godot/imported/AMBRurl_Meadow Open Plane Windy Deep Rumble_SYSO_SYSO011-1.wav-6180fd6bd34fc0c8d05ae0881f7d3830.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

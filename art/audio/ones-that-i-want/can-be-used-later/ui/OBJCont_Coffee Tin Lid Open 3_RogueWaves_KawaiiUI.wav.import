@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://csre88wwfdb15"
+path="res://.godot/imported/OBJCont_Coffee Tin Lid Open 3_RogueWaves_KawaiiUI.wav-1726245642e797e43753a2fcd4bf4eeb.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/can-be-used-later/ui/OBJCont_Coffee Tin Lid Open 3_RogueWaves_KawaiiUI.wav"
+dest_files=["res://.godot/imported/OBJCont_Coffee Tin Lid Open 3_RogueWaves_KawaiiUI.wav-1726245642e797e43753a2fcd4bf4eeb.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

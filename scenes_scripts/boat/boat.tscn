@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=21 format=3 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scenes_scripts/boat/Boat.cs" id="1_vvssr"]
 [ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scenes_scripts/boat/seat/Seat.cs" id="2_kgk83"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://b7i8jbk0g7j3" path="res://scenes_scripts/inventory/Inventory.cs" id="4_s60o4"]
 [ext_resource type="PackedScene" uid="uid://ds5xru6fctkkj" path="res://scenes_scripts/boat/anchor_point/anchor_point.tscn" id="6_8vmau"]
 [ext_resource type="PackedScene" uid="uid://dfu85f0xm7cia" path="res://scenes_scripts/boat/airpump/air_pump.tscn" id="8_3b5xp"]
+[ext_resource type="AudioStream" uid="uid://ceu2wp523u24o" path="res://art/audio/ones-that-i-want/deflating/floraphonic-balloon-deflate-squeak-9-185259.mp3" id="9_g3she"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0063d"]
 properties/0/path = NodePath(".:State")
@@ -263,6 +264,12 @@ transform = Transform3D(-0.99993205, 0, 0.011657125, 0, 1, 0, -0.011657125, 0, -
 
 [node name="AirPump" parent="." instance=ExtResource("8_3b5xp")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 1.9, 0.70000005, -0.50000006)
+
+[node name="DeflatingAudio" type="AudioStreamPlayer3D" parent="."]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
+stream = ExtResource("9_g3she")
+unit_size = 20.0
+max_distance = 20.0
 
 [connection signal="delta_synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="timeout" from="DamageDelayTimer" to="." method="DamageTimerEnded"]
