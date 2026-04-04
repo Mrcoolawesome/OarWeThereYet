@@ -242,6 +242,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_groundDetectionRay = GetNode<RayCast3D>("GroundDetectionRay");
 
 		_endGameUi = GetNode<Control>("EndScreen");
+    _endGameUi.Visible = false;
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -1368,12 +1369,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// This built-in function only catches inputs that UI menus haven't eaten yet!
   public override void _UnhandledInput(InputEvent @event)
   {
-    // NEW: Completely ignore the Escape key if the game is ending
-    if (CurrGameState == GameState.EndGame)
-    {
-      return; 
-    }
-
     if (@event.IsActionPressed("ui_cancel"))
     {
       // If we are currently playing, pause the game
@@ -1414,17 +1409,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   private void EndGame ()
   {
     // Put them in the EndGame state so they can't move or pause
-    CurrGameState = GameState.EndGame;
+    // CurrGameState = GameState.EndGame;
+    _endGameUi.Visible = true;
     
     // Hide the normal gameplay UI
     _hud.Visible = false;
     _pauseUICanvas.Visible = false;
-    Input.MouseMode = Input.MouseModeEnum.Visible; // Let them click the links!
-
-    if (IsMultiplayerAuthority())
-    {
-      // Trigger the GDScript function we just wrote!
-      _endGameUi.Call("start_end_game_sequence");
-    }
   }
 }
