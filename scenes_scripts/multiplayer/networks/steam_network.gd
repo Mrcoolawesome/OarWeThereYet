@@ -10,7 +10,6 @@ var LOBBY_NAME = "gaming"
 # player scene and level scene path
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
 const LEVEL_SCENE_PATH = "res://scenes_scripts/levels/stylized-map/stylized-map.tscn"
-var level_name = "DemoLevel"
 
 # global values to load the level in
 var loading: bool = false
