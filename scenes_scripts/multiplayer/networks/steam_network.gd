@@ -217,6 +217,7 @@ func _remove_player(id : int):
   Runs on client when kicked by host
 '''
 func _on_server_disconnected():
+  print("server kicked me :(")
   cleanup_network_state()
   GlobalSignalServer.emit_signal("GoToMainMenu")
 
