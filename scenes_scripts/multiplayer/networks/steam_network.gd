@@ -66,17 +66,9 @@ func _process(_delta: float) -> void:
 
       elif pending_host_id != 0:
         # Now that the client has the map loaded, connect to the server
-        multiplayer_peer = SteamMultiplayerPeer.new()
-        multiplayer_peer.server_relay = true 
-        var error = multiplayer_peer.create_client(pending_host_id)
-        
-        if error == OK:
-          multiplayer.multiplayer_peer = multiplayer_peer
-        else:
-          print("Failed to create client: ", error)
-          
+        multiplayer.multiplayer_peer = multiplayer_peer
+        multiplayer_peer.server_relay = true           
         pending_host_id = 0
-      # ------------------------------
 
       GlobalSignalServer.emit_signal("DoneLoadingMap")
 
