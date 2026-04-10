@@ -38,6 +38,7 @@ func initialize_voice():
   set_process(true)
 
 func stop_voice():
+  print("stopping voice via stop voice")
   if capture_effect:
     capture_effect.clear_buffer()
   set_process(false)
