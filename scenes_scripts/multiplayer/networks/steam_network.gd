@@ -50,6 +50,7 @@ func _process(_delta: float) -> void:
       # initialize voice
       ProxChat.initialize_voice()
       _add_level() # The map is officially in the SceneTree now!
+      GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
 
       # --- NETWORK INITIALIZATION ---
       if is_hosting:
@@ -70,7 +71,6 @@ func _process(_delta: float) -> void:
         multiplayer.multiplayer_peer = multiplayer_peer    
         pending_host_id = 0
         multiplayer.server_disconnected.connect(_on_server_disconnected)
-        GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
 
 
       GlobalSignalServer.emit_signal("DoneLoadingMap")
@@ -217,7 +217,6 @@ func _remove_player(id : int):
   Runs on client when kicked by host
 '''
 func _on_server_disconnected():
-  print("server kicked me :(")
   cleanup_network_state()
   GlobalSignalServer.emit_signal("GoToMainMenu")
 
