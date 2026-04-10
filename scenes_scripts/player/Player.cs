@@ -1395,6 +1395,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       // (Using 1 for direction is fine just to trigger the stop command)
       GlobalSignalServer.Instance.EmitSignal("AnimateOar", (int)_seat, 1, false);
     }
+
+		Input.MouseMode = Input.MouseModeEnum.Visible;
   }
 
 	// function to set their color from the RPC
