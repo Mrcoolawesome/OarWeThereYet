@@ -65,6 +65,14 @@ func _process(_delta: float) -> void:
         is_hosting = false
 
       elif pending_host_id != 0:
+        # Check if the host is still there before connecting Godot multiplayer
+        var current_owner = Steam.getLobbyOwner(_hosted_lobby_id)
+        if current_owner == 0 or current_owner != pending_host_id:
+          print("Host is no longer available.")
+          pending_host_id = 0
+          _on_server_disconnected()
+          return
+
         # Now that the client has the map loaded, connect to the server
         print("Setting multiplayer peer for client")
         multiplayer_peer.create_client(pending_host_id)
