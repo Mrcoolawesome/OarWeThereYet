@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=4 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=26 format=4 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
@@ -89,6 +89,8 @@ loop_begin = 22235
 loop_end = 39940
 mix_rate = 48000
 stereo = true
+
+[sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_fqj0r"]
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4
@@ -357,6 +359,11 @@ stream = ExtResource("14_4b7ak")
 
 [node name="TreadingWater" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("15_lvkhp")
+
+[node name="AudioStreamPlayer3D2" type="AudioStreamPlayer3D" parent="."]
+stream = SubResource("AudioStreamMicrophone_fqj0r")
+autoplay = true
+bus = &"Mic Input"
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]
