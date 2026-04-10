@@ -92,6 +92,7 @@ func become_host(is_public: bool, lobby_name: String):
 func join_as_client(lobby_id):
   is_client = true
   Steam.joinLobby(lobby_id)
+  _hosted_lobby_id = lobby_id
 
 func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
   if !is_client:
@@ -234,3 +235,5 @@ func cleanup_network_state() -> void:
   if multiplayer.multiplayer_peer != null:
     multiplayer.multiplayer_peer.close()
   multiplayer.multiplayer_peer = null
+
+  Steam.leaveLobby(_hosted_lobby_id)
