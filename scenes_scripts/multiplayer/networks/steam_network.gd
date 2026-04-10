@@ -71,6 +71,7 @@ func _process(_delta: float) -> void:
           print("Host is no longer available.")
           pending_host_id = 0
           _on_server_disconnected()
+          GlobalSignalServer.emit_signal("DoneLoadingMap")
           return
 
         # Now that the client has the map loaded, connect to the server
