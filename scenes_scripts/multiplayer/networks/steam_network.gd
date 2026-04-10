@@ -111,8 +111,6 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _respons
   _request_level_load()
 
 func _request_level_load() -> void:
-  await get_tree().process_frame 
-  await get_tree().process_frame 
   ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
   loading = true
 
