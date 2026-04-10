@@ -202,8 +202,6 @@ func _receive_player_color(color_hex: String) -> void:
 func _remove_player(id : int):    
   var active_level = level_container.get_children()[0];
   var player_node = active_level.get_node_or_null(str(id)) # recursively looks for the player
-
-  cleanup_network_state()
   
   if player_node:
     # Player drops item if they're holding it
@@ -233,3 +231,7 @@ func cleanup_network_state() -> void:
   multiplayer.peer_disconnected.disconnect(_remove_player)
   multiplayer.server_disconnected.disconnect(_on_server_disconnected)
   GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
+
+  if multiplayer.multiplayer_peer != null:
+    multiplayer.multiplayer_peer.close()
+  multiplayer.multiplayer_peer = null
