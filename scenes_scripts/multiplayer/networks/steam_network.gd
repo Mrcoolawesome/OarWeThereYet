@@ -49,15 +49,15 @@ func _process(_delta: float) -> void:
     
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       loading = false
+      multiplayer_peer.server_relay = true
       _add_level() # The map is officially in the SceneTree now!
 
       # --- NETWORK INITIALIZATION ---
       if is_hosting:
         # Now that the host has the map loaded, start the server
-        multiplayer_peer.server_relay = true
         multiplayer_peer.create_host()
         multiplayer.multiplayer_peer = multiplayer_peer
-        
+
         multiplayer.peer_connected.connect(_add_player_to_game)
         multiplayer.peer_disconnected.connect(_remove_player)
         
@@ -66,8 +66,7 @@ func _process(_delta: float) -> void:
 
       elif pending_host_id != 0:
         # Now that the client has the map loaded, connect to the server
-        multiplayer.multiplayer_peer = multiplayer_peer
-        multiplayer_peer.server_relay = true           
+        multiplayer.multiplayer_peer = multiplayer_peer    
         pending_host_id = 0
 
       GlobalSignalServer.emit_signal("DoneLoadingMap")
