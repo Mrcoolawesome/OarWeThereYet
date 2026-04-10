@@ -199,9 +199,6 @@ func _receive_player_color(color_hex: String) -> void:
   find the player we're looking to remove, and remove their instance.
 '''
 func _remove_player(id : int):    
-  ProxChat.stop_voice()
-  print("stopped voice")
-
   var active_level = level_container.get_children()[0];
   var player_node = active_level.get_node_or_null(str(id)) # recursively looks for the player
   
@@ -217,6 +214,10 @@ func _remove_player(id : int):
     print("Could not find player with ID: ", id)
 
 func cleanup_network_state() -> void:
+  print("Cleaning up network state")
+  ProxChat.stop_voice()
+  print("stopped voice")
+
   # 1. SHUT DOWN NETWORK FIRST (Stop incoming RPCs/Signals)
   multiplayer.peer_connected.disconnect(_add_player_to_game)
   multiplayer.peer_disconnected.disconnect(_remove_player)
