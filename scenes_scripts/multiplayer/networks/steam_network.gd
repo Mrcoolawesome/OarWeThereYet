@@ -70,7 +70,8 @@ func _process(_delta: float) -> void:
         multiplayer_peer.create_client(pending_host_id)
         multiplayer.multiplayer_peer = multiplayer_peer    
         pending_host_id = 0
-        multiplayer.server_disconnected.connect(cleanup_network_state)
+        multiplayer.server_disconnected.connect(_on_server_disconnected)
+        GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
 
 
       GlobalSignalServer.emit_signal("DoneLoadingMap")
@@ -196,7 +197,7 @@ func _receive_player_color(color_hex: String) -> void:
   GlobalSignalServer.emit_signal("AssignPlayerColor", color_hex)
 
 '''
-  find the player we're looking to remove, and remove their instance.
+  Runs on host when a client leaves
 '''
 func _remove_player(id : int):    
   var active_level = level_container.get_children()[0];
@@ -215,6 +216,13 @@ func _remove_player(id : int):
   else:
     print("Could not find player with ID: ", id)
 
+'''
+  Runs on client when kicked by host
+'''
+func _on_server_disconnected():
+  cleanup_network_state()
+  GlobalSignalServer.emit_signal("GoToMainMenu")
+
 func cleanup_network_state() -> void:
   print("Cleaning up network state")
   ProxChat.stop_voice()
@@ -223,4 +231,5 @@ func cleanup_network_state() -> void:
   # 1. SHUT DOWN NETWORK FIRST (Stop incoming RPCs/Signals)
   multiplayer.peer_connected.disconnect(_add_player_to_game)
   multiplayer.peer_disconnected.disconnect(_remove_player)
-  multiplayer.server_disconnected.disconnect(cleanup_network_state)
+  multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+  GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
