@@ -35,7 +35,7 @@ func _ready() -> void:
   # connect the 'on_lobby_created' function to the lobby created signal
   Steam.lobby_created.connect(_on_lobby_created)
   Steam.lobby_joined.connect(_on_lobby_join)
-  Steam.join_requested.connect(_on_lobby_created)
+  Steam.join_requested.connect(_on_lobby_join)
 
 func _process(_delta: float) -> void:
   Steam.run_callbacks()
