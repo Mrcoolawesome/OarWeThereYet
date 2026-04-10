@@ -61,12 +61,7 @@ func _process(_delta: float) -> void:
         byte_array.encode_s16(i * 2, raw_value)
       
       # SAFETY CHECK: Only send the RPC if we are actually connected to a multiplayer session
-      if multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
-        send_voice.rpc(byte_array)
-      else:
-        # If we lost connection, automatically shut down the mic to prevent errors
-        stop_voice()
-        return
+      send_voice.rpc(byte_array)
       
       if local_playback:
         process_voice(byte_array, multiplayer.get_unique_id())
