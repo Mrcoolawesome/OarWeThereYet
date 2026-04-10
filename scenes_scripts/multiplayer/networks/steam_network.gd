@@ -66,6 +66,8 @@ func _process(_delta: float) -> void:
 
       elif pending_host_id != 0:
         # Now that the client has the map loaded, connect to the server
+        print("Setting multiplayer peer for client")
+        multiplayer_peer.create_client(pending_host_id)
         multiplayer.multiplayer_peer = multiplayer_peer    
         pending_host_id = 0
 
