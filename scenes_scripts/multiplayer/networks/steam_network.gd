@@ -35,7 +35,7 @@ func _ready() -> void:
   # connect the 'on_lobby_created' function to the lobby created signal
   Steam.lobby_created.connect(_on_lobby_created)
   Steam.lobby_joined.connect(_on_lobby_join)
-  Steam.join_requested.connect(_on_lobby_join)
+  Steam.join_requested.connect(_on_join_requested)
 
 func _process(_delta: float) -> void:
   Steam.run_callbacks()
@@ -104,7 +104,7 @@ func join_as_client(lobby_id):
   Steam.joinLobby(lobby_id)
   _hosted_lobby_id = lobby_id
 
-func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool = false, _response : int = false):
+func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
   if !is_client:
     return
   
@@ -114,6 +114,20 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool = false, 
   
   # Start loading the map
   _request_level_load()
+
+func _on_join_requested(lobby_id: int, friend_id: int) -> void:
+  print("Steam Overlay requested to join lobby: ", lobby_id, " from friend: ", friend_id)
+  
+  # 1. If they are already in a match/loading, force a full reset!
+  if is_hosting or is_client or loading or level_container.get_child_count() > 0:
+    cleanup_network_state()
+    GlobalSignalServer.emit_signal("GoToMainMenu")
+    
+  # --- THE MISSING LINE: Explicitly trigger the loading screen! ---
+  GlobalSignalServer.emit_signal("ShowLoadingScreen")
+  
+  # 2. Tell the main scene to join
+  GlobalSignalServer.emit_signal("JoinGame", lobby_id)
 
 func _request_level_load() -> void:
   ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
