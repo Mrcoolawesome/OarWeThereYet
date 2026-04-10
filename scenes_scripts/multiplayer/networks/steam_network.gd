@@ -32,9 +32,6 @@ func _ready() -> void:
   Steam.steamInit(4563080, true)
   Steam.initRelayNetworkAccess() # start steam relay
 
-  # initialize voice
-  ProxChat.initialize_voice()
-
   # connect the 'on_lobby_created' function to the lobby created signal
   Steam.lobby_created.connect(_on_lobby_created)
   Steam.lobby_joined.connect(_on_lobby_join)
@@ -50,6 +47,8 @@ func _process(_delta: float) -> void:
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       loading = false
       multiplayer_peer.server_relay = true
+      # initialize voice
+      ProxChat.initialize_voice()
       _add_level() # The map is officially in the SceneTree now!
 
       # --- NETWORK INITIALIZATION ---
