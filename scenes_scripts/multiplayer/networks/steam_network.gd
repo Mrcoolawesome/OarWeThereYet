@@ -104,7 +104,7 @@ func join_as_client(lobby_id):
   Steam.joinLobby(lobby_id)
   _hosted_lobby_id = lobby_id
 
-func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
+func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool = false, _response : int = false):
   if !is_client:
     return
   
