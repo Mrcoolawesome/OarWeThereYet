@@ -70,6 +70,8 @@ func _process(_delta: float) -> void:
         multiplayer_peer.create_client(pending_host_id)
         multiplayer.multiplayer_peer = multiplayer_peer    
         pending_host_id = 0
+        multiplayer.server_disconnected.connect(cleanup_network_state)
+
 
       GlobalSignalServer.emit_signal("DoneLoadingMap")
 
@@ -212,3 +214,9 @@ func _remove_player(id : int):
     player_node.queue_free()
   else:
     print("Could not find player with ID: ", id)
+
+func cleanup_network_state() -> void:
+  # 1. SHUT DOWN NETWORK FIRST (Stop incoming RPCs/Signals)
+  multiplayer.peer_connected.disconnect(_add_player_to_game)
+  multiplayer.peer_disconnected.disconnect(_remove_player)
+  multiplayer.server_disconnected.disconnect(cleanup_network_state)
