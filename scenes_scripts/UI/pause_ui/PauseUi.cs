@@ -19,8 +19,6 @@ public partial class PauseUi : Control
     // get the stuff from the tree
     _settingsMenu = GetNode<Control>("PanelContainer/SettingsMenu");
     _mainContainer = GetNode<MarginContainer>("PanelContainer/PauseButtonMainContainer");
-
-    Multiplayer.ServerDisconnected += OnServerDisconnected;
   }
 
   // --- NEW INPUT HANDLER ---
@@ -53,28 +51,6 @@ public partial class PauseUi : Control
     // Whether we are the Host or the Client, the process is now exactly the same!
     // 1. Tell the local game manager to go to the main menu
     GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
-
-    // 2. Nuke the network connection
-    // (If we are the Host, this triggers "OnServerDisconnected" on all connected clients automatically!)
-    if (Multiplayer.MultiplayerPeer != null)
-    {
-      Multiplayer.MultiplayerPeer.Close();
-      Multiplayer.MultiplayerPeer = null;
-    }
-  }
-
-  // This fires automatically on the CLIENT if the HOST closes their game or loses internet
-  private void OnServerDisconnected()
-  {
-    // Force the client back to the main menu
-    GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.GoToMainMenu));
-
-    // Clean up their local peer so they don't become a ghost
-    if (Multiplayer.MultiplayerPeer != null)
-    {
-      Multiplayer.MultiplayerPeer.Close();
-      Multiplayer.MultiplayerPeer = null;
-    }
   }
 
   private void OnSettingsButtonPressed()

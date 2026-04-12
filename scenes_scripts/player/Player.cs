@@ -1370,6 +1370,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// This built-in function automatically runs the exact moment the node is queued for deletion
   public override void _ExitTree()
   {
+		// Unsubscribe from signals
+		GlobalSignalServer.Instance.RespawnPlayer -= OnPauseUIRespawnPlayer;
+		GlobalSignalServer.Instance.ApplyPlayerLookSpeed -= ChangePlayerLookSpeed;
+		GlobalSignalServer.Instance.AssignGamertag -= SetUsername;
+		GlobalSignalServer.Instance.AssignPlayerColor -= SetPlayerColor;
+    GlobalSignalServer.Instance.PlayerLoudness -= OnPlayerLoudness;
+    GlobalSignalServer.Instance.EndGame -= OnEndGameTriggered;
+
     // If the player was rowing when they disconnected/were deleted
     if (CurrPlayerState == PlayerState.Rowing && _boat != null)
     {
@@ -1387,6 +1395,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       // (Using 1 for direction is fine just to trigger the stop command)
       GlobalSignalServer.Instance.EmitSignal("AnimateOar", (int)_seat, 1, false);
     }
+
+		Input.MouseMode = Input.MouseModeEnum.Visible;
   }
 
 	// function to set their color from the RPC

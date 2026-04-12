@@ -10,7 +10,6 @@ var LOBBY_NAME = "gaming"
 # player scene and level scene path
 var player_scene = preload("res://scenes_scripts/player/player.tscn")
 const LEVEL_SCENE_PATH = "res://scenes_scripts/levels/stylized-map/stylized-map.tscn"
-var level_name = "DemoLevel"
 
 # global values to load the level in
 var loading: bool = false
@@ -33,12 +32,10 @@ func _ready() -> void:
   Steam.steamInit(4563080, true)
   Steam.initRelayNetworkAccess() # start steam relay
 
-  # initialize voice
-  ProxChat.initialize_voice()
-
   # connect the 'on_lobby_created' function to the lobby created signal
   Steam.lobby_created.connect(_on_lobby_created)
   Steam.lobby_joined.connect(_on_lobby_join)
+  Steam.join_requested.connect(_on_join_requested)
 
 func _process(_delta: float) -> void:
   Steam.run_callbacks()
@@ -50,15 +47,18 @@ func _process(_delta: float) -> void:
     
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       loading = false
+      multiplayer_peer.server_relay = true
+      # initialize voice
+      ProxChat.initialize_voice()
       _add_level() # The map is officially in the SceneTree now!
+      GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
 
       # --- NETWORK INITIALIZATION ---
       if is_hosting:
         # Now that the host has the map loaded, start the server
-        multiplayer_peer.server_relay = true
         multiplayer_peer.create_host()
         multiplayer.multiplayer_peer = multiplayer_peer
-        
+
         multiplayer.peer_connected.connect(_add_player_to_game)
         multiplayer.peer_disconnected.connect(_remove_player)
         
@@ -66,18 +66,22 @@ func _process(_delta: float) -> void:
         is_hosting = false
 
       elif pending_host_id != 0:
+        # Check if the host is still there before connecting Godot multiplayer
+        var current_owner = Steam.getLobbyOwner(_hosted_lobby_id)
+        if current_owner == 0 or current_owner != pending_host_id:
+          print("Host is no longer available.")
+          pending_host_id = 0
+          _on_server_disconnected()
+          GlobalSignalServer.emit_signal("DoneLoadingMap")
+          return
+
         # Now that the client has the map loaded, connect to the server
-        multiplayer_peer = SteamMultiplayerPeer.new()
-        multiplayer_peer.server_relay = true 
-        var error = multiplayer_peer.create_client(pending_host_id)
-        
-        if error == OK:
-          multiplayer.multiplayer_peer = multiplayer_peer
-        else:
-          print("Failed to create client: ", error)
-          
+        print("Setting multiplayer peer for client")
+        multiplayer_peer.create_client(pending_host_id)
+        multiplayer.multiplayer_peer = multiplayer_peer    
         pending_host_id = 0
-      # ------------------------------
+        multiplayer.server_disconnected.connect(_on_server_disconnected)
+
 
       GlobalSignalServer.emit_signal("DoneLoadingMap")
 
@@ -98,6 +102,7 @@ func become_host(is_public: bool, lobby_name: String):
 func join_as_client(lobby_id):
   is_client = true
   Steam.joinLobby(lobby_id)
+  _hosted_lobby_id = lobby_id
 
 func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _response : int):
   if !is_client:
@@ -110,9 +115,21 @@ func _on_lobby_join(lobby_id : int, _permissions : int, _locked : bool, _respons
   # Start loading the map
   _request_level_load()
 
+func _on_join_requested(lobby_id: int, friend_id: int) -> void:
+  print("Steam Overlay requested to join lobby: ", lobby_id, " from friend: ", friend_id)
+  
+  # 1. If they are already in a match/loading, force a full reset!
+  if is_hosting or is_client or loading or level_container.get_child_count() > 0:
+    cleanup_network_state()
+    GlobalSignalServer.emit_signal("GoToMainMenu")
+    
+  # --- THE MISSING LINE: Explicitly trigger the loading screen! ---
+  GlobalSignalServer.emit_signal("ShowLoadingScreen")
+  
+  # 2. Tell the main scene to join
+  GlobalSignalServer.emit_signal("JoinGame", lobby_id)
+
 func _request_level_load() -> void:
-  await get_tree().process_frame 
-  await get_tree().process_frame 
   ResourceLoader.load_threaded_request(LEVEL_SCENE_PATH)
   loading = true
 
@@ -204,11 +221,9 @@ func _receive_player_color(color_hex: String) -> void:
   GlobalSignalServer.emit_signal("AssignPlayerColor", color_hex)
 
 '''
-  find the player we're looking to remove, and remove their instance.
+  Runs on host when a client leaves
 '''
 func _remove_player(id : int):    
-  ProxChat.stop_voice()
-
   var active_level = level_container.get_children()[0];
   var player_node = active_level.get_node_or_null(str(id)) # recursively looks for the player
   
@@ -222,3 +237,27 @@ func _remove_player(id : int):
     player_node.queue_free()
   else:
     print("Could not find player with ID: ", id)
+
+'''
+  Runs on client when kicked by host
+'''
+func _on_server_disconnected():
+  cleanup_network_state()
+  GlobalSignalServer.emit_signal("GoToMainMenu")
+
+func cleanup_network_state() -> void:
+  print("Cleaning up network state")
+  ProxChat.stop_voice()
+  print("stopped voice")
+
+  # 1. SHUT DOWN NETWORK FIRST (Stop incoming RPCs/Signals)
+  multiplayer.peer_connected.disconnect(_add_player_to_game)
+  multiplayer.peer_disconnected.disconnect(_remove_player)
+  multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+  GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
+
+  if multiplayer.multiplayer_peer != null:
+    multiplayer.multiplayer_peer.close()
+  multiplayer.multiplayer_peer = null
+
+  Steam.leaveLobby(_hosted_lobby_id)
