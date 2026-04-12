@@ -67,7 +67,7 @@ public partial class GlobalSignalServer : Node
   public delegate void AssignGamertagEventHandler(string gamertag);
 
   [Signal]
-  public delegate void AssignPlayerColorEventHandler(string colorHex);
+  public delegate void AssignPlayerColorEventHandler(int multiplayerID, string colorHex);
 
   [Signal]
   public delegate void AssignInputDeviceEventHandler(string deviceName);

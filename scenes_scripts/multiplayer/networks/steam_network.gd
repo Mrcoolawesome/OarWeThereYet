@@ -25,6 +25,26 @@ var is_hosting: bool = false
 var pending_host_id: int = 0
 
 const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
+var assigned_player_colors: Dictionary = {}
+
+func _assign_unique_color(target_player_id: int) -> String:
+  if assigned_player_colors.has(target_player_id):
+    return assigned_player_colors[target_player_id]
+
+  var used_colors: Array = assigned_player_colors.values()
+  for color in PLAYER_COLORS:
+    if !used_colors.has(color):
+      assigned_player_colors[target_player_id] = color
+      return color
+
+  # Fallback (should never hit with max 4 players/colors).
+  var fallback_color: String = PLAYER_COLORS[target_player_id % PLAYER_COLORS.size()]
+  assigned_player_colors[target_player_id] = fallback_color
+  return fallback_color
+
+func _sync_all_player_colors_to_peer(target_peer_id: int) -> void:
+  for existing_player_id in assigned_player_colors.keys():
+    rpc_id(target_peer_id, "_receive_player_color", existing_player_id, assigned_player_colors[existing_player_id])
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -172,10 +192,13 @@ func _add_player_to_game(id: int):
     # Add the player as a child of the LOADED MAP
     current_map.add_child(player, true) # that second boolean is important because it keeps the name of the player to be the one that we set for it
 
-    # Pick a color based on their ID to ensure variety
-    var color_hex = PLAYER_COLORS[id % PLAYER_COLORS.size()]
-    # Send an RPC call ONLY to the client who owns this player node
-    rpc_id(id, "_receive_player_color", color_hex)
+    # Pick a unique color for this player for the current match.
+    var color_hex = _assign_unique_color(id)
+    # Broadcast this player's color to everyone.
+    rpc("_receive_player_color", id, color_hex)
+
+    # Also send a full color snapshot to the joining peer so all existing players are correct.
+    _sync_all_player_colors_to_peer(id)
 
     # --- THE FIX: Fetch their actual Steam name dynamically ---
     rpc_id(id, "_fetch_and_apply_gamertag")
@@ -216,9 +239,9 @@ func _fetch_and_apply_gamertag() -> void:
   GlobalSignalServer.emit_signal("AssignGamertag", my_steam_name)
 
 @rpc("authority", "reliable", "call_local")
-func _receive_player_color(color_hex: String) -> void:
+func _receive_player_color(target_player_id: int, color_hex: String) -> void:
   # Emit your global signal for the C# script to catch
-  GlobalSignalServer.emit_signal("AssignPlayerColor", color_hex)
+  GlobalSignalServer.emit_signal("AssignPlayerColor", target_player_id, color_hex)
 
 '''
   Runs on host when a client leaves
@@ -235,6 +258,7 @@ func _remove_player(id : int):
 
     # Free player
     player_node.queue_free()
+    assigned_player_colors.erase(id)
   else:
     print("Could not find player with ID: ", id)
 
@@ -261,3 +285,4 @@ func cleanup_network_state() -> void:
   multiplayer.multiplayer_peer = null
 
   Steam.leaveLobby(_hosted_lobby_id)
+  assigned_player_colors.clear()

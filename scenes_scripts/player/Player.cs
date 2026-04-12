@@ -1430,9 +1430,14 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   }
 
 	// function to set their color from the RPC
-  public void SetPlayerColor(string colorHex)
+  public void SetPlayerColor(int multiplayerID, string colorHex)
   {
-    // Only the authority actually captures the signal and sets the official color
+		if (Name != multiplayerID.ToString())
+		{
+			return;
+		}
+
+		// Apply only to the targeted player's node.
 		CurrentColorHex = colorHex;
 		ApplyMaterialColor(colorHex);
 		_lastAppliedColor = colorHex;
