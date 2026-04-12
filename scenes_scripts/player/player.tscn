@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=4 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=27 format=4 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
@@ -91,6 +91,20 @@ stereo = true
 [sub_resource type="AudioStreamMicrophone" id="AudioStreamMicrophone_fqj0r"]
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_0fxne"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_fqj0r"]
+properties/0/path = NodePath("..:WalkingOnBoatAudioGate")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath("..:WalkingOnGroundAudioGate")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("..:TreadingWaterAudioGate")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("..:MovementAudioPitchScale")
+properties/3/spawn = true
+properties/3/replication_mode = 2
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4
@@ -368,6 +382,9 @@ stream = SubResource("AudioStreamGenerator_0fxne")
 attenuation_model = 2
 bus = &"Voice Chat"
 doppler_tracking = 1
+
+[node name="AudioSynchronizer" type="MultiplayerSynchronizer" parent="AudioStuff"]
+replication_config = SubResource("SceneReplicationConfig_fqj0r")
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]

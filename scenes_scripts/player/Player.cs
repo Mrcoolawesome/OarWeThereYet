@@ -34,6 +34,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[ExportGroup("Head talking animation setting")]
   [Export] public float VoiceScaleMultiplier = 15.0f;
 
+	[ExportGroup("Networked Audio Gates")]
+	[Export] public bool WalkingOnBoatAudioGate { get; set; } = false;
+	[Export] public bool WalkingOnGroundAudioGate { get; set; } = false;
+	[Export] public bool TreadingWaterAudioGate { get; set; } = false;
+	[Export] public float MovementAudioPitchScale { get; set; } = 1.0f;
+
 	// Private variables
 	private float _currSpeed = 5.0f;
 	private float _gravity = 9.8f;
@@ -524,6 +530,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 			// do their audio stuff
 			HandleAudioPhysicsProcess();
+			ApplyAudioFromGates();
 		}
 		else // if we're not the owner of this instance, then we're just gonna sync their position and stuff (this is for 'network puppets')
 		{
@@ -545,6 +552,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
       // Sync network data 
       SyncAndLerpClientDataProcess(delta); // this deals with the sitting state
+
+			// Apply replicated audio state from synchronized gate booleans.
+			ApplyAudioFromGates();
 		}
 
 		// Reset for the NEXT frame's potential signal
@@ -642,25 +652,24 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	private void HandleAudioPhysicsProcess()
   {
-    // 2. CONTINUOUS LOOPING AUDIO (Swimming & Walking)
+		// Compute synchronized gate booleans for this frame.
     Vector2 inputDir = Input.GetVector("left", "right", "move_forward", "move_backward");
     bool isTryingToMove = inputDir.LengthSquared() > 0.01f;
+		TreadingWaterAudioGate = false;
+		WalkingOnBoatAudioGate = false;
+		WalkingOnGroundAudioGate = false;
+		MovementAudioPitchScale = 1.0f;
 
     // Check swimming
     if (_currentAnim == "swimming")
     {
-      if (!_treadingWaterAudio.Playing) _treadingWaterAudio.Play();
-      _walkingOnBoatAudio.Stop();
-      _walkingOnGroundAudio.Stop();
+			TreadingWaterAudioGate = true;
     }
     // Check walking on ground/boat
     else if (IsOnFloor() && isTryingToMove && CurrPlayerState == PlayerState.Standing)
     {
-      _treadingWaterAudio.Stop();
-
-      // Determine if they are crouch walking to set the speed to 10x
-      bool isCrouchWalking = _currentAnim == "crouchWalking" || _currentAnim == "crouchWalkingBackward";
-      float audioSpeed = isCrouchWalking ? 2.0f : 1.0f;
+			bool isCrouchWalking = _currentAnim == "crouchWalking" || _currentAnim == "crouchWalkingBackward";
+			MovementAudioPitchScale = isCrouchWalking ? 2.0f : 1.0f;
 
       bool isOnBoat = false;
       
@@ -677,26 +686,47 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       // Apply the speed and play the correct audio
       if (isOnBoat)
       {
-        _walkingOnBoatAudio.PitchScale = audioSpeed;
-        if (!_walkingOnBoatAudio.Playing) _walkingOnBoatAudio.Play();
-        
-        _walkingOnGroundAudio.Stop();
+        WalkingOnBoatAudioGate = true;
       }
       else
       {
-        _walkingOnGroundAudio.PitchScale = audioSpeed;
-        if (!_walkingOnGroundAudio.Playing) _walkingOnGroundAudio.Play();
-        
-        _walkingOnBoatAudio.Stop();
+        WalkingOnGroundAudioGate = true;
       }
     }
-    // Silence everything if standing still or in the air
-    else
-    {
-      _treadingWaterAudio.Stop();
-      _walkingOnBoatAudio.Stop();
-      _walkingOnGroundAudio.Stop();
-    }
+  }
+
+	private void ApplyAudioFromGates()
+	{
+		float audioSpeed = Mathf.Max(0.01f, MovementAudioPitchScale);
+
+		if (TreadingWaterAudioGate)
+		{
+			if (!_treadingWaterAudio.Playing) _treadingWaterAudio.Play();
+		}
+		else
+		{
+			_treadingWaterAudio.Stop();
+		}
+
+		if (WalkingOnBoatAudioGate)
+		{
+			_walkingOnBoatAudio.PitchScale = audioSpeed;
+			if (!_walkingOnBoatAudio.Playing) _walkingOnBoatAudio.Play();
+		}
+		else
+		{
+			_walkingOnBoatAudio.Stop();
+		}
+
+		if (WalkingOnGroundAudioGate)
+		{
+			_walkingOnGroundAudio.PitchScale = audioSpeed;
+			if (!_walkingOnGroundAudio.Playing) _walkingOnGroundAudio.Play();
+		}
+		else
+		{
+			_walkingOnGroundAudio.Stop();
+		}
   }
 
 	private void AnimationManager(Vector3 velocity, Vector2 inputDir, double delta)
