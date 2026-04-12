@@ -75,6 +75,7 @@ func _load_input_devices_into_dropdown() -> void:
   input_devices.clear()
   mic_option_button.clear()
 
+  var previous_input_device: String = settings_prefrences.input_device
   var devices: PackedStringArray = AudioServer.get_input_device_list()
   var default_input_device: String = AudioServer.input_device
   var selected_index: int = 0
@@ -105,7 +106,9 @@ func _load_input_devices_into_dropdown() -> void:
   settings_prefrences.input_device = current_input_device
   audio_input_device_dropdown.DefaultItem = selected_index
 
-  if AudioServer.input_device != current_input_device:
+  # Only auto-apply when the logical preference changed (e.g. missing device fallback).
+  # Do not compare against AudioServer.input_device here because backend updates can lag.
+  if previous_input_device != current_input_device:
     GlobalSignalServer.emit_signal("AssignInputDevice", current_input_device)
 
 func _on_voice_chat_volume_slider_value_changed(value: float) -> void:

@@ -63,10 +63,11 @@ func apply_audio_settings(user_prefs: UserSettingPrefrences) -> void:
 
     var default_input_device: String = AudioServer.input_device
     if user_prefs.input_device != "":
+        # Apply directly first so we don't lose the saved device to early startup timing.
+        AudioServer.input_device = user_prefs.input_device
+
         var available_input_devices: PackedStringArray = AudioServer.get_input_device_list()
-        if available_input_devices.has(user_prefs.input_device):
-            AudioServer.input_device = user_prefs.input_device
-        elif available_input_devices.has(default_input_device):
+        if !available_input_devices.has(user_prefs.input_device) and available_input_devices.has(default_input_device):
             AudioServer.input_device = default_input_device
             user_prefs.input_device = default_input_device
 
