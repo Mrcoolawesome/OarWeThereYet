@@ -53,6 +53,11 @@ var resolutions_array: Array[Vector2i] = [
   Vector2i(3440, 1440), # UWQHD (Ultrawide 1440p)
   Vector2i(2560, 1080), # UWFHD (Ultrawide 1080p)
 
+  # 32:9 resolutions (Super Ultrawide Monitors)
+  Vector2i(7680, 2160), # Dual 4K width / DQHD+
+  Vector2i(5120, 1440), # DQHD (Dual 1440p)
+  Vector2i(3840, 1080), # DFHD (Dual 1080p)
+
   # 3:2 resolutions (Common on Surface / Productivity laptops)
   Vector2i(2160, 1440), # 1440p 3:2
   Vector2i(1920, 1280), # 1280p 3:2
