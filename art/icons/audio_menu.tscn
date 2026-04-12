@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://b2o60fgelttrd"]
+[gd_scene load_steps=4 format=3 uid="uid://b2o60fgelttrd"]
 
 [ext_resource type="Script" uid="uid://mo3uybp5bb24" path="res://scenes_scripts/UI/settings_menu/audio_menu/audio_menu.gd" id="1_08ngt"]
 [ext_resource type="PackedScene" uid="uid://0fqe1khyldg5" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/slider/setting_slider.tscn" id="2_t3ptl"]
+[ext_resource type="PackedScene" uid="uid://di3iyb18rny5e" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/dropdown/dropdown_setting.tscn" id="3_08ngt"]
 
 [node name="AudioMenu" type="Control"]
 layout_mode = 3
@@ -37,5 +38,11 @@ size_flags_vertical = 3
 StartingValue = 100.0
 SliderLabelText = "Master Volume"
 
+[node name="MicInputDropdown" parent="MarginContainer/VBoxContainer" instance=ExtResource("3_08ngt")]
+layout_mode = 2
+size_flags_vertical = 3
+LabelText = "Mic Input"
+
 [connection signal="slider_changed" from="MarginContainer/VBoxContainer/VoicechatVolumeSlider" to="." method="_on_voice_chat_volume_slider_value_changed"]
 [connection signal="slider_changed" from="MarginContainer/VBoxContainer/MainVolumeSlider" to="." method="_on_main_volume_slider_slider_changed"]
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/MicInputDropdown" to="." method="_on_mic_input_dropdown_item_selected"]

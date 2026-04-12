@@ -69,6 +69,9 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void AssignPlayerColorEventHandler(string colorHex);
 
+  [Signal]
+  public delegate void AssignInputDeviceEventHandler(string deviceName);
+
   [Signal] 
   public delegate void PlayerLoudnessEventHandler(float loudness);
 

@@ -19,7 +19,22 @@ var active_players: Dictionary[int, PlayerAudioData] = {}
 var capture_effect: AudioEffectCapture
 
 func _ready() -> void:
+  if GlobalSignalServer and !GlobalSignalServer.is_connected("AssignInputDevice", Callable(self, "_on_assign_input_device")):
+    GlobalSignalServer.connect("AssignInputDevice", Callable(self, "_on_assign_input_device"))
+
   set_process(false)
+
+func _on_assign_input_device(device_name: String) -> void:
+  var available_devices: PackedStringArray = AudioServer.get_input_device_list()
+  if !available_devices.has(device_name):
+    push_warning("Requested mic input device not found: " + device_name)
+    return
+
+  AudioServer.input_device = device_name
+
+  # dump stale frames from the old device so capture starts clean
+  if capture_effect:
+    capture_effect.clear_buffer()
 
 func initialize_voice():
   var bus_idx = AudioServer.get_bus_index("MicInput")

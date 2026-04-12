@@ -61,5 +61,14 @@ func apply_audio_settings(user_prefs: UserSettingPrefrences) -> void:
     AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Voice Chat"), user_prefs.voicechat_volume)
     AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Master"), user_prefs.master_volume)
 
+    var default_input_device: String = AudioServer.input_device
+    if user_prefs.input_device != "":
+        var available_input_devices: PackedStringArray = AudioServer.get_input_device_list()
+        if available_input_devices.has(user_prefs.input_device):
+            AudioServer.input_device = user_prefs.input_device
+        elif available_input_devices.has(default_input_device):
+            AudioServer.input_device = default_input_device
+            user_prefs.input_device = default_input_device
+
 func apply_controls_settings(user_prefs: UserSettingPrefrences) -> void:
     GlobalSignalServer.emit_signal("ApplyPlayerLookSpeed", user_prefs.look_speed)
