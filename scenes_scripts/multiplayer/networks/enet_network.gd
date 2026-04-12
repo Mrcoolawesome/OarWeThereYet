@@ -50,6 +50,9 @@ func _process(_delta: float) -> void:
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       # done loading
       loading = false
+      # initialize voice before players start spawning in
+      ProxChat.initialize_voice()
+      GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
       # actually load the level in
       _add_level()
 
@@ -72,6 +75,7 @@ func _process(_delta: float) -> void:
         multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
         multiplayer.multiplayer_peer = multiplayer_peer
         is_joining = false
+        multiplayer.server_disconnected.connect(_on_server_disconnected)
       # ------------------------------
 
       # we can remove the main menu ui now
@@ -165,3 +169,36 @@ func _remove_player(id : int):
     player_node.queue_free()
   else:
     print("Could not find player with ID: ", id)
+
+'''
+  Runs on client when kicked by host, or whenever the peer drops.
+'''
+func _on_server_disconnected():
+  cleanup_network_state()
+  GlobalSignalServer.emit_signal("GoToMainMenu")
+
+func cleanup_network_state() -> void:
+  print("Cleaning up network state")
+  ProxChat.stop_voice()
+  print("stopped voice")
+
+  loading = false
+  is_hosting = false
+  is_joining = false
+
+  if multiplayer.peer_connected.is_connected(_add_player_to_game):
+    multiplayer.peer_connected.disconnect(_add_player_to_game)
+
+  if multiplayer.peer_disconnected.is_connected(_remove_player):
+    multiplayer.peer_disconnected.disconnect(_remove_player)
+
+  if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+    multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+
+  if GlobalSignalServer.GoToMainMenu.is_connected(cleanup_network_state):
+    GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
+
+  if multiplayer.multiplayer_peer != null:
+    multiplayer.multiplayer_peer.close()
+
+  multiplayer.multiplayer_peer = null

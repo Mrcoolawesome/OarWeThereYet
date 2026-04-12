@@ -12,6 +12,9 @@ signal setting_changed
 var settings_prefrences: UserSettingPrefrences
 var is_loading_ui: bool = false # Prevents signals from firing when UI boots
 var input_devices: Array[String] = []
+var last_detected_devices: PackedStringArray = PackedStringArray()
+var device_refresh_interval: float = 2.0
+var elapsed_refresh_time: float = 0.0
 
 func _ready() -> void:
   # Lock the signals while we load the UI
@@ -30,9 +33,43 @@ func _ready() -> void:
 
   # load all available mic devices into the dropdown
   _load_input_devices_into_dropdown()
+  last_detected_devices = AudioServer.get_input_device_list()
   
   # Unlock the signals now that the UI is done setting up
   is_loading_ui = false
+  set_process(true)
+
+func _process(delta: float) -> void:
+  if !visible:
+    return
+
+  elapsed_refresh_time += delta
+  if elapsed_refresh_time < device_refresh_interval:
+    return
+
+  elapsed_refresh_time = 0.0
+  _refresh_input_devices_if_changed()
+
+func _refresh_input_devices_if_changed() -> void:
+  var latest_devices: PackedStringArray = AudioServer.get_input_device_list()
+  if _packed_string_arrays_equal(latest_devices, last_detected_devices):
+    return
+
+  # Keep this update silent; this is a device hot-plug sync, not a user action.
+  is_loading_ui = true
+  _load_input_devices_into_dropdown()
+  is_loading_ui = false
+  last_detected_devices = latest_devices
+
+func _packed_string_arrays_equal(a: PackedStringArray, b: PackedStringArray) -> bool:
+  if a.size() != b.size():
+    return false
+
+  for i in range(a.size()):
+    if a[i] != b[i]:
+      return false
+
+  return true
 
 func _load_input_devices_into_dropdown() -> void:
   input_devices.clear()
@@ -67,6 +104,9 @@ func _load_input_devices_into_dropdown() -> void:
 
   settings_prefrences.input_device = current_input_device
   audio_input_device_dropdown.DefaultItem = selected_index
+
+  if AudioServer.input_device != current_input_device:
+    GlobalSignalServer.emit_signal("AssignInputDevice", current_input_device)
 
 func _on_voice_chat_volume_slider_value_changed(value: float) -> void:
   # the audio bus takes values only from 0.0 to 1.0
