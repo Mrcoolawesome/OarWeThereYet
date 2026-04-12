@@ -60,6 +60,9 @@ func apply_graphics_settings(user_prefs: UserSettingPrefrences) -> void:
 func apply_audio_settings(user_prefs: UserSettingPrefrences) -> void:
     AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Voice Chat"), user_prefs.voicechat_volume)
     AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Master"), user_prefs.master_volume)
+    AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("PlayerMovementSounds"), user_prefs.player_movement_volume)
+    AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), user_prefs.music_volume)
+    AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Environment"), user_prefs.environment_volume)
 
     var default_input_device: String = AudioServer.input_device
     if user_prefs.input_device != "":

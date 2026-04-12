@@ -23,26 +23,52 @@ grow_vertical = 2
 theme_override_constants/margin_left = 50
 theme_override_constants/margin_right = 50
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
 layout_mode = 2
 
-[node name="VoicechatVolumeSlider" parent="MarginContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
-StartingValue = 100.0
-SliderLabelText = "Voicechat Volume"
 
-[node name="MainVolumeSlider" parent="MarginContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
+[node name="MainVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
 layout_mode = 2
 size_flags_vertical = 3
 StartingValue = 100.0
 SliderLabelText = "Master Volume"
 
-[node name="MicInputDropdown" parent="MarginContainer/VBoxContainer" instance=ExtResource("3_08ngt")]
+[node name="VoicechatVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 100.0
+SliderLabelText = "Voicechat Volume"
+
+[node name="EnvironmentVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 100.0
+SliderLabelText = "Ambient Volume"
+
+[node name="MusicVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 100.0
+SliderLabelText = "Music Volume"
+
+[node name="PlayeMovementVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 100.0
+SliderLabelText = "Character Volume"
+
+[node name="MicInputDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_08ngt")]
 layout_mode = 2
 size_flags_vertical = 3
 LabelText = "Mic Input"
 
-[connection signal="slider_changed" from="MarginContainer/VBoxContainer/VoicechatVolumeSlider" to="." method="_on_voice_chat_volume_slider_value_changed"]
-[connection signal="slider_changed" from="MarginContainer/VBoxContainer/MainVolumeSlider" to="." method="_on_main_volume_slider_slider_changed"]
-[connection signal="item_selected" from="MarginContainer/VBoxContainer/MicInputDropdown" to="." method="_on_mic_input_dropdown_item_selected"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MainVolumeSlider" to="." method="_on_main_volume_slider_slider_changed"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/VoicechatVolumeSlider" to="." method="_on_voice_chat_volume_slider_value_changed"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/EnvironmentVolumeSlider" to="." method="_on_environment_volume_slider_slider_changed"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MusicVolumeSlider" to="." method="_on_music_volume_slider_slider_changed"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/PlayeMovementVolumeSlider" to="." method="_on_playe_movement_volume_slider_slider_changed"]
+[connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/MicInputDropdown" to="." method="_on_mic_input_dropdown_item_selected"]

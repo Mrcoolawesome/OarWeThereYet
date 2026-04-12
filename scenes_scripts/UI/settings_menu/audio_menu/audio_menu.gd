@@ -3,10 +3,13 @@ extends Control
 # NEW SIGNAL: Lets parent know a change happened
 signal setting_changed
 
-@onready var vc_volume_slider = $MarginContainer/VBoxContainer/VoicechatVolumeSlider
-@onready var main_volume_slider = $MarginContainer/VBoxContainer/MainVolumeSlider
-@onready var audio_input_device_dropdown = $MarginContainer/VBoxContainer/MicInputDropdown
-@onready var mic_option_button: OptionButton = $MarginContainer/VBoxContainer/MicInputDropdown/MarginContainer/HBoxContainer/OptionButton
+@onready var vc_volume_slider = $MarginContainer/ScrollContainer/VBoxContainer/VoicechatVolumeSlider
+@onready var main_volume_slider = $MarginContainer/ScrollContainer/VBoxContainer/MainVolumeSlider
+@onready var audio_input_device_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/MicInputDropdown
+@onready var mic_option_button: OptionButton = $MarginContainer/ScrollContainer/VBoxContainer/MicInputDropdown/MarginContainer/HBoxContainer/OptionButton
+@onready var environment_volume_slider = $MarginContainer/ScrollContainer/VBoxContainer/EnvironmentVolumeSlider
+@onready var music_volume_slider = $MarginContainer/ScrollContainer/VBoxContainer/MusicVolumeSlider
+@onready var player_movement_volume_slider = $MarginContainer/ScrollContainer/VBoxContainer/PlayeMovementVolumeSlider
 
 # the settings object
 var settings_prefrences: UserSettingPrefrences
@@ -25,11 +28,20 @@ func _ready() -> void:
   # set the slider tag immedately 
   var normalized_voicechat_volume: String = str(int(settings_prefrences.voicechat_volume * 100))
   var normalized_master_volume: String = str(int(settings_prefrences.master_volume * 100))
+  var normalized_player_movement_volume: String = str(int(settings_prefrences.player_movement_volume * 100))
+  var normalized_music_volume: String = str(int(settings_prefrences.music_volume * 100))
+  var normalized_environment_volume: String = str(int(settings_prefrences.environment_volume * 100))
   # set the text tag and the slider default values
   vc_volume_slider.number_tag.text = normalized_voicechat_volume
   main_volume_slider.number_tag.text = normalized_master_volume
+  player_movement_volume_slider.number_tag.text = normalized_player_movement_volume
+  music_volume_slider.number_tag.text = normalized_music_volume
+  environment_volume_slider.number_tag.text = normalized_environment_volume
   vc_volume_slider.StartingValue = normalized_voicechat_volume
   main_volume_slider.StartingValue = normalized_master_volume
+  player_movement_volume_slider.StartingValue = normalized_player_movement_volume
+  music_volume_slider.StartingValue = normalized_music_volume
+  environment_volume_slider.StartingValue = normalized_environment_volume
 
   # load all available mic devices into the dropdown
   _load_input_devices_into_dropdown()
@@ -157,6 +169,33 @@ func _on_mic_input_dropdown_item_selected(item: int) -> void:
   var selected_device: String = input_devices[item]
   settings_prefrences.input_device = selected_device
   GlobalSignalServer.emit_signal("AssignInputDevice", selected_device)
+
+  if !is_loading_ui:
+    setting_changed.emit()
+
+func _on_playe_movement_volume_slider_slider_changed(new_value: float) -> void:
+  var normalized_value: float = new_value / 100.0
+  AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("PlayerMovementSounds"), normalized_value)
+  player_movement_volume_slider.number_tag.text = str(int(new_value))
+  settings_prefrences.player_movement_volume = normalized_value
+
+  if !is_loading_ui:
+    setting_changed.emit()
+
+func _on_music_volume_slider_slider_changed(new_value: float) -> void:
+  var normalized_value: float = new_value / 100.0
+  AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Music"), normalized_value)
+  music_volume_slider.number_tag.text = str(int(new_value))
+  settings_prefrences.music_volume = normalized_value
+
+  if !is_loading_ui:
+    setting_changed.emit()
+
+func _on_environment_volume_slider_slider_changed(new_value: float) -> void:
+  var normalized_value: float = new_value / 100.0
+  AudioServer.set_bus_volume_linear(AudioServer.get_bus_index("Environment"), normalized_value)
+  environment_volume_slider.number_tag.text = str(int(new_value))
+  settings_prefrences.environment_volume = normalized_value
 
   if !is_loading_ui:
     setting_changed.emit()

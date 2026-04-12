@@ -344,15 +344,19 @@ visible = false
 
 [node name="Jump" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = SubResource("AudioStreamWAV_8u33c")
+bus = &"PlayerMovementSounds"
 
 [node name="WorldWalkingSingle" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("13_fqj0r")
+bus = &"PlayerMovementSounds"
 
 [node name="BoatWalking" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("14_4b7ak")
+bus = &"PlayerMovementSounds"
 
 [node name="TreadingWater" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("15_lvkhp")
+bus = &"PlayerMovementSounds"
 
 [node name="AudioInput" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = SubResource("AudioStreamMicrophone_fqj0r")
