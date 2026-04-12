@@ -1,7 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://bifkncl7wc6x2"]
+[gd_scene load_steps=3 format=3 uid="uid://bifkncl7wc6x2"]
 
 [ext_resource type="AudioStream" uid="uid://dqll11fhl10jf" path="res://art/audio/ones-that-i-want/river/flow-medium.wav" id="1_xex4t"]
+[ext_resource type="Script" uid="uid://ctwdyjxqbo1dh" path="res://scenes_scripts/audio/ambient-river/AmbientRiverAudio.cs" id="2_r702j"]
 
-[node name="AmbientRiverAudio" type="AudioStreamPlayer"]
+[node name="AmbientRiverAudio" type="AudioStreamPlayer3D"]
 stream = ExtResource("1_xex4t")
 autoplay = true
+script = ExtResource("2_r702j")
