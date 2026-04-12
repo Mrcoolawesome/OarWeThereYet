@@ -406,7 +406,16 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		_pauseUICanvas.Visible = false;
 		_hud.Visible = true;
-		Input.MouseMode = Input.MouseModeEnum.Captured;
+
+		// Only keep the cursor captured while the game window is focused.
+		if (GetWindow() != null && GetWindow().HasFocus())
+		{
+			Input.MouseMode = Input.MouseModeEnum.Captured;
+		}
+		else
+		{
+			Input.MouseMode = Input.MouseModeEnum.Visible;
+		}
 	}
 
 	private void MenuStateProcess()
