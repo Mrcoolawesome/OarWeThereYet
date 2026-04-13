@@ -1354,7 +1354,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     }
   }
 
-  [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
   private void BroadcastImpulse(NodePath targetPath, Vector3 pushDirection)
   {
     if (GetNodeOrNull(targetPath) is RigidBody3D rb)
