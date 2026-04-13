@@ -25,10 +25,6 @@ func _ready() -> void:
   GlobalSignalServer.HostGameEnet.connect(become_host_enet)
   GlobalSignalServer.JoinGame.connect(join_lobby)
   GlobalSignalServer.GoToMainMenu.connect(back_to_main_menu)
-  GlobalSignalServer.DoneLoadingMap.connect(remove_ui)
-
-func remove_ui() -> void:
-  main_menu_ui.queue_free()
 
 func become_host_steam(is_public: bool, lobbyName: String):
   if lobbyName.strip_edges().to_lower() == "gaming":
