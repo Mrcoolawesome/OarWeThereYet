@@ -39,6 +39,9 @@ func _on_refresh_timer_timeout() -> void:
 		_get_friends_lobbies()
 
 func _on_lobby_match_list(lobbies: Array) -> void:
+	if current_tab == 1:
+		lobbies = _filter_out_friend_lobbies(lobbies)
+
 	var existing_lobby_ids: Array = []
 	
 	# --- NEW FLICKER-FREE UI LOGIC ---
@@ -99,3 +102,27 @@ func _get_friends_lobbies() -> void:
 					friends_lobbies.append(lobby_id)
 					
 	_on_lobby_match_list(friends_lobbies)
+
+func _filter_out_friend_lobbies(lobbies: Array) -> Array:
+	var friend_ids := _get_immediate_friend_ids()
+	if friend_ids.is_empty():
+		return lobbies
+
+	var filtered_lobbies: Array = []
+	for lobby_id in lobbies:
+		var owner_id: int = Steam.getLobbyOwner(lobby_id)
+		if not friend_ids.has(owner_id):
+			filtered_lobbies.append(lobby_id)
+
+	return filtered_lobbies
+
+func _get_immediate_friend_ids() -> Array:
+	var friend_ids: Array = []
+	var num_friends: int = Steam.getFriendCount()
+
+	for i in range(num_friends):
+		var friend_steam_id: int = Steam.getFriendByIndex(i, Steam.FRIEND_FLAG_IMMEDIATE)
+		if friend_steam_id != 0:
+			friend_ids.append(friend_steam_id)
+
+	return friend_ids
