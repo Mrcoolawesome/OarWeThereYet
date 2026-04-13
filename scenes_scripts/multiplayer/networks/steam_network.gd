@@ -92,8 +92,8 @@ func _process(_delta: float) -> void:
         if current_owner == 0 or current_owner != pending_host_id:
           print("Host is no longer available.")
           pending_host_id = 0
-          _on_server_disconnected()
           GlobalSignalServer.emit_signal("DoneLoadingMap")
+          _on_server_disconnected()
           return
 
         # Now that the client has the map loaded, connect to the server
@@ -278,10 +278,14 @@ func cleanup_network_state() -> void:
   print("stopped voice")
 
   # 1. SHUT DOWN NETWORK FIRST (Stop incoming RPCs/Signals)
-  multiplayer.peer_connected.disconnect(_add_player_to_game)
-  multiplayer.peer_disconnected.disconnect(_remove_player)
-  multiplayer.server_disconnected.disconnect(_on_server_disconnected)
-  GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
+  if multiplayer.peer_connected.is_connected(_add_player_to_game):
+    multiplayer.peer_connected.disconnect(_add_player_to_game)
+  if multiplayer.peer_disconnected.is_connected(_remove_player):
+    multiplayer.peer_disconnected.disconnect(_remove_player)
+  if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+    multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+  if GlobalSignalServer.GoToMainMenu.is_connected(cleanup_network_state):
+    GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
 
   if multiplayer.multiplayer_peer != null:
     multiplayer.multiplayer_peer.close()
