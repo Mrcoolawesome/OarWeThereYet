@@ -68,8 +68,6 @@ func _process(_delta: float) -> void:
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       loading = false
       multiplayer_peer.server_relay = true
-      # initialize voice
-      ProxChat.initialize_voice()
       _add_level() # The map is officially in the SceneTree now!
       GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
 
@@ -84,6 +82,9 @@ func _process(_delta: float) -> void:
         
         _add_player_to_game(1) # Spawn the host
         is_hosting = false
+
+        # initialize voice
+        ProxChat.initialize_voice()
 
       elif pending_host_id != 0:
         # Check if the host is still there before connecting Godot multiplayer
@@ -101,6 +102,8 @@ func _process(_delta: float) -> void:
         multiplayer.multiplayer_peer = multiplayer_peer    
         pending_host_id = 0
         multiplayer.server_disconnected.connect(_on_server_disconnected)
+        # initialize voice
+        ProxChat.initialize_voice()
 
 
       GlobalSignalServer.emit_signal("DoneLoadingMap")
