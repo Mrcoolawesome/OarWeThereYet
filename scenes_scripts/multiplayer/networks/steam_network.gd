@@ -23,6 +23,8 @@ var player_id: int = -1
 var is_client = false
 var is_hosting: bool = false
 var pending_host_id: int = 0
+var client_connect_in_progress: bool = false
+const CLIENT_CONNECT_VALIDATION_FRAMES := 15
 
 const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
 var assigned_player_colors: Dictionary = {}
@@ -68,8 +70,6 @@ func _process(_delta: float) -> void:
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       loading = false
       multiplayer_peer.server_relay = true
-      # initialize voice
-      ProxChat.initialize_voice()
       _add_level() # The map is officially in the SceneTree now!
       GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
 
@@ -85,25 +85,56 @@ func _process(_delta: float) -> void:
         _add_player_to_game(1) # Spawn the host
         is_hosting = false
 
-      elif pending_host_id != 0:
-        # Check if the host is still there before connecting Godot multiplayer
-        var current_owner = Steam.getLobbyOwner(_hosted_lobby_id)
-        if current_owner == 0 or current_owner != pending_host_id:
-          print("Host is no longer available.")
-          pending_host_id = 0
-          _on_server_disconnected()
-          GlobalSignalServer.emit_signal("DoneLoadingMap")
-          return
+        # initialize voice
+        ProxChat.initialize_voice()
 
-        # Now that the client has the map loaded, connect to the server
-        print("Setting multiplayer peer for client")
-        multiplayer_peer.create_client(pending_host_id)
-        multiplayer.multiplayer_peer = multiplayer_peer    
-        pending_host_id = 0
-        multiplayer.server_disconnected.connect(_on_server_disconnected)
+      elif pending_host_id != 0:
+        # Validate over multiple frames to avoid race conditions when host closes right as loading ends.
+        if !client_connect_in_progress:
+          client_connect_in_progress = true
+          _start_pending_client_connect()
+        return
 
 
       GlobalSignalServer.emit_signal("DoneLoadingMap")
+
+func _start_pending_client_connect() -> void:
+  for _i in range(CLIENT_CONNECT_VALIDATION_FRAMES):
+    if !_is_pending_host_available():
+      _handle_host_unavailable_during_join()
+      return
+    await get_tree().process_frame
+
+  # One final check right before connecting.
+  if !_is_pending_host_available():
+    _handle_host_unavailable_during_join()
+    return
+
+  # Now that the client has the map loaded and host is still valid, connect to the server.
+  print("Setting multiplayer peer for client")
+  multiplayer_peer.create_client(pending_host_id)
+  multiplayer.multiplayer_peer = multiplayer_peer
+  pending_host_id = 0
+  client_connect_in_progress = false
+  if !multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+    multiplayer.server_disconnected.connect(_on_server_disconnected)
+  # initialize voice
+  ProxChat.initialize_voice()
+  GlobalSignalServer.emit_signal("DoneLoadingMap")
+
+func _is_pending_host_available() -> bool:
+  if pending_host_id == 0:
+    return false
+
+  var current_owner = Steam.getLobbyOwner(_hosted_lobby_id)
+  return current_owner != 0 and current_owner == pending_host_id
+
+func _handle_host_unavailable_during_join() -> void:
+  print("Host is no longer available.")
+  pending_host_id = 0
+  client_connect_in_progress = false
+  GlobalSignalServer.emit_signal("DoneLoadingMap")
+  _on_server_disconnected()
 
 func become_host(is_public: bool, lobby_name: String):
   is_hosting = true
@@ -113,7 +144,10 @@ func become_host(is_public: bool, lobby_name: String):
   else:
     Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, _max_lobby_members)
 
-  LOBBY_NAME = lobby_name if lobby_name != null else Steam.getPersonaName()
+  if lobby_name == "gaming" or lobby_name == "":
+    LOBBY_NAME = Steam.getPersonaName() + "'s lobby"
+  else:
+    LOBBY_NAME = lobby_name
   
   # Start loading the map immediately. 
   # We will create the Godot host AFTER it loads.
@@ -275,14 +309,20 @@ func cleanup_network_state() -> void:
   print("stopped voice")
 
   # 1. SHUT DOWN NETWORK FIRST (Stop incoming RPCs/Signals)
-  multiplayer.peer_connected.disconnect(_add_player_to_game)
-  multiplayer.peer_disconnected.disconnect(_remove_player)
-  multiplayer.server_disconnected.disconnect(_on_server_disconnected)
-  GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
+  if multiplayer.peer_connected.is_connected(_add_player_to_game):
+    multiplayer.peer_connected.disconnect(_add_player_to_game)
+  if multiplayer.peer_disconnected.is_connected(_remove_player):
+    multiplayer.peer_disconnected.disconnect(_remove_player)
+  if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+    multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+  if GlobalSignalServer.GoToMainMenu.is_connected(cleanup_network_state):
+    GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
 
   if multiplayer.multiplayer_peer != null:
     multiplayer.multiplayer_peer.close()
   multiplayer.multiplayer_peer = null
 
   Steam.leaveLobby(_hosted_lobby_id)
+  pending_host_id = 0
+  client_connect_in_progress = false
   assigned_player_colors.clear()
