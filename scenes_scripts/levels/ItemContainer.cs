@@ -27,6 +27,55 @@ public partial class ItemContainer : Node3D
 					arm.Item.Amount);
 			}
 		}
+
+		// --- Sync Anchor State ---
+		RequestAnchorState();
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+	public void RequestAnchorState()
+	{
+		if (!Multiplayer.IsServer()) return;
+		long senderId = Multiplayer.GetRemoteSenderId();
+
+		// Search for the anchor in world items
+		UniversalInWorld anchor = null;
+		foreach (Node child in GetChildren())
+		{
+			if (child is UniversalInWorld item && item.Item?.Data?.Name == "Anchor")
+			{
+				anchor = item;
+				break;
+			}
+		}
+
+		if (anchor != null)
+		{
+			RpcId(senderId, MethodName.ReceiveAnchorState,
+				anchor.Name.ToString(),
+				anchor.Item.Data.ResourcePath,
+				anchor.Item.Amount,
+				anchor.GlobalPosition);
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
+	public void ReceiveAnchorState(string name, string path, int count, Vector3 position)
+	{
+		if (GetNodeOrNull(name) != null) return;
+
+		PackedScene scene = GD.Load<PackedScene>(
+			"res://scenes_scripts/inventory/items/itemScenes/UniversalInWorld.tscn");
+		
+		UniversalInWorld node = scene.Instantiate<UniversalInWorld>();
+		node.Name = name;
+		node.ItemObject = GD.Load<InvItem>(path);
+		node.ItemCount = count;
+		node.Position = position;
+		// Remove MultiplayerSynchronizer — items spawned via RPC (not MultiplayerSpawner)
+		// cause path resolution errors in the multiplayer cache
+		node.GetNodeOrNull("MultiplayerSynchronizer")?.QueueFree();
+		AddChild(node);
 	}
 
 	public void CollectWorldItems(Array<Dictionary<string, Variant>> items)
