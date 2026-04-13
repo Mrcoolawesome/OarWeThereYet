@@ -33,7 +33,7 @@ public partial class ItemContainer : Node3D
 	{
 		foreach (Node child in GetChildren())
 		{
-			if (child is UniversalInWorld item && item.Item != null)
+			if (child is UniversalInWorld item && item.Item != null && item.Item.Data.Name != "Anchor")
 			{
 				items.Add(new Dictionary<string, Variant>
 				{
@@ -100,8 +100,11 @@ public partial class ItemContainer : Node3D
 	{
 		foreach (Node child in GetChildren())
 		{
-			if (child is UniversalInWorld)
+			if (child is UniversalInWorld item)
 			{
+				// Ignore anchors - they are handled specially by level logic
+				if (item.Item?.Data?.Name == "Anchor") continue;
+
 				if (!serverItemNames.Contains(child.Name.ToString()))
 					child.QueueFree();
 			}
@@ -112,8 +115,13 @@ public partial class ItemContainer : Node3D
 	{
 		foreach (Node child in GetChildren())
 		{
-			if (child is UniversalInWorld)
+			if (child is UniversalInWorld item)
+			{
+				// Ignore anchors
+				if (item.Item?.Data?.Name == "Anchor") continue;
+
 				names.Add(child.Name.ToString());
+			}
 		}
 	}
 
