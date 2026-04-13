@@ -19,6 +19,26 @@ var is_joining: bool = false
 @onready var level_container = get_tree().current_scene.get_node_or_null("Level")
 
 const PLAYER_COLORS = ["#B4B7FD", "#F9D412", "#EAF6FF", "#FCC6E2"]
+var assigned_player_colors: Dictionary = {}
+
+func _assign_unique_color(target_player_id: int) -> String:
+  if assigned_player_colors.has(target_player_id):
+    return assigned_player_colors[target_player_id]
+
+  var used_colors: Array = assigned_player_colors.values()
+  for color in PLAYER_COLORS:
+    if !used_colors.has(color):
+      assigned_player_colors[target_player_id] = color
+      return color
+
+  # Fallback (should never hit with max 4 players/colors).
+  var fallback_color: String = PLAYER_COLORS[target_player_id % PLAYER_COLORS.size()]
+  assigned_player_colors[target_player_id] = fallback_color
+  return fallback_color
+
+func _sync_all_player_colors_to_peer(target_peer_id: int) -> void:
+  for existing_player_id in assigned_player_colors.keys():
+    rpc_id(target_peer_id, "_receive_player_color", existing_player_id, assigned_player_colors[existing_player_id])
 
 # become host for ENet server
 func become_host():
@@ -50,6 +70,9 @@ func _process(_delta: float) -> void:
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       # done loading
       loading = false
+      # initialize voice before players start spawning in
+      ProxChat.initialize_voice()
+      GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
       # actually load the level in
       _add_level()
 
@@ -72,6 +95,7 @@ func _process(_delta: float) -> void:
         multiplayer_peer.create_client(SERVER_IP, SERVER_PORT)
         multiplayer.multiplayer_peer = multiplayer_peer
         is_joining = false
+        multiplayer.server_disconnected.connect(_on_server_disconnected)
       # ------------------------------
 
       # we can remove the main menu ui now
@@ -106,10 +130,13 @@ func _add_player_to_game(id: int):
     # Send an RPC call ONLY to the client who owns this player node
     rpc_id(id, "_receive_gamertag", str(id))
 
-    # Pick a color based on their ID to ensure variety
-    var color_hex = PLAYER_COLORS[id % PLAYER_COLORS.size()]
-    # Send an RPC call ONLY to the client who owns this player node
-    rpc_id(id, "_receive_player_color", color_hex)
+    # Pick a unique color for this player for the current match.
+    var color_hex = _assign_unique_color(id)
+    # Broadcast this player's color to everyone.
+    rpc("_receive_player_color", id, color_hex)
+
+    # Also send a full color snapshot to the joining peer so all existing players are correct.
+    _sync_all_player_colors_to_peer(id)
     
     # assign the camera to the player for the terrain3d addon
     rpc_id(id, "_assign_camera", id)
@@ -143,9 +170,9 @@ func _receive_gamertag(gamertag: String) -> void:
   GlobalSignalServer.emit_signal("AssignGamertag", gamertag)
 
 @rpc("authority", "reliable", "call_local")
-func _receive_player_color(color_hex: String) -> void:
+func _receive_player_color(target_player_id: int, color_hex: String) -> void:
   # Emit your global signal for the C# script to catch
-  GlobalSignalServer.emit_signal("AssignPlayerColor", color_hex)
+  GlobalSignalServer.emit_signal("AssignPlayerColor", target_player_id, color_hex)
 
 '''
   find the player we're looking to remove, and remove their instance.
@@ -163,5 +190,40 @@ func _remove_player(id : int):
 
     # Free player
     player_node.queue_free()
+    assigned_player_colors.erase(id)
   else:
     print("Could not find player with ID: ", id)
+
+'''
+  Runs on client when kicked by host, or whenever the peer drops.
+'''
+func _on_server_disconnected():
+  cleanup_network_state()
+  GlobalSignalServer.emit_signal("GoToMainMenu")
+
+func cleanup_network_state() -> void:
+  print("Cleaning up network state")
+  ProxChat.stop_voice()
+  print("stopped voice")
+
+  loading = false
+  is_hosting = false
+  is_joining = false
+
+  if multiplayer.peer_connected.is_connected(_add_player_to_game):
+    multiplayer.peer_connected.disconnect(_add_player_to_game)
+
+  if multiplayer.peer_disconnected.is_connected(_remove_player):
+    multiplayer.peer_disconnected.disconnect(_remove_player)
+
+  if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+    multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+
+  if GlobalSignalServer.GoToMainMenu.is_connected(cleanup_network_state):
+    GlobalSignalServer.GoToMainMenu.disconnect(cleanup_network_state)
+
+  if multiplayer.multiplayer_peer != null:
+    multiplayer.multiplayer_peer.close()
+
+  multiplayer.multiplayer_peer = null
+  assigned_player_colors.clear()

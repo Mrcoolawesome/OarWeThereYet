@@ -16,6 +16,7 @@ This project is a multiplayer rafting game built with **Godot 4.5** and **C# (Mo
 ## Architectural Patterns
 - **Composition over Inheritance:** Use components (like the `Health` component in `Boat.cs`) to manage state and behavior rather than deep inheritance hierarchies.
 - **Signal-Based Communication:** Utilize `GlobalSignalServer` (C#) for decoupled communication between major systems. Local signals should follow Godot's `EventHandler` naming convention in C#.
+- **Voice Input Routing:** Mic device selection should be broadcast through `GlobalSignalServer.AssignInputDevice` and applied by `prox_chat.gd` using `AudioServer.input_device`.
 - **Stateless Visuals:** Keep logic in scripts and use shaders (`WaterShader/`) or minimal textures for the "TABS-like" low-poly aesthetic.
 - **Multiplayer Synchronization:** Implement `ISyncBuffer` for objects that need state synchronization across the network (e.g., the `Boat`).
 

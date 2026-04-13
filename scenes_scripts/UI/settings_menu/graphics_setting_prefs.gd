@@ -24,6 +24,10 @@ class_name UserSettingPrefrences extends Resource
 # VOLUME SETTINGS
 @export var voicechat_volume: float = 1.0
 @export var master_volume: float = 1.0
+@export var player_movement_volume: float = 1.0
+@export var music_volume: float = 1.0
+@export var environment_volume: float = 1.0
+@export var input_device: String = ""
 
 # CONTROLS SETTINGS
 @export var look_speed: float = 0.4 # Default value (same as the default value for MouseSens in the Player.cs file)
