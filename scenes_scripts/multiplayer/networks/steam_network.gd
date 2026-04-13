@@ -144,7 +144,10 @@ func become_host(is_public: bool, lobby_name: String):
   else:
     Steam.createLobby(Steam.LOBBY_TYPE_FRIENDS_ONLY, _max_lobby_members)
 
-  LOBBY_NAME = lobby_name if lobby_name != null else Steam.getPersonaName()
+  if lobby_name == "gaming" or lobby_name == "":
+    LOBBY_NAME = Steam.getPersonaName() + "'s lobby"
+  else:
+    LOBBY_NAME = lobby_name
   
   # Start loading the map immediately. 
   # We will create the Godot host AFTER it loads.
