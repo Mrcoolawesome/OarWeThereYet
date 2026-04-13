@@ -1342,10 +1342,24 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
   private void ApplyImpulseOnHost(NodePath targetPath, Vector3 pushDirection)
   {
+    if (!Multiplayer.IsServer()) return;
+
     if (GetNodeOrNull(targetPath) is RigidBody3D rb)
     {
-      // Now rigidbodies will fly away from the oar swing properly too!
+      // Apply locally on host
       rb.ApplyCentralImpulse(pushDirection * ObjectKnockbackForce); 
+      
+      // Tell everyone else to apply the same impulse
+      Rpc(nameof(BroadcastImpulse), targetPath, pushDirection);
+    }
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
+  private void BroadcastImpulse(NodePath targetPath, Vector3 pushDirection)
+  {
+    if (GetNodeOrNull(targetPath) is RigidBody3D rb)
+    {
+      rb.ApplyCentralImpulse(pushDirection * ObjectKnockbackForce);
     }
   }
 
