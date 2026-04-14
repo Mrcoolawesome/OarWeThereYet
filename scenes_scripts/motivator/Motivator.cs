@@ -1,9 +1,12 @@
 using Godot;
 using System;
+using Waterways;
 
-public partial class Motivator : Node3D
+public partial class Motivator : Area3D
 {
 	[Export] public float Speed = 1.0f;
+	[Export] public RiverManager RiverNode;
+
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()

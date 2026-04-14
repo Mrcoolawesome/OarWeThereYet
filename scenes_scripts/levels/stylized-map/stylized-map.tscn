@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=3 uid="uid://3e1j5wcifl2m"]
+[gd_scene load_steps=58 format=3 uid="uid://3e1j5wcifl2m"]
 
 [ext_resource type="Terrain3DMaterial" uid="uid://dawexow81k0tj" path="res://scenes_scripts/levels/stylized-map/terrain3d-materials/stylized-map.tres" id="1_jsj3l"]
 [ext_resource type="Script" uid="uid://c5o5f1pvpn7nl" path="res://scenes_scripts/levels/TestLevel.cs" id="1_w3k0n"]
@@ -30,6 +30,7 @@
 [ext_resource type="AudioStream" uid="uid://bgg52b2wgmwoc" path="res://scenes_scripts/audio/tres-files/ambient-desert.tres" id="27_ul5uc"]
 [ext_resource type="AudioStream" uid="uid://5xrd8ctadx25" path="res://scenes_scripts/audio/tres-files/waterfall-audio.tres" id="28_3p6v0"]
 [ext_resource type="AudioStream" uid="uid://dylnox45o0rdy" path="res://scenes_scripts/audio/tres-files/water-flow-medium-audio.tres" id="29_eub0a"]
+[ext_resource type="PackedScene" uid="uid://ctkcbfftcgncc" path="res://scenes_scripts/motivator/motivator.tscn" id="31_eub0a"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_gspic"]
 sky_top_color = Color(0.27450982, 0.33333334, 0.5686275, 1)
@@ -185,7 +186,7 @@ noise = SubResource("FastNoiseLite_r0jk7")
 seamless = true
 as_normal_map = true
 
-[sub_resource type="Resource" id="Resource_1wsx2"]
+[sub_resource type="Resource" id="Resource_eub0a"]
 script = ExtResource("8_71wb6")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.4390477, 0.810188, 0.99799937, 1)
@@ -216,7 +217,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_3cg3l"]
+[sub_resource type="Curve3D" id="Curve3D_1wsx2"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -264,11 +265,11 @@ occluder = SubResource("ArrayOccluder3D_dlybm")
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 7.5, 1387.26)
 script = ExtResource("6_0rdde")
-ShaderSettings = SubResource("Resource_1wsx2")
+ShaderSettings = SubResource("Resource_eub0a")
 ShapeStepLengthDivs = 8
 ShapeStepWidthDivs = 8
 PointWidths = Array[float]([23.902393, 32.42006, 28.946308, 80.50104, 63.65614, 27.859253, 31.896112, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 16.833715, 20.306177, 40.21755, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 21.35885, 21.493624, 18.437275, 23.140083, 18.668379, 17.788136, 20.318071, 32.206818, 13.336895, 11.627182, 18.435146, 26.135626, 41.78639, 31.696486, 24.981487, 17.728525, 46.307415, 64.34529, 15.8331375, 19.795294, 22.768202, 19.351612, 40.65703, 40.65703, 40.65703, 22.17239, 20.850576, 23.006437, 21.498045, 30.017738, 40.65703, 40.65703, 31.225008, 19.226772, 16.284988, 18.411827, 15.539041, 17.436047, 16.913645, 15.961027, 40.65703, 20.22709, 17.452988, 14.648635, 13.03373, 21.23851, 24.863054, 15.022035, 15.891383, 12.259704, 10.694574, 12.643903, 17.760015, 15.484123, 18.108717, 14.696549, 24.768816, 17.793274, 16.778706, 18.287302, 22.270689])
-Curve = SubResource("Curve3D_3cg3l")
+Curve = SubResource("Curve3D_1wsx2")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
@@ -767,6 +768,9 @@ unit_size = 80.0
 autoplay = true
 max_distance = 200.0
 bus = &"Environment"
+
+[node name="Motivator" parent="." instance=ExtResource("31_eub0a")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0568209, 0, 1380.2493)
 
 [editable path="CheckpointContainer/Checkpoint"]
 [editable path="CheckpointContainer/Checkpoint2"]
