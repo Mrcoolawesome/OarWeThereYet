@@ -45,29 +45,28 @@ public partial class Motivator : Area3D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (IsMoving && RiverNode != null && RiverNode.Curve != null)
-		{
-			if (Multiplayer.IsServer())
-			{
-				CurrentOffset += Speed * (float)delta;
-			}
-			
-			// 1. Update Position
-			Vector3 localPoint = RiverNode.Curve.SampleBaked(CurrentOffset);
-			GlobalPosition = RiverNode.ToGlobal(localPoint);
+		if (RiverNode == null || RiverNode.Curve == null) return;
 
-			// 2. Update Rotation (Look down the river)
-			// Get the tangent (forward direction) at the current offset
-			// SampleBakedWithRotation or just sampling a point slightly ahead works too
-			Vector3 nextLocalPoint = RiverNode.Curve.SampleBaked(CurrentOffset + 0.1f);
-			Vector3 nextGlobalPoint = RiverNode.ToGlobal(nextLocalPoint);
-			
-			// LookAt is a simple way to align the -Z axis with the target. 
-			// We use GlobalPosition and nextGlobalPoint.
-			if (GlobalPosition.DistanceSquaredTo(nextGlobalPoint) > 0.0001f)
-			{
-				LookAt(nextGlobalPoint, Vector3.Up);
-			}
+		if (IsMoving && Multiplayer.IsServer())
+		{
+			CurrentOffset += Speed * (float)delta;
+		}
+		
+		// 1. Update Position
+		Vector3 localPoint = RiverNode.Curve.SampleBaked(CurrentOffset);
+		GlobalPosition = RiverNode.ToGlobal(localPoint);
+
+		// 2. Update Rotation (Look down the river)
+		// Get the tangent (forward direction) at the current offset
+		// SampleBakedWithRotation or just sampling a point slightly ahead works too
+		Vector3 nextLocalPoint = RiverNode.Curve.SampleBaked(CurrentOffset + 0.1f);
+		Vector3 nextGlobalPoint = RiverNode.ToGlobal(nextLocalPoint);
+		
+		// LookAt is a simple way to align the -Z axis with the target. 
+		// We use GlobalPosition and nextGlobalPoint.
+		if (GlobalPosition.DistanceSquaredTo(nextGlobalPoint) > 0.0001f)
+		{
+			LookAt(nextGlobalPoint, Vector3.Up);
 		}
 	}
 
