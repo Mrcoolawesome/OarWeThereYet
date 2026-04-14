@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c1ht3f4a3g6sq" path="res://scenes_scripts/checkpoints/Checkpoint.cs" id="1_70jua"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hfxjx"]
-size = Vector3(35.673492, 11.671143, 15.140625)
+size = Vector3(72.917274, 60, 57.566864)
 
 [node name="Checkpoint" type="Area3D"]
 collision_layer = 0
