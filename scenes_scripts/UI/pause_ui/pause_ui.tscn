@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://rwsu0iw4awvo"]
+[gd_scene load_steps=7 format=3 uid="uid://rwsu0iw4awvo"]
 
 [ext_resource type="Script" uid="uid://cxiotrex7o0h5" path="res://scenes_scripts/UI/pause_ui/PauseUi.cs" id="1_ypbrs"]
 [ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="2_vcehk"]
 [ext_resource type="Material" uid="uid://jpuau08ng2hf" path="res://scenes_scripts/UI/shader/menu_blur.tres" id="2_vnn51"]
 [ext_resource type="StyleBox" uid="uid://660ef4736dm7" path="res://scenes_scripts/UI/shader/blur_stylebox.tres" id="3_0kse1"]
 [ext_resource type="PackedScene" uid="uid://cwoh3ayn5hlr1" path="res://scenes_scripts/UI/settings_menu/settings_menu.tscn" id="3_s0h3q"]
+[ext_resource type="PackedScene" uid="uid://dh5qqy16oj1fx" path="res://scenes_scripts/UI/settings_menu/reset_menu/reset_menu.tscn" id="6_q25gf"]
 
 [node name="PauseUI" type="Control"]
 process_mode = 3
@@ -46,6 +47,12 @@ theme = ExtResource("2_vcehk")
 text = "Resume"
 alignment = 0
 
+[node name="ResetButton" type="Button" parent="PanelContainer/PauseButtonMainContainer/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_vcehk")
+text = "Reset"
+alignment = 0
+
 [node name="SettingsButton" type="Button" parent="PanelContainer/PauseButtonMainContainer/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("2_vcehk")
@@ -63,7 +70,12 @@ alignment = 0
 visible = false
 layout_mode = 2
 
+[node name="ResetMenu" parent="PanelContainer" instance=ExtResource("6_q25gf")]
+visible = false
+layout_mode = 2
+
 [connection signal="pressed" from="PanelContainer/PauseButtonMainContainer/VBoxContainer/ResumeButton" to="." method="OnResumeButtonPressed"]
+[connection signal="pressed" from="PanelContainer/PauseButtonMainContainer/VBoxContainer/ResetButton" to="." method="OnResetButtonPressed"]
 [connection signal="pressed" from="PanelContainer/PauseButtonMainContainer/VBoxContainer/SettingsButton" to="." method="OnSettingsButtonPressed"]
 [connection signal="pressed" from="PanelContainer/PauseButtonMainContainer/VBoxContainer/ExitButton" to="." method="OnExitButtonPressed"]
 [connection signal="back_button_pressed" from="PanelContainer/SettingsMenu" to="." method="OnSettingsBackButtonPressed"]

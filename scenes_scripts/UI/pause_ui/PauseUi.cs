@@ -8,6 +8,7 @@ public partial class PauseUi : Control
   
   // get the settings menu
   private Control _settingsMenu = new Control();
+  private Control _ResetMenu = new Control();
   private MarginContainer _mainContainer = new MarginContainer();
 
   // some gemini thing so that player.cs knows the state of the pause menu
@@ -18,6 +19,7 @@ public partial class PauseUi : Control
   {
     // get the stuff from the tree
     _settingsMenu = GetNode<Control>("PanelContainer/SettingsMenu");
+    _ResetMenu = GetNode<Control>("PanelContainer/ResetMenu");
     _mainContainer = GetNode<MarginContainer>("PanelContainer/PauseButtonMainContainer");
   }
 
@@ -63,5 +65,10 @@ public partial class PauseUi : Control
   {
     _settingsMenu.Visible = false;
     _mainContainer.Visible = true;
+  }
+
+  private void OnResetButtonPressed()
+  {
+    _ResetMenu.Visible = true;
   }
 }
