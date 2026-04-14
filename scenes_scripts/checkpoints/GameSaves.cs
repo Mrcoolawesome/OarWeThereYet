@@ -6,12 +6,14 @@ public partial class GameSaves : Resource
 	[Export] public int CheckpointNum { get; set; } = 0;
 	[Export] public Array<Dictionary<string, Variant>> BoatInventory { get; set; } = new();
 	[Export] public Array<Dictionary<string, Variant>> WorldItems { get; set; } = new();
+	[Export] public float MotivatorOffset { get; set; } = -1f;
 
 	private const string SaveDir = "user://saves/";
 
-	public void Save(int slot, Inventory inventory, ItemContainer itemContainer,
+	public void Save(int slot, Inventory inventory, ItemContainer itemContainer, float motivatorOffset,
 		Array<Dictionary<string, Variant>> heldItems = null)
 	{
+    MotivatorOffset = motivatorOffset;
     BoatInventory = inventory.SerializeInventory();
     WorldItems.Clear();
     itemContainer.CollectWorldItems(WorldItems);
