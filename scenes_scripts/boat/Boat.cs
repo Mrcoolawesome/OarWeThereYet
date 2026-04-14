@@ -1,6 +1,7 @@
 using Godot;
 using Godot.Collections;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Dynamic;
 using System.Linq;
@@ -87,6 +88,7 @@ public partial class Boat : RigidBody3D, ISyncBuffer
 
     // deflating audio
     private AudioStreamPlayer3D _deflatingAudio;
+    private readonly System.Collections.Generic.Dictionary<Hole, AudioStreamPlayer3D> _holeDeflatingAudioInstances = new();
 
     public override void _Ready()
     {
@@ -154,28 +156,8 @@ public partial class Boat : RigidBody3D, ISyncBuffer
     {
         ChangeOarVisibiltiy();
 
-        // --- NEW AUDIO LOGIC ---
-        // We run this BEFORE the Server check so all clients can hear the audio locally!
-        // .Any() returns true if there is 1 or more holes, and false if there are 0.
-        bool hasHoles = HoleLocation.GetChildren().OfType<Hole>().Any();
-
-        if (hasHoles)
-        {
-            // Play the audio if it isn't already playing
-            if (!_deflatingAudio.Playing)
-            {
-                _deflatingAudio.Play();
-            }
-        }
-        else
-        {
-            // Stop the audio if there are no holes
-            if (_deflatingAudio.Playing)
-            {
-                _deflatingAudio.Stop();
-            }
-        }
-        // -----------------------
+        // Keep one deflating audio instance attached to each active hole.
+        UpdateHoleDeflatingAudioInstances();
 
         // Now we stop the clients from running the health damage code below
         if (!Multiplayer.IsServer()) return;
@@ -190,6 +172,50 @@ public partial class Boat : RigidBody3D, ISyncBuffer
             // update our health, this automatically sends out a signal that the health has been updated
             HealthComponent.UpdateHealth(-HoleLeakRate);
         }
+        }
+    }
+
+    private void UpdateHoleDeflatingAudioInstances()
+    {
+        Array<Node> holeChildren = HoleLocation.GetChildren();
+        List<Hole> activeHoles = holeChildren.OfType<Hole>().ToList();
+
+        // Ensure each active hole has its own audio player instance.
+        foreach (Hole hole in activeHoles)
+        {
+            if (_holeDeflatingAudioInstances.ContainsKey(hole))
+            {
+                AudioStreamPlayer3D existingPlayer = _holeDeflatingAudioInstances[hole];
+                if (GodotObject.IsInstanceValid(existingPlayer) && !existingPlayer.Playing)
+                {
+                    existingPlayer.Play();
+                }
+                continue;
+            }
+
+            AudioStreamPlayer3D holeAudio = (AudioStreamPlayer3D)_deflatingAudio.Duplicate();
+            holeAudio.Name = "DeflatingAudioInstance";
+            hole.AddChild(holeAudio);
+            holeAudio.Position = Vector3.Zero;
+            holeAudio.Play();
+
+            _holeDeflatingAudioInstances[hole] = holeAudio;
+        }
+
+        // Remove audio entries for holes that no longer exist (patched/removed).
+        List<Hole> staleHoles = _holeDeflatingAudioInstances.Keys
+            .Where(hole => !GodotObject.IsInstanceValid(hole) || !activeHoles.Contains(hole))
+            .ToList();
+
+        foreach (Hole staleHole in staleHoles)
+        {
+            AudioStreamPlayer3D staleAudio = _holeDeflatingAudioInstances[staleHole];
+            if (GodotObject.IsInstanceValid(staleAudio))
+            {
+                staleAudio.Stop();
+                staleAudio.QueueFree();
+            }
+            _holeDeflatingAudioInstances.Remove(staleHole);
         }
     }
 

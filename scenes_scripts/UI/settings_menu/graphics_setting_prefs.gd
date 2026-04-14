@@ -12,6 +12,7 @@ class_name UserSettingPrefrences extends Resource
 
 @export var vsync_mode: DisplayServer.VSyncMode = DisplayServer.VSYNC_ENABLED
 @export var max_fps: float = 0.0
+@export var player_fov: float = 100.0
 @export var render_scale: float = 1.0
 @export var shadow_quality: int = 2 # Default High (2)
 
