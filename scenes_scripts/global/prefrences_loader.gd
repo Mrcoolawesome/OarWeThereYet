@@ -20,7 +20,6 @@ func apply_all_settings(user_prefs: UserSettingPrefrences) -> void:
 func apply_graphics_settings(user_prefs: UserSettingPrefrences) -> void:
     var clamped_fov: float = clamp(user_prefs.player_fov, 1.0, 179.0)
     user_prefs.player_fov = clamped_fov
-    print("[PrefsLoader] apply_graphics_settings -> emitting ApplyPlayerFov with value:", user_prefs.player_fov)
     get_viewport().msaa_3d = user_prefs.msaa_mode
     DisplayServer.window_set_mode(user_prefs.display_mode)
     DisplayServer.window_set_flag(user_prefs.display_flag, user_prefs.borderless_enable) # this sets the gvien flag to false or true

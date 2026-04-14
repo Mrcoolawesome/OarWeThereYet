@@ -284,7 +284,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// subscribe to the signal that changes the mouse sensitivity from the settings menu
 		GlobalSignalServer.Instance.ApplyPlayerLookSpeed += ChangePlayerLookSpeed;
 		GlobalSignalServer.Instance.ApplyPlayerFov += ChangePlayerFov;
-		GD.Print($"[Player:{Name}] Subscribed to ApplyPlayerFov. IsAuthority={IsMultiplayerAuthority()}");
 		// subscribe to setting the gamertag
 		GlobalSignalServer.Instance.AssignGamertag += SetUsername;
 		// subscribe to change colors
@@ -296,7 +295,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		// Get the camera reference
 		_playerCamera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
-		GD.Print($"[Player:{Name}] Camera found? {_playerCamera != null}");
 		ApplySavedLocalSettings();
 
 		// get the animation player
@@ -1625,32 +1623,26 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		if (!IsMultiplayerAuthority())
 		{
-			GD.Print($"[Player:{Name}] ApplySavedLocalSettings skipped (not authority)");
 			return;
 		}
 
 		var savedSettings = ResourceLoader.Load<Resource>("user://user_settings_prefs.tres");
 		if (savedSettings == null)
 		{
-			GD.Print($"[Player:{Name}] No saved settings resource found at user://user_settings_prefs.tres");
 			return;
 		}
 
 		MouseSens = (float)savedSettings.Get("look_speed");
 		float savedFov = (float)savedSettings.Get("player_fov");
-		GD.Print($"[Player:{Name}] Loaded saved look_speed={MouseSens}, player_fov={savedFov}");
 		ChangePlayerFov(savedFov);
 	}
 
 	private void ChangePlayerFov(float newFov)
 	{
 		float clampedFov = Mathf.Clamp(newFov, 1.0f, 179.0f);
-		GD.Print($"[Player:{Name}] ChangePlayerFov called. IsAuthority={IsMultiplayerAuthority()}, CameraNull={_playerCamera == null}, IncomingFov={newFov}, ClampedFov={clampedFov}");
 		if (IsMultiplayerAuthority() && _playerCamera != null)
 		{
-			GD.Print($"[Player:{Name}] Camera FOV before={_playerCamera.Fov}");
 			_playerCamera.Fov = clampedFov;
-			GD.Print($"[Player:{Name}] Camera FOV after={_playerCamera.Fov}");
 		}
 	}
 
