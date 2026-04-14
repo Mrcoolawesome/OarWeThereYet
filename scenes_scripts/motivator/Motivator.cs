@@ -7,8 +7,22 @@ public partial class Motivator : Area3D
 	[Export] public float Speed = 1.0f;
 	[Export] public RiverManager RiverNode;
 
-	public float CurrentOffset = 0f;
+	[Export] public float CurrentOffset = 0f;
+
 	private bool _isMoving = true;
+	[Export] public bool IsMoving 
+	{
+		get => _isMoving;
+		set 
+		{
+			if (_isMoving != value)
+			{
+				_isMoving = value;
+				UpdateAnimationState();
+			}
+		}
+	}
+
 	private AnimationPlayer _animationPlayer;
 
 	public override void _Ready()
@@ -31,9 +45,12 @@ public partial class Motivator : Area3D
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (_isMoving && RiverNode != null && RiverNode.Curve != null)
+		if (IsMoving && RiverNode != null && RiverNode.Curve != null)
 		{
-			CurrentOffset += Speed * (float)delta;
+			if (Multiplayer.IsServer())
+			{
+				CurrentOffset += Speed * (float)delta;
+			}
 			
 			// 1. Update Position
 			Vector3 localPoint = RiverNode.Curve.SampleBaked(CurrentOffset);
@@ -56,21 +73,19 @@ public partial class Motivator : Area3D
 
 	private void OnStartMotivator()
 	{
-		_isMoving = true;
-		UpdateAnimationState();
+		IsMoving = true;
 	}
 
 	private void OnStopMotivator()
 	{
-		_isMoving = false;
-		UpdateAnimationState();
+		IsMoving = false;
 	}
 
 	private void UpdateAnimationState()
 	{
 		if (_animationPlayer == null) return;
 
-		if (_isMoving)
+		if (IsMoving)
 		{
 			if (_animationPlayer.HasAnimation("Swim"))
 			{

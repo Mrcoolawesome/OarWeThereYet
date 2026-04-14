@@ -1,7 +1,15 @@
-[gd_scene load_steps=4 format=3 uid="uid://ctkcbfftcgncc"]
+[gd_scene load_steps=5 format=3 uid="uid://ctkcbfftcgncc"]
 
 [ext_resource type="PackedScene" uid="uid://bspwtetc0fejm" path="res://art/models/fish.blend" id="1_4y3fb"]
 [ext_resource type="Script" uid="uid://bsd5p5eaewu1r" path="res://scenes_scripts/motivator/Motivator.cs" id="1_31aj4"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_motivator"]
+properties/0/path = NodePath(".:CurrentOffset")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:IsMoving")
+properties/1/spawn = true
+properties/1/replication_mode = 2
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_31aj4"]
 size = Vector3(1, 67.365, 121.72)
@@ -23,3 +31,6 @@ bones/0/rotation = Quaternion(0.0056448937, -4.6637087e-08, -2.8974043e-08, 0.99
 bones/1/rotation = Quaternion(0.99998283, -6.022016e-08, -3.5954837e-08, -0.0058666207)
 
 [editable path="fish"]
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_motivator")

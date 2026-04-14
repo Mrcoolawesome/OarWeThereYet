@@ -281,6 +281,7 @@ public partial class TestLevel : Node
 
 		if (_motivator != null && _gameSaves.MotivatorOffset >= 0f)
 		{
+			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.StopMotivator));
 			_motivator.CurrentOffset = _gameSaves.MotivatorOffset;
 		}
 
