@@ -30,12 +30,14 @@ public partial class TestLevel : Node
 	private bool _clientNetworkInitialized = false;
 
   private string _anchorSpawnPath = null;
+	private Motivator _motivator;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
   {
     _checkpointContainer = GetNode<Node3D>("CheckpointContainer");
     _itemContainer = GetNode<ItemContainer>("ItemContainer");
+    _motivator = FindChild("Motivator", true, false) as Motivator;
 
     // load or create save slot
     _gameSaves = GameSaves.LoadOrCreate(SaveSlot);
@@ -242,7 +244,7 @@ public partial class TestLevel : Node
 			}
 		}
 
-		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, heldItems);
+		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, _motivator != null ? _motivator.CurrentOffset : -1f, heldItems);
 	}
 
 	private void LoadGame()
@@ -276,6 +278,11 @@ public partial class TestLevel : Node
 
 		// Broadcast world items to all clients
 		_itemContainer.Rpc(ItemContainer.MethodName.ReceiveWorldItems, _gameSaves.WorldItems);
+
+		if (_motivator != null && _gameSaves.MotivatorOffset >= 0f)
+		{
+			_motivator.CurrentOffset = _gameSaves.MotivatorOffset;
+		}
 
 		// Reset boat and players
 		InitateReset();

@@ -7,7 +7,7 @@ public partial class Motivator : Area3D
 	[Export] public float Speed = 1.0f;
 	[Export] public RiverManager RiverNode;
 
-	private float _currentOffset = 0f;
+	public float CurrentOffset = 0f;
 	private bool _isMoving = true;
 	private AnimationPlayer _animationPlayer;
 
@@ -19,7 +19,7 @@ public partial class Motivator : Area3D
 		if (RiverNode != null && RiverNode.Curve != null)
 		{
 			Vector3 localPos = RiverNode.ToLocal(GlobalPosition);
-			_currentOffset = RiverNode.Curve.GetClosestOffset(localPos);
+			CurrentOffset = RiverNode.Curve.GetClosestOffset(localPos);
 		}
 
 		BodyEntered += OnBodyEntered;
@@ -33,16 +33,16 @@ public partial class Motivator : Area3D
 	{
 		if (_isMoving && RiverNode != null && RiverNode.Curve != null)
 		{
-			_currentOffset += Speed * (float)delta;
+			CurrentOffset += Speed * (float)delta;
 			
 			// 1. Update Position
-			Vector3 localPoint = RiverNode.Curve.SampleBaked(_currentOffset);
+			Vector3 localPoint = RiverNode.Curve.SampleBaked(CurrentOffset);
 			GlobalPosition = RiverNode.ToGlobal(localPoint);
 
 			// 2. Update Rotation (Look down the river)
 			// Get the tangent (forward direction) at the current offset
 			// SampleBakedWithRotation or just sampling a point slightly ahead works too
-			Vector3 nextLocalPoint = RiverNode.Curve.SampleBaked(_currentOffset + 0.1f);
+			Vector3 nextLocalPoint = RiverNode.Curve.SampleBaked(CurrentOffset + 0.1f);
 			Vector3 nextGlobalPoint = RiverNode.ToGlobal(nextLocalPoint);
 			
 			// LookAt is a simple way to align the -Z axis with the target. 
