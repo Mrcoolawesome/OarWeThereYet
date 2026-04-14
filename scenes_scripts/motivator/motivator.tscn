@@ -3,6 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://bspwtetc0fejm" path="res://art/models/fish.blend" id="1_4y3fb"]
 [ext_resource type="Script" uid="uid://bsd5p5eaewu1r" path="res://scenes_scripts/motivator/Motivator.cs" id="1_31aj4"]
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_31aj4"]
+size = Vector3(1, 67.365, 121.72)
+
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_motivator"]
 properties/0/path = NodePath(".:CurrentOffset")
 properties/0/spawn = true
@@ -10,9 +13,9 @@ properties/0/replication_mode = 1
 properties/1/path = NodePath(".:IsMoving")
 properties/1/spawn = true
 properties/1/replication_mode = 2
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_31aj4"]
-size = Vector3(1, 67.365, 121.72)
+properties/2/path = NodePath(".:visible")
+properties/2/spawn = true
+properties/2/replication_mode = 2
 
 [node name="Motivator" type="Area3D"]
 collision_layer = 0
@@ -27,10 +30,10 @@ shape = SubResource("BoxShape3D_31aj4")
 transform = Transform3D(-4.26186e-07, 0, 9.749999, 0, 9.749999, 0, -9.749999, 0, -4.26186e-07, 0, 4.7328467, 8.108149)
 
 [node name="Skeleton3D" parent="fish/Armature" index="0"]
-bones/0/rotation = Quaternion(0.0056448937, -4.6637087e-08, -2.8974043e-08, 0.9999841)
-bones/1/rotation = Quaternion(0.99998283, -6.022016e-08, -3.5954837e-08, -0.0058666207)
-
-[editable path="fish"]
+bones/0/rotation = Quaternion(-0.2038131, -4.4643116e-08, -2.9622562e-08, 0.9790098)
+bones/1/rotation = Quaternion(0.98504573, -6.5696966e-08, -2.9125632e-08, -0.17229302)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_motivator")
+
+[editable path="fish"]

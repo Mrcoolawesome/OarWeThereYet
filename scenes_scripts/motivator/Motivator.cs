@@ -72,11 +72,13 @@ public partial class Motivator : Area3D
 
 	private void OnStartMotivator()
 	{
+		Visible = true;
 		IsMoving = true;
 	}
 
 	private void OnStopMotivator()
 	{
+		Visible = false;
 		IsMoving = false;
 	}
 

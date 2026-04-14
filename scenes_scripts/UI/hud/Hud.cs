@@ -13,6 +13,8 @@ public partial class Hud : CanvasLayer
 		TryResolveBoatHealthBar();
 
 		_fish = GetNode<Label>("Fish");
+		_fish.Visible = false;
+
 
 		// Subscribe to the boat health update
 		GlobalSignalServer.Instance.UpdateBoatHealth += UpdateBoatHealthUi;
@@ -70,15 +72,14 @@ public partial class Hud : CanvasLayer
 	{
 		if (_fish == null) return;
 		
-		for (int i = 0; i < 3; i++)
+		// Show fish is coming for 1 second
+		_fish.Visible = true;
+
+		await ToSignal(GetTree().CreateTimer(3.0f), SceneTreeTimer.SignalName.Timeout);
+
+		if (GodotObject.IsInstanceValid(_fish))
 		{
-			if (!GodotObject.IsInstanceValid(_fish)) return;
-			_fish.Visible = true;
-			await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
-			
-			if (!GodotObject.IsInstanceValid(_fish)) return;
 			_fish.Visible = false;
-			await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
 		}
 	}
 }
