@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bsd5p5eaewu1r" path="res://scenes_scripts/motivator/Motivator.cs" id="1_31aj4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_31aj4"]
-size = Vector3(1, 51.83, 81.29)
+size = Vector3(1, 67.365, 121.72)
 
 [node name="Motivator" type="Area3D"]
 collision_layer = 0
@@ -12,7 +12,14 @@ collision_mask = 2
 script = ExtResource("1_31aj4")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 shape = SubResource("BoxShape3D_31aj4")
 
 [node name="fish" parent="." instance=ExtResource("1_4y3fb")]
-transform = Transform3D(3.78, 0, 0, 0, 3.78, 0, 0, 0, 3.78, 0, 0, 0)
+transform = Transform3D(-4.26186e-07, 0, 9.749999, 0, 9.749999, 0, -9.749999, 0, -4.26186e-07, 0, 4.7328467, 8.108149)
+
+[node name="Skeleton3D" parent="fish/Armature" index="0"]
+bones/0/rotation = Quaternion(-8.291636e-25, -5.58347e-09, -5.58347e-09, 1)
+bones/1/rotation = Quaternion(1, -3.7748954e-08, -3.774895e-08, -2.9802326e-08)
+
+[editable path="fish"]
