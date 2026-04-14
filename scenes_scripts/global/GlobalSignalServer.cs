@@ -78,6 +78,12 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void EndGameEventHandler();
 
+  [Signal]
+  public delegate void StartMotivatorEventHandler();
+
+  [Signal]
+  public delegate void StopMotivatorEventHandler();
+
   public int Health { get; set; }
 
   public override void _Ready()

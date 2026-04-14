@@ -19,3 +19,4 @@ UseAnchor = false
 shape = SubResource("BoxShape3D_hfxjx")
 
 [connection signal="body_entered" from="." to="." method="OnBodyEntered"]
+[connection signal="body_exited" from="." to="." method="OnBodyExited"]
