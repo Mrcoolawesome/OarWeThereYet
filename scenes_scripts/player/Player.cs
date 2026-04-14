@@ -39,6 +39,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Export] public bool WalkingOnGroundAudioGate { get; set; } = false;
 	[Export] public bool TreadingWaterAudioGate { get; set; } = false;
 	[Export] public bool PlayerHitSwooshAudioGate { get; set; } = false;
+	[Export] public int PlayerHitSomethingAudioTrigger { get; set; } = 0;
+	[Export] public int PlayerHitBoatAudioTrigger { get; set; } = 0;
 	[Export] public float MovementAudioPitchScale { get; set; } = 1.0f;
 	[Export] public bool IsUnderWater { get; set; } = false;
 	[Export] public float UnderWaterSubmergedOffset = 0.3f;
@@ -197,6 +199,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private AudioStreamPlayer _endGameMusic;
 	private AudioStreamPlayer _underwater;
 	private AudioStreamPlayer3D _playerHitSwoosh;
+	private AudioStreamPlayer3D _playerHitPlayer;
+	private AudioStreamPlayer3D _playerHitBoat;
 
 	// under water view
 	private Control _underWaterPOV;
@@ -209,6 +213,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private AudioEffectReverb _micInputReverb;
 	private AudioEffectPitchShift _micInputPitch;
 	private double _playerHitSwooshGateTimer = 0.0;
+	private int _lastPlayerHitSomethingAudioTrigger = 0;
+	private int _lastPlayerHitBoatAudioTrigger = 0;
 
   public override void _EnterTree()
 	{
@@ -282,6 +288,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_endGameMusic = GetNode<AudioStreamPlayer>("AudioStuff/Endgame");
 		_underwater = GetNode<AudioStreamPlayer>("AudioStuff/Underwater");
 		_playerHitSwoosh = GetNode<AudioStreamPlayer3D>("AudioStuff/PlayerHitSwooshShortened");
+		_playerHitPlayer = GetNode<AudioStreamPlayer3D>("AudioStuff/BellHitSound");
+		_playerHitBoat = GetNode<AudioStreamPlayer3D>("AudioStuff/HitBoatSound");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -939,6 +947,20 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			if (!_playerHitSwoosh.Playing) _playerHitSwoosh.Play();
 		}
 
+		if (PlayerHitSomethingAudioTrigger != _lastPlayerHitSomethingAudioTrigger)
+		{
+			_playerHitPlayer.Stop();
+			_playerHitPlayer.Play();
+			_lastPlayerHitSomethingAudioTrigger = PlayerHitSomethingAudioTrigger;
+		}
+
+		if (PlayerHitBoatAudioTrigger != _lastPlayerHitBoatAudioTrigger)
+		{
+			_playerHitBoat.Stop();
+			_playerHitBoat.Play();
+			_lastPlayerHitBoatAudioTrigger = PlayerHitBoatAudioTrigger;
+		}
+
 		if (TreadingWaterAudioGate)
 		{
 			if (!_treadingWaterAudio.Playing) _treadingWaterAudio.Play();
@@ -1491,6 +1513,26 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 		PlayerHitSwooshAudioGate = true;
 		_playerHitSwooshGateTimer = 0.15;
+	}
+
+	public void TriggerPlayerHitSomething()
+	{
+		if (!IsMultiplayerAuthority())
+		{
+			return;
+		}
+
+		PlayerHitSomethingAudioTrigger++;
+	}
+
+	public void TriggerPlayerHitBoat()
+	{
+		if (!IsMultiplayerAuthority())
+		{
+			return;
+		}
+
+		PlayerHitBoatAudioTrigger++;
 	}
 
   // 1. Ask the Server to relay the command AND the direction

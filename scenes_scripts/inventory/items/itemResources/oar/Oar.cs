@@ -4,6 +4,23 @@ using System;
 [GlobalClass]
 public partial class Oar : ItemAction
 {
+  private static Boat FindBoatAncestor(Node node)
+  {
+    Node currentNode = node;
+
+    while (currentNode != null)
+    {
+      if (currentNode is Boat boat)
+      {
+        return boat;
+      }
+
+      currentNode = currentNode.GetParent();
+    }
+
+    return null;
+  }
+
   public override void Use(Player _player, ArmNode _arm)
   {
     GodotObject observedObject = _player.GetRaycastObject();
@@ -16,6 +33,16 @@ public partial class Oar : ItemAction
 
     if (observedObject is Node3D targetNode)
     {
+      if (targetNode is CharacterBody3D)
+      {
+        _player.TriggerPlayerHitSomething();
+      }
+
+      if (FindBoatAncestor(targetNode) != null)
+      {
+        _player.TriggerPlayerHitBoat();
+      }
+
       // Calculate the exact direction from the attacker to the target
       Vector3 pushDirection = (targetNode.GlobalPosition - _player.GlobalPosition).Normalized();
 
