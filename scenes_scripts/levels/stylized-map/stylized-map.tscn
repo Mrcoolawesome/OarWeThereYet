@@ -769,8 +769,9 @@ autoplay = true
 max_distance = 200.0
 bus = &"Environment"
 
-[node name="Motivator" parent="." instance=ExtResource("31_eub0a")]
+[node name="Motivator" parent="." node_paths=PackedStringArray("RiverNode") instance=ExtResource("31_eub0a")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.0568209, 0, 1380.2493)
+RiverNode = NodePath("../RiverManager")
 
 [editable path="CheckpointContainer/Checkpoint"]
 [editable path="CheckpointContainer/Checkpoint2"]
