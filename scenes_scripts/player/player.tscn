@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=4 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=29 format=4 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
@@ -16,6 +16,7 @@
 [ext_resource type="AudioStream" uid="uid://esphyok7v4fb" path="res://art/audio/ones-that-i-want/walking/boat-walking.wav" id="14_4b7ak"]
 [ext_resource type="AudioStream" uid="uid://dkhy8nmbdgslo" path="res://art/audio/ones-that-i-want/swimming/treading-water.wav" id="15_lvkhp"]
 [ext_resource type="AudioStream" uid="uid://bwa6ameabfexi" path="res://art/audio/ones-that-i-want/endgame-sound/endgame.wav" id="16_4b7ak"]
+[ext_resource type="AudioStream" uid="uid://bvi6q1jcgixj2" path="res://art/audio/ones-that-i-want/underwater/underwater.wav" id="17_lvkhp"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
 properties/0/path = NodePath(".:State")
@@ -389,8 +390,31 @@ stream = ExtResource("16_4b7ak")
 volume_db = 20.0
 bus = &"Music"
 
+[node name="Underwater" type="AudioStreamPlayer" parent="AudioStuff"]
+stream = ExtResource("17_lvkhp")
+volume_db = 20.0
+bus = &"PlayerMovementSounds"
+
 [node name="AudioSynchronizer" type="MultiplayerSynchronizer" parent="AudioStuff"]
 replication_config = SubResource("SceneReplicationConfig_fqj0r")
+
+[node name="UnderWaterPOV" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="UnderWaterPOV"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02745098, 0, 0.54509807, 0.7647059)
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]

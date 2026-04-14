@@ -39,6 +39,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Export] public bool WalkingOnGroundAudioGate { get; set; } = false;
 	[Export] public bool TreadingWaterAudioGate { get; set; } = false;
 	[Export] public float MovementAudioPitchScale { get; set; } = 1.0f;
+	[Export] public bool IsUnderWater { get; set; } = false;
+	[Export] public float UnderWaterSubmergedOffset = 0.3f;
 
 	// Private variables
 	private float _currSpeed = 5.0f;
@@ -192,6 +194,18 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private AudioStreamPlayer3D _walkingOnGroundAudio;
 	private AudioStreamPlayer3D _treadingWaterAudio;
 	private AudioStreamPlayer _endGameMusic;
+	private AudioStreamPlayer _underwater;
+
+	// under water view
+	private Control _underWaterPOV;
+	private Camera3D _playerCamera;
+
+	// underwater audio state tracking
+	private bool _wasUnderWater = false;
+	private AudioEffectReverb _voiceChatReverb;
+	private AudioEffectPitchShift _voiceChatPitch;
+	private AudioEffectReverb _micInputReverb;
+	private AudioEffectPitchShift _micInputPitch;
 
   public override void _EnterTree()
 	{
@@ -263,6 +277,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_walkingOnGroundAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/WorldWalkingSingle");
 		_treadingWaterAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/TreadingWater");
 		_endGameMusic = GetNode<AudioStreamPlayer>("AudioStuff/Endgame");
+		_underwater = GetNode<AudioStreamPlayer>("AudioStuff/Underwater");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -278,7 +293,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     GlobalSignalServer.Instance.EndGame += OnEndGameTriggered;
 
 		// Get the camera reference
-		Camera3D camera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
+		_playerCamera = _head.GetNodeOrNull<Camera3D>("CameraContainer/Camera3D"); 
 
 		// get the animation player
 		_animationPlayer = GetNode<AnimationPlayer>("FullPlayerModel/AnimationPlayer");
@@ -292,6 +307,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// set their gamertag
 		_gamerTag = GetNode<Label3D>("GamerTag");
 
+		// get the underwater pov
+		_underWaterPOV = GetNode<Control>("UnderWaterPOV");
+		_underWaterPOV.Visible = false; // make the underwater pov invisible by default
+
 		// client code for when setting up their camera and stuff
 		// if we are the player, then use the camera for this player
 		// IsMultiplayerAuthority checks if the current client is the multiplayer authority of THIS current NODE 
@@ -301,9 +320,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			RequestSitInSeat(-1);
 
 			// Enable our camera
-			if (camera != null)
+			if (_playerCamera != null)
 			{
-				camera.Current = true;
+				_playerCamera.Current = true;
 			}
 
 			// set the current game state to be the menu state	
@@ -335,9 +354,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			_pauseUICanvas.QueueFree();
 
 			// Delete the Camera for other players
-			if (camera != null)
+			if (_playerCamera != null)
 			{
-				camera.QueueFree(); 
+				_playerCamera.QueueFree(); 
 			}
 			
 			// Disable processing for non-authority
@@ -382,6 +401,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				break;
 		}
 
+		// Always process underwater state regardless of game state
+		UnderWaterStateProcess();
+
 		switch(CurrPlayerState)
 		{
 			case PlayerState.Standing:
@@ -424,7 +446,194 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		if (!_invUI.isOpen()) { _pauseUICanvas.Visible = true; };
 		_hud.Visible = false;
+		
+		if (_underWaterPOV != null)
+		{
+			_underWaterPOV.Visible = false;
+		}
+		
 		Input.MouseMode = Input.MouseModeEnum.Visible;
+	}
+
+	private void UnderWaterStateProcess()
+	{
+		if (_riverFloatSystem == null || _underWaterPOV == null)
+		{
+			return;
+		}
+
+		if (_playerCamera == null)
+		{
+			IsUnderWater = false;
+			_underWaterPOV.Visible = false;
+			return;
+		}
+
+		float waterHeight = _riverFloatSystem.GetWaterHeight(_playerCamera.GlobalPosition);
+		IsUnderWater = _playerCamera.GlobalPosition.Y < waterHeight + UnderWaterSubmergedOffset;
+		_underWaterPOV.Visible = IsUnderWater;
+
+		// Handle audio effects when transitioning underwater
+		if (IsUnderWater && !_wasUnderWater)
+		{
+			ApplyUnderWaterAudioEffects();
+		}
+		else if (!IsUnderWater && _wasUnderWater)
+		{
+			RemoveUnderWaterAudioEffects();
+		}
+
+		_wasUnderWater = IsUnderWater;
+	}
+
+	private void ApplyUnderWaterAudioEffects()
+	{
+		// Play the underwater ambient sound
+		if (_underwater != null && !_underwater.Playing)
+		{
+			_underwater.Play();
+		}
+
+		// Mute the environment audio bus
+		int envBusIdx = AudioServer.GetBusIndex("Environment");
+		if (envBusIdx >= 0)
+		{
+			AudioServer.SetBusMute(envBusIdx, true);
+		}
+
+		// Apply reverb and pitch effects to Voice Chat bus
+		int voiceChatBusIdx = AudioServer.GetBusIndex("Voice Chat");
+		if (voiceChatBusIdx >= 0)
+		{
+			// Create and apply reverb effect
+			if (_voiceChatReverb == null)
+			{
+        _voiceChatReverb = new AudioEffectReverb
+        {
+          RoomSize = 0.5f,
+          Damping = 0.7f,
+          Wet = 0.15f,
+          Dry = 1.0f
+        };
+      }
+			AudioServer.AddBusEffect(voiceChatBusIdx, _voiceChatReverb);
+
+			// Create and apply pitch shift effect
+			if (_voiceChatPitch == null)
+			{
+        _voiceChatPitch = new AudioEffectPitchShift
+        {
+          PitchScale = 0.8f // Lower pitch by 20%
+        };
+      }
+			AudioServer.AddBusEffect(voiceChatBusIdx, _voiceChatPitch);
+		}
+
+		// Apply reverb and pitch effects to MicInput bus
+		int micInputBusIdx = AudioServer.GetBusIndex("MicInput");
+		if (micInputBusIdx >= 0)
+		{
+			// Create and apply reverb effect
+			if (_micInputReverb == null)
+			{
+        _micInputReverb = new AudioEffectReverb
+        {
+          RoomSize = 0.5f,
+          Damping = 0.7f,
+          Wet = 0.15f,
+          Dry = 1.0f
+        };
+      }
+			AudioServer.AddBusEffect(micInputBusIdx, _micInputReverb);
+
+			// Create and apply pitch shift effect
+			if (_micInputPitch == null)
+			{
+        _micInputPitch = new AudioEffectPitchShift
+        {
+          PitchScale = 0.8f // Lower pitch by 20%
+        };
+      }
+			AudioServer.AddBusEffect(micInputBusIdx, _micInputPitch);
+		}
+	}
+
+	private void RemoveUnderWaterAudioEffects()
+	{
+		// Stop the underwater ambient sound
+		if (_underwater != null)
+		{
+			_underwater.Stop();
+		}
+
+		// Unmute the environment audio bus
+		int envBusIdx = AudioServer.GetBusIndex("Environment");
+		if (envBusIdx >= 0)
+		{
+			AudioServer.SetBusMute(envBusIdx, false);
+		}
+
+		// Remove reverb and pitch effects from Voice Chat bus
+		int voiceChatBusIdx = AudioServer.GetBusIndex("Voice Chat");
+		if (voiceChatBusIdx >= 0)
+		{
+			// Remove reverb effect
+			if (_voiceChatReverb != null)
+			{
+				for (int i = 0; i < AudioServer.GetBusEffectCount(voiceChatBusIdx); i++)
+				{
+					if (AudioServer.GetBusEffect(voiceChatBusIdx, i) == _voiceChatReverb)
+					{
+						AudioServer.RemoveBusEffect(voiceChatBusIdx, i);
+						break;
+					}
+				}
+			}
+
+			// Remove pitch effect
+			if (_voiceChatPitch != null)
+			{
+				for (int i = 0; i < AudioServer.GetBusEffectCount(voiceChatBusIdx); i++)
+				{
+					if (AudioServer.GetBusEffect(voiceChatBusIdx, i) == _voiceChatPitch)
+					{
+						AudioServer.RemoveBusEffect(voiceChatBusIdx, i);
+						break;
+					}
+				}
+			}
+		}
+
+		// Remove reverb and pitch effects from MicInput bus
+		int micInputBusIdx = AudioServer.GetBusIndex("MicInput");
+		if (micInputBusIdx >= 0)
+		{
+			// Remove reverb effect
+			if (_micInputReverb != null)
+			{
+				for (int i = 0; i < AudioServer.GetBusEffectCount(micInputBusIdx); i++)
+				{
+					if (AudioServer.GetBusEffect(micInputBusIdx, i) == _micInputReverb)
+					{
+						AudioServer.RemoveBusEffect(micInputBusIdx, i);
+						break;
+					}
+				}
+			}
+
+			// Remove pitch effect
+			if (_micInputPitch != null)
+			{
+				for (int i = 0; i < AudioServer.GetBusEffectCount(micInputBusIdx); i++)
+				{
+					if (AudioServer.GetBusEffect(micInputBusIdx, i) == _micInputPitch)
+					{
+						AudioServer.RemoveBusEffect(micInputBusIdx, i);
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	// Rowing state input handling
