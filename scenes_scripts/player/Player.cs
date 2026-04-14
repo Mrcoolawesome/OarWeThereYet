@@ -191,6 +191,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private AudioStreamPlayer3D _walkingOnBoatAudio;
 	private AudioStreamPlayer3D _walkingOnGroundAudio;
 	private AudioStreamPlayer3D _treadingWaterAudio;
+	private AudioStreamPlayer _endGameMusic;
 
   public override void _EnterTree()
 	{
@@ -261,6 +262,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_walkingOnBoatAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/BoatWalking");
 		_walkingOnGroundAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/WorldWalkingSingle");
 		_treadingWaterAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/TreadingWater");
+		_endGameMusic = GetNode<AudioStreamPlayer>("AudioStuff/Endgame");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -1553,6 +1555,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // Put them in the EndGame state so they can't move or pause
     // CurrGameState = GameState.EndGame;
     _endGameUi.Visible = true;
+
+		if (_endGameMusic != null && !_endGameMusic.Playing)
+		{
+			_endGameMusic.Play();
+		}
     
     // Hide the normal gameplay UI
     _hud.Visible = false;
