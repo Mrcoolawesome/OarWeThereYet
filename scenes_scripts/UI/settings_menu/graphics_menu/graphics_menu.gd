@@ -338,7 +338,7 @@ func _on_fov_slider_slider_changed(new_value: float) -> void:
   var clamped_fov: float = clamp(new_value, 1.0, 120.0)
   settings_prefrences.player_fov = clamped_fov
 
-  var display_string: String = str(int(clamped_fov))
+  var display_string: String = "Quake Pro" if int(clamped_fov) == 120 else str(int(clamped_fov))
   fov_slider.change_number_display_tag(display_string)
 
   if !is_loading_ui:
