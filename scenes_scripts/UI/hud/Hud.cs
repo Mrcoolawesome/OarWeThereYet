@@ -5,14 +5,19 @@ public partial class Hud : CanvasLayer
 {
 	// Rename this to make more sense for your health bar
 	private Control _boatHealthBar;
+	private Label _fish;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		TryResolveBoatHealthBar();
 
+		_fish = GetNode<Label>("Fish");
+
 		// Subscribe to the boat health update
 		GlobalSignalServer.Instance.UpdateBoatHealth += UpdateBoatHealthUi;
+
+		GlobalSignalServer.Instance.StartMotivator += OnStartMotivator;
 
 		// Initialize with current health
 		UpdateBoatHealthUi(GlobalSignalServer.Instance.Health);
@@ -23,6 +28,7 @@ public partial class Hud : CanvasLayer
 		if (GlobalSignalServer.Instance != null)
 		{
 			GlobalSignalServer.Instance.UpdateBoatHealth -= UpdateBoatHealthUi;
+			GlobalSignalServer.Instance.StartMotivator -= OnStartMotivator;
 		}
 	}
 
@@ -49,5 +55,30 @@ public partial class Hud : CanvasLayer
 
 		_boatHealthBar = GetNodeOrNull<Control>("BoatHealthBar");
 		return GodotObject.IsInstanceValid(_boatHealthBar);
+	}
+
+	private void OnStartMotivator()
+	{
+		if (Multiplayer.IsServer())
+		{
+			Rpc(nameof(ShowFishWarning));
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private async void ShowFishWarning()
+	{
+		if (_fish == null) return;
+		
+		for (int i = 0; i < 3; i++)
+		{
+			if (!GodotObject.IsInstanceValid(_fish)) return;
+			_fish.Visible = true;
+			await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
+			
+			if (!GodotObject.IsInstanceValid(_fish)) return;
+			_fish.Visible = false;
+			await ToSignal(GetTree().CreateTimer(0.5f), SceneTreeTimer.SignalName.Timeout);
+		}
 	}
 }

@@ -14,7 +14,7 @@ corner_radius_bottom_left = 20
 expand_margin_top = 35.0
 expand_margin_bottom = 35.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h0y0o"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4wu0i"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 5
 border_width_top = 5
@@ -28,7 +28,7 @@ corner_radius_bottom_left = 20
 expand_margin_top = 35.0
 expand_margin_bottom = 35.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u5sva"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h0y0o"]
 bg_color = Color(0, 1, 0, 1)
 border_width_left = 5
 border_width_top = 5
@@ -83,10 +83,28 @@ size_flags_vertical = 4
 theme = ExtResource("3_4wu0i")
 theme_override_icons/grabber = ExtResource("4_4wu0i")
 theme_override_styles/slider = SubResource("StyleBoxFlat_opnk5")
-theme_override_styles/grabber_area = SubResource("StyleBoxFlat_h0y0o")
-theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_u5sva")
+theme_override_styles/grabber_area = SubResource("StyleBoxFlat_4wu0i")
+theme_override_styles/grabber_area_highlight = SubResource("StyleBoxFlat_h0y0o")
 value = 100.0
 ticks_on_borders = true
 ticks_position = 3
+
+[node name="Fish" type="Label" parent="."]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.922789, 3.2488256e-06, 1.732707e-06, 1)
+theme_override_font_sizes/font_size = 241
+text = "GOD IS COMING"
 
 [connection signal="value_changed" from="BoatHealthBar/MarginContainer/HBoxContainer/Slider" to="BoatHealthBar" method="_on_slider_value_changed"]
