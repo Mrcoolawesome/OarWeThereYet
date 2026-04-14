@@ -343,7 +343,7 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 15.3
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.160554, 2.0516508, 6.3963623)
 
 [node name="CheckpointCollision" parent="CheckpointContainer/Checkpoint" index="2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.960175, 1.5957031, 3.8066406)
+transform = Transform3D(0.9037466, 0, 0.4280678, 0, 1, 0, -0.4280678, 0, 0.9037466, 21.362625, 1.5957031, 5.0218506)
 
 [node name="Checkpoint2" parent="CheckpointContainer" instance=ExtResource("16_0b6ne")]
 transform = Transform3D(0.1417651, 0, 0.98990035, 0, 1, 0, -0.98990035, 0, 0.1417651, 1075.0454, -11.778191, 860.44617)

@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://ctkcbfftcgncc"]
+
+[ext_resource type="PackedScene" uid="uid://bspwtetc0fejm" path="res://art/models/fish.blend" id="1_4y3fb"]
+[ext_resource type="Script" uid="uid://bsd5p5eaewu1r" path="res://scenes_scripts/motivator/Motivator.cs" id="1_31aj4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_31aj4"]
+
+[node name="Motivator" type="Node3D"]
+script = ExtResource("1_31aj4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_31aj4")
+
+[node name="fish" parent="." instance=ExtResource("1_4y3fb")]
