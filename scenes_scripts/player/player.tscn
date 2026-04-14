@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=4 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=30 format=4 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
@@ -17,6 +17,7 @@
 [ext_resource type="AudioStream" uid="uid://dkhy8nmbdgslo" path="res://art/audio/ones-that-i-want/swimming/treading-water.wav" id="15_lvkhp"]
 [ext_resource type="AudioStream" uid="uid://bwa6ameabfexi" path="res://art/audio/ones-that-i-want/endgame-sound/endgame.wav" id="16_4b7ak"]
 [ext_resource type="AudioStream" uid="uid://bvi6q1jcgixj2" path="res://art/audio/ones-that-i-want/underwater/underwater.wav" id="17_lvkhp"]
+[ext_resource type="AudioStream" uid="uid://bp3dn037mm50l" path="res://art/audio/ones-that-i-want/player-hit/player-hit-swoosh-shortened.wav" id="18_8u33c"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
 properties/0/path = NodePath(".:State")
@@ -107,6 +108,9 @@ properties/2/replication_mode = 2
 properties/3/path = NodePath("..:MovementAudioPitchScale")
 properties/3/spawn = true
 properties/3/replication_mode = 2
+properties/4/path = NodePath("..:PlayerHitSwooshAudioGate")
+properties/4/spawn = true
+properties/4/replication_mode = 2
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4
@@ -384,6 +388,10 @@ stream = SubResource("AudioStreamGenerator_0fxne")
 attenuation_model = 2
 bus = &"Voice Chat"
 doppler_tracking = 1
+
+[node name="PlayerHitSwooshShortened" type="AudioStreamPlayer3D" parent="AudioStuff"]
+stream = ExtResource("18_8u33c")
+bus = &"PlayerMovementSounds"
 
 [node name="Endgame" type="AudioStreamPlayer" parent="AudioStuff"]
 stream = ExtResource("16_4b7ak")

@@ -8,6 +8,12 @@ public partial class Oar : ItemAction
   {
     GodotObject observedObject = _player.GetRaycastObject();
 
+    if (observedObject is not Node3D)
+    {
+      _player.TriggerPlayerHitSwoosh();
+      return;
+    }
+
     if (observedObject is Node3D targetNode)
     {
       // Calculate the exact direction from the attacker to the target

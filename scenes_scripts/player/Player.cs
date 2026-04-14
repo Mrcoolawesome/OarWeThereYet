@@ -38,6 +38,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Export] public bool WalkingOnBoatAudioGate { get; set; } = false;
 	[Export] public bool WalkingOnGroundAudioGate { get; set; } = false;
 	[Export] public bool TreadingWaterAudioGate { get; set; } = false;
+	[Export] public bool PlayerHitSwooshAudioGate { get; set; } = false;
 	[Export] public float MovementAudioPitchScale { get; set; } = 1.0f;
 	[Export] public bool IsUnderWater { get; set; } = false;
 	[Export] public float UnderWaterSubmergedOffset = 0.3f;
@@ -195,6 +196,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private AudioStreamPlayer3D _treadingWaterAudio;
 	private AudioStreamPlayer _endGameMusic;
 	private AudioStreamPlayer _underwater;
+	private AudioStreamPlayer3D _playerHitSwoosh;
 
 	// under water view
 	private Control _underWaterPOV;
@@ -206,6 +208,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private AudioEffectPitchShift _voiceChatPitch;
 	private AudioEffectReverb _micInputReverb;
 	private AudioEffectPitchShift _micInputPitch;
+	private double _playerHitSwooshGateTimer = 0.0;
 
   public override void _EnterTree()
 	{
@@ -278,6 +281,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_treadingWaterAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/TreadingWater");
 		_endGameMusic = GetNode<AudioStreamPlayer>("AudioStuff/Endgame");
 		_underwater = GetNode<AudioStreamPlayer>("AudioStuff/Underwater");
+		_playerHitSwoosh = GetNode<AudioStreamPlayer3D>("AudioStuff/PlayerHitSwooshShortened");
 
 		// subscribe to the global signal server call to respawn the player to the boat
 		GlobalSignalServer.Instance.RespawnPlayer += OnPauseUIRespawnPlayer;
@@ -710,6 +714,15 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Logic for movement depending on player state
 	public override void _PhysicsProcess(double delta)
 	{
+		if (IsMultiplayerAuthority() && PlayerHitSwooshAudioGate)
+		{
+			_playerHitSwooshGateTimer -= delta;
+			if (_playerHitSwooshGateTimer <= 0.0)
+			{
+				PlayerHitSwooshAudioGate = false;
+			}
+		}
+
 		// Capture the stable state for this whole frame
 		IsSwimming = _applyWaterPhysicsForce;
 
@@ -920,6 +933,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void ApplyAudioFromGates()
 	{
 		float audioSpeed = Mathf.Max(0.01f, MovementAudioPitchScale);
+
+		if (PlayerHitSwooshAudioGate)
+		{
+			if (!_playerHitSwoosh.Playing) _playerHitSwoosh.Play();
+		}
 
 		if (TreadingWaterAudioGate)
 		{
@@ -1463,6 +1481,17 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   {
     return _interactRay.GetCollider();
   }
+
+	public void TriggerPlayerHitSwoosh()
+	{
+		if (!IsMultiplayerAuthority())
+		{
+			return;
+		}
+
+		PlayerHitSwooshAudioGate = true;
+		_playerHitSwooshGateTimer = 0.15;
+	}
 
   // 1. Ask the Server to relay the command AND the direction
   public void ApplyKnockbackOnClient(string clientName, Vector3 pushDirection)
