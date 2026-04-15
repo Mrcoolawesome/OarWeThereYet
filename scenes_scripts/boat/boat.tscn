@@ -63,8 +63,8 @@ point_count = 8
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g3she"]
 render_priority = 2
 transparency = 1
+cull_mode = 1
 depth_draw_mode = 1
-no_depth_test = true
 shading_mode = 0
 albedo_color = Color(1, 1, 1, 0)
 stencil_mode = 3
@@ -300,7 +300,7 @@ max_distance = 20.0
 bus = &"Environment"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.42263997, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.30939066, 0)
 mesh = SubResource("BoxMesh_g3she")
 
 [connection signal="delta_synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]

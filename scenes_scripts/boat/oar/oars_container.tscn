@@ -1,20 +1,27 @@
-[gd_scene load_steps=14 format=4 uid="uid://di8o6ioxtkr2c"]
+[gd_scene load_steps=10 format=4 uid="uid://di8o6ioxtkr2c"]
 
 [ext_resource type="PackedScene" uid="uid://di51rmms48nsb" path="res://scenes_scripts/boat/oar/oar.tscn" id="1_ghe3o"]
 [ext_resource type="Script" uid="uid://cwpemyimd6t6a" path="res://scenes_scripts/boat/oar/OarsContainer.cs" id="1_mmxoc"]
-[ext_resource type="Shader" uid="uid://bu4ja6x7tylt8" path="res://art/shaders/outline.gdshader" id="3_f1ojj"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_kexru"]
-render_priority = 0
-shader = ExtResource("3_f1ojj")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
-shader_parameter/outline_width = 0.03
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jihq0"]
+render_priority = 5
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+grow = true
+grow_amount = 0.03
+stencil_mode = 3
+stencil_flags = 1
+stencil_compare = 5
+metadata/_stencil_owned = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1ojj"]
 resource_name = "Material"
-cull_mode = 2
+render_priority = 4
+next_pass = SubResource("StandardMaterial3D_jihq0")
 albedo_color = Color(0.9063355, 0.35398418, 0, 1)
 roughness = 0.9410876
+stencil_mode = 1
 stencil_flags = 2
 stencil_outline_thickness = 0.03
 
@@ -52,12 +59,6 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_hp20a")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_6a7yf"]
-render_priority = 0
-shader = ExtResource("3_f1ojj")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
-shader_parameter/outline_width = 0.03
-
 [sub_resource type="ArrayMesh" id="ArrayMesh_6a7yf"]
 resource_name = "oar_Cube"
 _surfaces = [{
@@ -77,12 +78,6 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_hp20a")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_t5ebm"]
-render_priority = 0
-shader = ExtResource("3_f1ojj")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
-shader_parameter/outline_width = 0.03
-
 [sub_resource type="ArrayMesh" id="ArrayMesh_t5ebm"]
 resource_name = "oar_Cube"
 _surfaces = [{
@@ -101,12 +96,6 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_hp20a")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_8ypd2"]
-render_priority = 0
-shader = ExtResource("3_f1ojj")
-shader_parameter/outline_color = Color(0, 0, 0, 1)
-shader_parameter/outline_width = 0.03
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_8ypd2"]
 resource_name = "oar_Cube"
@@ -134,28 +123,24 @@ script = ExtResource("1_mmxoc")
 transform = Transform3D(1, 3.0908613e-08, -1.2802769e-08, -3.0908613e-08, 0.7071067, -0.7071068, -1.2802769e-08, 0.7071068, 0.7071067, -2.0000002, 0, -3)
 
 [node name="Cube" parent="OarBackLeft" index="1"]
-material_overlay = SubResource("ShaderMaterial_kexru")
 mesh = SubResource("ArrayMesh_kexru")
 
 [node name="OarFrontLeft" parent="." instance=ExtResource("1_ghe3o")]
 transform = Transform3D(1, 3.0908613e-08, -1.2802769e-08, -3.0908613e-08, 0.7071067, -0.7071068, -1.2802769e-08, 0.7071068, 0.7071067, 1.9999999, 0, -3)
 
 [node name="Cube" parent="OarFrontLeft" index="1"]
-material_overlay = SubResource("ShaderMaterial_6a7yf")
 mesh = SubResource("ArrayMesh_6a7yf")
 
 [node name="OarFrontRight" parent="." instance=ExtResource("1_ghe3o")]
 transform = Transform3D(-1, -1.5048155e-07, -1.06770145e-07, -3.0908613e-08, 0.7071067, -0.7071068, 1.8190443e-07, -0.7071068, -0.7071067, 2.0000002, 0, 2.9999998)
 
 [node name="Cube" parent="OarFrontRight" index="1"]
-material_overlay = SubResource("ShaderMaterial_t5ebm")
 mesh = SubResource("ArrayMesh_t5ebm")
 
 [node name="OarBackRight" parent="." instance=ExtResource("1_ghe3o")]
 transform = Transform3D(-1, -1.5048155e-07, -1.06770145e-07, -3.0908613e-08, 0.7071067, -0.7071068, 1.8190443e-07, -0.7071068, -0.7071067, -1.9999999, 0, 3.0000002)
 
 [node name="Cube" parent="OarBackRight" index="1"]
-material_overlay = SubResource("ShaderMaterial_8ypd2")
 mesh = SubResource("ArrayMesh_8ypd2")
 
 [editable path="OarBackLeft"]
