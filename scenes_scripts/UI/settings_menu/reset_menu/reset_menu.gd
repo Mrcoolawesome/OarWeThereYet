@@ -1,6 +1,7 @@
 extends Control
 
 @onready var reset_button: Button = $MarginContainer/VBoxContainer2/ResetGameButton
+@onready var respawn_button: Button = $MarginContainer/VBoxContainer2/RespawnPlayerButton
 
 signal back_button_pressed
 
@@ -8,6 +9,9 @@ signal back_button_pressed
 func _ready() -> void:
 	# only the host can see the reset game button
 	reset_button.visible = multiplayer.is_server()
+
+	if GlobalVariables.active_network_type == GlobalVariables.MULTIPLAYER_NETWORK_TYPE.STEAM:
+		respawn_button.visible = false;
 
 func _on_back_button_pressed() -> void:
 	back_button_pressed.emit()

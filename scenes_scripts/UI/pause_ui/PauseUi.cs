@@ -10,6 +10,7 @@ public partial class PauseUi : Control
   private Control _settingsMenu = new Control();
   private Control _resetMenu = new Control();
   private MarginContainer _mainContainer = new MarginContainer();
+  private Button _resetButton = new Button();
 
   // some gemini thing so that player.cs knows the state of the pause menu
   public bool IsSettingsOpen => _settingsMenu.Visible;
@@ -21,6 +22,14 @@ public partial class PauseUi : Control
     _settingsMenu = GetNode<Control>("PanelContainer/SettingsMenu");
     _resetMenu = GetNode<Control>("PanelContainer/ResetMenu");
     _mainContainer = GetNode<MarginContainer>("PanelContainer/PauseButtonMainContainer");
+    _resetButton = GetNode<Button>("PanelContainer/PauseButtonMainContainer/VBoxContainer/ResetButton");
+
+    // Check if we are on Steam networking (1) and hide the reset button if so
+    Node globalVariables = GetNode("/root/GlobalVariables");
+    if ((int)globalVariables.Get("active_network_type") == 1 && !Multiplayer.IsServer()) // 1 is STEAM
+    {
+      _resetButton.Visible = false;
+    }
   }
 
   // --- NEW INPUT HANDLER ---
