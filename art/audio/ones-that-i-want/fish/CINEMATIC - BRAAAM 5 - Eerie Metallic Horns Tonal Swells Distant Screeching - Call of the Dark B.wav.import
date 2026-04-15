@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://pcrwx63qq37w"
+path="res://.godot/imported/CINEMATIC - BRAAAM 5 - Eerie Metallic Horns Tonal Swells Distant Screeching - Call of the Dark B.wav-461570f8582a6285aaec95ea6fdcf15d.sample"
+
+[deps]
+
+source_file="res://art/audio/ones-that-i-want/fish/CINEMATIC - BRAAAM 5 - Eerie Metallic Horns Tonal Swells Distant Screeching - Call of the Dark B.wav"
+dest_files=["res://.godot/imported/CINEMATIC - BRAAAM 5 - Eerie Metallic Horns Tonal Swells Distant Screeching - Call of the Dark B.wav-461570f8582a6285aaec95ea6fdcf15d.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

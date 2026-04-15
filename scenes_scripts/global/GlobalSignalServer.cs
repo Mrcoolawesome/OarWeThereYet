@@ -66,6 +66,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void ApplyPlayerLookSpeedEventHandler(float multiplier);
 
+  // signal to apply the local player's camera fov
+  [Signal]
+  public delegate void ApplyPlayerFovEventHandler(float fov);
+
   // signal to set the player's gamertag
   [Signal]
   public delegate void AssignGamertagEventHandler(string gamertag);

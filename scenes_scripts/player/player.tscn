@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=4 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=32 format=4 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
@@ -12,6 +12,14 @@
 [ext_resource type="PackedScene" uid="uid://c5qyjwmlp4xyw" path="res://scenes_scripts/UI/inventory_UI/InventoryUI.tscn" id="8_a5pl4"]
 [ext_resource type="PackedScene" uid="uid://c5od8jurojwbs" path="res://scenes_scripts/floatable/water-physics.tscn" id="10_qjplb"]
 [ext_resource type="PackedScene" uid="uid://cfvlihgonijke" path="res://scenes_scripts/UI/end_screen/end-screen.tscn" id="12_33s6o"]
+[ext_resource type="AudioStream" uid="uid://b3xhcdklgycpb" path="res://art/audio/ones-that-i-want/walking/world-walking-single.wav" id="13_fqj0r"]
+[ext_resource type="AudioStream" uid="uid://esphyok7v4fb" path="res://art/audio/ones-that-i-want/walking/boat-walking.wav" id="14_4b7ak"]
+[ext_resource type="AudioStream" uid="uid://dkhy8nmbdgslo" path="res://art/audio/ones-that-i-want/swimming/treading-water.wav" id="15_lvkhp"]
+[ext_resource type="AudioStream" uid="uid://bwa6ameabfexi" path="res://art/audio/ones-that-i-want/endgame-sound/endgame.wav" id="16_4b7ak"]
+[ext_resource type="AudioStream" uid="uid://dxmswxaxydctc" path="res://art/audio/ones-that-i-want/player-hit/bell-hit-sound.wav" id="17_5tvsi"]
+[ext_resource type="AudioStream" uid="uid://bvi6q1jcgixj2" path="res://art/audio/ones-that-i-want/underwater/underwater.wav" id="17_lvkhp"]
+[ext_resource type="AudioStream" uid="uid://bp3dn037mm50l" path="res://art/audio/ones-that-i-want/player-hit/player-hit-swoosh-shortened.wav" id="18_8u33c"]
+[ext_resource type="AudioStream" uid="uid://nxjqoq7xaxtu" path="res://art/audio/ones-that-i-want/player-hit/MagicPack2_WaterExplosions_Explosion2-004.wav" id="18_klt8r"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
 properties/0/path = NodePath(".:State")
@@ -105,6 +113,15 @@ properties/2/replication_mode = 2
 properties/3/path = NodePath("..:MovementAudioPitchScale")
 properties/3/spawn = true
 properties/3/replication_mode = 2
+properties/4/path = NodePath("..:PlayerHitSwooshAudioGate")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath("..:PlayerHitSomethingAudioTrigger")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath("..:PlayerHitBoatAudioTrigger")
+properties/6/spawn = true
+properties/6/replication_mode = 2
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4
@@ -380,8 +397,46 @@ attenuation_model = 2
 bus = &"Voice Chat"
 doppler_tracking = 1
 
+[node name="PlayerHitSwooshShortened" type="AudioStreamPlayer3D" parent="AudioStuff"]
+stream = ExtResource("18_8u33c")
+bus = &"PlayerMovementSounds"
+
+[node name="BellHitSound" type="AudioStreamPlayer3D" parent="AudioStuff"]
+stream = ExtResource("17_5tvsi")
+
+[node name="HitBoatSound" type="AudioStreamPlayer3D" parent="AudioStuff"]
+stream = ExtResource("18_klt8r")
+
+[node name="Endgame" type="AudioStreamPlayer" parent="AudioStuff"]
+stream = ExtResource("16_4b7ak")
+volume_db = 20.0
+bus = &"Music"
+
+[node name="Underwater" type="AudioStreamPlayer" parent="AudioStuff"]
+stream = ExtResource("17_lvkhp")
+volume_db = 20.0
+bus = &"PlayerMovementSounds"
+
 [node name="AudioSynchronizer" type="MultiplayerSynchronizer" parent="AudioStuff"]
 replication_config = SubResource("SceneReplicationConfig_fqj0r")
+
+[node name="UnderWaterPOV" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="UnderWaterPOV"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02745098, 0, 0.54509807, 0.7647059)
 
 [connection signal="synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="Resume" from="PauseCanvas/PauseUI" to="." method="OnPauseUIResume"]

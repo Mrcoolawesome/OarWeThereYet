@@ -16,6 +16,7 @@ signal setting_changed
 # new dropdowns and sliders for the added settings
 @onready var vsync_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/VSyncDropdown
 @onready var max_fps_slider = $MarginContainer/ScrollContainer/VBoxContainer/MaxFPSSlider
+@onready var fov_slider = $MarginContainer/ScrollContainer/VBoxContainer/FOVSlider
 @onready var render_scale_slider = $MarginContainer/ScrollContainer/VBoxContainer/RenderScaleSlider
 @onready var shadow_dropdown = $MarginContainer/ScrollContainer/VBoxContainer/ShadowDropdown
 
@@ -132,6 +133,13 @@ func _load_ui_stuff() -> void:
   # call the function first to set the display string properly, then set the starting value
   _on_max_fps_slider_slider_changed(settings_prefrences.max_fps)
   max_fps_slider.StartingValue = settings_prefrences.max_fps
+
+  # FOV SLIDER
+  var loaded_fov: float = clamp(settings_prefrences.player_fov, 1.0, 179.0)
+  if loaded_fov != settings_prefrences.player_fov:
+    settings_prefrences.player_fov = loaded_fov
+  _on_fov_slider_slider_changed(loaded_fov)
+  fov_slider.StartingValue = loaded_fov
 
   # RENDER SCALE SLIDER
   _on_render_scale_slider_slider_changed(settings_prefrences.render_scale)
@@ -325,3 +333,13 @@ func revert_settings() -> void:
   PrefrencesLoader.apply_graphics_settings(settings_prefrences)
   # Visually update the sliders/dropdowns to reflect the rollback
   _load_ui_stuff()
+
+func _on_fov_slider_slider_changed(new_value: float) -> void:
+  var clamped_fov: float = clamp(new_value, 1.0, 120.0)
+  settings_prefrences.player_fov = clamped_fov
+
+  var display_string: String = "Quake Pro" if int(clamped_fov) == 120 else str(int(clamped_fov))
+  fov_slider.change_number_display_tag(display_string)
+
+  if !is_loading_ui:
+    setting_changed.emit()
