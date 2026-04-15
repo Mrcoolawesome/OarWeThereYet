@@ -32,6 +32,7 @@ public partial class Hud : CanvasLayer
 
 		GlobalSignalServer.Instance.ResetLevel += ResetScreen;
 		GlobalSignalServer.Instance.LoadGame += ResetScreen;
+		GlobalSignalServer.Instance.BoatDeath += ResetScreen;
 
 		// Initialize with current health
 		UpdateBoatHealthUi(GlobalSignalServer.Instance.Health);
@@ -46,6 +47,7 @@ public partial class Hud : CanvasLayer
 			GlobalSignalServer.Instance.UpdateResetTimer -= OnUpdateResetTimer;
 			GlobalSignalServer.Instance.ResetLevel -= ResetScreen;
 			GlobalSignalServer.Instance.LoadGame -= ResetScreen;
+			GlobalSignalServer.Instance.BoatDeath -= ResetScreen;
 		}
 	}
 
