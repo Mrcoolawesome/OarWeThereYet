@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://cwpemyimd6t6a" path="res://scenes_scripts/boat/oar/OarsContainer.cs" id="1_mmxoc"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jihq0"]
-render_priority = 1
+render_priority = 5
 transparency = 1
 shading_mode = 0
 albedo_color = Color(0, 0, 0, 1)
@@ -17,8 +17,8 @@ metadata/_stencil_owned = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1ojj"]
 resource_name = "Material"
+render_priority = 4
 next_pass = SubResource("StandardMaterial3D_jihq0")
-cull_mode = 2
 albedo_color = Color(0.9063355, 0.35398418, 0, 1)
 roughness = 0.9410876
 stencil_mode = 1

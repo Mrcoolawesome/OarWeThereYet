@@ -1,9 +1,10 @@
-[gd_scene load_steps=21 format=3 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=25 format=3 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scenes_scripts/boat/Boat.cs" id="1_vvssr"]
 [ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scenes_scripts/boat/seat/Seat.cs" id="2_kgk83"]
 [ext_resource type="ArrayMesh" uid="uid://bh7l47nlyrm13" path="res://scenes_scripts/boat/boat-mesh.res" id="3_8vmau"]
 [ext_resource type="PackedScene" uid="uid://danavscflb0ck" path="res://scenes_scripts/boat/dry_box/dry_box.tscn" id="3_ltyy5"]
+[ext_resource type="Shader" uid="uid://bu4ja6x7tylt8" path="res://art/shaders/outline.gdshader" id="3_m43lt"]
 [ext_resource type="PackedScene" uid="uid://di8o6ioxtkr2c" path="res://scenes_scripts/boat/oar/oars_container.tscn" id="4_li7rg"]
 [ext_resource type="Script" uid="uid://b7i8jbk0g7j3" path="res://scenes_scripts/inventory/Inventory.cs" id="4_s60o4"]
 [ext_resource type="PackedScene" uid="uid://ds5xru6fctkkj" path="res://scenes_scripts/boat/anchor_point/anchor_point.tscn" id="6_8vmau"]
@@ -33,6 +34,12 @@ size = Vector3(1, 0.25, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_3b5xp"]
 size = Vector3(1, 0.25, 1)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_go6fw"]
+render_priority = 0
+shader = ExtResource("3_m43lt")
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/outline_width = 0.1
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_0063d"]
 size = Vector3(13, 0.3, 5)
 
@@ -52,6 +59,20 @@ _data = {
 "tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
 }
 point_count = 8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g3she"]
+render_priority = 2
+transparency = 1
+depth_draw_mode = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0)
+stencil_mode = 3
+stencil_flags = 2
+stencil_reference = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_g3she"]
+material = SubResource("StandardMaterial3D_g3she")
+size = Vector3(6.2, 0.75, 2.3)
 
 [node name="Boat" type="RigidBody3D"]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
@@ -174,6 +195,7 @@ shape = SubResource("BoxShape3D_3b5xp")
 
 [node name="Raft" type="MeshInstance3D" parent="."]
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+material_overlay = SubResource("ShaderMaterial_go6fw")
 mesh = ExtResource("3_8vmau")
 skeleton = NodePath("")
 
@@ -275,6 +297,10 @@ volume_db = 20.0
 unit_size = 20.0
 max_distance = 20.0
 bus = &"Environment"
+
+[node name="WaterMaskMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.506293, 0)
+mesh = SubResource("BoxMesh_g3she")
 
 [connection signal="delta_synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="timeout" from="DamageDelayTimer" to="." method="DamageTimerEnded"]

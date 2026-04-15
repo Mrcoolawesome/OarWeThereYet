@@ -54,7 +54,7 @@ scene_file = ExtResource("3_jq3eh")
 cast_shadows = 0
 last_lod = 0
 last_shadow_lod = 0
-lod0_range = 128.0
+lod0_range = 500.0
 
 [sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_itx5c"]
 name = "grass"
@@ -63,7 +63,7 @@ scene_file = ExtResource("2_6a22d")
 cast_shadows = 0
 last_lod = 0
 last_shadow_lod = 0
-lod0_range = 128.0
+lod0_range = 500.0
 
 [sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_b2tru"]
 name = "bush"
@@ -72,7 +72,7 @@ scene_file = ExtResource("4_71wb6")
 cast_shadows = 0
 last_lod = 0
 last_shadow_lod = 0
-lod0_range = 128.0
+lod0_range = 500.0
 
 [sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_n47sq"]
 name = "tall_dead_grass"
@@ -80,7 +80,7 @@ id = 3
 scene_file = ExtResource("5_b2tru")
 last_lod = 0
 last_shadow_lod = 0
-lod0_range = 128.0
+lod0_range = 500.0
 
 [sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_ap3k2"]
 name = "cactus"
@@ -89,7 +89,7 @@ scene_file = ExtResource("6_n47sq")
 density = 0.01
 last_lod = 0
 last_shadow_lod = 0
-lod0_range = 128.0
+lod0_range = 500.0
 
 [sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_fjq28"]
 name = "rock"
@@ -99,7 +99,7 @@ density = 2.2681065
 cast_shadows = 0
 last_lod = 0
 last_shadow_lod = 0
-lod0_range = 128.0
+lod0_range = 500.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0b6ne"]
 albedo_color = Color(0.49590194, 0.49590188, 0.49590188, 1)
@@ -112,7 +112,7 @@ density = 2.2681065
 material_override = SubResource("StandardMaterial3D_0b6ne")
 last_lod = 0
 last_shadow_lod = 0
-lod0_range = 128.0
+lod0_range = 500.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_34k5s"]
 transparency = 4

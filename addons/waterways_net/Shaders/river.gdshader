@@ -3,6 +3,10 @@
 shader_type spatial;
 render_mode depth_draw_always, specular_schlick_ggx, cull_disabled;
 
+// --- THE NEW GODOT 4.5 STENCIL COMMAND ---
+// This tells the GPU: "Read the stencil buffer. If the value is 1, DO NOT draw this water."
+stencil_mode read, compare_not_equal, 2;
+
 uniform sampler2D DEPTH_TEXTURE : hint_depth_texture, filter_linear_mipmap;
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap;
 
@@ -104,7 +108,7 @@ void vertex() {
 }
 
 void fragment() {
-    // --- NEW LOW POLY LIGHTING ---
+	// --- NEW LOW POLY LIGHTING ---
     // This forces the faceted look by using the geometry's screen derivatives
     NORMAL = normalize(cross(dFdy(VERTEX), dFdx(VERTEX)));
 
