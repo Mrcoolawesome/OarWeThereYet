@@ -13,6 +13,10 @@ public static class RiverShaderHelper
                 material.Shader = ResourceLoader.Load<Shader>($"{WaterwaysPlugin.PluginPath}/Shaders/river.gdshader");
                 material.Shader.ResourceLocalToScene = true;
                 material.SetShaderParameter("normal_bump_texture", ResourceLoader.Load<Texture>($"{WaterwaysPlugin.PluginPath}/Textures/water_normal_bump.png"));
+                
+                // setting the render priority to be higher than 0 so that it happens after the boat hull mask is rendered
+                material.RenderPriority = 3; 
+                
                 break;
 
             case ShaderType.None:

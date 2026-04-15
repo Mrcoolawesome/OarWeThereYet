@@ -61,7 +61,7 @@ _data = {
 point_count = 8
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g3she"]
-render_priority = -10
+render_priority = 2
 transparency = 1
 depth_draw_mode = 1
 no_depth_test = true

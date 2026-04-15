@@ -774,9 +774,6 @@ transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.0
 Speed = 3.0
 RiverNode = NodePath("../RiverManager")
 
-[node name="Boat" parent="." instance=ExtResource("10_bvt7m")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 190.82523, -1.6579294, 1286.3151)
-
 [editable path="CheckpointContainer/Checkpoint"]
 [editable path="CheckpointContainer/Checkpoint2"]
 [editable path="CheckpointContainer/Checkpoint3"]

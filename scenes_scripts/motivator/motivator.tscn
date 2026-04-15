@@ -1,30 +1,23 @@
-[gd_scene load_steps=8 format=4 uid="uid://ctkcbfftcgncc"]
+[gd_scene load_steps=9 format=4 uid="uid://ctkcbfftcgncc"]
 
 [ext_resource type="PackedScene" uid="uid://bspwtetc0fejm" path="res://art/models/fish.blend" id="1_4y3fb"]
 [ext_resource type="Script" uid="uid://bsd5p5eaewu1r" path="res://scenes_scripts/motivator/Motivator.cs" id="1_31aj4"]
+[ext_resource type="Shader" uid="uid://bu4ja6x7tylt8" path="res://art/shaders/outline.gdshader" id="3_y2ys1"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_31aj4"]
 size = Vector3(1, 67.365, 121.72)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_31aj4"]
-render_priority = 1
-transparency = 1
-shading_mode = 0
-albedo_color = Color(0, 0, 0, 1)
-grow = true
-grow_amount = 0.01
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_epm6i"]
+render_priority = 0
+shader = ExtResource("3_y2ys1")
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+shader_parameter/outline_width = 0.03
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y2ys1"]
 resource_name = "Material"
-next_pass = SubResource("StandardMaterial3D_31aj4")
 cull_mode = 2
 albedo_color = Color(0.5583326, 0.19184983, 0.2214343, 1)
 roughness = 0.5
-stencil_mode = 1
 stencil_flags = 2
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_epm6i"]
@@ -126,6 +119,7 @@ settings/0/enable_all_child_collisions = true
 settings/0/exclude_collision_count = 0
 
 [node name="Cube" parent="fish/Armature/Skeleton3D" index="2"]
+material_overlay = SubResource("ShaderMaterial_epm6i")
 mesh = SubResource("ArrayMesh_epm6i")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
