@@ -137,7 +137,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private RiverFloatSystem _riverFloatSystem;
 	// variables to help apply water physics force
 	private bool _applyWaterPhysicsForce = false;
-	public bool IsSwimming { get; private set; } = false;
+	[Export] public bool IsSwimming { get; private set; } = false;
 	private Vector3 _waterPhysicsForce;
 	private Vector3 _waterPhysicsForcePosition;
 

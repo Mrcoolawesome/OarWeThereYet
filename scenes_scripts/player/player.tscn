@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=4 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=24 format=4 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
@@ -12,9 +12,6 @@
 [ext_resource type="PackedScene" uid="uid://c5qyjwmlp4xyw" path="res://scenes_scripts/UI/inventory_UI/InventoryUI.tscn" id="8_a5pl4"]
 [ext_resource type="PackedScene" uid="uid://c5od8jurojwbs" path="res://scenes_scripts/floatable/water-physics.tscn" id="10_qjplb"]
 [ext_resource type="PackedScene" uid="uid://cfvlihgonijke" path="res://scenes_scripts/UI/end_screen/end-screen.tscn" id="12_33s6o"]
-[ext_resource type="AudioStream" uid="uid://b3xhcdklgycpb" path="res://art/audio/ones-that-i-want/walking/world-walking-single.wav" id="13_fqj0r"]
-[ext_resource type="AudioStream" uid="uid://esphyok7v4fb" path="res://art/audio/ones-that-i-want/walking/boat-walking.wav" id="14_4b7ak"]
-[ext_resource type="AudioStream" uid="uid://dkhy8nmbdgslo" path="res://art/audio/ones-that-i-want/swimming/treading-water.wav" id="15_lvkhp"]
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
 properties/0/path = NodePath(".:State")
@@ -23,6 +20,9 @@ properties/0/replication_mode = 1
 properties/1/path = NodePath("GamerTag:text")
 properties/1/spawn = true
 properties/1/replication_mode = 1
+properties/2/path = NodePath(".:IsSwimming")
+properties/2/spawn = true
+properties/2/replication_mode = 2
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
 
@@ -361,15 +361,12 @@ stream = SubResource("AudioStreamWAV_8u33c")
 bus = &"PlayerMovementSounds"
 
 [node name="WorldWalkingSingle" type="AudioStreamPlayer3D" parent="AudioStuff"]
-stream = ExtResource("13_fqj0r")
 bus = &"PlayerMovementSounds"
 
 [node name="BoatWalking" type="AudioStreamPlayer3D" parent="AudioStuff"]
-stream = ExtResource("14_4b7ak")
 bus = &"PlayerMovementSounds"
 
 [node name="TreadingWater" type="AudioStreamPlayer3D" parent="AudioStuff"]
-stream = ExtResource("15_lvkhp")
 bus = &"PlayerMovementSounds"
 
 [node name="AudioInput" type="AudioStreamPlayer3D" parent="AudioStuff"]
