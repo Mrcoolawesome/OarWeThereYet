@@ -63,7 +63,6 @@ point_count = 8
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g3she"]
 render_priority = 2
 transparency = 1
-cull_mode = 1
 depth_draw_mode = 1
 shading_mode = 0
 albedo_color = Color(1, 1, 1, 0)
@@ -73,7 +72,7 @@ stencil_reference = 2
 
 [sub_resource type="BoxMesh" id="BoxMesh_g3she"]
 material = SubResource("StandardMaterial3D_g3she")
-size = Vector3(6.5, 0.3, 2.3)
+size = Vector3(6.2, 0.75, 2.3)
 
 [node name="Boat" type="RigidBody3D"]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
@@ -299,8 +298,8 @@ unit_size = 20.0
 max_distance = 20.0
 bus = &"Environment"
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.30939066, 0)
+[node name="WaterMaskMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.506293, 0)
 mesh = SubResource("BoxMesh_g3she")
 
 [connection signal="delta_synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
