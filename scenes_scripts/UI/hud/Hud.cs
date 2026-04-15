@@ -7,6 +7,7 @@ public partial class Hud : CanvasLayer
 	private Control _boatHealthBar;
 	private Label _fish;
 	private Label _resetTimerLabel;
+	private Control _resetScreen;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -19,12 +20,19 @@ public partial class Hud : CanvasLayer
 		_resetTimerLabel = GetNode<Label>("ResetTimer");
 		_resetTimerLabel.Visible = false;
 
+		_resetScreen = GetNode<Control>("ResetScreen");
+		_resetScreen.Visible = false;
+
 		// Subscribe to the boat health update
 		GlobalSignalServer.Instance.UpdateBoatHealth += UpdateBoatHealthUi;
 
 		GlobalSignalServer.Instance.StartMotivator += OnStartMotivator;
 
 		GlobalSignalServer.Instance.UpdateResetTimer += OnUpdateResetTimer;
+
+		GlobalSignalServer.Instance.ResetLevel += ResetScreen;
+		GlobalSignalServer.Instance.LoadGame += ResetScreen;
+		GlobalSignalServer.Instance.BoatDeath += ResetScreen;
 
 		// Initialize with current health
 		UpdateBoatHealthUi(GlobalSignalServer.Instance.Health);
@@ -37,6 +45,9 @@ public partial class Hud : CanvasLayer
 			GlobalSignalServer.Instance.UpdateBoatHealth -= UpdateBoatHealthUi;
 			GlobalSignalServer.Instance.StartMotivator -= OnStartMotivator;
 			GlobalSignalServer.Instance.UpdateResetTimer -= OnUpdateResetTimer;
+			GlobalSignalServer.Instance.ResetLevel -= ResetScreen;
+			GlobalSignalServer.Instance.LoadGame -= ResetScreen;
+			GlobalSignalServer.Instance.BoatDeath -= ResetScreen;
 		}
 	}
 
@@ -98,5 +109,32 @@ public partial class Hud : CanvasLayer
 		{
 			_fish.Visible = false;
 		}
+	}
+
+	private void ResetScreen()
+	{
+		if (Multiplayer.IsServer())
+		{
+			Rpc(nameof(BroadcastResetScreen));
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void BroadcastResetScreen()
+	{
+		if (_resetScreen == null) return;
+
+		// Make visible and reset opacity
+		_resetScreen.Modulate = new Color(1, 1, 1, 1);
+		_resetScreen.Visible = true;
+
+		// Create a tween for the fade-out effect
+		Tween tween = CreateTween();
+		// Stay visible for a brief moment
+		tween.TweenInterval(0.5f);
+		// Fade out alpha to 0 over 1 second
+		tween.TweenProperty(_resetScreen, "modulate:a", 0.0f, 1.0f);
+		// Hide the control once finished
+		tween.Finished += () => _resetScreen.Visible = false;
 	}
 }
