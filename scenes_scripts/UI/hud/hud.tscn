@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://dyjf8cl7dhrr5"]
+[gd_scene load_steps=9 format=3 uid="uid://dyjf8cl7dhrr5"]
 
 [ext_resource type="Script" uid="uid://bu8lx7h5m8frd" path="res://scenes_scripts/UI/hud/Hud.cs" id="1_oo0fn"]
 [ext_resource type="Script" uid="uid://dosr3xd78lnhp" path="res://scenes_scripts/UI/hud/boat_health_bar.gd" id="2_usjff"]
 [ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="3_4wu0i"]
 [ext_resource type="Texture2D" uid="uid://bcgksk8xwksmn" path="res://art/icons/boatSmall.png" id="4_4wu0i"]
+[ext_resource type="Theme" uid="uid://dujaq66w8tdw7" path="res://art/themes/dongleFont.tres" id="5_opnk5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_opnk5"]
 bg_color = Color(0, 0, 0, 1)
@@ -109,5 +110,20 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 10
 theme_override_font_sizes/font_size = 251
 text = "FISH IS COMING"
+
+[node name="ResetTimer" type="Label" parent="."]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -726.0
+offset_top = 61.865
+offset_right = 726.0
+offset_bottom = 206.865
+grow_horizontal = 2
+size_flags_horizontal = 4
+theme = ExtResource("5_opnk5")
+theme_override_constants/outline_size = 10
+text = "Everyone fell into the river! Reseting game in 10s"
 
 [connection signal="value_changed" from="BoatHealthBar/MarginContainer/HBoxContainer/Slider" to="BoatHealthBar" method="_on_slider_value_changed"]

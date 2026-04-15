@@ -6,6 +6,7 @@ public partial class Hud : CanvasLayer
 	// Rename this to make more sense for your health bar
 	private Control _boatHealthBar;
 	private Label _fish;
+	private Label _resetTimerLabel;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -15,11 +16,15 @@ public partial class Hud : CanvasLayer
 		_fish = GetNode<Label>("Fish");
 		_fish.Visible = false;
 
+		_resetTimerLabel = GetNode<Label>("ResetTimer");
+		_resetTimerLabel.Visible = false;
 
 		// Subscribe to the boat health update
 		GlobalSignalServer.Instance.UpdateBoatHealth += UpdateBoatHealthUi;
 
 		GlobalSignalServer.Instance.StartMotivator += OnStartMotivator;
+
+		GlobalSignalServer.Instance.UpdateResetTimer += OnUpdateResetTimer;
 
 		// Initialize with current health
 		UpdateBoatHealthUi(GlobalSignalServer.Instance.Health);
@@ -31,6 +36,18 @@ public partial class Hud : CanvasLayer
 		{
 			GlobalSignalServer.Instance.UpdateBoatHealth -= UpdateBoatHealthUi;
 			GlobalSignalServer.Instance.StartMotivator -= OnStartMotivator;
+			GlobalSignalServer.Instance.UpdateResetTimer -= OnUpdateResetTimer;
+		}
+	}
+
+	private void OnUpdateResetTimer(bool isVisible, float remainingTime)
+	{
+		if (_resetTimerLabel == null) return;
+
+		_resetTimerLabel.Visible = isVisible;
+		if (isVisible)
+		{
+			_resetTimerLabel.Text = $"Everyone fell into the river! Reseting game in {Mathf.CeilToInt(remainingTime)}s";
 		}
 	}
 

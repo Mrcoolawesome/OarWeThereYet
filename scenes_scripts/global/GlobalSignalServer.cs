@@ -39,6 +39,10 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void BoatDeathEventHandler();
 
+  // signal for updating the reset timer ui
+  [Signal]
+  public delegate void UpdateResetTimerEventHandler(bool isVisible, float remainingTime);
+
   // signal for triggering the oar rowing animation for a specific oar
   [Signal]
   public delegate void AnimateOarEventHandler(int seat, int direction, bool startStop);

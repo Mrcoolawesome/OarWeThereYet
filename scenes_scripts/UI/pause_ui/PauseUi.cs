@@ -8,7 +8,9 @@ public partial class PauseUi : Control
   
   // get the settings menu
   private Control _settingsMenu = new Control();
+  private Control _resetMenu = new Control();
   private MarginContainer _mainContainer = new MarginContainer();
+  private Button _resetButton = new Button();
 
   // some gemini thing so that player.cs knows the state of the pause menu
   public bool IsSettingsOpen => _settingsMenu.Visible;
@@ -18,7 +20,16 @@ public partial class PauseUi : Control
   {
     // get the stuff from the tree
     _settingsMenu = GetNode<Control>("PanelContainer/SettingsMenu");
+    _resetMenu = GetNode<Control>("PanelContainer/ResetMenu");
     _mainContainer = GetNode<MarginContainer>("PanelContainer/PauseButtonMainContainer");
+    _resetButton = GetNode<Button>("PanelContainer/PauseButtonMainContainer/VBoxContainer/ResetButton");
+
+    // Check if we are on Steam networking (1) and hide the reset button if so
+    Node globalVariables = GetNode("/root/GlobalVariables");
+    if ((int)globalVariables.Get("active_network_type") == 1 && !Multiplayer.IsServer()) // 1 is STEAM
+    {
+      _resetButton.Visible = false;
+    }
   }
 
   // --- NEW INPUT HANDLER ---
@@ -36,6 +47,14 @@ public partial class PauseUi : Control
 
         // 2. Call the GDScript's back button function so it handles your unsaved changes logic
         _settingsMenu.Call("_on_back_button_pressed");
+      }
+      else if (_resetMenu.Visible)
+      {
+        // 1. Consume the input so your main game script doesn't see it and close the whole pause menu!
+        GetViewport().SetInputAsHandled();
+
+        // 2. Call the GDScript's back button function so it handles your unsaved changes logic
+        OnSettingsBackButtonPressed();
       }
     }
   }
@@ -61,7 +80,14 @@ public partial class PauseUi : Control
 
   private void OnSettingsBackButtonPressed()
   {
+    _resetMenu.Visible = false;
     _settingsMenu.Visible = false;
     _mainContainer.Visible = true;
+  }
+
+  private void OnResetButtonPressed()
+  {
+    _resetMenu.Visible = true;
+    _mainContainer.Visible = false;
   }
 }
