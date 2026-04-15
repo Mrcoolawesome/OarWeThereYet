@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dh5qqy16oj1fx"]
+[gd_scene load_steps=4 format=3 uid="uid://dh5qqy16oj1fx"]
 
 [ext_resource type="Theme" uid="uid://b5jqsgq6g8fnl" path="res://art/themes/pauseButton.tres" id="1_6nvit"]
 [ext_resource type="Script" uid="uid://bot4ujxglfa6u" path="res://scenes_scripts/UI/settings_menu/reset_menu/reset_menu.gd" id="1_k7evx"]
+[ext_resource type="Theme" uid="uid://chyq2g3h1geyf" path="res://scenes_scripts/UI/settings_menu/themes/settings_menu_buttons.tres" id="2_75kix"]
 
 [node name="ResetMenu" type="Control"]
 layout_mode = 3
@@ -22,21 +23,34 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 6
 size_flags_vertical = 4
 alignment = 1
 
-[node name="ResetGameButton" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="ResetGameButton" type="Button" parent="MarginContainer/VBoxContainer2"]
 layout_mode = 2
 theme = ExtResource("1_6nvit")
 text = "Reset Game"
 
-[node name="RespawnPlayerButton" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="RespawnPlayerButton" type="Button" parent="MarginContainer/VBoxContainer2"]
 layout_mode = 2
 theme = ExtResource("1_6nvit")
 text = "Respawn"
 
-[connection signal="pressed" from="MarginContainer/VBoxContainer/ResetGameButton" to="." method="_on_reset_game_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/RespawnPlayerButton" to="." method="_on_respawn_player_button_pressed"]
+[node name="BackButton" type="Button" parent="."]
+custom_minimum_size = Vector2(263, 0)
+layout_mode = 0
+offset_left = 51.0
+offset_top = 121.0
+offset_right = 314.0
+offset_bottom = 240.0
+theme = ExtResource("2_75kix")
+theme_type_variation = &"SubMenuSelectionButtons"
+theme_override_font_sizes/font_size = 75
+text = "Back"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer2/ResetGameButton" to="." method="_on_reset_game_button_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer2/RespawnPlayerButton" to="." method="_on_respawn_player_button_pressed"]
+[connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]

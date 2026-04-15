@@ -1,23 +1,18 @@
 extends Control
 
-# controls if the reset menu should be visible 
-@export var reset_menu_visible: bool = true
-
 # submenus
 @onready var audio_menu: Control = $MainContainer/HBoxContainer/VBoxContainer2/AudioMenu
-@onready var reset_menu: Control = $MainContainer/HBoxContainer/VBoxContainer2/ResetMenu
 @onready var graphics_menu: Control = $MainContainer/HBoxContainer/VBoxContainer2/GraphicsMenu
 @onready var controls_menu: Control = $MainContainer/HBoxContainer/VBoxContainer2/ControlsMenu
 
 # buttons
 @onready var audio_button: Button = $MainContainer/HBoxContainer/VBoxContainer2/ApplySettingsButton
-@onready var reset_button: Button = $MainContainer/HBoxContainer/VBoxContainer/ResetMenuButton
 
 # --- NEW CONFIRM PROMPT NODES ---
 @onready var confirm_prompt = $ConfirmPage
 @onready var revert_timer = $RevertTimer
 
-enum SubMenuVisibility {AUDIO, RESET, GRAPHICS, CONTROLS}
+enum SubMenuVisibility {AUDIO, GRAPHICS, CONTROLS}
 
 # keep track of the current menu
 var curr_menu: SubMenuVisibility = SubMenuVisibility.AUDIO
@@ -31,8 +26,6 @@ var waiting_to_exit: bool = false # Tracks if we hit the Back button and are wai
 signal back_button_pressed
 
 func _ready() -> void:
-	# make the reset button visible depending on if they want it or not
-	reset_button.visible = reset_menu_visible
 	
 	# Connect the new signals from our child menus
 	audio_menu.setting_changed.connect(_on_audio_setting_changed)
@@ -66,9 +59,6 @@ func _on_controls_setting_changed() -> void:
 func _on_audio_menu_button_pressed() -> void:
 	_show_menu(SubMenuVisibility.AUDIO)
 
-func _on_reset_menu_button_pressed() -> void:
-	_show_menu(SubMenuVisibility.RESET)
-
 func _on_graphics_menu_button_pressed() -> void:
 	_show_menu(SubMenuVisibility.GRAPHICS)
 
@@ -79,7 +69,6 @@ func _on_controls_menu_button_pressed() -> void: # NEW: Button press for control
 func _show_menu(menu: SubMenuVisibility) -> void:
 	# make all others stuff invisible right here so that they get turned visible right after this
 	audio_menu.visible = false
-	reset_menu.visible = false
 	graphics_menu.visible = false
 	controls_menu.visible = false # NEW: Hide controls menu by default
 
@@ -89,10 +78,6 @@ func _show_menu(menu: SubMenuVisibility) -> void:
 		SubMenuVisibility.AUDIO:
 			audio_menu.visible = true
 			curr_menu = SubMenuVisibility.AUDIO
-		SubMenuVisibility.RESET:
-			reset_menu.visible = true
-			curr_menu = SubMenuVisibility.RESET
-			audio_button.visible = false
 		SubMenuVisibility.GRAPHICS:
 			graphics_menu.visible = true
 			curr_menu = SubMenuVisibility.GRAPHICS
