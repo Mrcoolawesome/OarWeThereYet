@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=4 uid="uid://ds5xru6fctkkj"]
+[gd_scene load_steps=11 format=4 uid="uid://ds5xru6fctkkj"]
 
 [ext_resource type="Script" uid="uid://cqewywluv021g" path="res://scenes_scripts/boat/anchor_point/AnchorPoint.cs" id="1_widv8"]
+[ext_resource type="Shader" uid="uid://bu4ja6x7tylt8" path="res://art/shaders/outline.gdshader" id="2_565dh"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y8qi5"]
 albedo_color = Color(0.20871028, 0.2087101, 0.20871007, 1)
@@ -11,28 +12,20 @@ material = SubResource("StandardMaterial3D_y8qi5")
 [sub_resource type="BoxShape3D" id="BoxShape3D_y8qi5"]
 size = Vector3(0.7, 0.7, 0.6)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_widv8"]
-render_priority = 1
-transparency = 1
-shading_mode = 0
-grow = true
-grow_amount = 0.02
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-stencil_reference = 4
-metadata/_stencil_owned = true
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uf14x"]
+render_priority = 0
+shader = ExtResource("2_565dh")
+shader_parameter/outline_color = Color(1, 1, 1, 1)
+shader_parameter/outline_width = 0.03
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_565dh"]
 resource_name = "Material.001"
-next_pass = SubResource("StandardMaterial3D_widv8")
 cull_mode = 2
 albedo_color = Color(0.69597334, 0.69597334, 0.69597334, 1)
 metallic = 0.83035713
 roughness = 0.14732143
-stencil_mode = 1
 stencil_flags = 2
-stencil_reference = 4
+stencil_reference = 2
 stencil_color = Color(1, 1, 1, 1)
 stencil_outline_thickness = 0.02
 
@@ -95,6 +88,7 @@ shape = SubResource("BoxShape3D_y8qi5")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Anchor"]
+material_overlay = SubResource("ShaderMaterial_uf14x")
 mesh = SubResource("ArrayMesh_y0a6k")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]

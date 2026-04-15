@@ -62,7 +62,6 @@ grow_amount = 0.02
 stencil_mode = 3
 stencil_flags = 1
 stencil_compare = 5
-stencil_reference = 5
 metadata/_stencil_owned = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xlndb"]
@@ -73,7 +72,6 @@ albedo_color = Color(0.9063355, 0.35398418, 0, 1)
 roughness = 0.9410876
 stencil_mode = 1
 stencil_flags = 2
-stencil_reference = 5
 stencil_color = Color(1, 1, 1, 1)
 stencil_outline_thickness = 0.02
 

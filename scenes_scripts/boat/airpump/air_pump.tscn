@@ -2,53 +2,30 @@
 
 [ext_resource type="Script" uid="uid://psnv2osty7pb" path="res://scenes_scripts/boat/airpump/AirPump.cs" id="1_24h1e"]
 [ext_resource type="PackedScene" uid="uid://cwu6sv67qb4fn" path="res://art/models/airPump.blend" id="1_wr1ln"]
+[ext_resource type="Shader" uid="uid://bu4ja6x7tylt8" path="res://art/shaders/outline.gdshader" id="3_7chm1"]
 [ext_resource type="AudioStream" uid="uid://bscdatdag4tvw" path="res://art/audio/ones-that-i-want/pumping-it/pumping-it.wav" id="3_dlk3q"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dlk3q"]
-render_priority = 1
-transparency = 1
-shading_mode = 0
-grow = true
-grow_amount = 0.02
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-stencil_reference = 2
-metadata/_stencil_owned = true
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dkdx8"]
+render_priority = 0
+shader = ExtResource("3_7chm1")
+shader_parameter/outline_color = Color(1, 1, 1, 1)
+shader_parameter/outline_width = 0.03
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7chm1"]
 resource_name = "Material.002"
-next_pass = SubResource("StandardMaterial3D_dlk3q")
 cull_mode = 2
 albedo_color = Color(0.4201678, 0.4201678, 0.4201678, 1)
 roughness = 0.5
-stencil_mode = 1
 stencil_flags = 2
-stencil_reference = 2
 stencil_color = Color(1, 1, 1, 1)
 stencil_outline_thickness = 0.02
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dkdx8"]
-render_priority = 1
-transparency = 1
-shading_mode = 0
-grow = true
-grow_amount = 0.02
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-stencil_reference = 2
-metadata/_stencil_owned = true
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0qpkt"]
 resource_name = "Material.001"
-next_pass = SubResource("StandardMaterial3D_dkdx8")
 cull_mode = 2
 albedo_color = Color(0.90633535, 0.14446197, 0.24907036, 1)
 roughness = 0.5
-stencil_mode = 1
 stencil_flags = 2
-stencil_reference = 2
 stencil_color = Color(1, 1, 1, 1)
 stencil_outline_thickness = 0.02
 
@@ -132,27 +109,18 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_ca6x1")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rsjcq"]
-render_priority = 1
-transparency = 1
-shading_mode = 0
-grow = true
-grow_amount = 0.03
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-stencil_reference = 2
-metadata/_stencil_owned = true
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0qpkt"]
+render_priority = 0
+shader = ExtResource("3_7chm1")
+shader_parameter/outline_color = Color(1, 1, 1, 1)
+shader_parameter/outline_width = 0.03
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4b2kx"]
 resource_name = "Material.004"
-next_pass = SubResource("StandardMaterial3D_rsjcq")
 cull_mode = 2
 albedo_color = Color(0.4201678, 0.4201678, 0.4201678, 1)
 roughness = 0.5
-stencil_mode = 1
 stencil_flags = 2
-stencil_reference = 2
 stencil_color = Color(1, 1, 1, 1)
 stencil_outline_thickness = 0.03
 
@@ -225,9 +193,11 @@ script = ExtResource("1_24h1e")
 [node name="airPump" parent="." instance=ExtResource("1_wr1ln")]
 
 [node name="body" parent="airPump" index="0"]
+material_overlay = SubResource("ShaderMaterial_dkdx8")
 mesh = SubResource("ArrayMesh_3opl2")
 
 [node name="head_001" parent="airPump" index="1"]
+material_overlay = SubResource("ShaderMaterial_0qpkt")
 mesh = SubResource("ArrayMesh_ycr0v")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
