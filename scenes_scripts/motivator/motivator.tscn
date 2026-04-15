@@ -30,9 +30,9 @@ shape = SubResource("BoxShape3D_31aj4")
 transform = Transform3D(-4.26186e-07, 0, 9.749999, 0, 9.749999, 0, -9.749999, 0, -4.26186e-07, 0, 4.266273, 8.108149)
 
 [node name="Skeleton3D" parent="fish/Armature" index="0"]
-bones/0/rotation = Quaternion(0.07750469, -0.07750465, -0.7028464, 0.7028464)
+bones/0/rotation = Quaternion(-0.14411765, 0.14411762, -0.6922645, 0.6922645)
 bones/1/rotation = Quaternion(0.0008822363, 0.82920086, 0.55895, -0.00042271081)
-bones/3/rotation = Quaternion(0.70503306, -0.70503294, -0.0541153, 0.054115344)
+bones/3/rotation = Quaternion(0.69653255, -0.69653255, 0.12182954, -0.121829525)
 
 [node name="RightEyeSpringBone" type="SpringBoneSimulator3D" parent="fish/Armature/Skeleton3D" index="0"]
 transform = Transform3D(1.0000001, 0, 3.5527137e-15, 0, 1.0000001, 0, -3.5527137e-15, 0, 1.0000001, 0, 0, 0)
