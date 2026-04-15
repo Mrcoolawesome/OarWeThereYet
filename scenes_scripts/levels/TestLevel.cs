@@ -10,6 +10,7 @@ public partial class TestLevel : Node
 	[Export] public int SaveSlot = 0;
 	[Export] public float AllPlayersSwimmingResetTime = 5.0f;
 	private float _allPlayersSwimmingTimer = 0.0f;
+	private bool _isAllSwimmingVisible = false;
 	public bool IsBoatReady { get; private set; } = false;
 
 	// boat object 
@@ -129,16 +130,36 @@ public partial class TestLevel : Node
       if (allSwimming)
       {
           _allPlayersSwimmingTimer += (float)delta;
+          float remainingTime = AllPlayersSwimmingResetTime - _allPlayersSwimmingTimer;
+
+          // Broadcast to all clients
+          Rpc(nameof(SyncResetTimer), true, remainingTime);
+          _isAllSwimmingVisible = true;
+
           if (_allPlayersSwimmingTimer >= AllPlayersSwimmingResetTime)
           {
               _allPlayersSwimmingTimer = 0.0f;
               GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.ResetLevel);
+              // reset UI
+              Rpc(nameof(SyncResetTimer), false, 0.0f);
+              _isAllSwimmingVisible = false;
           }
       }
       else
       {
-          _allPlayersSwimmingTimer = 0.0f;
+          if (_isAllSwimmingVisible)
+          {
+              _allPlayersSwimmingTimer = 0.0f;
+              Rpc(nameof(SyncResetTimer), false, 0.0f);
+              _isAllSwimmingVisible = false;
+          }
       }
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void SyncResetTimer(bool isVisible, float remainingTime)
+  {
+      GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.UpdateResetTimer), isVisible, remainingTime);
   }
 
   private void OnClientConnected()
