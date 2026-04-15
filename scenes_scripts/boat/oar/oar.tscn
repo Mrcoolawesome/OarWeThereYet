@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=4 uid="uid://di51rmms48nsb"]
+[gd_scene load_steps=9 format=4 uid="uid://di51rmms48nsb"]
 
 [ext_resource type="PackedScene" uid="uid://ce012vktvhu1r" path="res://art/models/oar.blend" id="1_2s4kg"]
 [ext_resource type="Animation" uid="uid://dwe2ky3x8ta6m" path="res://art/animations/oar_rowing.res" id="2_3f467"]
@@ -53,24 +53,11 @@ _data = {
 &"oar_rowing": ExtResource("2_3f467")
 }
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q3mhf"]
-render_priority = 1
-transparency = 1
-shading_mode = 0
-grow = true
-grow_amount = 0.02
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xlndb"]
 resource_name = "Material"
-next_pass = SubResource("StandardMaterial3D_q3mhf")
 cull_mode = 2
 albedo_color = Color(0.9063355, 0.35398418, 0, 1)
 roughness = 0.9410876
-stencil_mode = 1
 stencil_flags = 2
 stencil_color = Color(1, 1, 1, 1)
 stencil_outline_thickness = 0.02
