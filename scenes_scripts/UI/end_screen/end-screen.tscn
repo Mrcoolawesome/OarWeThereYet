@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cfvlihgonijke"]
+[gd_scene load_steps=5 format=3 uid="uid://cfvlihgonijke"]
 
 [ext_resource type="Theme" uid="uid://cwkn35f6g4qe0" path="res://art/themes/controls.tres" id="1_ogp13"]
 [ext_resource type="FontFile" uid="uid://ciar161rl8d7p" path="res://art/fonts/Dongle/Dongle-Regular.ttf" id="2_uxkw2"]
 [ext_resource type="FontFile" uid="uid://c2spru0tbvbyi" path="res://art/fonts/Dongle/Dongle-Bold.ttf" id="3_sknkn"]
+[ext_resource type="Texture2D" uid="uid://c2bhci80r7lmv" path="res://art/SteamAssets/RenderedAssets/oarwethereyet.svg" id="4_ogp13"]
 
 [node name="EndScreen" type="Control"]
 layout_mode = 3
@@ -70,6 +71,15 @@ custom_minimum_size = Vector2(325, 325)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="PlugSocials/HBoxContainer/VBoxContainer/HBoxContainer/QR code"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_ogp13")
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="PlugSocials/HBoxContainer/VBoxContainer"]
 layout_mode = 2
