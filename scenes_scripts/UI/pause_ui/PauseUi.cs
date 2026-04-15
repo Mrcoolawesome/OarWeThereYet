@@ -8,7 +8,7 @@ public partial class PauseUi : Control
   
   // get the settings menu
   private Control _settingsMenu = new Control();
-  private Control _ResetMenu = new Control();
+  private Control _resetMenu = new Control();
   private MarginContainer _mainContainer = new MarginContainer();
 
   // some gemini thing so that player.cs knows the state of the pause menu
@@ -19,7 +19,7 @@ public partial class PauseUi : Control
   {
     // get the stuff from the tree
     _settingsMenu = GetNode<Control>("PanelContainer/SettingsMenu");
-    _ResetMenu = GetNode<Control>("PanelContainer/ResetMenu");
+    _resetMenu = GetNode<Control>("PanelContainer/ResetMenu");
     _mainContainer = GetNode<MarginContainer>("PanelContainer/PauseButtonMainContainer");
   }
 
@@ -38,6 +38,14 @@ public partial class PauseUi : Control
 
         // 2. Call the GDScript's back button function so it handles your unsaved changes logic
         _settingsMenu.Call("_on_back_button_pressed");
+      }
+      else if (_resetMenu.Visible)
+      {
+        // 1. Consume the input so your main game script doesn't see it and close the whole pause menu!
+        GetViewport().SetInputAsHandled();
+
+        // 2. Call the GDScript's back button function so it handles your unsaved changes logic
+        OnSettingsBackButtonPressed();
       }
     }
   }
@@ -63,12 +71,14 @@ public partial class PauseUi : Control
 
   private void OnSettingsBackButtonPressed()
   {
+    _resetMenu.Visible = false;
     _settingsMenu.Visible = false;
     _mainContainer.Visible = true;
   }
 
   private void OnResetButtonPressed()
   {
-    _ResetMenu.Visible = true;
+    _resetMenu.Visible = true;
+    _mainContainer.Visible = false;
   }
 }

@@ -79,3 +79,4 @@ layout_mode = 2
 [connection signal="pressed" from="PanelContainer/PauseButtonMainContainer/VBoxContainer/SettingsButton" to="." method="OnSettingsButtonPressed"]
 [connection signal="pressed" from="PanelContainer/PauseButtonMainContainer/VBoxContainer/ExitButton" to="." method="OnExitButtonPressed"]
 [connection signal="back_button_pressed" from="PanelContainer/SettingsMenu" to="." method="OnSettingsBackButtonPressed"]
+[connection signal="back_button_pressed" from="PanelContainer/ResetMenu" to="." method="OnSettingsBackButtonPressed"]
