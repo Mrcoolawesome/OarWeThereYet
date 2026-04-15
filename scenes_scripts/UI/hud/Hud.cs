@@ -31,6 +31,7 @@ public partial class Hud : CanvasLayer
 		GlobalSignalServer.Instance.UpdateResetTimer += OnUpdateResetTimer;
 
 		GlobalSignalServer.Instance.ResetLevel += ResetScreen;
+		GlobalSignalServer.Instance.LoadGame += ResetScreen;
 
 		// Initialize with current health
 		UpdateBoatHealthUi(GlobalSignalServer.Instance.Health);
@@ -43,7 +44,8 @@ public partial class Hud : CanvasLayer
 			GlobalSignalServer.Instance.UpdateBoatHealth -= UpdateBoatHealthUi;
 			GlobalSignalServer.Instance.StartMotivator -= OnStartMotivator;
 			GlobalSignalServer.Instance.UpdateResetTimer -= OnUpdateResetTimer;
-			GlobalSignalServer.Instance.ResetLevel += ResetScreen;
+			GlobalSignalServer.Instance.ResetLevel -= ResetScreen;
+			GlobalSignalServer.Instance.LoadGame -= ResetScreen;
 		}
 	}
 
@@ -109,6 +111,28 @@ public partial class Hud : CanvasLayer
 
 	private void ResetScreen()
 	{
-		
+		if (Multiplayer.IsServer())
+		{
+			Rpc(nameof(BroadcastResetScreen));
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	private void BroadcastResetScreen()
+	{
+		if (_resetScreen == null) return;
+
+		// Make visible and reset opacity
+		_resetScreen.Modulate = new Color(1, 1, 1, 1);
+		_resetScreen.Visible = true;
+
+		// Create a tween for the fade-out effect
+		Tween tween = CreateTween();
+		// Stay visible for a brief moment
+		tween.TweenInterval(0.5f);
+		// Fade out alpha to 0 over 1 second
+		tween.TweenProperty(_resetScreen, "modulate:a", 0.0f, 1.0f);
+		// Hide the control once finished
+		tween.Finished += () => _resetScreen.Visible = false;
 	}
 }
