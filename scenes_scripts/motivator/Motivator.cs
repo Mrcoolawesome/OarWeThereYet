@@ -4,108 +4,173 @@ using Waterways;
 
 public partial class Motivator : Area3D
 {
-	[Export] public float Speed = 1.0f;
-	[Export] public RiverManager RiverNode;
+  [Export] public float Speed = 1.0f;
+  [Export] public RiverManager RiverNode;
 
-	[Export] public float CurrentOffset = 0f;
+  [Export] public float CurrentOffset = 0f;
 
-	private bool _isMoving = true;
-	[Export] public bool IsMoving 
-	{
-		get => _isMoving;
-		set 
-		{
-			if (_isMoving != value)
-			{
-				_isMoving = value;
-				UpdateAnimationState();
-			}
-		}
-	}
+  [ExportGroup("Audio Scaling Settings")]
+  [Export] public float ScaleMultiplier = 15.0f; 
+  
+  public float _targetScale = 1.0f;
+  private float _currentScale = 1.0f;
+  private int _busIndex;
 
-	private AnimationPlayer _animationPlayer;
+  // meshes
+  private MeshInstance3D _body;
+  private MeshInstance3D _eyesWhiteLeft;
+  private MeshInstance3D _eyesWhiteRight;
+  private MeshInstance3D _eyesPupilLeft;
+  private MeshInstance3D _eyesPupilRight;
+  private MeshInstance3D _eyebrows;
 
-	public override void _Ready()
-	{
-		GlobalSignalServer.Instance.StartMotivator += OnStartMotivator;
-		GlobalSignalServer.Instance.StopMotivator += OnStopMotivator;
+  private bool _isMoving = true;
+  [Export] public bool IsMoving 
+  {
+    get => _isMoving;
+    set 
+    {
+      if (_isMoving != value)
+      {
+        _isMoving = value;
+        UpdateAnimationState();
+      }
+    }
+  }
 
-		if (RiverNode != null && RiverNode.Curve != null)
-		{
-			Vector3 localPos = RiverNode.ToLocal(GlobalPosition);
-			CurrentOffset = RiverNode.Curve.GetClosestOffset(localPos);
-		}
+  private AnimationPlayer _animationPlayer;
+  private AudioStreamPlayer3D _doom;
 
-		BodyEntered += OnBodyEntered;
+  public override void _Ready()
+  {
+    GlobalSignalServer.Instance.StartMotivator += OnStartMotivator;
+    GlobalSignalServer.Instance.StopMotivator += OnStopMotivator;
 
-		// Assuming the fish.blend instance contains the AnimationPlayer
-		_animationPlayer = GetNodeOrNull<AnimationPlayer>("fish/AnimationPlayer");
-		UpdateAnimationState();
-	}
+    if (RiverNode != null && RiverNode.Curve != null)
+    {
+      Vector3 localPos = RiverNode.ToLocal(GlobalPosition);
+      CurrentOffset = RiverNode.Curve.GetClosestOffset(localPos);
+    }
 
-	public override void _PhysicsProcess(double delta)
-	{
-		if (RiverNode == null || RiverNode.Curve == null) return;
+    BodyEntered += OnBodyEntered;
 
-		if (IsMoving && Multiplayer.IsServer())
-		{
-			CurrentOffset += Speed * (float)delta;
-		}
-		
-		// 1. Update Position
-		Vector3 localPoint = RiverNode.Curve.SampleBaked(CurrentOffset);
-		GlobalPosition = RiverNode.ToGlobal(localPoint);
+    _animationPlayer = GetNodeOrNull<AnimationPlayer>("fish/AnimationPlayer");
+    UpdateAnimationState();
 
-		// 2. Update Rotation (Look down the river)
-		// Get the tangent (forward direction) at the current offset
-		// SampleBakedWithRotation or just sampling a point slightly ahead works too
-		Vector3 nextLocalPoint = RiverNode.Curve.SampleBaked(CurrentOffset + 0.1f);
-		Vector3 nextGlobalPoint = RiverNode.ToGlobal(nextLocalPoint);
-		
-		// LookAt is a simple way to align the -Z axis with the target. 
-		// We use GlobalPosition and nextGlobalPoint.
-		if (GlobalPosition.DistanceSquaredTo(nextGlobalPoint) > 0.0001f)
-		{
-			LookAt(nextGlobalPoint, Vector3.Up);
-		}
-	}
+    _doom = GetNode<AudioStreamPlayer3D>("Doom");
 
-	private void OnStartMotivator()
-	{
-		Visible = true;
-		IsMoving = true;
-	}
+    // Get the audio bus index for our private Doom bus
+    _busIndex = AudioServer.GetBusIndex("Doom");
 
-	private void OnStopMotivator()
-	{
-		Visible = false;
-		IsMoving = false;
-	}
+    // get the meshes
+    _body = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/Cube");
+    _eyesWhiteLeft = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/EyeWhiteLeft");
+    _eyesWhiteRight = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/EyeWhiteRight"); 
+    _eyesPupilLeft = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/EyePupilLeft");
+    _eyesPupilRight = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/EyePupilRight");
+    _eyebrows = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/Plane");
+  }
 
-	private void UpdateAnimationState()
-	{
-		if (_animationPlayer == null) return;
+  public override void _PhysicsProcess(double delta)
+  {
+    if (RiverNode == null || RiverNode.Curve == null) return;
 
-		if (IsMoving)
-		{
-			if (_animationPlayer.HasAnimation("Swim"))
-			{
-				_animationPlayer.Play("Swim");
-			}
-		}
-		else
-		{
-			_animationPlayer.Stop();
-		}
-	}
+    if (IsMoving && Multiplayer.IsServer())
+    {
+      CurrentOffset += Speed * (float)delta;
+    }
+    
+    Vector3 localPoint = RiverNode.Curve.SampleBaked(CurrentOffset);
+    GlobalPosition = RiverNode.ToGlobal(localPoint);
 
-	private void OnBodyEntered(Node3D body)
-	{
-		if (!Multiplayer.IsServer()) return;
+    Vector3 nextLocalPoint = RiverNode.Curve.SampleBaked(CurrentOffset + 0.1f);
+    Vector3 nextGlobalPoint = RiverNode.ToGlobal(nextLocalPoint);
+    
+    if (GlobalPosition.DistanceSquaredTo(nextGlobalPoint) > 0.0001f)
+    {
+      LookAt(nextGlobalPoint, Vector3.Up);
+    }
 
-		if (body.Name == "Boat")
-		{
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.ResetLevel));
-		}
-	}
+    MeshAnimationPhysicsProcess(delta);
+  }
+
+  private void MeshAnimationPhysicsProcess(double delta)
+  {
+    // If the doom sound is playing, calculate the loudness from its isolated bus
+    if (_doom != null && _doom.Playing)
+    {
+      float volumeDb = AudioServer.GetBusPeakVolumeLeftDb(_busIndex, 0);
+      float loudness = Mathf.DbToLinear(volumeDb);
+      
+      float newTargetScale = 1.0f + (loudness * ScaleMultiplier);
+
+      if (newTargetScale > _targetScale)
+      {
+        _targetScale = newTargetScale;
+      }
+    }
+
+    _currentScale = Mathf.Lerp(_currentScale, _targetScale, (float)delta * 20.0f);
+    
+    Vector3 newScale = new Vector3(_currentScale, 1.0f, _currentScale);
+    
+    // Apply to the meshes
+    if (_body != null) _body.Scale = newScale;
+    if (_eyesWhiteLeft != null) _eyesWhiteLeft.Scale = newScale;
+    if (_eyesWhiteRight != null) _eyesWhiteRight.Scale = newScale;
+    if (_eyesPupilLeft != null) _eyesPupilLeft.Scale = newScale;
+    if (_eyesPupilRight != null) _eyesPupilRight.Scale = newScale;
+    if (_eyebrows != null) _eyebrows.Scale = newScale;
+
+    _targetScale = Mathf.Lerp(_targetScale, 1.0f, (float)delta * 10.0f);
+  }
+
+  private void OnStartMotivator()
+  {
+    Visible = true;
+    IsMoving = true;
+
+    if (_doom != null && !_doom.Playing)
+    {
+      _doom.Play();
+    }
+  }
+
+  private void OnStopMotivator()
+  {
+    Visible = false;
+    IsMoving = false;
+
+    if (_doom != null)
+    {
+      _doom.Stop();
+    }
+  }
+
+  private void UpdateAnimationState()
+  {
+    if (_animationPlayer == null) return;
+
+    if (IsMoving)
+    {
+      if (_animationPlayer.HasAnimation("Swim"))
+      {
+        _animationPlayer.Play("Swim");
+      }
+    }
+    else
+    {
+      _animationPlayer.Stop();
+    }
+  }
+
+  private void OnBodyEntered(Node3D body)
+  {
+    if (!Multiplayer.IsServer()) return;
+
+    if (body.Name == "Boat")
+    {
+      GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.ResetLevel));
+    }
+  }
 }
