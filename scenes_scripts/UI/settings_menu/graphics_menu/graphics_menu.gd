@@ -113,8 +113,7 @@ func _load_ui_stuff() -> void:
 
   # RESOLUTION DROPDOWN
   # only display this if they've selected either windowed or fullscreen
-  if settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_FULLSCREEN ||\
-  settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_WINDOWED:
+  if settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_WINDOWED:
     resolution_dropdown.visible = true # make it visible
     # load all the resolutions into the resolution dropdown
     _load_all_resolutions()
@@ -122,7 +121,7 @@ func _load_ui_stuff() -> void:
     # get the index of the resolution in the table, which will correlate to the index in the dropdown
     resolution_dropdown.DefaultItem = resolutions_array.find(settings_prefrences.resolution)
   else:
-    # make it invisible if they're not in a window mode that makes sense
+    # make it invisible if they're not in a window mode that makes sense (aka if they're in fullscreen or borderless mode)
     resolution_dropdown.visible = false
     
   # VSYNC DROPDOWN
