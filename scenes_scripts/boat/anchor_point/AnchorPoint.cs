@@ -11,6 +11,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
   [Export] public bool Deployed = false;
   [Export] private string _deployedAnchorPath = "";
   private Node3D _deployedAnchor;
+  private bool _subscribedToSetAnchorSignal = false;
 
   // Node for the rope visual
   private Node3D _ropeRoot = null;
@@ -20,8 +21,6 @@ public partial class AnchorPoint : StaticBody3D, Interactable
   public override void _Ready()
   {
     _anchor = GetNode<StaticBody3D>("Anchor");
-
-    GlobalSignalServer.Instance.SetAnchor += RequestSetAnchor;
 
     // Initialize rope visual (similar to ArmNode.cs)
     _ropeRoot = new Node3D();
@@ -46,8 +45,26 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     _ropeRoot.AddChild(_ropeMeshInstance);
   }
 
+  public override void _EnterTree()
+  {
+    if (!IsInstanceValid(GlobalSignalServer.Instance) || _subscribedToSetAnchorSignal)
+    {
+      return;
+    }
+
+    GlobalSignalServer.Instance.SetAnchor += RequestSetAnchor;
+    _subscribedToSetAnchorSignal = true;
+  }
+
   public override void _ExitTree()
   {
+    if (_subscribedToSetAnchorSignal && IsInstanceValid(GlobalSignalServer.Instance))
+    {
+      GlobalSignalServer.Instance.SetAnchor -= RequestSetAnchor;
+    }
+
+    _subscribedToSetAnchorSignal = false;
+
     if (IsInstanceValid(_ropeRoot))
     {
       _ropeRoot.QueueFree();
@@ -214,6 +231,8 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
   public void RequestSetAnchor(string anchorNodePath)
 	{
+		if (!IsInsideTree()) return;
+
 		if (Multiplayer.IsServer())
     {
       SetAnchor(anchorNodePath);
@@ -228,6 +247,11 @@ public partial class AnchorPoint : StaticBody3D, Interactable
   public void SetAnchor(string anchorNodePath)
   {
     if (!Multiplayer.IsServer()) return;
+
+    if (_deployedAnchorPath == anchorNodePath && IsInstanceValid(_deployedAnchor))
+    {
+      return;
+    }
 
     _deployedAnchorPath = anchorNodePath;
     if (string.IsNullOrEmpty(anchorNodePath))
