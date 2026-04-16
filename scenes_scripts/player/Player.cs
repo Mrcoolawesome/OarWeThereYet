@@ -1127,7 +1127,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   {
     // Set their global transform to be that of the boat seat they're sitting on
     StaticBody3D seatCollision = GetCurrentSeat();
-    GlobalPosition = seatCollision.GlobalPosition;
+		GlobalPosition = seatCollision.GlobalPosition + new Vector3(0, 0.5f, 0);
 
     // Handle mouse input while sitting
     PlayerRotation();
