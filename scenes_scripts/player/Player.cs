@@ -227,6 +227,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private int _requestedSeatIndex = -1;
 	private bool _requestedSeatIsSitting = false;
 
+	// Patch intent handshake state.
+	private bool _hasPendingPatchIntent = false;
+	private Hole _pendingPatchHole = null;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -739,6 +743,20 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			if (_hasPendingOarAnimationIntent)
 			{
 				RequestOarAnimationConfirmation(_requestedOarAnimationSeat, _requestedOarAnimationDirection, _requestedOarAnimationStartStop);
+			}
+
+			if (_hasPendingPatchIntent)
+			{
+				if (GodotObject.IsInstanceValid(_pendingPatchHole))
+				{
+					_pendingPatchHole.Rpc(nameof(Hole.RequestPatchConfirmation));
+				}
+				else
+				{
+					// Hole was removed/disposed, clear pending state
+					_hasPendingPatchIntent = false;
+					_pendingPatchHole = null;
+				}
 			}
 		}
 
@@ -1457,6 +1475,32 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 
 		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), seat, direction, startStop);
+	}
+
+	/// <summary>
+	/// Request to patch a hole. Client will resend until server confirms removal.
+	/// </summary>
+	public void RequestPatch(Hole hole)
+	{
+		if (hole == null) return;
+
+		_hasPendingPatchIntent = true;
+		_pendingPatchHole = hole;
+		if (Multiplayer.IsServer())
+		{
+			hole.RequestPatchConfirmation();
+		}
+		else
+		{
+			hole.Rpc(nameof(Hole.RequestPatchConfirmation));
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void OnPatchConfirmed()
+	{
+		_hasPendingPatchIntent = false;
+		_pendingPatchHole = null;
 	}
 
 	public void Reset()
