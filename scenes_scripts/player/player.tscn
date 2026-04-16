@@ -120,7 +120,7 @@ properties/6/replication_mode = 2
 collision_layer = 4
 collision_mask = 3
 script = ExtResource("1_g6k8r")
-SwimmingSpeed = 3.0
+SwimmingSpeed = 6.0
 MouseSens = 0.5
 ObjectKnockbackForce = 200.0
 LerpSpeed = 5.0
@@ -407,7 +407,7 @@ bus = &"Music"
 
 [node name="Underwater" type="AudioStreamPlayer" parent="AudioStuff"]
 stream = ExtResource("17_lvkhp")
-volume_db = 20.0
+volume_db = 5.0
 bus = &"PlayerMovementSounds"
 
 [node name="AudioSynchronizer" type="MultiplayerSynchronizer" parent="AudioStuff"]
