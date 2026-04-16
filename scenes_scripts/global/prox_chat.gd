@@ -156,7 +156,7 @@ func process_voice(voice_buffer: PackedByteArray, player: int):
 
 func setup_player_audio(player_id: int) -> bool:
   # --- WE CHANGED THIS TO get_node_or_null ---
-  var stream_path = "/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStuff/ProximityChatOutput"
+  var stream_path = "/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStreamPlayer3D"
   var stream_node: AudioStreamPlayer3D = get_node_or_null(stream_path)
   
   if stream_node and stream_node.stream is AudioStreamGenerator:
