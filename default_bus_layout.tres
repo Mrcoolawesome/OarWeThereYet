@@ -46,4 +46,4 @@ bus/6/solo = false
 bus/6/mute = false
 bus/6/bypass_fx = false
 bus/6/volume_db = 6.0199986
-bus/6/send = &"Environment"
+bus/6/send = &"Master"
