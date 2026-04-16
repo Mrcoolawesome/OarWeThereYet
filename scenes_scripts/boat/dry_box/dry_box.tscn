@@ -1,27 +1,22 @@
-[gd_scene load_steps=8 format=4 uid="uid://danavscflb0ck"]
+[gd_scene load_steps=9 format=4 uid="uid://danavscflb0ck"]
 
 [ext_resource type="Script" uid="uid://beshkpn7hsow" path="res://scenes_scripts/boat/dry_box/DryBox.cs" id="1_4amak"]
 [ext_resource type="PackedScene" uid="uid://cegj4xdw5ihm0" path="res://art/models/drybox.blend" id="1_ymuao"]
+[ext_resource type="Shader" uid="uid://bu4ja6x7tylt8" path="res://art/shaders/outline.gdshader" id="3_pitob"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uvupb"]
-render_priority = 1
-transparency = 1
-shading_mode = 0
-grow = true
-grow_amount = 0.03
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_aj5nf"]
+render_priority = 0
+shader = ExtResource("3_pitob")
+shader_parameter/outline_color = Color(1, 1, 1, 1)
+shader_parameter/outline_width = 0.03
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pitob"]
 resource_name = "Material"
-next_pass = SubResource("StandardMaterial3D_uvupb")
+next_pass = SubResource("ShaderMaterial_aj5nf")
 cull_mode = 2
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
 metallic = 0.7
 roughness = 0.4
-stencil_mode = 1
 stencil_flags = 2
 stencil_color = Color(1, 1, 1, 1)
 stencil_outline_thickness = 0.03
