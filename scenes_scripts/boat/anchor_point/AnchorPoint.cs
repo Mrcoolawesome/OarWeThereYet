@@ -222,8 +222,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
       if (Multiplayer.IsServer())
       {
         DeleteAnchor();
-        _deployedAnchorPath = "";
-        Deployed = false;
+        Rpc(nameof(SetAnchor), "");
       }
       _deployedAnchor = null;
     }
@@ -235,19 +234,24 @@ public partial class AnchorPoint : StaticBody3D, Interactable
 
 		if (Multiplayer.IsServer())
     {
-      SetAnchor(anchorNodePath);
+      Rpc(nameof(SetAnchor), anchorNodePath);
     }
     else
     {
-      RpcId(1, nameof(SetAnchor), anchorNodePath);
+      RpcId(1, nameof(ServerRequestSetAnchor), anchorNodePath);
     }
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+	private void ServerRequestSetAnchor(string anchorNodePath)
+	{
+		if (!Multiplayer.IsServer()) return;
+		Rpc(nameof(SetAnchor), anchorNodePath);
 	}
 	
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   public void SetAnchor(string anchorNodePath)
   {
-    if (!Multiplayer.IsServer()) return;
-
     if (_deployedAnchorPath == anchorNodePath && IsInstanceValid(_deployedAnchor))
     {
       return;

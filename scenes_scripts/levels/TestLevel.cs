@@ -202,8 +202,10 @@ public partial class TestLevel : Node
 
 		_boat.Reset();
 
+		bool shouldSpawnAnchor = _boat?.AnchorPoint == null || !_boat.AnchorPoint.Deployed;
+
     // Spawn Anchor once if needed
-    if (!string.IsNullOrEmpty(_anchorSpawnPath))
+    if (!string.IsNullOrEmpty(_anchorSpawnPath) && shouldSpawnAnchor)
     {
       var players = GetTree().GetNodesInGroup("players");
       if (players.Count > 0)

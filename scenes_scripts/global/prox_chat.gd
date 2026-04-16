@@ -22,7 +22,6 @@ func _ready() -> void:
   if GlobalSignalServer and !GlobalSignalServer.is_connected("AssignInputDevice", Callable(self, "_on_assign_input_device")):
     GlobalSignalServer.connect("AssignInputDevice", Callable(self, "_on_assign_input_device"))
 
-  print("prox_chat ready on peer ", multiplayer.get_unique_id())
   set_process(false)
 
 func _on_assign_input_device(device_name: String) -> void:
@@ -38,7 +37,6 @@ func _on_assign_input_device(device_name: String) -> void:
     capture_effect.clear_buffer()
 
 func initialize_voice():
-  print("prox_chat initialize_voice on peer ", multiplayer.get_unique_id())
   _apply_saved_input_device_preference()
 
   var bus_idx = AudioServer.get_bus_index("MicInput")
@@ -54,7 +52,6 @@ func initialize_voice():
     
   current_sample_rate = AudioServer.get_mix_rate()
   frames_to_buffer = int(current_sample_rate * buffer_target_seconds)
-  print("prox_chat voice initialized: sample_rate=", current_sample_rate, " frames_to_buffer=", frames_to_buffer, " bus_idx=", bus_idx)
   set_process(true)
 
 func _apply_saved_input_device_preference() -> void:
@@ -63,11 +60,9 @@ func _apply_saved_input_device_preference() -> void:
     _on_assign_input_device(settings_prefrences.input_device)
 
 func stop_voice():
-  print("stopping voice via stop voice")
   if capture_effect:
     capture_effect.clear_buffer()
   active_players.clear()
-  print("prox_chat voice stopped and active players cleared on peer ", multiplayer.get_unique_id())
   set_process(false)
 
 func _process(_delta: float) -> void:
@@ -75,7 +70,6 @@ func _process(_delta: float) -> void:
   if capture_effect:
     var frames_available = capture_effect.get_frames_available()
     if frames_available > 0:
-      print("prox_chat capture frames=", frames_available, " peer=", multiplayer.get_unique_id())
       var audio_buffer: PackedVector2Array = capture_effect.get_buffer(frames_available)
       
       # Compress to 16-bit mono to save network bandwidth (similar to Steam)
@@ -89,7 +83,6 @@ func _process(_delta: float) -> void:
         byte_array.encode_s16(i * 2, raw_value)
       
       # SAFETY CHECK: Only send the RPC if we are actually connected to a multiplayer session
-      print("prox_chat sending voice bytes=", byte_array.size(), " frames=", audio_buffer.size(), " peer=", multiplayer.get_unique_id())
       send_voice.rpc(byte_array)
       
       if local_playback:
@@ -141,12 +134,10 @@ func _process(_delta: float) -> void:
         stream.stop()
 
 func process_voice(voice_buffer: PackedByteArray, player: int):
-  print("prox_chat process_voice from player=", player, " bytes=", voice_buffer.size(), " local_peer=", multiplayer.get_unique_id())
   if not active_players.has(player):
     # --- WE ADDED THIS ABORT CHECK ---
     var setup_successful = setup_player_audio(player)
     if not setup_successful:
-      push_warning("prox_chat could not set up audio playback for player %s" % str(player))
       return
 
   var p_data = active_players[player]
@@ -162,13 +153,11 @@ func process_voice(voice_buffer: PackedByteArray, player: int):
     audio_frames[i] = Vector2(amplitude, amplitude)
 
   p_data.buffer.append_array(audio_frames)
-  print("prox_chat buffered frames for player=", player, " total_buffered=", p_data.buffer.size())
 
 func setup_player_audio(player_id: int) -> bool:
   # --- WE CHANGED THIS TO get_node_or_null ---
   var stream_path = "/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStuff/ProximityChatOutput"
   var stream_node: AudioStreamPlayer3D = get_node_or_null(stream_path)
-  print("prox_chat setup_player_audio path=", stream_path, " found=", stream_node != null, " peer=", multiplayer.get_unique_id())
   
   if stream_node and stream_node.stream is AudioStreamGenerator:
     stream_node.stream.mix_rate = current_sample_rate
@@ -176,16 +165,13 @@ func setup_player_audio(player_id: int) -> bool:
     
     var player_data = PlayerAudioData.new(stream_node)
     active_players[player_id] = player_data
-    print("prox_chat audio playback ready for player=", player_id)
     return true
   else:
-    push_warning("prox_chat missing AudioStreamGenerator or AudioStreamPlayer3D at %s" % stream_path)
     return false # Safely fail without pushing an error
 
 @rpc("any_peer", "call_remote", "unreliable", 1)
 func send_voice(voice_buffer: PackedByteArray):
   var sender_id = multiplayer.get_remote_sender_id()
-  print("prox_chat send_voice received sender_id=", sender_id, " local_peer=", multiplayer.get_unique_id(), " bytes=", voice_buffer.size())
   if sender_id != multiplayer.get_unique_id():
     process_voice(voice_buffer, sender_id)
 

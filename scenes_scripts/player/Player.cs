@@ -226,6 +226,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private bool _hasPendingSeatIntent = false;
 	private int _requestedSeatIndex = -1;
 	private bool _requestedSeatIsSitting = false;
+	private bool _pendingRespawnReseat = false;
 
 	// Patch intent handshake state.
 	private bool _hasPendingPatchIntent = false;
@@ -1242,22 +1243,36 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		if (Name == multiplayerID.ToString())
 		{
-			// If they're in a seat, reset the seat
-			if (CurrPlayerState == PlayerState.Rowing)
-			{
-				// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
-				RequestRowing((int)_seat, false, false);
-				UpdateSeatIntent((int)_seat, false);
-				UpdateOarAnimationIntent((int)_seat, 1, false);
-			}
-
-			// set their position to be the position of the boat but just a little higher so they're not just clipping into it
-			// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
-			RequestSitInSeat(-1);
+			BeginRespawnReseat();
 
 			// put them into the playing state after that so the pause ui goes away
 			CurrGameState = GameState.Playing;
 		}
+	}
+
+	private void BeginRespawnReseat()
+	{
+		if (!IsMultiplayerAuthority())
+		{
+			return;
+		}
+
+		_pendingRespawnReseat = true;
+
+		// Clear stale pending state before starting a fresh unsit -> sit handshake.
+		_hasPendingSeatIntent = false;
+		_requestedSeatIndex = -1;
+		_requestedSeatIsSitting = false;
+
+		if (CurrPlayerState == PlayerState.Rowing)
+		{
+			RequestRowing((int)_seat, false, false);
+			UpdateOarAnimationIntent((int)_seat, 1, false);
+			UpdateSeatIntent((int)_seat, false);
+			return;
+		}
+
+		RequestSitInSeat(-1);
 	}
 
 	//RPC Functions
@@ -1452,6 +1467,18 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		}
 
 		SetSitStandState(isSitting, seat);
+
+		if (IsMultiplayerAuthority() && _pendingRespawnReseat)
+		{
+			if (!isSitting)
+			{
+				RequestSitInSeat(-1);
+			}
+			else
+			{
+				_pendingRespawnReseat = false;
+			}
+		}
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
@@ -1523,15 +1550,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void SyncReset()
 	{
-		// Set the player into the standing state and reset their position and velocity
-		// _currPlayerState = PlayerState.Standing;
-		// Position = Vector3.Zero;
-		// Rotation = Vector3.Zero;
-		// Velocity = Vector3.Zero;
-
-		// Sit in boat which should be reset
 		if (IsMultiplayerAuthority())
-			RequestSitInSeat(-1);
+		{
+			BeginRespawnReseat();
+		}
 	}
 
 	public void OpenInventory(Inventory inventory)
