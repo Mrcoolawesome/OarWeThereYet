@@ -166,7 +166,7 @@ func process_voice(voice_buffer: PackedByteArray, player: int):
 
 func setup_player_audio(player_id: int) -> bool:
   # --- WE CHANGED THIS TO get_node_or_null ---
-  var stream_path = "/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStreamPlayer3D"
+  var stream_path = "/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStuff/ProximityChatOutput"
   var stream_node: AudioStreamPlayer3D = get_node_or_null(stream_path)
   print("prox_chat setup_player_audio path=", stream_path, " found=", stream_node != null, " peer=", multiplayer.get_unique_id())
   
