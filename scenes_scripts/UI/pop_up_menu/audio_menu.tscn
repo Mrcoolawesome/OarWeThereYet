@@ -1,0 +1,74 @@
+[gd_scene load_steps=4 format=3 uid="uid://db3iirhvuwff2"]
+
+[ext_resource type="Script" uid="uid://mo3uybp5bb24" path="res://scenes_scripts/UI/settings_menu/audio_menu/audio_menu.gd" id="1_7n0mf"]
+[ext_resource type="PackedScene" uid="uid://0fqe1khyldg5" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/slider/setting_slider.tscn" id="2_60wuw"]
+[ext_resource type="PackedScene" uid="uid://di3iyb18rny5e" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/dropdown/dropdown_setting.tscn" id="3_p6ufk"]
+
+[node name="AudioMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7n0mf")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_right = 50
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MainVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_60wuw")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 40.0
+SliderLabelText = "Master Volume"
+
+[node name="VoicechatVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_60wuw")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 100.0
+SliderLabelText = "Voicechat Volume"
+
+[node name="EnvironmentVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_60wuw")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 100.0
+SliderLabelText = "Ambient Volume"
+
+[node name="MusicVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_60wuw")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 100.0
+SliderLabelText = "Music Volume"
+
+[node name="PlayeMovementVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_60wuw")]
+layout_mode = 2
+size_flags_vertical = 3
+StartingValue = 100.0
+SliderLabelText = "Character Volume"
+
+[node name="MicInputDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_p6ufk")]
+layout_mode = 2
+size_flags_vertical = 3
+LabelText = "Mic Input"
+
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MainVolumeSlider" to="." method="_on_main_volume_slider_slider_changed"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/VoicechatVolumeSlider" to="." method="_on_voice_chat_volume_slider_value_changed"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/EnvironmentVolumeSlider" to="." method="_on_environment_volume_slider_slider_changed"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/MusicVolumeSlider" to="." method="_on_music_volume_slider_slider_changed"]
+[connection signal="slider_changed" from="MarginContainer/ScrollContainer/VBoxContainer/PlayeMovementVolumeSlider" to="." method="_on_playe_movement_volume_slider_slider_changed"]
+[connection signal="item_selected" from="MarginContainer/ScrollContainer/VBoxContainer/MicInputDropdown" to="." method="_on_mic_input_dropdown_item_selected"]
