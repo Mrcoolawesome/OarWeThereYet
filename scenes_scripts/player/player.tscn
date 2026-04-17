@@ -140,11 +140,11 @@ shape = SubResource("CapsuleShape3D_3vyb7")
 disabled = true
 
 [node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
 [node name="CameraContainer" type="Node3D" parent="Head"]
 
 [node name="Camera3D" type="Camera3D" parent="Head/CameraContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
 [node name="InteractRay" parent="Head/CameraContainer/Camera3D" node_paths=PackedStringArray("Player") instance=ExtResource("2_boad6")]
 Player = NodePath("../../../..")
