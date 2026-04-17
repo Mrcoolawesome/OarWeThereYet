@@ -60,9 +60,9 @@ func _apply_saved_input_device_preference() -> void:
     _on_assign_input_device(settings_prefrences.input_device)
 
 func stop_voice():
-  print("stopping voice via stop voice")
   if capture_effect:
     capture_effect.clear_buffer()
+  active_players.clear()
   set_process(false)
 
 func _process(_delta: float) -> void:
@@ -156,7 +156,8 @@ func process_voice(voice_buffer: PackedByteArray, player: int):
 
 func setup_player_audio(player_id: int) -> bool:
   # --- WE CHANGED THIS TO get_node_or_null ---
-  var stream_node: AudioStreamPlayer3D = get_node_or_null("/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStreamPlayer3D")
+  var stream_path = "/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStreamPlayer3D"
+  var stream_node: AudioStreamPlayer3D = get_node_or_null(stream_path)
   
   if stream_node and stream_node.stream is AudioStreamGenerator:
     stream_node.stream.mix_rate = current_sample_rate

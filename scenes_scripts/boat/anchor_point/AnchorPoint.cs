@@ -11,6 +11,8 @@ public partial class AnchorPoint : StaticBody3D, Interactable
   [Export] public bool Deployed = false;
   [Export] private string _deployedAnchorPath = "";
   private Node3D _deployedAnchor;
+  private bool _subscribedToSetAnchorSignal = false;
+  private const string AnchorItemResourcePath = "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres";
 
   // Node for the rope visual
   private Node3D _ropeRoot = null;
@@ -20,8 +22,6 @@ public partial class AnchorPoint : StaticBody3D, Interactable
   public override void _Ready()
   {
     _anchor = GetNode<StaticBody3D>("Anchor");
-
-    GlobalSignalServer.Instance.SetAnchor += RequestSetAnchor;
 
     // Initialize rope visual (similar to ArmNode.cs)
     _ropeRoot = new Node3D();
@@ -46,8 +46,26 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     _ropeRoot.AddChild(_ropeMeshInstance);
   }
 
+  public override void _EnterTree()
+  {
+    if (!IsInstanceValid(GlobalSignalServer.Instance) || _subscribedToSetAnchorSignal)
+    {
+      return;
+    }
+
+    GlobalSignalServer.Instance.SetAnchor += RequestSetAnchor;
+    _subscribedToSetAnchorSignal = true;
+  }
+
   public override void _ExitTree()
   {
+    if (_subscribedToSetAnchorSignal && IsInstanceValid(GlobalSignalServer.Instance))
+    {
+      GlobalSignalServer.Instance.SetAnchor -= RequestSetAnchor;
+    }
+
+    _subscribedToSetAnchorSignal = false;
+
     if (IsInstanceValid(_ropeRoot))
     {
       _ropeRoot.QueueFree();
@@ -169,7 +187,7 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     {
       if (player.ArmNode.Item == null)
       {
-        player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), "res://scenes_scripts/inventory/items/itemResources/anchor/anchor.tres", 1);
+        player.ArmNode.Rpc(nameof(player.ArmNode.SetItem), AnchorItemResourcePath, 1);
         Deployed = true;
       }
     }
@@ -179,23 +197,30 @@ public partial class AnchorPoint : StaticBody3D, Interactable
   public void DeleteAnchor()
   {
     if (!Multiplayer.IsServer()) return;
-    if (!IsInstanceValid(_deployedAnchor)) return;
 
-    // Remove item from world or remove from player's ArmNode
-    // Make sure you use the proper rpc calls to do this
-    if (_deployedAnchor is MeshInstance3D)
+    Node3D target = IsInstanceValid(_deployedAnchor)
+      ? _deployedAnchor
+      : GetNodeOrNull<Node3D>(_deployedAnchorPath);
+
+    if (target is MeshInstance3D)
     {
-      ArmNode arm = _deployedAnchor.GetNodeOrNull<ArmNode>("../../../../../Head/ArmNode");
+      // Resolve owning player from the anchor mesh, then clear that player's held item.
+      Player owner = FindAncestorPlayer(target);
+      ArmNode arm = owner?.GetNodeOrNull<ArmNode>("Head/ArmNode");
       if (arm != null)
       {
         arm.Rpc(nameof(arm.SetItem), "", 0);
       }
     }
 
-    if (_deployedAnchor is UniversalInWorld anchorInWorld)
+    if (target is UniversalInWorld anchorInWorld)
     {
       anchorInWorld.Rpc(nameof(anchorInWorld.DeleteItem));
     }
+
+    // Safety cleanup: if target was stale/missing, remove anchor items from arms and world by data.
+    ClearAnchorFromAllPlayers();
+    ClearAnchorFromWorldItems();
   }
 
   public void ResetAnchor()
@@ -205,30 +230,40 @@ public partial class AnchorPoint : StaticBody3D, Interactable
       if (Multiplayer.IsServer())
       {
         DeleteAnchor();
-        _deployedAnchorPath = "";
-        Deployed = false;
+        Rpc(nameof(SetAnchor), "");
       }
+
+      _deployedAnchorPath = "";
+      Deployed = false;
       _deployedAnchor = null;
     }
   }
 
   public void RequestSetAnchor(string anchorNodePath)
 	{
+		if (!IsInsideTree()) return;
+
 		if (Multiplayer.IsServer())
     {
-      SetAnchor(anchorNodePath);
+      Rpc(nameof(SetAnchor), anchorNodePath);
     }
     else
     {
-      RpcId(1, nameof(SetAnchor), anchorNodePath);
+      RpcId(1, nameof(ServerRequestSetAnchor), anchorNodePath);
     }
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+	private void ServerRequestSetAnchor(string anchorNodePath)
+	{
+		if (!Multiplayer.IsServer()) return;
+		Rpc(nameof(SetAnchor), anchorNodePath);
 	}
 	
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
   public void SetAnchor(string anchorNodePath)
   {
-    if (!Multiplayer.IsServer()) return;
-
+    // Never early-return here: anchor nodes can be recreated at the same path across resets.
     _deployedAnchorPath = anchorNodePath;
     if (string.IsNullOrEmpty(anchorNodePath))
     {
@@ -239,6 +274,53 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     {
       _deployedAnchor = GetNodeOrNull<Node3D>(anchorNodePath);
       Deployed = true;
+    }
+  }
+
+  private Player FindAncestorPlayer(Node node)
+  {
+    Node current = node;
+    while (current != null)
+    {
+      if (current is Player player)
+      {
+        return player;
+      }
+
+      current = current.GetParent();
+    }
+
+    return null;
+  }
+
+  private void ClearAnchorFromAllPlayers()
+  {
+    foreach (Node node in GetTree().GetNodesInGroup("players"))
+    {
+      if (node is not Player player) continue;
+
+      ArmNode arm = player.GetNodeOrNull<ArmNode>("Head/ArmNode");
+      if (arm?.Item?.Data?.Name == "Anchor")
+      {
+        arm.Rpc(nameof(arm.SetItem), "", 0);
+      }
+    }
+  }
+
+  private void ClearAnchorFromWorldItems()
+  {
+    Node itemContainer = GetNodeOrNull("../..")?.GetNodeOrNull("ItemContainer");
+    if (itemContainer == null)
+    {
+      return;
+    }
+
+    foreach (Node child in itemContainer.GetChildren())
+    {
+      if (child is UniversalInWorld item && item.ItemObject?.ResourcePath == AnchorItemResourcePath)
+      {
+        item.Rpc(nameof(item.DeleteItem));
+      }
     }
   }
 }

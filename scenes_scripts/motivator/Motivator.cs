@@ -25,6 +25,7 @@ public partial class Motivator : Area3D
   private MeshInstance3D _eyebrows;
 
   private bool _isMoving = true;
+  private bool _subscribedToMotivatorSignals = false;
   [Export] public bool IsMoving 
   {
     get => _isMoving;
@@ -41,11 +42,20 @@ public partial class Motivator : Area3D
   private AnimationPlayer _animationPlayer;
   private AudioStreamPlayer3D _doom;
 
-  public override void _Ready()
+  public override void _EnterTree()
   {
+    if (_subscribedToMotivatorSignals || !IsInstanceValid(GlobalSignalServer.Instance))
+    {
+      return;
+    }
+
     GlobalSignalServer.Instance.StartMotivator += OnStartMotivator;
     GlobalSignalServer.Instance.StopMotivator += OnStopMotivator;
+    _subscribedToMotivatorSignals = true;
+  }
 
+  public override void _Ready()
+  {
     if (RiverNode != null && RiverNode.Curve != null)
     {
       Vector3 localPos = RiverNode.ToLocal(GlobalPosition);
@@ -55,7 +65,6 @@ public partial class Motivator : Area3D
     BodyEntered += OnBodyEntered;
 
     _animationPlayer = GetNodeOrNull<AnimationPlayer>("fish/AnimationPlayer");
-    UpdateAnimationState();
 
     _doom = GetNode<AudioStreamPlayer3D>("Doom");
 
@@ -69,6 +78,23 @@ public partial class Motivator : Area3D
     _eyesPupilLeft = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/EyePupilLeft");
     _eyesPupilRight = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/EyePupilRight");
     _eyebrows = GetNode<MeshInstance3D>("fish/Armature/Skeleton3D/Plane");
+
+    Visible = false;
+    IsMoving = false;
+    _targetScale = 1.0f;
+    _currentScale = 1.0f;
+    UpdateAnimationState();
+  }
+
+  public override void _ExitTree()
+  {
+    if (_subscribedToMotivatorSignals && IsInstanceValid(GlobalSignalServer.Instance))
+    {
+      GlobalSignalServer.Instance.StartMotivator -= OnStartMotivator;
+      GlobalSignalServer.Instance.StopMotivator -= OnStopMotivator;
+    }
+
+    _subscribedToMotivatorSignals = false;
   }
 
   public override void _PhysicsProcess(double delta)
@@ -129,6 +155,7 @@ public partial class Motivator : Area3D
   {
     Visible = true;
     IsMoving = true;
+    _targetScale = Mathf.Max(_targetScale, 1.0f);
 
     if (_doom != null && !_doom.Playing)
     {
@@ -140,6 +167,8 @@ public partial class Motivator : Area3D
   {
     Visible = false;
     IsMoving = false;
+    _targetScale = 1.0f;
+    _currentScale = 1.0f;
 
     if (_doom != null)
     {

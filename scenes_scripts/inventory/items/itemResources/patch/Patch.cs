@@ -10,7 +10,7 @@ public partial class Patch : ItemAction
 
     if (target is Hole hole)
     {
-      hole.Rpc(nameof(Hole.RequestPatch));
+      player.RequestPatch(hole);
 
       // Consume one patch
       int newAmount = arm.Item.Amount - 1;
