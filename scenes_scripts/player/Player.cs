@@ -236,6 +236,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private bool _hasPendingPatchIntent = false;
 	private Hole _pendingPatchHole = null;
 
+	// neck physics bone
+	private SpringBoneSimulator3D _neckJigglePhysics;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -344,6 +347,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// get the underwater pov
 		_underWaterPOV = GetNode<Control>("UnderWaterPOV");
 		_underWaterPOV.Visible = false; // make the underwater pov invisible by default
+
+		// get the neck jiggle physics bone
+		_neckJigglePhysics = GetNode<SpringBoneSimulator3D>("FullPlayerModel/Armature/Skeleton3D/HeadMovement");
 
 		// client code for when setting up their camera and stuff
 		// if we are the player, then use the camera for this player
@@ -1310,6 +1316,21 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     {
       _knockbackVelocity = Vector3.Zero;
       _applyKnockback = false;
+    }
+
+		// --- SPRING BONE LOGIC ---
+    if (_neckJigglePhysics != null)
+    {
+      if (isSitting)
+      {
+        // Turn off the physics processing so it stops freaking out
+        _neckJigglePhysics.ProcessMode = Node.ProcessModeEnum.Disabled;
+      }
+      else
+      {
+        // Turn it back on when they stand up
+        _neckJigglePhysics.ProcessMode = Node.ProcessModeEnum.Inherit;
+      }
     }
 	}
 
