@@ -66,9 +66,9 @@ shape = SubResource("BoxShape3D_31aj4")
 transform = Transform3D(-4.26186e-07, 0, 9.749999, 0, 9.749999, 0, -9.749999, 0, -4.26186e-07, 0, 4.266273, 8.108149)
 
 [node name="Skeleton3D" parent="fish/Armature" index="0"]
-bones/0/rotation = Quaternion(-0.08472173, 0.08472173, -0.70201296, 0.70201296)
+bones/0/rotation = Quaternion(-0.089202695, 0.08920268, -0.7014577, 0.7014577)
 bones/1/rotation = Quaternion(0.0008822363, 0.82920086, 0.55895, -0.00042271081)
-bones/3/rotation = Quaternion(0.7031853, -0.7031853, 0.074366614, -0.074366614)
+bones/3/rotation = Quaternion(0.70279986, -0.70279986, 0.077925466, -0.07792545)
 
 [node name="RightEyeSpringBone" type="SpringBoneSimulator3D" parent="fish/Armature/Skeleton3D" index="0"]
 transform = Transform3D(1.0000001, 0, 3.5527137e-15, 0, 1.0000001, 0, -3.5527137e-15, 0, 1.0000001, 0, 0, 0)
@@ -86,7 +86,7 @@ settings/0/individual_config = false
 settings/0/rotation_axis = 0
 settings/0/radius/value = 0.02
 settings/0/radius/damping_curve = null
-settings/0/stiffness/value = 10.0
+settings/0/stiffness/value = 20.0
 settings/0/stiffness/damping_curve = null
 settings/0/drag/value = 0.1
 settings/0/drag/damping_curve = null
@@ -112,7 +112,7 @@ settings/0/individual_config = false
 settings/0/rotation_axis = 0
 settings/0/radius/value = 0.02
 settings/0/radius/damping_curve = null
-settings/0/stiffness/value = 10.0
+settings/0/stiffness/value = 20.0
 settings/0/stiffness/damping_curve = null
 settings/0/drag/value = 0.1
 settings/0/drag/damping_curve = null
