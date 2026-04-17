@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://b2o60fgelttrd"]
+[gd_scene load_steps=4 format=3 uid="uid://b2qj743t6aai6"]
 
 [ext_resource type="Script" uid="uid://mo3uybp5bb24" path="res://scenes_scripts/UI/settings_menu/audio_menu/audio_menu.gd" id="1_08ngt"]
 [ext_resource type="PackedScene" uid="uid://0fqe1khyldg5" path="res://scenes_scripts/UI/settings_menu/base_ui_elements/slider/setting_slider.tscn" id="2_t3ptl"]
@@ -34,7 +34,7 @@ size_flags_vertical = 3
 [node name="MainVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
 layout_mode = 2
 size_flags_vertical = 3
-StartingValue = 100.0
+StartingValue = 50.0
 SliderLabelText = "Master Volume"
 
 [node name="VoicechatVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_t3ptl")]
