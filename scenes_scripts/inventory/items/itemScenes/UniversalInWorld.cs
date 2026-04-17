@@ -9,7 +9,7 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   [Export] public bool CanBePickedUp { get; set; } = true;
 
   [ExportGroup("Water Physics Settings")]
-	[Export] public float Mass = 10.0f;
+  [Export] public new float Mass = 10.0f;
 	[Export] public float FloatForce = 1.0f;
 	[Export] public float RiverSpeed = 1.0f;
 	[Export] public float WaterDrag = 2.0f;
@@ -21,6 +21,20 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   private bool _applyWaterPhysicsForce = false;
 	private Vector3 _waterPhysicsForce;
 	private Vector3 _waterPhysicsForcePosition;
+  private bool _applyNewPositionState = false;
+  private bool _applyNewRotationState = false;
+  private bool _applyNewVelocityState = false;
+  private Transform3D _newPositionState;
+  private Basis _newRotationState;
+  private Vector3 _newLinearVelocityState;
+  private Vector3 _newAngularVelocityState;
+  private int _stateSequence = 0;
+  private bool _hasAppliedState = false;
+  private bool _hasLastBroadcastState = false;
+  private Vector3 _lastBroadcastPosition;
+  private Quaternion _lastBroadcastRotation;
+  private Vector3 _lastBroadcastLinearVelocity;
+  private Vector3 _lastBroadcastAngularVelocity;
 
 	// Get the terrain
 	private Node3D _terrain;
@@ -29,6 +43,8 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   public override void _Ready()
   {
     if (ItemObject == null) return;
+
+    SetMultiplayerAuthority(1);
 
     Item = new InvSlot(ItemObject, ItemCount);
 
@@ -49,6 +65,8 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
       _waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
     }
 
+    Freeze = !Multiplayer.IsServer();
+
     // If anchor, emit setanchor signal (only on server to avoid redundant RPCs)
     if (Multiplayer.IsServer() && Item?.Data.Name == "Anchor")
     {
@@ -58,12 +76,23 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 		// Get terrain
 		_terrain = GetNode<Node3D>("../../Terrain3D");
 		_terrainData = _terrain.Get("data").AsGodotObject();
+
+    if (Multiplayer.IsServer())
+    {
+      Multiplayer.PeerConnected += OnPeerConnected;
+    }
   }
 
   public override void _Process(double delta)
   {
     if (Item == null) return;
     PromptMessage = CanBePickedUp ? "Pick Up (" + Item.Amount + ")" : "";
+
+    if (!Multiplayer.IsServer())
+    {
+      SyncAndLerpClientState(delta);
+      return;
+    }
 
 		// If player falls below terrain, teleport them back up
 		if (_terrainData != null)
@@ -78,9 +107,21 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
   public override void _PhysicsProcess(double delta)
   {
+    if (!Multiplayer.IsServer()) return;
+
     if (Item?.Data.Name != "Anchor")
     {
       FloatingPhysicsProcess(delta);
+    }
+
+    BroadcastStateIfNeeded();
+  }
+
+  public override void _ExitTree()
+  {
+    if (Multiplayer.IsServer())
+    {
+      Multiplayer.PeerConnected -= OnPeerConnected;
     }
   }
 
@@ -155,10 +196,122 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     ItemCount = newAmount;
   }
 
+  private void BroadcastStateIfNeeded()
+  {
+    if (!Multiplayer.IsServer())
+    {
+      return;
+    }
+
+    Vector3 currentPosition = GlobalPosition;
+    Quaternion currentRotation = Quaternion;
+    Vector3 currentLinearVelocity = LinearVelocity;
+    Vector3 currentAngularVelocity = AngularVelocity;
+
+    bool changed = !_hasLastBroadcastState
+      || currentPosition.DistanceTo(_lastBroadcastPosition) > 0.01f
+      || Mathf.Abs(currentRotation.AngleTo(_lastBroadcastRotation)) > Mathf.DegToRad(0.5f)
+      || currentLinearVelocity.DistanceTo(_lastBroadcastLinearVelocity) > 0.01f
+      || currentAngularVelocity.DistanceTo(_lastBroadcastAngularVelocity) > 0.01f;
+
+    if (!changed)
+    {
+      return;
+    }
+
+    _hasLastBroadcastState = true;
+    _lastBroadcastPosition = currentPosition;
+    _lastBroadcastRotation = currentRotation;
+    _lastBroadcastLinearVelocity = currentLinearVelocity;
+    _lastBroadcastAngularVelocity = currentAngularVelocity;
+    _stateSequence++;
+
+    Rpc(nameof(ApplyWorldItemState), _stateSequence, currentPosition, currentRotation, currentLinearVelocity, currentAngularVelocity);
+  }
+
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void DeleteItem()
   {
     QueueFree();
+  }
+
+  private void OnPeerConnected(long peerId)
+  {
+    if (!Multiplayer.IsServer()) return;
+
+    RpcId(peerId, nameof(ApplyWorldItemState), _stateSequence, GlobalPosition, Quaternion, LinearVelocity, AngularVelocity);
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void ApplyWorldItemState(int sequence, Vector3 position, Quaternion rotation, Vector3 linearVelocity, Vector3 angularVelocity)
+  {
+    if (Multiplayer.IsServer())
+    {
+      return;
+    }
+
+    if (_hasAppliedState && sequence <= _stateSequence)
+    {
+      return;
+    }
+
+    _stateSequence = sequence;
+    _hasAppliedState = true;
+
+    float positionDiff = (position - GlobalPosition).Length();
+    if (positionDiff > 0.05f)
+    {
+      _newPositionState = new Transform3D(new Basis(rotation), position);
+      _applyNewPositionState = true;
+    }
+
+    Quaternion currentRotation = Quaternion;
+    if (Mathf.Abs(currentRotation.AngleTo(rotation)) > Mathf.DegToRad(1.0f))
+    {
+      _newRotationState = new Basis(rotation);
+      _applyNewRotationState = true;
+    }
+
+    _newLinearVelocityState = linearVelocity;
+    _newAngularVelocityState = angularVelocity;
+    _applyNewVelocityState = true;
+  }
+
+  private void SyncAndLerpClientState(double delta)
+  {
+    float weight = (float)delta * 10.0f;
+
+    if (_applyNewPositionState)
+    {
+      GlobalTransform = GlobalTransform.InterpolateWith(_newPositionState, weight);
+
+      if (GlobalTransform.Origin.DistanceTo(_newPositionState.Origin) < 0.01f)
+      {
+        _applyNewPositionState = false;
+      }
+    }
+
+    if (_applyNewRotationState)
+    {
+      Quaternion currentRot = GlobalTransform.Basis.GetRotationQuaternion();
+      Quaternion targetRot = _newRotationState.GetRotationQuaternion();
+      Quaternion smoothRot = currentRot.Slerp(targetRot, weight);
+
+      Vector3 currentPosition = GlobalTransform.Origin;
+      GlobalTransform = new Transform3D(new Basis(smoothRot), currentPosition);
+
+      if (Mathf.Abs(currentRot.AngleTo(targetRot)) < 0.01f)
+      {
+        _applyNewRotationState = false;
+      }
+    }
+
+    if (_applyNewVelocityState)
+    {
+      LinearVelocity = _newLinearVelocityState;
+      AngularVelocity = _newAngularVelocityState;
+      _applyNewVelocityState = false;
+    }
   }
 
   // function that's called from the water physics node's signal
