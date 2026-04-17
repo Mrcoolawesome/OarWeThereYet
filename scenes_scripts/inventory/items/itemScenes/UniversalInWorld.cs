@@ -8,6 +8,18 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   [Export] public int ItemCount { get; set; } = 1;
   [Export] public bool CanBePickedUp { get; set; } = true;
 
+  [ExportGroup("Network Sync Settings")]
+  [Export] public float HostPositionDeltaThreshold = 0.35f;
+  [Export] public float HostRotationDeltaThresholdDegrees = 3.0f;
+  [Export] public float HostLinearVelocityDeltaThreshold = 1.0f;
+  [Export] public float HostAngularVelocityDeltaThreshold = 1.0f;
+  [Export] public float ClientPositionCorrectionThreshold = 0.5f;
+  [Export] public float ClientRotationCorrectionThresholdDegrees = 2.0f;
+  [Export] public float ClientLinearVelocityCorrectionThreshold = 1.0f;
+  [Export] public float ClientAngularVelocityCorrectionThreshold = 1.0f;
+  [Export] public float HardSnapDistance = 8.0f;
+  [Export] public float NetworkLerpSpeed = 10.0f;
+
   [ExportGroup("Water Physics Settings")]
   [Export] public new float Mass = 10.0f;
 	[Export] public float FloatForce = 1.0f;
@@ -65,7 +77,7 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
       _waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
     }
 
-    Freeze = !Multiplayer.IsServer();
+    Freeze = false;
 
     // If anchor, emit setanchor signal (only on server to avoid redundant RPCs)
     if (Multiplayer.IsServer() && Item?.Data.Name == "Anchor")
@@ -107,14 +119,15 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
   public override void _PhysicsProcess(double delta)
   {
-    if (!Multiplayer.IsServer()) return;
-
     if (Item?.Data.Name != "Anchor")
     {
       FloatingPhysicsProcess(delta);
     }
 
-    BroadcastStateIfNeeded();
+    if (Multiplayer.IsServer())
+    {
+      BroadcastStateIfNeeded();
+    }
   }
 
   public override void _ExitTree()
@@ -209,10 +222,10 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     Vector3 currentAngularVelocity = AngularVelocity;
 
     bool changed = !_hasLastBroadcastState
-      || currentPosition.DistanceTo(_lastBroadcastPosition) > 0.01f
-      || Mathf.Abs(currentRotation.AngleTo(_lastBroadcastRotation)) > Mathf.DegToRad(0.5f)
-      || currentLinearVelocity.DistanceTo(_lastBroadcastLinearVelocity) > 0.01f
-      || currentAngularVelocity.DistanceTo(_lastBroadcastAngularVelocity) > 0.01f;
+      || currentPosition.DistanceTo(_lastBroadcastPosition) > HostPositionDeltaThreshold
+      || Mathf.Abs(currentRotation.AngleTo(_lastBroadcastRotation)) > Mathf.DegToRad(HostRotationDeltaThresholdDegrees)
+      || currentLinearVelocity.DistanceTo(_lastBroadcastLinearVelocity) > HostLinearVelocityDeltaThreshold
+      || currentAngularVelocity.DistanceTo(_lastBroadcastAngularVelocity) > HostAngularVelocityDeltaThreshold;
 
     if (!changed)
     {
@@ -259,27 +272,42 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     _hasAppliedState = true;
 
     float positionDiff = (position - GlobalPosition).Length();
-    if (positionDiff > 0.05f)
+    if (positionDiff > HardSnapDistance)
+    {
+      GlobalTransform = new Transform3D(new Basis(rotation), position);
+      LinearVelocity = linearVelocity;
+      AngularVelocity = angularVelocity;
+      _applyNewPositionState = false;
+      _applyNewRotationState = false;
+      _applyNewVelocityState = false;
+      return;
+    }
+
+    if (positionDiff > ClientPositionCorrectionThreshold)
     {
       _newPositionState = new Transform3D(new Basis(rotation), position);
       _applyNewPositionState = true;
     }
 
     Quaternion currentRotation = Quaternion;
-    if (Mathf.Abs(currentRotation.AngleTo(rotation)) > Mathf.DegToRad(1.0f))
+    if (Mathf.Abs(currentRotation.AngleTo(rotation)) > Mathf.DegToRad(ClientRotationCorrectionThresholdDegrees))
     {
       _newRotationState = new Basis(rotation);
       _applyNewRotationState = true;
     }
 
-    _newLinearVelocityState = linearVelocity;
-    _newAngularVelocityState = angularVelocity;
-    _applyNewVelocityState = true;
+    if (linearVelocity.DistanceTo(LinearVelocity) > ClientLinearVelocityCorrectionThreshold
+      || angularVelocity.DistanceTo(AngularVelocity) > ClientAngularVelocityCorrectionThreshold)
+    {
+      _newLinearVelocityState = linearVelocity;
+      _newAngularVelocityState = angularVelocity;
+      _applyNewVelocityState = true;
+    }
   }
 
   private void SyncAndLerpClientState(double delta)
   {
-    float weight = (float)delta * 10.0f;
+    float weight = (float)delta * NetworkLerpSpeed;
 
     if (_applyNewPositionState)
     {
