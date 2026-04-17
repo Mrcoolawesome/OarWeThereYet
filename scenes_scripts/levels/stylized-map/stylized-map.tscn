@@ -770,7 +770,7 @@ bus = &"Environment"
 
 [node name="Motivator" parent="." node_paths=PackedStringArray("RiverNode") instance=ExtResource("31_eub0a")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -1.0568209, 0, 1380.2493)
-Speed = 3.0
+Speed = 5.0
 RiverNode = NodePath("../RiverManager")
 
 [editable path="CheckpointContainer/Checkpoint"]

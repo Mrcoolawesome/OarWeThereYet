@@ -140,11 +140,11 @@ shape = SubResource("CapsuleShape3D_3vyb7")
 disabled = true
 
 [node name="Head" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
 [node name="CameraContainer" type="Node3D" parent="Head"]
 
 [node name="Camera3D" type="Camera3D" parent="Head/CameraContainer"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
 
 [node name="InteractRay" parent="Head/CameraContainer/Camera3D" node_paths=PackedStringArray("Player") instance=ExtResource("2_boad6")]
 Player = NodePath("../../../..")
@@ -205,25 +205,24 @@ transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.39621035e-08, 1.4612839, -0.09246683)
 
 [node name="Skeleton3D" parent="FullPlayerModel/Armature" index="0"]
-bones/0/position = Vector3(0, -0.94975215, -0.290425)
-bones/0/rotation = Quaternion(0.15528774, -0.047792938, -0.015727269, 0.9865872)
-bones/1/rotation = Quaternion(0.040618338, 0.00012636751, -0.0026458828, 0.9991712)
-bones/2/rotation = Quaternion(0.27763915, 0.030979676, -0.006012121, 0.960167)
-bones/3/rotation = Quaternion(-0.4797962, 0.030513978, -0.0039716177, 0.87684023)
-bones/7/rotation = Quaternion(0.11305265, -0.01001249, -0.85198736, 0.5111128)
-bones/8/rotation = Quaternion(0.36094984, -0.64023113, -0.27164665, 0.62131107)
-bones/9/rotation = Quaternion(0.49498913, 0.41624287, -0.2737619, 0.7118864)
-bones/10/rotation = Quaternion(-0.041292984, -0.25754273, 0.27650604, 0.9249384)
-bones/11/rotation = Quaternion(0.12330371, 0.04319369, 0.84637773, 0.5163092)
-bones/12/rotation = Quaternion(0.5142487, 0.050220028, 0.00020195788, 0.8561695)
-bones/13/rotation = Quaternion(0.5091107, 0.18041727, -0.06878411, 0.83876383)
-bones/14/rotation = Quaternion(0.019371547, 0.27269545, -0.22978622, 0.93405586)
-bones/15/rotation = Quaternion(0.008107144, 0.8569546, 0.44329983, -0.26277077)
-bones/16/rotation = Quaternion(-0.93808055, 0.0502466, 0.10919078, 0.32489645)
-bones/17/rotation = Quaternion(0.5042048, 0.2108856, -0.32993427, 0.7697066)
-bones/18/rotation = Quaternion(-0.009638793, 0.86191475, 0.47175276, 0.18563259)
-bones/19/rotation = Quaternion(-0.9459714, -0.059762515, 0.0021321469, 0.31868777)
-bones/20/rotation = Quaternion(0.5676739, -0.064900905, 0.17788436, 0.8011812)
+bones/0/rotation = Quaternion(-0.032100532, -0.005475809, -0.040682152, 0.9986414)
+bones/1/rotation = Quaternion(0.05820037, -0.0011095705, 0.019819811, 0.99810755)
+bones/2/rotation = Quaternion(0.29628405, -0.0045469105, 0.016689537, 0.9549432)
+bones/3/rotation = Quaternion(-0.36917353, -0.001136723, 0.017537644, 0.9291943)
+bones/7/rotation = Quaternion(0.06568191, 0.05682445, -0.8769982, 0.47257918)
+bones/8/rotation = Quaternion(0.08482315, -0.55688584, -0.36964792, 0.73894775)
+bones/9/rotation = Quaternion(0.027003702, 0.6012661, -0.054201175, 0.796751)
+bones/10/rotation = Quaternion(-0.03469376, 0.21602024, 0.1839915, 0.95826864)
+bones/11/rotation = Quaternion(0.04537532, -0.07589872, 0.891288, 0.44473153)
+bones/12/rotation = Quaternion(0.0888249, -0.1604349, 0.27782303, 0.9429662)
+bones/13/rotation = Quaternion(0.05517455, 0.12815672, 0.019256085, 0.99003077)
+bones/14/rotation = Quaternion(-0.1524872, -0.08561144, -0.017204184, 0.98444015)
+bones/15/rotation = Quaternion(-0.041307237, -0.109150015, 0.9863349, -0.11629082)
+bones/16/rotation = Quaternion(-0.14741239, 0.0057191807, -0.010355145, 0.98900443)
+bones/17/rotation = Quaternion(0.60122895, -0.04548871, -0.089488655, 0.7927461)
+bones/18/rotation = Quaternion(-0.005814642, 0.15170217, 0.98805165, 0.026584845)
+bones/19/rotation = Quaternion(-0.057634678, 0.00019513813, 0.0066289525, 0.9983157)
+bones/20/rotation = Quaternion(0.26612648, 0.054755896, 0.058664966, 0.960592)
 
 [node name="body" parent="FullPlayerModel/Armature/Skeleton3D" index="0"]
 material_overlay = SubResource("ShaderMaterial_lvkhp")
@@ -235,15 +234,17 @@ settings/0/root_bone_name = "neck"
 settings/0/root_bone = 2
 settings/0/end_bone_name = "head_2"
 settings/0/end_bone = 3
-settings/0/extend_end_bone = false
+settings/0/extend_end_bone = true
+settings/0/end_bone/direction = 6
+settings/0/end_bone/length = 0.1
 settings/0/center_from = 0
 settings/0/individual_config = false
 settings/0/rotation_axis = 3
 settings/0/radius/value = 0.02
 settings/0/radius/damping_curve = null
-settings/0/stiffness/value = 1.0
+settings/0/stiffness/value = 5.0
 settings/0/stiffness/damping_curve = null
-settings/0/drag/value = 1.5
+settings/0/drag/value = 1.0
 settings/0/drag/damping_curve = null
 settings/0/gravity/value = 0.0
 settings/0/gravity/damping_curve = null
@@ -252,13 +253,13 @@ settings/0/enable_all_child_collisions = true
 settings/0/exclude_collision_count = 0
 
 [node name="SpringBoneCollisionCapsule3D" type="SpringBoneCollisionCapsule3D" parent="FullPlayerModel/Armature/Skeleton3D/HeadMovement"]
-transform = Transform3D(0.99964267, 0.00054374523, 0.026729092, -0.0017240308, 0.9990232, 0.04415375, -0.026678951, -0.04418403, 0.99866706, 0.015300925, -1.7624786, 0.24515909)
+transform = Transform3D(0.99868125, -0.014987394, -0.049102694, 0.02000846, 0.9944367, 0.10341704, 0.047279574, -0.1042631, 0.99342513, 0.061441198, -0.70698, 0.16694054)
 bone_name = "head_2"
 bone = 3
 position_offset = Vector3(0, 0, 0)
 rotation_offset = Quaternion(0, 0, 0, 1)
-radius = 0.079
-height = 0.252
+radius = 0.2
+height = 1.0
 inside = true
 
 [node name="RightEyeJiggle" type="SpringBoneSimulator3D" parent="FullPlayerModel/Armature/Skeleton3D" index="4"]
@@ -317,7 +318,7 @@ material_overlay = SubResource("ShaderMaterial_klt8r")
 mesh = SubResource("ArrayMesh_iwtuv")
 
 [node name="BoneAttachment3D" type="BoneAttachment3D" parent="FullPlayerModel/Armature/Skeleton3D" index="10"]
-transform = Transform3D(-0.9982785, -0.045643818, -0.036829352, -0.050973117, 0.36463678, 0.9297534, -0.02900812, 0.9300304, -0.36633545, -0.2635418, -0.19166094, 1.0478902)
+transform = Transform3D(-0.898276, -0.3908159, 0.20090604, 0.27993888, -0.86135197, -0.42391828, 0.33872485, -0.32455415, 0.88313615, -0.6259007, -0.05835411, -0.06074377)
 bone_name = "hand.R"
 bone_idx = 14
 

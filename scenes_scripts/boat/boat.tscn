@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://bchwofjewsivn"]
+[gd_scene load_steps=26 format=3 uid="uid://bchwofjewsivn"]
 
 [ext_resource type="Script" uid="uid://dojr2mtuscsql" path="res://scenes_scripts/boat/Boat.cs" id="1_vvssr"]
 [ext_resource type="Script" uid="uid://cvaqim6hpiijd" path="res://scenes_scripts/boat/seat/Seat.cs" id="2_kgk83"]
@@ -70,9 +70,13 @@ stencil_mode = 3
 stencil_flags = 2
 stencil_reference = 2
 
+[sub_resource type="BoxMesh" id="BoxMesh_m43lt"]
+material = SubResource("StandardMaterial3D_g3she")
+size = Vector3(5, 0.5, 2.2)
+
 [sub_resource type="BoxMesh" id="BoxMesh_g3she"]
 material = SubResource("StandardMaterial3D_g3she")
-size = Vector3(6.2, 0.75, 2.3)
+size = Vector3(1, 0.5, 2)
 
 [node name="Boat" type="RigidBody3D"]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
@@ -298,9 +302,22 @@ unit_size = 20.0
 max_distance = 20.0
 bus = &"Environment"
 
-[node name="WaterMaskMesh" type="MeshInstance3D" parent="."]
+[node name="EmptyWaterMasks" type="Node3D" parent="."]
+
+[node name="WaterMaskMesh" type="MeshInstance3D" parent="EmptyWaterMasks"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.506293, 0)
+mesh = SubResource("BoxMesh_m43lt")
+skeleton = NodePath("../..")
+
+[node name="WaterMaskMesh2" type="MeshInstance3D" parent="EmptyWaterMasks"]
+transform = Transform3D(0.9581429, 0.28629044, 1.8296333e-09, -0.28629044, 0.9581429, 1.251415e-08, 1.8296333e-09, -1.251415e-08, 1, -2.8746185, 0.5506128, 1.2565357e-07)
 mesh = SubResource("BoxMesh_g3she")
+skeleton = NodePath("../..")
+
+[node name="WaterMaskMesh3" type="MeshInstance3D" parent="EmptyWaterMasks"]
+transform = Transform3D(-0.9583226, -0.28568837, -8.742278e-08, -0.28568837, 0.9583226, 0, 8.377922e-08, 2.4975671e-08, -1, 2.875, 0.551, 0)
+mesh = SubResource("BoxMesh_g3she")
+skeleton = NodePath("../..")
 
 [connection signal="delta_synchronized" from="MultiplayerSynchronizer" to="." method="SyncPosIfNeeded"]
 [connection signal="timeout" from="DamageDelayTimer" to="." method="DamageTimerEnded"]

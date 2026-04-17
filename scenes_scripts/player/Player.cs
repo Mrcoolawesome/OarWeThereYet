@@ -50,6 +50,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private float _gravity = 9.8f;
 	private Vector3 _direction = Vector3.Zero;
 	private Node3D _head;
+	private float _standingHeadHeight = 0.0f;
 	private CollisionShape3D _crouchingCollision;
 	private CollisionShape3D _standingCollision;
 	private float _crouchingDepth = -0.5f; // this is relative to the regular head 
@@ -236,6 +237,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private bool _hasPendingPatchIntent = false;
 	private Hole _pendingPatchHole = null;
 
+	// neck physics bone
+	private SpringBoneSimulator3D _neckJigglePhysics;
+
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -248,6 +252,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	public override void _Ready()
 	{
 		_head = GetNode<Node3D>("Head");
+		_standingHeadHeight = _head.Position.Y;
 		_crouchingCollision = GetNode<CollisionShape3D>("CrouchingCollision");
 		_standingCollision = GetNode<CollisionShape3D>("StandingCollision");
 		_pauseUICanvas = GetNode<CanvasLayer>("PauseCanvas");
@@ -344,6 +349,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// get the underwater pov
 		_underWaterPOV = GetNode<Control>("UnderWaterPOV");
 		_underWaterPOV.Visible = false; // make the underwater pov invisible by default
+
+		// get the neck jiggle physics bone
+		_neckJigglePhysics = GetNode<SpringBoneSimulator3D>("FullPlayerModel/Armature/Skeleton3D/HeadMovement");
 
 		// client code for when setting up their camera and stuff
 		// if we are the player, then use the camera for this player
@@ -1137,7 +1145,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				_currSpeed = CrouchingSpeed;
 
 				// Set the head height to be offset by the crouching depth
-				Vector3 targetHeadPosition = new Vector3(_head.Position.X, _crouchingDepth, _head.Position.Z);
+				Vector3 targetHeadPosition = new Vector3(_head.Position.X, _standingHeadHeight + _crouchingDepth, _head.Position.Z);
 				_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
 
 				// Disable the staning collision shape
@@ -1147,7 +1155,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			else
 			{
 				// Set head position to be default when not crouching
-				Vector3 targetHeadPosition = new Vector3(_head.Position.X, 0.0f, _head.Position.Z);
+				Vector3 targetHeadPosition = new Vector3(_head.Position.X, _standingHeadHeight, _head.Position.Z);
 				_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
 
 				// Enable the standing collision shape
@@ -1310,6 +1318,21 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     {
       _knockbackVelocity = Vector3.Zero;
       _applyKnockback = false;
+    }
+
+		// --- SPRING BONE LOGIC ---
+    if (_neckJigglePhysics != null)
+    {
+      if (isSitting)
+      {
+        // Turn off the physics processing so it stops freaking out
+        _neckJigglePhysics.ProcessMode = Node.ProcessModeEnum.Disabled;
+      }
+      else
+      {
+        // Turn it back on when they stand up
+        _neckJigglePhysics.ProcessMode = Node.ProcessModeEnum.Inherit;
+      }
     }
 	}
 
