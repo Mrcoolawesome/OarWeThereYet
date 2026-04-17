@@ -236,21 +236,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private bool _hasPendingPatchIntent = false;
 	private Hole _pendingPatchHole = null;
 
-	private static string SeatNameFromIndex(int seatIdx)
-	{
-		if (!Enum.IsDefined(typeof(Boat.SeatIndicies), seatIdx))
-		{
-			return $"Unknown({seatIdx})";
-		}
-
-		return ((Boat.SeatIndicies)seatIdx).ToString();
-	}
-
-	private string OccupiedSeatsDebugString()
-	{
-		return _boat == null ? "<no-boat>" : $"[{string.Join(",", _boat.OccupiedSeats)}]";
-	}
-
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -1305,10 +1290,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void SetSitStandState(bool isSitting, int seatIdx)
 	{
-		// if (Multiplayer.IsServer() && IsMultiplayerAuthority()) {
-			GD.Print($"[SeatState] player={Name} seat={SeatNameFromIndex(seatIdx)}({seatIdx}) -> {(isSitting ? "occupied" : "free")} server={Multiplayer.IsServer()} authority={IsMultiplayerAuthority()}");
-		// }
-
 		// Broadcast occupied seat
 		_boat.OccupiedSeats[seatIdx] = isSitting;
 		if (ArmNode?.Item?.Data?.UseAction == null)
@@ -1590,8 +1571,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// Only the server should issue this command
 		if (Multiplayer.IsServer())
 		{
-			GD.Print($"[SeatResetInit] player={Name} server={Multiplayer.IsServer()} authority={IsMultiplayerAuthority()} occupiedSeats={OccupiedSeatsDebugString()}");
-
 			// Tell EVERYONE (including the server) to run the SyncReset function
 			Rpc(nameof(SyncReset));
 
@@ -1607,8 +1586,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void SyncReset()
 	{
-		GD.Print($"[SeatResetApplied] player={Name} server={Multiplayer.IsServer()} authority={IsMultiplayerAuthority()} occupiedSeats={OccupiedSeatsDebugString()}");
-
 		_seatResetEpoch++;
 		_seatRequestSerial = 0;
 		_pendingSeatRequestSerial = -1;
@@ -1818,7 +1795,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   {
     if (Multiplayer.IsServer())
     {
-			GD.Print($"[SeatKnockbackHost] relaying hit to client={targetClientId} occupiedSeats={OccupiedSeatsDebugString()}");
 			RpcId(targetClientId, nameof(BroadcastApplyKnockback), pushDirection);
     }
   }
@@ -1829,8 +1805,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // If they are sitting in the boat, forcibly eject them!
     if (CurrPlayerState == PlayerState.Rowing)
     {
-			GD.Print($"[SeatKnockbackClient] player={Name} seat={SeatNameFromIndex((int)_seat)}({(int)_seat}) occupiedSeats={OccupiedSeatsDebugString()}");
-
       // 1. Tell the server to stop the rowing physics for this seat
       RequestRowing((int)_seat, false, false);
 
