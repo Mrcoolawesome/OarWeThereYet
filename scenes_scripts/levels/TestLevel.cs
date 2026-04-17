@@ -8,7 +8,9 @@ public partial class TestLevel : Node
 	[Signal] public delegate void BoatReadyEventHandler();
 
 	[Export] public int SaveSlot = 0;
+  [Export] public float HiddenAllPlayersSwimmingDelayTime = 5.0f;
 	[Export] public float AllPlayersSwimmingResetTime = 5.0f;
+  private float _hiddenAllPlayersSwimmingDelayTimer = 0.0f;
 	private float _allPlayersSwimmingTimer = 0.0f;
 	private bool _isAllSwimmingVisible = false;
 	public bool IsBoatReady { get; private set; } = false;
@@ -129,6 +131,19 @@ public partial class TestLevel : Node
 
       if (allSwimming)
       {
+          if (_hiddenAllPlayersSwimmingDelayTimer < HiddenAllPlayersSwimmingDelayTime)
+          {
+            _hiddenAllPlayersSwimmingDelayTimer += (float)delta;
+
+            if (_isAllSwimmingVisible)
+            {
+              Rpc(nameof(SyncResetTimer), false, 0.0f);
+              _isAllSwimmingVisible = false;
+            }
+
+            return;
+          }
+
           _allPlayersSwimmingTimer += (float)delta;
           float remainingTime = AllPlayersSwimmingResetTime - _allPlayersSwimmingTimer;
 
@@ -138,6 +153,7 @@ public partial class TestLevel : Node
 
           if (_allPlayersSwimmingTimer >= AllPlayersSwimmingResetTime)
           {
+              _hiddenAllPlayersSwimmingDelayTimer = 0.0f;
               _allPlayersSwimmingTimer = 0.0f;
               GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.ResetLevel);
               // reset UI
@@ -147,8 +163,9 @@ public partial class TestLevel : Node
       }
       else
       {
-          if (_isAllSwimmingVisible)
+          if (_isAllSwimmingVisible || _hiddenAllPlayersSwimmingDelayTimer > 0.0f || _allPlayersSwimmingTimer > 0.0f)
           {
+            _hiddenAllPlayersSwimmingDelayTimer = 0.0f;
               _allPlayersSwimmingTimer = 0.0f;
               Rpc(nameof(SyncResetTimer), false, 0.0f);
               _isAllSwimmingVisible = false;

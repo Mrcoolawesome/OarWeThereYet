@@ -8,8 +8,20 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   [Export] public int ItemCount { get; set; } = 1;
   [Export] public bool CanBePickedUp { get; set; } = true;
 
+  [ExportGroup("Network Sync Settings")]
+  [Export] public float HostPositionDeltaThreshold = 0.35f;
+  [Export] public float HostRotationDeltaThresholdDegrees = 6.0f;
+  [Export] public float HostLinearVelocityDeltaThreshold = 1.0f;
+  [Export] public float HostAngularVelocityDeltaThreshold = 2.0f;
+  [Export] public float ClientPositionCorrectionThreshold = 0.5f;
+  [Export] public float ClientRotationCorrectionThresholdDegrees = 4.0f;
+  [Export] public float ClientLinearVelocityCorrectionThreshold = 1.0f;
+  [Export] public float ClientAngularVelocityCorrectionThreshold = 2.0f;
+  [Export] public float HardSnapDistance = 8.0f;
+  [Export] public float NetworkLerpSpeed = 10.0f;
+
   [ExportGroup("Water Physics Settings")]
-	[Export] public float Mass = 10.0f;
+  [Export] public new float Mass = 10.0f;
 	[Export] public float FloatForce = 1.0f;
 	[Export] public float RiverSpeed = 1.0f;
 	[Export] public float WaterDrag = 2.0f;
@@ -21,6 +33,24 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   private bool _applyWaterPhysicsForce = false;
 	private Vector3 _waterPhysicsForce;
 	private Vector3 _waterPhysicsForcePosition;
+  private bool _applyNewPositionState = false;
+  private bool _applyNewRotationState = false;
+  private bool _applyNewVelocityState = false;
+  private bool _applyHardSnapState = false;
+  private Transform3D _newPositionState;
+  private Transform3D _hardSnapState;
+  private Basis _newRotationState;
+  private Vector3 _newLinearVelocityState;
+  private Vector3 _newAngularVelocityState;
+  private Vector3 _hardSnapLinearVelocityState;
+  private Vector3 _hardSnapAngularVelocityState;
+  private int _stateSequence = 0;
+  private bool _hasAppliedState = false;
+  private bool _hasLastBroadcastState = false;
+  private Vector3 _lastBroadcastPosition;
+  private Quaternion _lastBroadcastRotation;
+  private Vector3 _lastBroadcastLinearVelocity;
+  private Vector3 _lastBroadcastAngularVelocity;
 
 	// Get the terrain
 	private Node3D _terrain;
@@ -29,6 +59,8 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   public override void _Ready()
   {
     if (ItemObject == null) return;
+
+    SetMultiplayerAuthority(1);
 
     Item = new InvSlot(ItemObject, ItemCount);
 
@@ -49,6 +81,8 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
       _waterPhysics.SetParameters(_riverFloatSystem, FloatForce, RiverSpeed, WaterDrag);
     }
 
+    Freeze = false;
+
     // If anchor, emit setanchor signal (only on server to avoid redundant RPCs)
     if (Multiplayer.IsServer() && Item?.Data.Name == "Anchor")
     {
@@ -58,12 +92,22 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 		// Get terrain
 		_terrain = GetNode<Node3D>("../../Terrain3D");
 		_terrainData = _terrain.Get("data").AsGodotObject();
+
+    if (Multiplayer.IsServer())
+    {
+      Multiplayer.PeerConnected += OnPeerConnected;
+    }
   }
 
   public override void _Process(double delta)
   {
     if (Item == null) return;
     PromptMessage = CanBePickedUp ? "Pick Up (" + Item.Amount + ")" : "";
+
+    if (!Multiplayer.IsServer())
+    {
+      return;
+    }
 
 		// If player falls below terrain, teleport them back up
 		if (_terrainData != null)
@@ -81,6 +125,29 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     if (Item?.Data.Name != "Anchor")
     {
       FloatingPhysicsProcess(delta);
+    }
+
+    if (Multiplayer.IsServer())
+    {
+      BroadcastStateIfNeeded();
+    }
+  }
+
+  public override void _IntegrateForces(PhysicsDirectBodyState3D state)
+  {
+    if (Multiplayer.IsServer())
+    {
+      return;
+    }
+
+    SyncAndLerpClientState(state);
+  }
+
+  public override void _ExitTree()
+  {
+    if (Multiplayer.IsServer())
+    {
+      Multiplayer.PeerConnected -= OnPeerConnected;
     }
   }
 
@@ -155,10 +222,149 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     ItemCount = newAmount;
   }
 
+  private void BroadcastStateIfNeeded()
+  {
+    if (!Multiplayer.IsServer())
+    {
+      return;
+    }
+
+    Vector3 currentPosition = GlobalPosition;
+    Quaternion currentRotation = Quaternion;
+    Vector3 currentLinearVelocity = LinearVelocity;
+    Vector3 currentAngularVelocity = AngularVelocity;
+
+    bool changed = !_hasLastBroadcastState
+      || currentPosition.DistanceTo(_lastBroadcastPosition) > HostPositionDeltaThreshold
+      || Mathf.Abs(currentRotation.AngleTo(_lastBroadcastRotation)) > Mathf.DegToRad(HostRotationDeltaThresholdDegrees)
+      || currentLinearVelocity.DistanceTo(_lastBroadcastLinearVelocity) > HostLinearVelocityDeltaThreshold
+      || currentAngularVelocity.DistanceTo(_lastBroadcastAngularVelocity) > HostAngularVelocityDeltaThreshold;
+
+    if (!changed)
+    {
+      return;
+    }
+
+    _hasLastBroadcastState = true;
+    _lastBroadcastPosition = currentPosition;
+    _lastBroadcastRotation = currentRotation;
+    _lastBroadcastLinearVelocity = currentLinearVelocity;
+    _lastBroadcastAngularVelocity = currentAngularVelocity;
+    _stateSequence++;
+
+    Rpc(nameof(ApplyWorldItemState), _stateSequence, currentPosition, currentRotation, currentLinearVelocity, currentAngularVelocity);
+  }
+
   [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void DeleteItem()
   {
     QueueFree();
+  }
+
+  private void OnPeerConnected(long peerId)
+  {
+    if (!Multiplayer.IsServer()) return;
+
+    RpcId(peerId, nameof(ApplyWorldItemState), _stateSequence, GlobalPosition, Quaternion, LinearVelocity, AngularVelocity);
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+  private void ApplyWorldItemState(int sequence, Vector3 position, Quaternion rotation, Vector3 linearVelocity, Vector3 angularVelocity)
+  {
+    if (Multiplayer.IsServer())
+    {
+      return;
+    }
+
+    if (_hasAppliedState && sequence <= _stateSequence)
+    {
+      return;
+    }
+
+    _stateSequence = sequence;
+    _hasAppliedState = true;
+
+    float positionDiff = (position - GlobalPosition).Length();
+    if (positionDiff > HardSnapDistance)
+    {
+      _hardSnapState = new Transform3D(new Basis(rotation), position);
+      _hardSnapLinearVelocityState = linearVelocity;
+      _hardSnapAngularVelocityState = angularVelocity;
+      _applyHardSnapState = true;
+      _applyNewPositionState = false;
+      _applyNewRotationState = false;
+      _applyNewVelocityState = false;
+      return;
+    }
+
+    if (positionDiff > ClientPositionCorrectionThreshold)
+    {
+      // Position correction intentionally keeps current basis to avoid injecting extra rotation jitter.
+      _newPositionState = new Transform3D(Basis, position);
+      _applyNewPositionState = true;
+    }
+
+    Quaternion currentRotation = Quaternion;
+    if (Mathf.Abs(currentRotation.AngleTo(rotation)) > Mathf.DegToRad(ClientRotationCorrectionThresholdDegrees))
+    {
+      _newRotationState = new Basis(rotation);
+      _applyNewRotationState = true;
+    }
+
+    if (linearVelocity.DistanceTo(LinearVelocity) > ClientLinearVelocityCorrectionThreshold
+      || angularVelocity.DistanceTo(AngularVelocity) > ClientAngularVelocityCorrectionThreshold)
+    {
+      _newLinearVelocityState = linearVelocity;
+      _newAngularVelocityState = angularVelocity;
+      _applyNewVelocityState = true;
+    }
+  }
+
+  private void SyncAndLerpClientState(PhysicsDirectBodyState3D state)
+  {
+    float weight = Mathf.Clamp(state.Step * NetworkLerpSpeed, 0.0f, 1.0f);
+
+    if (_applyHardSnapState)
+    {
+      state.Transform = _hardSnapState;
+      state.LinearVelocity = _hardSnapLinearVelocityState;
+      state.AngularVelocity = _hardSnapAngularVelocityState;
+      _applyHardSnapState = false;
+      return;
+    }
+
+    if (_applyNewPositionState)
+    {
+      Vector3 blendedPosition = state.Transform.Origin.Lerp(_newPositionState.Origin, weight);
+      state.Transform = new Transform3D(state.Transform.Basis, blendedPosition);
+
+      if (state.Transform.Origin.DistanceTo(_newPositionState.Origin) < 0.01f)
+      {
+        _applyNewPositionState = false;
+      }
+    }
+
+    if (_applyNewRotationState)
+    {
+      Quaternion currentRot = state.Transform.Basis.GetRotationQuaternion();
+      Quaternion targetRot = _newRotationState.GetRotationQuaternion();
+      Quaternion smoothRot = currentRot.Slerp(targetRot, weight);
+
+      Vector3 currentPosition = state.Transform.Origin;
+      state.Transform = new Transform3D(new Basis(smoothRot), currentPosition);
+
+      if (Mathf.Abs(currentRot.AngleTo(targetRot)) < 0.01f)
+      {
+        _applyNewRotationState = false;
+      }
+    }
+
+    if (_applyNewVelocityState)
+    {
+      state.LinearVelocity = _newLinearVelocityState;
+      state.AngularVelocity = _newAngularVelocityState;
+      _applyNewVelocityState = false;
+    }
   }
 
   // function that's called from the water physics node's signal

@@ -127,6 +127,7 @@ LerpSpeed = 5.0
 CrouchLerpSpeed = 7.5
 RiverSpeed = 200.0
 VoiceScaleMultiplier = 2.0
+UnderWaterSubmergedOffset = 1.0
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_qhqgy")
