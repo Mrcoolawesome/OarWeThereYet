@@ -226,11 +226,30 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private bool _hasPendingSeatIntent = false;
 	private int _requestedSeatIndex = -1;
 	private bool _requestedSeatIsSitting = false;
+	private int _seatResetEpoch = 0;
+	private int _seatRequestSerial = 0;
+	private int _pendingSeatRequestSerial = -1;
+	private int _lastAppliedSeatRequestSerial = -1;
 	private bool _pendingRespawnReseat = false;
 
 	// Patch intent handshake state.
 	private bool _hasPendingPatchIntent = false;
 	private Hole _pendingPatchHole = null;
+
+	private static string SeatNameFromIndex(int seatIdx)
+	{
+		if (!Enum.IsDefined(typeof(Boat.SeatIndicies), seatIdx))
+		{
+			return $"Unknown({seatIdx})";
+		}
+
+		return ((Boat.SeatIndicies)seatIdx).ToString();
+	}
+
+	private string OccupiedSeatsDebugString()
+	{
+		return _boat == null ? "<no-boat>" : $"[{string.Join(",", _boat.OccupiedSeats)}]";
+	}
 
   public override void _EnterTree()
 	{
@@ -1263,6 +1282,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_hasPendingSeatIntent = false;
 		_requestedSeatIndex = -1;
 		_requestedSeatIsSitting = false;
+		_pendingSeatRequestSerial = -1;
 
 		if (CurrPlayerState == PlayerState.Rowing)
 		{
@@ -1285,6 +1305,10 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	public void SetSitStandState(bool isSitting, int seatIdx)
 	{
+		// if (Multiplayer.IsServer() && IsMultiplayerAuthority()) {
+			GD.Print($"[SeatState] player={Name} seat={SeatNameFromIndex(seatIdx)}({seatIdx}) -> {(isSitting ? "occupied" : "free")} server={Multiplayer.IsServer()} authority={IsMultiplayerAuthority()}");
+		// }
+
 		// Broadcast occupied seat
 		_boat.OccupiedSeats[seatIdx] = isSitting;
 		if (ArmNode?.Item?.Data?.UseAction == null)
@@ -1316,13 +1340,18 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 
 	public void RequestSeatStateConfirmation(int seatIdx, bool isSitting)
 	{
+		RequestSeatStateConfirmation(seatIdx, isSitting, _seatResetEpoch, _pendingSeatRequestSerial);
+	}
+
+	public void RequestSeatStateConfirmation(int seatIdx, bool isSitting, int resetEpoch, int requestSerial)
+	{
 		if (Multiplayer.IsServer())
 		{
-			ServerRequestSeatState(seatIdx, isSitting);
+			ServerRequestSeatState(seatIdx, isSitting, resetEpoch, requestSerial);
 			return;
 		}
 
-		RpcId(1, nameof(ServerRequestSeatState), seatIdx, isSitting);
+		RpcId(1, nameof(ServerRequestSeatState), seatIdx, isSitting, resetEpoch, requestSerial);
 	}
 
 	public void RequestOarAnimationConfirmation(int seatIdx, int direction, bool startStop)
@@ -1341,14 +1370,16 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		bool requestedStateChanged = _requestedSeatIndex != seatIdx || _requestedSeatIsSitting != isSitting;
 		if (requestedStateChanged)
 		{
+			_seatRequestSerial++;
 			_requestedSeatIndex = seatIdx;
 			_requestedSeatIsSitting = isSitting;
+			_pendingSeatRequestSerial = _seatRequestSerial;
 			_hasPendingSeatIntent = true;
 		}
 
 		if (_hasPendingSeatIntent)
 		{
-			RequestSeatStateConfirmation(_requestedSeatIndex, _requestedSeatIsSitting);
+			RequestSeatStateConfirmation(_requestedSeatIndex, _requestedSeatIsSitting, _seatResetEpoch, _pendingSeatRequestSerial);
 		}
 	}
 
@@ -1413,16 +1444,21 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
-	private void ServerRequestSeatState(int seat, bool isSitting)
+	private void ServerRequestSeatState(int seat, bool isSitting, int resetEpoch, int requestSerial)
 	{
 		if (!Multiplayer.IsServer()) return;
+
+		if (resetEpoch != _seatResetEpoch)
+		{
+			return;
+		}
 
 		if (isSitting)
 		{
 			if (CurrPlayerState == PlayerState.Rowing)
 			{
 				// Idempotent ack: if this player is already seated, reuse that seat.
-				Rpc(nameof(ConfirmSeatState), (int)_seat, true);
+				Rpc(nameof(ConfirmSeatState), (int)_seat, true, resetEpoch, requestSerial);
 				return;
 			}
 
@@ -1432,20 +1468,38 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				chosenSeat = _boat.NextAvailableSeat();
 			}
 
-			if (chosenSeat < 0) return;
-			if (!_boat.IsSeatAvailable(chosenSeat)) return;
+			if (chosenSeat < 0)
+			{
+				return;
+			}
 
-			Rpc(nameof(ConfirmSeatState), chosenSeat, true);
+			if (!_boat.IsSeatAvailable(chosenSeat))
+			{
+				return;
+			}
+
+			Rpc(nameof(ConfirmSeatState), chosenSeat, true, resetEpoch, requestSerial);
 			return;
 		}
 
 		int unsitSeat = seat == -1 ? (int)_seat : seat;
-		Rpc(nameof(ConfirmSeatState), unsitSeat, false);
+		Rpc(nameof(ConfirmSeatState), unsitSeat, false, resetEpoch, requestSerial);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void ConfirmSeatState(int seat, bool isSitting)
+	private void ConfirmSeatState(int seat, bool isSitting, int resetEpoch, int requestSerial)
 	{
+		if (resetEpoch != _seatResetEpoch)
+		{
+			return;
+		}
+
+		if (requestSerial <= _lastAppliedSeatRequestSerial)
+		{
+			return;
+		}
+		_lastAppliedSeatRequestSerial = requestSerial;
+
 		if (isSitting && CurrPlayerState == PlayerState.Rowing && (int)_seat != seat)
 		{
 			// Prevent stale occupancy if seat changed due network timing.
@@ -1463,6 +1517,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				}
 
 				_hasPendingSeatIntent = false;
+				_pendingSeatRequestSerial = -1;
 			}
 		}
 
@@ -1535,6 +1590,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// Only the server should issue this command
 		if (Multiplayer.IsServer())
 		{
+			GD.Print($"[SeatResetInit] player={Name} server={Multiplayer.IsServer()} authority={IsMultiplayerAuthority()} occupiedSeats={OccupiedSeatsDebugString()}");
+
 			// Tell EVERYONE (including the server) to run the SyncReset function
 			Rpc(nameof(SyncReset));
 
@@ -1550,6 +1607,16 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void SyncReset()
 	{
+		GD.Print($"[SeatResetApplied] player={Name} server={Multiplayer.IsServer()} authority={IsMultiplayerAuthority()} occupiedSeats={OccupiedSeatsDebugString()}");
+
+		_seatResetEpoch++;
+		_seatRequestSerial = 0;
+		_pendingSeatRequestSerial = -1;
+		_lastAppliedSeatRequestSerial = -1;
+		_hasPendingSeatIntent = false;
+		_requestedSeatIndex = -1;
+		_requestedSeatIsSitting = false;
+
 		if (IsMultiplayerAuthority())
 		{
 			BeginRespawnReseat();
@@ -1751,6 +1818,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   {
     if (Multiplayer.IsServer())
     {
+			GD.Print($"[SeatKnockbackHost] relaying hit to client={targetClientId} occupiedSeats={OccupiedSeatsDebugString()}");
 			RpcId(targetClientId, nameof(BroadcastApplyKnockback), pushDirection);
     }
   }
@@ -1761,6 +1829,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // If they are sitting in the boat, forcibly eject them!
     if (CurrPlayerState == PlayerState.Rowing)
     {
+			GD.Print($"[SeatKnockbackClient] player={Name} seat={SeatNameFromIndex((int)_seat)}({(int)_seat}) occupiedSeats={OccupiedSeatsDebugString()}");
+
       // 1. Tell the server to stop the rowing physics for this seat
       RequestRowing((int)_seat, false, false);
 
