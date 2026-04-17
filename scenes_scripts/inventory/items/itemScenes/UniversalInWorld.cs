@@ -10,13 +10,13 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
   [ExportGroup("Network Sync Settings")]
   [Export] public float HostPositionDeltaThreshold = 0.35f;
-  [Export] public float HostRotationDeltaThresholdDegrees = 3.0f;
+  [Export] public float HostRotationDeltaThresholdDegrees = 6.0f;
   [Export] public float HostLinearVelocityDeltaThreshold = 1.0f;
-  [Export] public float HostAngularVelocityDeltaThreshold = 1.0f;
+  [Export] public float HostAngularVelocityDeltaThreshold = 2.0f;
   [Export] public float ClientPositionCorrectionThreshold = 0.5f;
-  [Export] public float ClientRotationCorrectionThresholdDegrees = 2.0f;
+  [Export] public float ClientRotationCorrectionThresholdDegrees = 4.0f;
   [Export] public float ClientLinearVelocityCorrectionThreshold = 1.0f;
-  [Export] public float ClientAngularVelocityCorrectionThreshold = 1.0f;
+  [Export] public float ClientAngularVelocityCorrectionThreshold = 2.0f;
   [Export] public float HardSnapDistance = 8.0f;
   [Export] public float NetworkLerpSpeed = 10.0f;
 
@@ -36,10 +36,14 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
   private bool _applyNewPositionState = false;
   private bool _applyNewRotationState = false;
   private bool _applyNewVelocityState = false;
+  private bool _applyHardSnapState = false;
   private Transform3D _newPositionState;
+  private Transform3D _hardSnapState;
   private Basis _newRotationState;
   private Vector3 _newLinearVelocityState;
   private Vector3 _newAngularVelocityState;
+  private Vector3 _hardSnapLinearVelocityState;
+  private Vector3 _hardSnapAngularVelocityState;
   private int _stateSequence = 0;
   private bool _hasAppliedState = false;
   private bool _hasLastBroadcastState = false;
@@ -102,7 +106,6 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
     if (!Multiplayer.IsServer())
     {
-      SyncAndLerpClientState(delta);
       return;
     }
 
@@ -128,6 +131,16 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     {
       BroadcastStateIfNeeded();
     }
+  }
+
+  public override void _IntegrateForces(PhysicsDirectBodyState3D state)
+  {
+    if (Multiplayer.IsServer())
+    {
+      return;
+    }
+
+    SyncAndLerpClientState(state);
   }
 
   public override void _ExitTree()
@@ -274,9 +287,10 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     float positionDiff = (position - GlobalPosition).Length();
     if (positionDiff > HardSnapDistance)
     {
-      GlobalTransform = new Transform3D(new Basis(rotation), position);
-      LinearVelocity = linearVelocity;
-      AngularVelocity = angularVelocity;
+      _hardSnapState = new Transform3D(new Basis(rotation), position);
+      _hardSnapLinearVelocityState = linearVelocity;
+      _hardSnapAngularVelocityState = angularVelocity;
+      _applyHardSnapState = true;
       _applyNewPositionState = false;
       _applyNewRotationState = false;
       _applyNewVelocityState = false;
@@ -285,7 +299,8 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
     if (positionDiff > ClientPositionCorrectionThreshold)
     {
-      _newPositionState = new Transform3D(new Basis(rotation), position);
+      // Position correction intentionally keeps current basis to avoid injecting extra rotation jitter.
+      _newPositionState = new Transform3D(Basis, position);
       _applyNewPositionState = true;
     }
 
@@ -305,15 +320,25 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
     }
   }
 
-  private void SyncAndLerpClientState(double delta)
+  private void SyncAndLerpClientState(PhysicsDirectBodyState3D state)
   {
-    float weight = (float)delta * NetworkLerpSpeed;
+    float weight = Mathf.Clamp(state.Step * NetworkLerpSpeed, 0.0f, 1.0f);
+
+    if (_applyHardSnapState)
+    {
+      state.Transform = _hardSnapState;
+      state.LinearVelocity = _hardSnapLinearVelocityState;
+      state.AngularVelocity = _hardSnapAngularVelocityState;
+      _applyHardSnapState = false;
+      return;
+    }
 
     if (_applyNewPositionState)
     {
-      GlobalTransform = GlobalTransform.InterpolateWith(_newPositionState, weight);
+      Vector3 blendedPosition = state.Transform.Origin.Lerp(_newPositionState.Origin, weight);
+      state.Transform = new Transform3D(state.Transform.Basis, blendedPosition);
 
-      if (GlobalTransform.Origin.DistanceTo(_newPositionState.Origin) < 0.01f)
+      if (state.Transform.Origin.DistanceTo(_newPositionState.Origin) < 0.01f)
       {
         _applyNewPositionState = false;
       }
@@ -321,12 +346,12 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
     if (_applyNewRotationState)
     {
-      Quaternion currentRot = GlobalTransform.Basis.GetRotationQuaternion();
+      Quaternion currentRot = state.Transform.Basis.GetRotationQuaternion();
       Quaternion targetRot = _newRotationState.GetRotationQuaternion();
       Quaternion smoothRot = currentRot.Slerp(targetRot, weight);
 
-      Vector3 currentPosition = GlobalTransform.Origin;
-      GlobalTransform = new Transform3D(new Basis(smoothRot), currentPosition);
+      Vector3 currentPosition = state.Transform.Origin;
+      state.Transform = new Transform3D(new Basis(smoothRot), currentPosition);
 
       if (Mathf.Abs(currentRot.AngleTo(targetRot)) < 0.01f)
       {
@@ -336,8 +361,8 @@ public partial class UniversalInWorld : RigidBody3D, Interactable
 
     if (_applyNewVelocityState)
     {
-      LinearVelocity = _newLinearVelocityState;
-      AngularVelocity = _newAngularVelocityState;
+      state.LinearVelocity = _newLinearVelocityState;
+      state.AngularVelocity = _newAngularVelocityState;
       _applyNewVelocityState = false;
     }
   }
