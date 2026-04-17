@@ -203,7 +203,7 @@ theme_override_font_sizes/font_size = 80
 transform = Transform3D(-0.5, 0, -7.54979e-08, 0, 0.5, 0, 7.54979e-08, 0, -0.5, 0, -1, 0)
 
 [node name="Armature" parent="FullPlayerModel" index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.39621035e-08, 1.4612839, -0.09246683)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.06814477, 1.4612839, -0.21073867)
 
 [node name="Skeleton3D" parent="FullPlayerModel/Armature" index="0"]
 bones/0/rotation = Quaternion(-0.032100532, -0.005475809, -0.040682152, 0.9986414)
@@ -254,7 +254,7 @@ settings/0/enable_all_child_collisions = true
 settings/0/exclude_collision_count = 0
 
 [node name="SpringBoneCollisionCapsule3D" type="SpringBoneCollisionCapsule3D" parent="FullPlayerModel/Armature/Skeleton3D/HeadMovement"]
-transform = Transform3D(0.99868125, -0.014987394, -0.049102694, 0.02000846, 0.9944367, 0.10341704, 0.047279574, -0.1042631, 0.99342513, 0.061441198, -0.70698, 0.16694054)
+transform = Transform3D(0.99868125, -0.014987394, -0.049102694, 0.02000846, 0.9944367, 0.10341704, 0.047279574, -0.1042631, 0.99342513, 0.0614412, -0.70698, 0.16694054)
 bone_name = "head_2"
 bone = 3
 position_offset = Vector3(0, 0, 0)
@@ -279,7 +279,7 @@ settings/0/radius/value = 0.0
 settings/0/radius/damping_curve = null
 settings/0/stiffness/value = 2.0
 settings/0/stiffness/damping_curve = null
-settings/0/drag/value = 0.1
+settings/0/drag/value = 0.05
 settings/0/drag/damping_curve = null
 settings/0/gravity/value = 0.0
 settings/0/gravity/damping_curve = null
@@ -303,7 +303,7 @@ settings/0/radius/value = 0.0
 settings/0/radius/damping_curve = null
 settings/0/stiffness/value = 2.0
 settings/0/stiffness/damping_curve = null
-settings/0/drag/value = 0.1
+settings/0/drag/value = 0.05
 settings/0/drag/damping_curve = null
 settings/0/gravity/value = 0.0
 settings/0/gravity/damping_curve = null
