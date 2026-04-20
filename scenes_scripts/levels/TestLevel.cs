@@ -109,8 +109,8 @@ public partial class TestLevel : Node
     {
         if (Multiplayer.GetUniqueId() != 1 && Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connected)
         {
-            _clientNetworkInitialized = true;
-            OnClientConnected(); }
+            OnClientConnected();
+        }
     }
   }
 
@@ -183,7 +183,7 @@ public partial class TestLevel : Node
   {
     // The client runs this when they connect to the host
     // We use a flag to ensure it only runs once
-    if (Multiplayer.IsServer()) return; 
+    if (Multiplayer.IsServer() || _clientNetworkInitialized) return;
     
     _clientNetworkInitialized = true;
     _itemContainer.RpcId(1, nameof(ItemContainer.RequestWorldState));
@@ -358,8 +358,8 @@ public partial class TestLevel : Node
 
 		if (_motivator != null && _gameSaves.MotivatorOffset >= 0f)
 		{
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.StopMotivator));
 			_motivator.CurrentOffset = _gameSaves.MotivatorOffset;
+      GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.StopMotivator));
 		}
 
 		// Reset boat and players

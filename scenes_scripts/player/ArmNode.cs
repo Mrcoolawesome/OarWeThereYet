@@ -23,6 +23,7 @@ public partial class ArmNode : MeshInstance3D
 
 	// Current range of life preserver
 	private float _currLifepreserverRange = 0.0f;
+	private bool _isPullingLifepreserver = false;
 
 	// Node for the rope visual
 	private Node3D _ropeRoot = null;
@@ -155,13 +156,14 @@ public partial class ArmNode : MeshInstance3D
 				RequestDropItem(GlobalPosition, throwVelocity + platformVelocity);
 			}
 
-			if (Input.IsActionPressed("left_click"))
+			if (Input.IsActionJustPressed("left_click") && IsInstanceValid(_activeLifepreserverNode))
 			{
-				// If preserver is active, hold left_click to pull it closer continuously
-				if (IsInstanceValid(_activeLifepreserverNode))
-				{
-					RequestPullLifepreserver();
-				}
+				RequestSetLifepreserverPullState(true);
+			}
+
+			if (Input.IsActionJustReleased("left_click"))
+			{
+				RequestSetLifepreserverPullState(false);
 			}
 
 			if (Input.IsActionJustPressed("left_click"))
@@ -242,6 +244,17 @@ public partial class ArmNode : MeshInstance3D
 			activeLifepreserver.LinearVelocity = activeLifepreserver.LinearVelocity.Lerp(desiredVelocity, (float)delta * pullBlend);
 		}
 
+		if (_isPullingLifepreserver)
+		{
+			_currLifepreserverRange -= PullStrength;
+
+			if (_currLifepreserverRange <= RetractThreshold)
+			{
+				_isPullingLifepreserver = false;
+				RetractLifepreserver();
+			}
+		}
+
 		if (_capturedPlayerNode != null && IsInstanceValid(_activeLifepreserverNode) && _capturedPlayerNode.CurrPlayerState == Player.PlayerState.Standing)
 		{
 			_capturedPlayerNode.GlobalPosition = _activeLifepreserverNode.GlobalPosition;
@@ -287,24 +300,17 @@ public partial class ArmNode : MeshInstance3D
 		}
 	}
 
-	private void RequestPullLifepreserver()
+	private void RequestSetLifepreserverPullState(bool isPulling)
 	{
 		if (!IsMultiplayerAuthority()) return;
-		RpcId(1, MethodName.PullLifepreserver);
+		RpcId(1, MethodName.SetLifepreserverPullState, isPulling);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void PullLifepreserver()
+	private void SetLifepreserverPullState(bool isPulling)
 	{
 		if (!Multiplayer.IsServer()) return;
-		if (!IsInstanceValid(_activeLifepreserverNode)) return;
-
-		_currLifepreserverRange -= PullStrength;
-
-		if (_currLifepreserverRange <= RetractThreshold)
-		{
-			RetractLifepreserver();
-		}
+		_isPullingLifepreserver = isPulling && IsInstanceValid(_activeLifepreserverNode);
 	}
 
 	public void RequestToggleLifepreserverThrow(Vector3 throwPosition, Vector3 throwDirection)
@@ -373,6 +379,7 @@ public partial class ArmNode : MeshInstance3D
 	{
 		if (string.IsNullOrEmpty(nodeName))
 		{
+			_isPullingLifepreserver = false;
 			_activeLifepreserverNode = null;
 			if (_capturedPlayerNode != null)
 			{
@@ -581,6 +588,7 @@ public partial class ArmNode : MeshInstance3D
 	{
 		UniversalInWorld activePreserver = GetActiveLifepreserverNode();
 		if (activePreserver == null) return;
+		_isPullingLifepreserver = false;
 
 		// Teleport captured player to the holder's position plus offset, then reset rotation and node
 		if (_capturedPlayerNode != null)

@@ -124,7 +124,7 @@ public partial class Motivator : Area3D
       TickAudioSyncRetry(delta);
     }
 
-    if (IsMoving && Multiplayer.IsServer())
+    if (IsMoving)
     {
       CurrentOffset += Speed * (float)delta;
     }
@@ -183,6 +183,7 @@ public partial class Motivator : Area3D
     if (Multiplayer.IsServer())
     {
       StartAudioSync(true);
+      SyncMotivatorStateToPeers();
     }
     else
     {
@@ -200,11 +201,43 @@ public partial class Motivator : Area3D
     if (Multiplayer.IsServer())
     {
       StartAudioSync(false);
+      SyncMotivatorStateToPeers();
     }
     else
     {
       SetDoomPlaying(false);
     }
+  }
+
+  private void SyncMotivatorStateToPeers()
+  {
+    if (!Multiplayer.IsServer())
+    {
+      return;
+    }
+
+    foreach (long peerId in Multiplayer.GetPeers())
+    {
+      RpcId(peerId, nameof(ReceiveMotivatorState), CurrentOffset, IsMoving, Visible);
+    }
+  }
+
+  private void SyncMotivatorStateToPeer(long peerId)
+  {
+    if (!Multiplayer.IsServer())
+    {
+      return;
+    }
+
+    RpcId(peerId, nameof(ReceiveMotivatorState), CurrentOffset, IsMoving, Visible);
+  }
+
+  [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
+  private void ReceiveMotivatorState(float currentOffset, bool isMoving, bool isVisible)
+  {
+    CurrentOffset = currentOffset;
+    Visible = isVisible;
+    IsMoving = isMoving;
   }
 
   private void StartAudioSync(bool shouldPlay)
@@ -302,6 +335,7 @@ public partial class Motivator : Area3D
     _audioSyncAwaitingAck = true;
     _audioSyncRetryTimer = 0.0;
     RpcId(peerId, nameof(ReceiveDoomAudioState), _audioSyncSequence, _desiredDoomPlaying);
+    SyncMotivatorStateToPeer(peerId);
   }
 
   [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
