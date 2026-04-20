@@ -94,7 +94,7 @@ func _get_friends_lobbies() -> void:
 		var game_info: Dictionary = Steam.getFriendGamePlayed(friend_steam_id)
 	
 		if game_info.has("lobby") and game_info["lobby"] != 0:
-			if game_info.has("id") and game_info["id"] == 4563080:
+			if game_info.has("id") and game_info["id"] == 480:
 				var lobby_id = game_info["lobby"]
 				
 				# Prevents 4 friends in the same server from showing 4 duplicate servers
