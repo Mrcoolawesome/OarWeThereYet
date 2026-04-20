@@ -1,12 +1,11 @@
-[gd_scene load_steps=10 format=4 uid="uid://ctkcbfftcgncc"]
+[gd_scene load_steps=9 format=4 uid="uid://ctkcbfftcgncc"]
 
 [ext_resource type="PackedScene" uid="uid://bspwtetc0fejm" path="res://art/models/fish.blend" id="1_4y3fb"]
 [ext_resource type="Script" uid="uid://bsd5p5eaewu1r" path="res://scenes_scripts/motivator/Motivator.cs" id="1_31aj4"]
 [ext_resource type="Shader" uid="uid://bu4ja6x7tylt8" path="res://art/shaders/outline.gdshader" id="3_y2ys1"]
-[ext_resource type="AudioStream" uid="uid://cm1q88mjmkpjb" path="res://art/audio/ones-that-i-want/fish/nordic-horn-single.wav" id="4_epm6i"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_31aj4"]
-size = Vector3(1, 67.365, 121.72)
+size = Vector3(1, 100, 500)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_epm6i"]
 render_priority = 0
@@ -130,7 +129,6 @@ mesh = SubResource("ArrayMesh_epm6i")
 replication_config = SubResource("SceneReplicationConfig_motivator")
 
 [node name="Doom" type="AudioStreamPlayer3D" parent="."]
-stream = ExtResource("4_epm6i")
 volume_db = 50.0
 unit_size = 200.0
 max_db = 6.0
