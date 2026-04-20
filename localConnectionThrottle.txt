@@ -1,0 +1,5 @@
+# Simulate delay and packet loss for local testing
+sudo tc qdisc add dev lo root netem delay 150ms loss 5%
+
+# Reset delay and packet loss
+sudo tc qdisc del dev lo root
