@@ -228,9 +228,7 @@ func _load_all_resolutions() -> void:
   # load in each resolution into the dropdown that are smaller than their displays
   var index: int = 0
   for resolution in resolutions_array:
-    # gemini made this boolean i don't really get why it works but it does so whatever
-    var aspect_is_same: bool = (resolution.x * max_screen_size.y) == (max_screen_size.x * resolution.y)
-    if (resolution.x <= max_screen_size.x && resolution.y <= max_screen_size.y) && aspect_is_same:
+    if resolution.x <= max_screen_size.x && resolution.y <= max_screen_size.y:
       # turn it into a string
       var string_display_version: String = str(resolution.x) + "x" + str(resolution.y)
       resolution_dropdown.add_item(string_display_version, index) # need to keep track of the actual index so i know what they're selecting
