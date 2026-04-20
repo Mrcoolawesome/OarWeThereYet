@@ -188,6 +188,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// loudness caling variables
   public float _targetHeadScale = 1.0f;
   private float _currentHeadScale = 1.0f;
+  private float _lastSentLoudness = -1.0f;
+  private double _voiceLoudnessRpcTimer = 0.0;
+
+	[ExportGroup("Voice Sync Settings")]
+	[Export] public float VoiceLoudnessRpcInterval = 0.05f;
+	[Export] public float VoiceLoudnessRpcThreshold = 0.01f;
 
 	// END GAME UI
 	private Control _endGameUi;
@@ -399,6 +405,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
   //PROCESS CODE AND ALL ASSOCIATED FUNCTIONS
   public override void _Process(double delta)
   {
+		_voiceLoudnessRpcTimer += delta;
+
 		// If we are looking at someone else, and their synced color just arrived over the network:
     if (!IsMultiplayerAuthority() && CurrentColorHex != _lastAppliedColor && CurrentColorHex != "")
     {
@@ -1807,8 +1815,17 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     // ONLY the local player listens to their own mic volume signal.
     if (IsMultiplayerAuthority())
     {
-      // Tell EVERYONE (including ourselves via CallLocal) to change the target scale
-      Rpc(nameof(RpcUpdateHeadScale), loudness);
+			bool loudnessChangedEnough = _lastSentLoudness < 0.0f || Mathf.Abs(loudness - _lastSentLoudness) >= VoiceLoudnessRpcThreshold;
+			bool canSendNow = _voiceLoudnessRpcTimer >= VoiceLoudnessRpcInterval;
+
+			if (loudnessChangedEnough && canSendNow)
+			{
+				_lastSentLoudness = loudness;
+				_voiceLoudnessRpcTimer = 0.0;
+
+				// Tell EVERYONE (including ourselves via CallLocal) to change the target scale
+				Rpc(nameof(RpcUpdateHeadScale), loudness);
+			}
     }
   }
 

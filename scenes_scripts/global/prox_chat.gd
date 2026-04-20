@@ -14,6 +14,10 @@ var local_playback: bool = false
 
 var buffer_target_seconds: float = 0.1
 var frames_to_buffer: int = 0
+var voice_packet_target_frames: int = 0
+var pending_voice_frames: PackedVector2Array = PackedVector2Array()
+var voice_send_timer: float = 0.0
+var voice_send_interval: float = 0.02
 
 var active_players: Dictionary[int, PlayerAudioData] = {}
 var capture_effect: AudioEffectCapture
@@ -50,8 +54,9 @@ func initialize_voice():
     push_error("AudioEffectCapture not found on 'MicInput' bus! Voice chat will not work.")
     return
     
-  current_sample_rate = AudioServer.get_mix_rate()
+  current_sample_rate = int(AudioServer.get_mix_rate())
   frames_to_buffer = int(current_sample_rate * buffer_target_seconds)
+  voice_packet_target_frames = max(1, int(current_sample_rate * voice_send_interval))
   set_process(true)
 
 func _apply_saved_input_device_preference() -> void:
@@ -66,31 +71,17 @@ func stop_voice():
   set_process(false)
 
 func _process(_delta: float) -> void:
+  voice_send_timer += _delta
+
   # 1. FETCH VOICE DATA FROM GODOT MIC BUS
   if capture_effect:
     var frames_available = capture_effect.get_frames_available()
     if frames_available > 0:
       var audio_buffer: PackedVector2Array = capture_effect.get_buffer(frames_available)
-      
-      # Compress to 16-bit mono to save network bandwidth (similar to Steam)
-      var byte_array = PackedByteArray()
-      byte_array.resize(audio_buffer.size() * 2)
-      
-      for i in range(audio_buffer.size()):
-        # Mix down to mono
-        var sample = (audio_buffer[i].x + audio_buffer[i].y) / 2.0 
-        var raw_value = int(clamp(sample, -1.0, 1.0) * 32767.0)
-        byte_array.encode_s16(i * 2, raw_value)
-      
-      # SAFETY CHECK: Only send the RPC if we are actually connected to a multiplayer session
-      send_voice.rpc(byte_array)
-      
-      if local_playback:
-        process_voice(byte_array, multiplayer.get_unique_id())
-        
-      # CALCULATE LOCAL LOUDNESS AND EMIT SIGNAL
-      var loudness = calculate_loudness(byte_array, byte_array.size())
-      GlobalSignalServer.emit_signal("PlayerLoudness", loudness)
+      pending_voice_frames.append_array(audio_buffer)
+
+  if voice_send_timer >= voice_send_interval and not pending_voice_frames.is_empty():
+    _flush_pending_voice()
 
   # 2. FEED THE GENERATORS
   for player_id in active_players.keys():
@@ -141,7 +132,7 @@ func process_voice(voice_buffer: PackedByteArray, player: int):
       return
 
   var p_data = active_players[player]
-  var frame_count = voice_buffer.size() / 2
+  var frame_count: int = int(voice_buffer.size() / 2.0)
   
   var audio_frames: PackedVector2Array = PackedVector2Array()
   audio_frames.resize(frame_count) 
@@ -153,6 +144,36 @@ func process_voice(voice_buffer: PackedByteArray, player: int):
     audio_frames[i] = Vector2(amplitude, amplitude)
 
   p_data.buffer.append_array(audio_frames)
+
+func _flush_pending_voice() -> void:
+  if pending_voice_frames.is_empty():
+    voice_send_timer = 0.0
+    return
+
+  var send_frames: int = int(min(voice_packet_target_frames, pending_voice_frames.size()))
+  var audio_chunk := pending_voice_frames.slice(0, send_frames)
+  pending_voice_frames = pending_voice_frames.slice(send_frames)
+
+  # Compress to 16-bit mono in fixed-size chunks so we do not emit one RPC per capture tick.
+  var byte_array = PackedByteArray()
+  byte_array.resize(audio_chunk.size() * 2)
+
+  for i in range(audio_chunk.size()):
+    var sample = (audio_chunk[i].x + audio_chunk[i].y) / 2.0
+    var raw_value = int(clamp(sample, -1.0, 1.0) * 32767.0)
+    byte_array.encode_s16(i * 2, raw_value)
+
+  if not byte_array.is_empty() and multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.ConnectionStatus.CONNECTION_CONNECTED:
+    send_voice.rpc(byte_array)
+
+  if local_playback and not byte_array.is_empty():
+    process_voice(byte_array, multiplayer.get_unique_id())
+
+  if not byte_array.is_empty():
+    var loudness = calculate_loudness(byte_array, byte_array.size())
+    GlobalSignalServer.emit_signal("PlayerLoudness", loudness)
+
+  voice_send_timer = 0.0
 
 func setup_player_audio(player_id: int) -> bool:
   # --- WE CHANGED THIS TO get_node_or_null ---
@@ -178,7 +199,7 @@ func send_voice(voice_buffer: PackedByteArray):
 # MATH HELPER FOR AUDIO VOLUME
 func calculate_loudness(voice_buffer: PackedByteArray, size: int) -> float:
   var sum: float = 0.0
-  var num_samples = size / 2
+  var num_samples: int = int(size / 2.0)
   for i in range(num_samples):
     var raw_value: int = voice_buffer.decode_s16(i * 2)
     # Normalize to a 0.0 - 1.0 range based on the 16-bit audio limit
