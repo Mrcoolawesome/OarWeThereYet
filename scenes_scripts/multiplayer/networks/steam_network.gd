@@ -1,6 +1,6 @@
 extends Node
 
-@export var simulate_bad_connection: bool = false
+@export var simulate_bad_connection: bool = true
 var multiplayer_peer: SteamMultiplayerPeer = SteamMultiplayerPeer.new()
 var _hosted_lobby_id = 0
 var _max_lobby_members = 4
