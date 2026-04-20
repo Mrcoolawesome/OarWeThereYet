@@ -86,7 +86,7 @@ func _process(_delta: float) -> void:
         is_hosting = false
 
         # initialize voice
-        # ProxChat.initialize_voice()
+        ProxChat.initialize_voice()
 
       elif pending_host_id != 0:
         # Validate over multiple frames to avoid race conditions when host closes right as loading ends.
@@ -119,7 +119,7 @@ func _start_pending_client_connect() -> void:
   if !multiplayer.server_disconnected.is_connected(_on_server_disconnected):
     multiplayer.server_disconnected.connect(_on_server_disconnected)
   # initialize voice
-  # ProxChat.initialize_voice()
+  ProxChat.initialize_voice()
   GlobalSignalServer.emit_signal("DoneLoadingMap")
 
 func _is_pending_host_available() -> bool:
@@ -305,7 +305,7 @@ func _on_server_disconnected():
 
 func cleanup_network_state() -> void:
   print("Cleaning up network state")
-  # ProxChat.stop_voice()
+  ProxChat.stop_voice()
   print("stopped voice")
 
   # 1. SHUT DOWN NETWORK FIRST (Stop incoming RPCs/Signals)
