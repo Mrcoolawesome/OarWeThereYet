@@ -57,9 +57,9 @@ func _ready() -> void:
 
   if simulate_bad_connection:
     # Add 150ms delay
-    Steam.setConnectionConfigValueFloat(Steam.NETWORKING_CONFIG_SCOPE_GLOBAL, Steam.NETWORKING_CONFIG_FAKE_PACKET_LAG_SEND, 150)
+    Steam.setConnectionConfigValueFloat(Steam.NETWORKING_CONFIG_SCOPE_CONNECTION, Steam.NETWORKING_CONFIG_FAKE_PACKET_LAG_SEND, 150)
     # Add 10% packet loss
-    Steam.setConnectionConfigValueFloat(Steam.NETWORKING_CONFIG_SCOPE_GLOBAL, Steam.NETWORKING_CONFIG_FAKE_PACKET_LOSS_SEND, 100.0)
+    Steam.setConnectionConfigValueFloat(Steam.NETWORKING_CONFIG_SCOPE_CONNECTION, Steam.NETWORKING_CONFIG_FAKE_PACKET_LOSS_SEND, 90.0)
 
   # connect the 'on_lobby_created' function to the lobby created signal
   Steam.lobby_created.connect(_on_lobby_created)
