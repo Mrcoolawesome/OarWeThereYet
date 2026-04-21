@@ -15,6 +15,7 @@ signal delete_save
 
 @onready var delete_button: Button = $PanelContainer/VBoxContainer/MarginContainer/DeleteButton
 @onready var speed_selecter: VBoxContainer = $PanelContainer/VBoxContainer/MarginContainer/SpeedSelecter
+@onready var host_button: Button = $PanelContainer/VBoxContainer/MarginContainer3/HostButton
 
 const SAVE_DIR := "user://saves/"
 
@@ -24,9 +25,12 @@ func setup_for_save() -> void:
 	if FileAccess.file_exists(save_path):
 		delete_button.visible = true
 		speed_selecter.visible = false
+		host_button.disabled = false
 	else:
 		delete_button.visible = false
 		speed_selecter.visible = true
+		GlobalVariables.motivator_speed = -1
+		host_button.disabled = true
 
 
 func _ready() -> void:
@@ -89,11 +93,15 @@ func _on_cancel_deletion() -> void:
 
 
 func _on_fast_pressed() -> void:
-	pass # Replace with function body.
+	GlobalVariables.motivator_speed = 2
+	host_button.disabled = false
 
 
 func _on_medium_pressed() -> void:
-	pass # Replace with function body.
+	GlobalVariables.motivator_speed = 1
+	host_button.disabled = false
+
 
 func _on_slow_pressed() -> void:
-	pass # Replace with function body.
+	GlobalVariables.motivator_speed = 0
+	host_button.disabled = false
