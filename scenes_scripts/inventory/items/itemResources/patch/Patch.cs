@@ -10,18 +10,7 @@ public partial class Patch : ItemAction
 
     if (target is Hole hole)
     {
-      hole.Rpc(nameof(Hole.RequestPatch));
-
-      // Consume one patch
-      int newAmount = arm.Item.Amount - 1;
-      if (newAmount <= 0)
-      {
-        arm.Rpc(nameof(ArmNode.SetItem), "", 0);
-      }
-      else
-      {
-        arm.Rpc(nameof(ArmNode.SetItem), arm.Item.Data.ResourcePath, newAmount);
-      }
+      hole.Rpc(nameof(Hole.RequestPatch), arm.GetPath().ToString());
     }
   }
 }
