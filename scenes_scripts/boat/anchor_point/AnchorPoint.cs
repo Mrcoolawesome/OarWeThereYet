@@ -52,6 +52,8 @@ public partial class AnchorPoint : StaticBody3D, Interactable
     {
       _ropeRoot.QueueFree();
     }
+
+    GlobalSignalServer.Instance.SetAnchor -= RequestSetAnchor;
   }
 
   public override void _Process(double delta)
