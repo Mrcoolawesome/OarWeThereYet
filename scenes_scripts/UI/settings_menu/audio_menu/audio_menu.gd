@@ -22,6 +22,7 @@ var elapsed_refresh_time: float = 0.0
 func _ready() -> void:
   # Lock the signals while we load the UI
   is_loading_ui = true
+  audio_input_device_dropdown.visible = false
   
   # load the settings prefrences
   settings_prefrences = UserSettingPrefrences.load_or_create()
