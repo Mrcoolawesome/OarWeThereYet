@@ -383,8 +383,8 @@ bus = &"PlayerMovementSounds"
 bus = &"PlayerMovementSounds"
 
 [node name="AudioInput" type="AudioStreamPlayer3D" parent="AudioStuff"]
+visible = false
 stream = SubResource("AudioStreamMicrophone_fqj0r")
-autoplay = true
 bus = &"MicInput"
 
 [node name="ProximityChatOutput" type="AudioStreamPlayer3D" parent="AudioStuff"]
