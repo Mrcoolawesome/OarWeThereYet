@@ -60,6 +60,7 @@ public partial class Motivator : Area3D
 
     GlobalSignalServer.Instance.StartMotivator += OnStartMotivator;
     GlobalSignalServer.Instance.StopMotivator += OnStopMotivator;
+    GlobalSignalServer.Instance.UpdateMotivatorSpeed += OnUpdateMotivatorSpeed;
     _subscribedToMotivatorSignals = true;
   }
 
@@ -96,6 +97,8 @@ public partial class Motivator : Area3D
     _currentScale = 1.0f;
     UpdateAnimationState();
 
+    Speed = (int)_globalVars.Get("motivator_speed");
+
     if (Multiplayer.IsServer())
     {
       Multiplayer.PeerConnected += OnPeerConnected;
@@ -108,6 +111,7 @@ public partial class Motivator : Area3D
     {
       GlobalSignalServer.Instance.StartMotivator -= OnStartMotivator;
       GlobalSignalServer.Instance.StopMotivator -= OnStopMotivator;
+      GlobalSignalServer.Instance.UpdateMotivatorSpeed -= OnUpdateMotivatorSpeed;
     }
 
     _subscribedToMotivatorSignals = false;
@@ -118,7 +122,7 @@ public partial class Motivator : Area3D
     }
   }
 
-  public override void _Process(double delta)
+  private void OnUpdateMotivatorSpeed()
   {
     Speed = (int)_globalVars.Get("motivator_speed");
   }

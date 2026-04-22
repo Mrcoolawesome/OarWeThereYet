@@ -357,6 +357,7 @@ public partial class TestLevel : Node
 		_itemContainer.ReceiveWorldItems(_gameSaves.WorldItems);
 
     _globalVars.Set("motivator_speed", _gameSaves.MotivatorSpeed);
+    GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.UpdateMotivatorSpeed);
 
 		// Broadcast world items to all clients
 		_itemContainer.Rpc(ItemContainer.MethodName.ReceiveWorldItems, _gameSaves.WorldItems);
