@@ -123,7 +123,7 @@ func process_voice(raw_buffer: PackedByteArray, player: int):
 
 
 func setup_player_audio(player_id: int):
-	var stream_node: AudioStreamPlayer3D = get_node("/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStreamPlayer3D")
+	var stream_node: AudioStreamPlayer3D = get_node("/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStuff/ProximityChatOutput")
 	
 	if stream_node and stream_node.stream is AudioStreamGenerator:
 		stream_node.stream.mix_rate = current_sample_rate
