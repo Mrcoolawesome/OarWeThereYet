@@ -1,215 +1,157 @@
 extends Node
 
 class PlayerAudioData:
-  var stream: AudioStreamPlayer3D
-  var buffer: PackedVector2Array = PackedVector2Array()
-  # A mathematical tracker for how much audio Godot is currently holding
-  var unplayed_frames: float = 0.0 
-  
-  func _init(p_stream: AudioStreamPlayer3D):
-    stream = p_stream
+	var stream: AudioStreamPlayer3D
+	var buffer: PackedVector2Array = PackedVector2Array()
+	# NEW: A mathematical tracker for how much audio Godot is currently holding
+	var unplayed_frames: float = 0.0 
+	
+	func _init(p_stream: AudioStreamPlayer3D):
+		stream = p_stream
 
 var current_sample_rate: int = 48000
+var use_recommended_sample_rate: bool = true
 var local_playback: bool = false
 
 var buffer_target_seconds: float = 0.1
 var frames_to_buffer: int = 0
-var voice_packet_target_frames: int = 0
-var pending_voice_frames: PackedVector2Array = PackedVector2Array()
-var voice_send_timer: float = 0.0
-var voice_send_interval: float = 0.02
-
-const NETWORK_SAMPLE_RATE: int = 24000
-const NETWORK_PACKET_SECONDS: float = 0.02
 
 var active_players: Dictionary[int, PlayerAudioData] = {}
-var capture_effect: AudioEffectCapture
+
 
 func _ready() -> void:
-  if GlobalSignalServer and !GlobalSignalServer.is_connected("AssignInputDevice", Callable(self, "_on_assign_input_device")):
-    GlobalSignalServer.connect("AssignInputDevice", Callable(self, "_on_assign_input_device"))
+	set_process(false)
 
-  set_process(false)
-
-func _on_assign_input_device(device_name: String) -> void:
-  var available_devices: PackedStringArray = AudioServer.get_input_device_list()
-  if !available_devices.has(device_name):
-    push_warning("Requested mic input device not found: " + device_name)
-    return
-
-  AudioServer.input_device = device_name
-
-  # dump stale frames from the old device so capture starts clean
-  if capture_effect:
-    capture_effect.clear_buffer()
 
 func initialize_voice():
-  _apply_saved_input_device_preference()
-
-  var bus_idx = AudioServer.get_bus_index("MicInput")
-  if bus_idx != -1:
-    for i in range(AudioServer.get_bus_effect_count(bus_idx)):
-      if AudioServer.get_bus_effect(bus_idx, i) is AudioEffectCapture:
-        capture_effect = AudioServer.get_bus_effect(bus_idx, i)
-        break
-        
-  if not capture_effect:
-    push_error("AudioEffectCapture not found on 'MicInput' bus! Voice chat will not work.")
-    return
-    
-  # Use a fixed network sample rate so voice packet sizes stay predictable.
-  current_sample_rate = NETWORK_SAMPLE_RATE
-  frames_to_buffer = int(current_sample_rate * buffer_target_seconds)
-  voice_send_interval = NETWORK_PACKET_SECONDS
-  voice_packet_target_frames = max(1, int(current_sample_rate * voice_send_interval))
-  set_process(true)
-
-func _apply_saved_input_device_preference() -> void:
-  var settings_prefrences: UserSettingPrefrences = UserSettingPrefrences.load_or_create()
-  if settings_prefrences.input_device != "":
-    _on_assign_input_device(settings_prefrences.input_device)
+	Steam.startVoiceRecording()
+	get_sample_rate()
+	frames_to_buffer = int(current_sample_rate * buffer_target_seconds)
+	set_process(true)
 
 func stop_voice():
-  if capture_effect:
-    capture_effect.clear_buffer()
-  active_players.clear()
-  set_process(false)
+	Steam.stopVoiceRecording()
+	set_process(false)
+
+func get_sample_rate():
+	if use_recommended_sample_rate:
+		current_sample_rate = Steam.getVoiceOptimalSampleRate()
+	else:
+		current_sample_rate = 48000
+
 
 func _process(_delta: float) -> void:
-  voice_send_timer += _delta
+	# 1. FETCH VOICE DATA 
+	while true:
+		var voice_data: Dictionary = Steam.getVoice()
+		if voice_data['result'] == Steam.VOICE_RESULT_OK and voice_data['written'] > 0:
+			var raw_buffer = voice_data['buffer']
+			send_voice.rpc(raw_buffer)
+			
+			if local_playback:
+				process_voice(raw_buffer, multiplayer.get_unique_id())
+				
+			# --- NEW: CALCULATE LOCAL LOUDNESS AND EMIT SIGNAL ---
+			var decompressed_voice = Steam.decompressVoice(raw_buffer, current_sample_rate)
+			if decompressed_voice['result'] == Steam.VOICE_RESULT_OK and decompressed_voice['size'] > 0:
+				var loudness = calculate_loudness(decompressed_voice['uncompressed'], decompressed_voice['size'])
+				GlobalSignalServer.emit_signal("PlayerLoudness", loudness)
+			# -----------------------------------------------------
+		else:
+			break
 
-  # 1. FETCH VOICE DATA FROM GODOT MIC BUS
-  if capture_effect:
-    var frames_available = capture_effect.get_frames_available()
-    if frames_available > 0:
-      pending_voice_frames.append_array(capture_effect.get_buffer(frames_available))
+	# 2. FEED THE GENERATORS
+	for player_id in active_players.keys():
+		var p_data = active_players[player_id]
+		var stream: AudioStreamPlayer3D = p_data.stream
+		
+		if not stream.playing:
+			if p_data.buffer.size() >= frames_to_buffer:
+				stream.play()
+				p_data.unplayed_frames = 0.0 # Reset our custom tracker
+				
+		else:
+			var playback: AudioStreamGeneratorPlayback = stream.get_stream_playback()
+			if playback == null:
+				continue
+			
+			# MATH MAGIC: Subtract the exact number of frames Godot consumed during this delta tick
+			p_data.unplayed_frames -= current_sample_rate * _delta
+			if p_data.unplayed_frames < 0:
+				p_data.unplayed_frames = 0.0
+			
+			var frames_needed: int = playback.get_frames_available()
+			
+			if frames_needed > 0 and p_data.buffer.size() > 0:
+				var push_amount = min(frames_needed, p_data.buffer.size())
+				playback.push_buffer(p_data.buffer.slice(0, push_amount))
+				p_data.buffer = p_data.buffer.slice(push_amount)
+				
+				# Add the frames we just pushed to our tracker
+				p_data.unplayed_frames += push_amount
+				
+			# BULLETPROOF STARVATION CHECK:
+			# We only stop if our custom buffer is empty AND our math says Godot has finished playing everything
+			if p_data.buffer.is_empty() and p_data.unplayed_frames <= 0.0:
+				stream.stop()
 
-  if voice_send_timer >= voice_send_interval and not pending_voice_frames.is_empty():
-    _flush_pending_voice()
 
-  # 2. FEED THE GENERATORS
-  for player_id in active_players.keys():
-    var p_data = active_players[player_id]
-    
-    # Clean up disconnected players
-    if not is_instance_valid(p_data.stream):
-      active_players.erase(player_id)
-      continue
-      
-    var stream: AudioStreamPlayer3D = p_data.stream
-    
-    if not stream.playing:
-      if p_data.buffer.size() >= frames_to_buffer:
-        stream.play()
-        p_data.unplayed_frames = 0.0 # Reset our custom tracker
-        
-    else:
-      var playback: AudioStreamGeneratorPlayback = stream.get_stream_playback()
-      if playback == null:
-        continue
-      
-      # MATH MAGIC: Subtract the exact number of frames Godot consumed during this delta tick
-      p_data.unplayed_frames -= current_sample_rate * _delta
-      if p_data.unplayed_frames < 0:
-        p_data.unplayed_frames = 0.0
-      
-      var frames_needed: int = playback.get_frames_available()
-      
-      if frames_needed > 0 and p_data.buffer.size() > 0:
-        var push_amount = min(frames_needed, p_data.buffer.size())
-        playback.push_buffer(p_data.buffer.slice(0, push_amount))
-        p_data.buffer = p_data.buffer.slice(push_amount)
-        
-        # Add the frames we just pushed to our tracker
-        p_data.unplayed_frames += push_amount
-        
-      # BULLETPROOF STARVATION CHECK:
-      # We only stop if our custom buffer is empty AND our math says Godot has finished playing everything
-      if p_data.buffer.is_empty() and p_data.unplayed_frames <= 0.0:
-        stream.stop()
+func process_voice(raw_buffer: PackedByteArray, player: int):
+	var decompressed_voice: Dictionary = Steam.decompressVoice(raw_buffer, current_sample_rate)
 
-func process_voice(voice_buffer: PackedByteArray, player: int):
-  if not active_players.has(player):
-    # --- WE ADDED THIS ABORT CHECK ---
-    var setup_successful = setup_player_audio(player)
-    if not setup_successful:
-      return
+	if decompressed_voice['result'] != Steam.VOICE_RESULT_OK or decompressed_voice['size'] <= 0:
+		return
 
-  var p_data = active_players[player]
-  var frame_count = int(voice_buffer.size() / 2.0)
-  
-  var audio_frames: PackedVector2Array = PackedVector2Array()
-  audio_frames.resize(frame_count) 
-  
-  for i in range(frame_count):
-    var raw_value: int = voice_buffer.decode_s16(i * 2)
-    var amplitude: float = float(raw_value) / 32768.0
-    # Duplicate mono back into stereo for the 3D Audio Stream
-    audio_frames[i] = Vector2(amplitude, amplitude)
+	if not active_players.has(player):
+		setup_player_audio(player)
 
-  p_data.buffer.append_array(audio_frames)
+	var p_data = active_players[player]
+	var voice_buffer: PackedByteArray = decompressed_voice['uncompressed']
+	
+	var frame_count = decompressed_voice["size"] / 2
+	var audio_frames: PackedVector2Array = PackedVector2Array()
+	audio_frames.resize(frame_count) 
+	
+	var frame_idx = 0
+	for i in range(0, decompressed_voice["size"], 2):
+		var raw_value: int = voice_buffer.decode_s16(i)
+		var amplitude: float = float(raw_value) / 32768.0
+		audio_frames[frame_idx] = Vector2(amplitude, amplitude)
+		frame_idx += 1
 
-func _flush_pending_voice() -> void:
-  if pending_voice_frames.is_empty():
-    voice_send_timer = 0.0
-    return
+	p_data.buffer.append_array(audio_frames)
 
-  var send_frames: int = int(min(voice_packet_target_frames, pending_voice_frames.size()))
-  var audio_chunk := pending_voice_frames.slice(0, send_frames)
-  pending_voice_frames = pending_voice_frames.slice(send_frames)
 
-  # Compress to 16-bit mono in fixed-size chunks so we do not emit one RPC per capture tick.
-  var byte_array := PackedByteArray()
-  byte_array.resize(audio_chunk.size() * 2)
+func setup_player_audio(player_id: int):
+	var stream_node: AudioStreamPlayer3D = get_node("/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStreamPlayer3D")
+	
+	if stream_node and stream_node.stream is AudioStreamGenerator:
+		stream_node.stream.mix_rate = current_sample_rate
+		stream_node.stream.buffer_length = 0.1 # Keep this exactly at 0.1 for perfect tracking
+		
+		var player_data = PlayerAudioData.new(stream_node)
+		active_players[player_id] = player_data
+	else:
+		push_error("Could not find AudioStreamPlayer3D for player %s" % player_id)
 
-  for i in range(audio_chunk.size()):
-    var sample = (audio_chunk[i].x + audio_chunk[i].y) / 2.0
-    var raw_value = int(clamp(sample, -1.0, 1.0) * 32767.0)
-    byte_array.encode_s16(i * 2, raw_value)
-
-  if not byte_array.is_empty() and multiplayer.multiplayer_peer != null and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.ConnectionStatus.CONNECTION_CONNECTED:
-    send_voice.rpc(byte_array)
-
-  if local_playback and not byte_array.is_empty():
-    process_voice(byte_array, multiplayer.get_unique_id())
-
-  if not byte_array.is_empty():
-    var loudness = calculate_loudness(byte_array, byte_array.size())
-    GlobalSignalServer.emit_signal("PlayerLoudness", loudness)
-
-  voice_send_timer = 0.0
-
-func setup_player_audio(player_id: int) -> bool:
-  # --- WE CHANGED THIS TO get_node_or_null ---
-  var stream_path = "/root/GameManager/Level/StylizedMap/" + str(player_id) + "/AudioStreamPlayer3D"
-  var stream_node: AudioStreamPlayer3D = get_node_or_null(stream_path)
-  
-  if stream_node and stream_node.stream is AudioStreamGenerator:
-    stream_node.stream.mix_rate = current_sample_rate
-    stream_node.stream.buffer_length = 0.1 
-    
-    var player_data = PlayerAudioData.new(stream_node)
-    active_players[player_id] = player_data
-    return true
-  else:
-    return false # Safely fail without pushing an error
 
 @rpc("any_peer", "call_remote", "unreliable", 1)
 func send_voice(voice_buffer: PackedByteArray):
-  var sender_id = multiplayer.get_remote_sender_id()
-  if sender_id != multiplayer.get_unique_id():
-    process_voice(voice_buffer, sender_id)
+	var sender_id = multiplayer.get_remote_sender_id()
+	if sender_id != multiplayer.get_unique_id():
+		process_voice(voice_buffer, sender_id)
 
-# MATH HELPER FOR AUDIO VOLUME
+
+# --- NEW: MATH HELPER FOR AUDIO VOLUME ---
 func calculate_loudness(voice_buffer: PackedByteArray, size: int) -> float:
-  var sum: float = 0.0
-  var num_samples = int(size / 2.0)
-  for i in range(num_samples):
-    var raw_value: int = voice_buffer.decode_s16(i * 2)
-    # Normalize to a 0.0 - 1.0 range based on the 16-bit audio limit
-    var amplitude: float = abs(float(raw_value) / 32768.0)
-    sum += amplitude
-  
-  if num_samples > 0:
-    return sum / float(num_samples)
-  return 0.0
+	var sum: float = 0.0
+	var num_samples = size / 2
+	for i in range(0, size, 2):
+		var raw_value: int = voice_buffer.decode_s16(i)
+		# Normalize to a 0.0 - 1.0 range based on the 16-bit audio limit
+		var amplitude: float = abs(float(raw_value) / 32768.0)
+		sum += amplitude
+	
+	if num_samples > 0:
+		return sum / float(num_samples)
+	return 0.0

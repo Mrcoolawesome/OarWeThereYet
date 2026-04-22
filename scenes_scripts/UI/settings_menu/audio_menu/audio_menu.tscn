@@ -62,6 +62,7 @@ StartingValue = 100.0
 SliderLabelText = "Character Volume"
 
 [node name="MicInputDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_08ngt")]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 LabelText = "Mic Input"
