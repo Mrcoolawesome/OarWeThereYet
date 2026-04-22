@@ -202,6 +202,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private AudioStreamPlayer3D _playerHitSwoosh;
 	private AudioStreamPlayer3D _playerHitPlayer;
 	private AudioStreamPlayer3D _playerHitBoat;
+	private float _walkingOnBoatBaseVolumeDb = 0.0f;
+	private float _walkingOnGroundBaseVolumeDb = 0.0f;
 
 	// under water view
 	private Control _underWaterPOV;
@@ -286,6 +288,8 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		_jumpAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/Jump");
 		_walkingOnBoatAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/BoatWalking");
 		_walkingOnGroundAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/WorldWalkingSingle");
+		_walkingOnBoatBaseVolumeDb = _walkingOnBoatAudio.VolumeDb;
+		_walkingOnGroundBaseVolumeDb = _walkingOnGroundAudio.VolumeDb;
 		_treadingWaterAudio = GetNode<AudioStreamPlayer3D>("AudioStuff/TreadingWater");
 		_endGameMusic = GetNode<AudioStreamPlayer>("AudioStuff/Endgame");
 		_underwater = GetNode<AudioStreamPlayer>("AudioStuff/Underwater");
@@ -943,6 +947,9 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private void ApplyAudioFromGates()
 	{
 		float audioSpeed = Mathf.Max(0.01f, MovementAudioPitchScale);
+		bool isFastCrouchWalkAudio = audioSpeed > 1.0f;
+		_walkingOnBoatAudio.VolumeDb = isFastCrouchWalkAudio ? _walkingOnBoatBaseVolumeDb - 5.0f : _walkingOnBoatBaseVolumeDb;
+		_walkingOnGroundAudio.VolumeDb = isFastCrouchWalkAudio ? _walkingOnGroundBaseVolumeDb - 5.0f : _walkingOnGroundBaseVolumeDb;
 
 		if (PlayerHitSwooshAudioGate)
 		{
