@@ -118,8 +118,8 @@ func _load_ui_stuff() -> void:
   # Load all the resolutions into the resolution dropdown unconditionally first
   _load_all_resolutions()
   
-  # only display this if they've selected either windowed or fullscreen
-  if settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_WINDOWED or settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_FULLSCREEN:
+  # Hide only in exclusive fullscreen; keep available in borderless and windowed.
+  if settings_prefrences.display_mode != DisplayServer.WINDOW_MODE_FULLSCREEN:
     resolution_dropdown.visible = true # make it visible
     # load the current resolution into the dropdown menu
     # get the index of the resolution in the table, which will correlate to the index in the dropdown
@@ -130,7 +130,7 @@ func _load_ui_stuff() -> void:
       # If the current resolution isn't in our array (e.g. odd screen size), default to highest available
       resolution_dropdown.DefaultItem = 0
   else:
-    # make it invisible if they're in borderless mode where resolution is locked to screen size
+    # make it invisible in exclusive fullscreen
     resolution_dropdown.visible = false
     
   # VSYNC DROPDOWN
@@ -201,15 +201,13 @@ func _on_screen_mode_dropdown_item_selected(item: int) -> void:
   match converted_value:
     0:
       new_display_mode = DisplayServer.WINDOW_MODE_FULLSCREEN
-      # make the resoution dropdown visible
-      resolution_dropdown.visible = true
+      # hide resolution in fullscreen
+      resolution_dropdown.visible = false
     1:  
       # this is fullscreen borderless
       new_display_mode = DisplayServer.WINDOW_MODE_MAXIMIZED
       borderless_enable = true
-      resolution_dropdown.visible = false
-      # set the display resolution to be the full resolution
-      settings_prefrences.resolution = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
+      resolution_dropdown.visible = true
     2: 
       new_display_mode = DisplayServer.WINDOW_MODE_WINDOWED
       resolution_dropdown.visible = true
