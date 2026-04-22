@@ -27,8 +27,6 @@ public partial class InteractRay : RayCast3D
         {
           hitObject = io;
 
-          if (hitObject.PromptMessage == "Sit" && Player.IsSwimming) return;
-
           _prompt.Text = hitObject.GetMessage();
         
           if (Input.IsActionJustPressed(hitObject.PromptInput))
