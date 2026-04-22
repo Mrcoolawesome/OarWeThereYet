@@ -23,7 +23,27 @@ func apply_graphics_settings(user_prefs: UserSettingPrefrences) -> void:
     get_viewport().msaa_3d = user_prefs.msaa_mode
     DisplayServer.window_set_mode(user_prefs.display_mode)
     DisplayServer.window_set_flag(user_prefs.display_flag, user_prefs.borderless_enable) # this sets the gvien flag to false or true
-    get_window().size = user_prefs.resolution # this is the correct way of doing it so that godot knows that the resolution has been changed
+
+    var target_resolution: Vector2i = user_prefs.resolution
+    if user_prefs.borderless_enable and user_prefs.display_mode != DisplayServer.WINDOW_MODE_FULLSCREEN:
+        var current_screen: int = DisplayServer.window_get_current_screen()
+        var screen_size: Vector2i = DisplayServer.screen_get_size(current_screen)
+
+        # Keep borderless window fully visible and centered on the active display.
+        target_resolution = Vector2i(
+            min(target_resolution.x, screen_size.x),
+            min(target_resolution.y, screen_size.y)
+        )
+
+        get_window().size = target_resolution
+        var centered_position: Vector2i = Vector2i(
+            int((screen_size.x - target_resolution.x) / 2.0),
+            int((screen_size.y - target_resolution.y) / 2.0)
+        )
+        DisplayServer.window_set_position(centered_position)
+    else:
+        get_window().size = target_resolution # this is the correct way of doing it so that godot knows that the resolution has been changed
+
     GlobalSignalServer.emit_signal("ApplyPlayerFov", clamped_fov)
     
     # apply basic graphics settings

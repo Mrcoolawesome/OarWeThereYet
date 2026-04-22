@@ -2438,5 +2438,6 @@ shadow_blur = 1.508
 
 [node name="AllAroundTheTable" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("13_13buo")
+volume_db = -5.0
 autoplay = true
 bus = &"Music"

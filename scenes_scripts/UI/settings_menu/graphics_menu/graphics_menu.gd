@@ -204,8 +204,8 @@ func _on_screen_mode_dropdown_item_selected(item: int) -> void:
       # hide resolution in fullscreen
       resolution_dropdown.visible = false
     1:  
-      # this is fullscreen borderless
-      new_display_mode = DisplayServer.WINDOW_MODE_MAXIMIZED
+      # this is borderless windowed so custom resolution can be centered on-screen
+      new_display_mode = DisplayServer.WINDOW_MODE_WINDOWED
       borderless_enable = true
       resolution_dropdown.visible = true
     2: 

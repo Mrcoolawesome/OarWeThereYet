@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=4 uid="uid://dmth1b1qymst1"]
+[gd_scene load_steps=33 format=4 uid="uid://dmth1b1qymst1"]
 
 [ext_resource type="Script" uid="uid://vjdtri2npbkf" path="res://scenes_scripts/player/Player.cs" id="1_g6k8r"]
 [ext_resource type="PackedScene" uid="uid://baso7rmgvqb8h" path="res://scenes_scripts/interact/interact_ray.tscn" id="2_boad6"]
@@ -12,6 +12,9 @@
 [ext_resource type="PackedScene" uid="uid://c5qyjwmlp4xyw" path="res://scenes_scripts/UI/inventory_UI/InventoryUI.tscn" id="8_a5pl4"]
 [ext_resource type="PackedScene" uid="uid://c5od8jurojwbs" path="res://scenes_scripts/floatable/water-physics.tscn" id="10_qjplb"]
 [ext_resource type="PackedScene" uid="uid://cfvlihgonijke" path="res://scenes_scripts/UI/end_screen/end-screen.tscn" id="12_33s6o"]
+[ext_resource type="AudioStream" uid="uid://b3xhcdklgycpb" path="res://art/audio/ones-that-i-want/walking/world-walking-single.wav" id="13_klt8r"]
+[ext_resource type="AudioStream" uid="uid://esphyok7v4fb" path="res://art/audio/ones-that-i-want/walking/boat-walking.wav" id="14_n73fb"]
+[ext_resource type="AudioStream" uid="uid://dkhy8nmbdgslo" path="res://art/audio/ones-that-i-want/swimming/treading-water.wav" id="15_k3sd5"]
 [ext_resource type="AudioStream" uid="uid://bwa6ameabfexi" path="res://art/audio/ones-that-i-want/endgame-sound/endgame.wav" id="16_4b7ak"]
 [ext_resource type="AudioStream" uid="uid://dxmswxaxydctc" path="res://art/audio/ones-that-i-want/player-hit/bell-hit-sound.wav" id="17_5tvsi"]
 [ext_resource type="AudioStream" uid="uid://bvi6q1jcgixj2" path="res://art/audio/ones-that-i-want/underwater/underwater.wav" id="17_lvkhp"]
@@ -374,12 +377,17 @@ stream = SubResource("AudioStreamWAV_8u33c")
 bus = &"PlayerMovementSounds"
 
 [node name="WorldWalkingSingle" type="AudioStreamPlayer3D" parent="AudioStuff"]
+stream = ExtResource("13_klt8r")
+volume_db = -20.0
 bus = &"PlayerMovementSounds"
 
 [node name="BoatWalking" type="AudioStreamPlayer3D" parent="AudioStuff"]
+stream = ExtResource("14_n73fb")
+volume_db = -20.0
 bus = &"PlayerMovementSounds"
 
 [node name="TreadingWater" type="AudioStreamPlayer3D" parent="AudioStuff"]
+stream = ExtResource("15_k3sd5")
 bus = &"PlayerMovementSounds"
 
 [node name="AudioInput" type="AudioStreamPlayer3D" parent="AudioStuff"]
@@ -405,12 +413,11 @@ stream = ExtResource("18_klt8r")
 
 [node name="Endgame" type="AudioStreamPlayer" parent="AudioStuff"]
 stream = ExtResource("16_4b7ak")
-volume_db = 20.0
+volume_db = 5.0
 bus = &"Music"
 
 [node name="Underwater" type="AudioStreamPlayer" parent="AudioStuff"]
 stream = ExtResource("17_lvkhp")
-volume_db = 5.0
 bus = &"PlayerMovementSounds"
 
 [node name="AudioSynchronizer" type="MultiplayerSynchronizer" parent="AudioStuff"]
