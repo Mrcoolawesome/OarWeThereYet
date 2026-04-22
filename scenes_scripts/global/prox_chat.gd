@@ -63,6 +63,10 @@ func _process(_delta: float) -> void:
 	# 2. FEED THE GENERATORS
 	for player_id in active_players.keys():
 		var p_data = active_players[player_id]
+		if p_data == null or !is_instance_valid(p_data.stream) or !p_data.stream.is_inside_tree():
+			active_players.erase(player_id)
+			continue
+
 		var stream: AudioStreamPlayer3D = p_data.stream
 		
 		if not stream.playing:

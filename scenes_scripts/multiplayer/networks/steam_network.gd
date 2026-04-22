@@ -280,7 +280,8 @@ func _receive_player_color(target_player_id: int, color_hex: String) -> void:
 '''
   Runs on host when a client leaves
 '''
-func _remove_player(id : int):    
+func _remove_player(id : int):
+  print("hola")
   var active_level = level_container.get_children()[0];
   var player_node = active_level.get_node_or_null(str(id)) # recursively looks for the player
   
