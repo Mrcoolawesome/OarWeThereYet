@@ -13,6 +13,25 @@ signal delete_save
 # the deletion confirm page
 @onready var deletion_confirm_page: Control = $DeletionConfirmPage
 
+@onready var delete_button: Button = $PanelContainer/VBoxContainer/MarginContainer/DeleteButton
+@onready var speed_selecter: VBoxContainer = $PanelContainer/VBoxContainer/MarginContainer/SpeedSelecter
+@onready var host_button: Button = $PanelContainer/VBoxContainer/MarginContainer3/HostButton
+
+const SAVE_DIR := "user://saves/"
+
+func setup_for_save() -> void:
+	var save_path := "%ssave_%d.tres" % [SAVE_DIR, GlobalVariables.save_slot]
+	
+	if FileAccess.file_exists(save_path):
+		delete_button.visible = true
+		speed_selecter.visible = false
+		host_button.disabled = false
+	else:
+		delete_button.visible = false
+		speed_selecter.visible = true
+		GlobalVariables.motivator_speed = -1
+		host_button.disabled = true
+
 
 func _ready() -> void:
 	# Make sure the confirm page is hidden by default
@@ -71,3 +90,18 @@ func _on_confirm_deletion() -> void:
 func _on_cancel_deletion() -> void:
 	# Just hide the confirm page, doing nothing else
 	deletion_confirm_page.visible = false
+
+
+func _on_fast_pressed() -> void:
+	GlobalVariables.motivator_speed = 5
+	host_button.disabled = false
+
+
+func _on_medium_pressed() -> void:
+	GlobalVariables.motivator_speed = 4
+	host_button.disabled = false
+
+
+func _on_slow_pressed() -> void:
+	GlobalVariables.motivator_speed = 3
+	host_button.disabled = false

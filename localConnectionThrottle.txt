@@ -3,3 +3,20 @@ sudo tc qdisc add dev lo root netem delay 150ms loss 5%
 
 # Reset delay and packet loss
 sudo tc qdisc del dev lo root
+
+
+# FOR ACTUAL NETWORKING
+# 10% packet loss
+sudo tc qdisc add dev eth0 root netem loss 10%
+
+# 150ms of ping
+sudo tc qdisc add dev eth0 root netem delay 150ms
+
+# ping and packet loss
+sudo tc qdisc add dev eth0 root netem delay 150ms loss 10%
+
+# reset 
+sudo tc qdisc del dev eth0 root
+
+# to get the network driver name that you want
+ip link

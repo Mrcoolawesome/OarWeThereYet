@@ -65,7 +65,8 @@ func _on_select_save_menu_back_button_pressed() -> void:
   _show_menu(MenuType.MAIN_MENU)
 
 func _on_select_save_button_pressed() -> void:
-  _show_menu(MenuType.HOST_MENU)
+    host_game_menu.setup_for_save()
+    _show_menu(MenuType.HOST_MENU)
 
 func _on_select_save_popup_menu_deleted_save() -> void:
   _show_menu(MenuType.SAVE_MENU)

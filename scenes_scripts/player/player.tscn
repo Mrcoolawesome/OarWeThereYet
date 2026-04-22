@@ -21,13 +21,13 @@
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_qhqgy"]
 properties/0/path = NodePath(".:State")
 properties/0/spawn = true
-properties/0/replication_mode = 1
+properties/0/replication_mode = 2
 properties/1/path = NodePath("GamerTag:text")
 properties/1/spawn = true
-properties/1/replication_mode = 1
+properties/1/replication_mode = 2
 properties/2/path = NodePath(".:IsSwimming")
 properties/2/spawn = true
-properties/2/replication_mode = 2
+properties/2/replication_mode = 1
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_u8vuu"]
 
@@ -96,25 +96,25 @@ stereo = true
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_fqj0r"]
 properties/0/path = NodePath("..:WalkingOnBoatAudioGate")
 properties/0/spawn = true
-properties/0/replication_mode = 2
+properties/0/replication_mode = 1
 properties/1/path = NodePath("..:WalkingOnGroundAudioGate")
 properties/1/spawn = true
-properties/1/replication_mode = 2
+properties/1/replication_mode = 1
 properties/2/path = NodePath("..:TreadingWaterAudioGate")
 properties/2/spawn = true
-properties/2/replication_mode = 2
+properties/2/replication_mode = 1
 properties/3/path = NodePath("..:MovementAudioPitchScale")
 properties/3/spawn = true
-properties/3/replication_mode = 2
+properties/3/replication_mode = 1
 properties/4/path = NodePath("..:PlayerHitSwooshAudioGate")
 properties/4/spawn = true
-properties/4/replication_mode = 2
+properties/4/replication_mode = 1
 properties/5/path = NodePath("..:PlayerHitSomethingAudioTrigger")
 properties/5/spawn = true
-properties/5/replication_mode = 2
+properties/5/replication_mode = 1
 properties/6/path = NodePath("..:PlayerHitBoatAudioTrigger")
 properties/6/spawn = true
-properties/6/replication_mode = 2
+properties/6/replication_mode = 1
 
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 4

@@ -17,7 +17,7 @@ properties/0/spawn = true
 properties/0/replication_mode = 2
 properties/1/path = NodePath("DryBox/Inventory:NetworkInventory")
 properties/1/spawn = true
-properties/1/replication_mode = 2
+properties/1/replication_mode = 1
 
 [sub_resource type="BoxMesh" id="BoxMesh_0063d"]
 size = Vector3(0.5, 0.25, 0.5)

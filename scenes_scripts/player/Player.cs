@@ -217,29 +217,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	private int _lastPlayerHitSomethingAudioTrigger = 0;
 	private int _lastPlayerHitBoatAudioTrigger = 0;
 
-	// Oar animation intent handshake state.
-	private bool _hasPendingOarAnimationIntent = false;
-	private int _requestedOarAnimationSeat = -1;
-	private int _requestedOarAnimationDirection = 1;
-	private bool _requestedOarAnimationStartStop = false;
-
-	// Seat sit/unsit intent handshake state.
-	private bool _hasPendingSeatIntent = false;
-	private int _requestedSeatIndex = -1;
-	private bool _requestedSeatIsSitting = false;
-	private int _seatResetEpoch = 0;
-	private int _seatRequestSerial = 0;
-	private int _pendingSeatRequestSerial = -1;
-	private int _lastAppliedSeatRequestSerial = -1;
-	private bool _pendingRespawnReseat = false;
-
-	// Patch intent handshake state.
-	private bool _hasPendingPatchIntent = false;
-	private Hole _pendingPatchHole = null;
-
-	// neck physics bone
-	private SpringBoneSimulator3D _neckJigglePhysics;
-
   public override void _EnterTree()
 	{
 		// THIS IS VERY IMPORTANT
@@ -349,9 +326,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		// get the underwater pov
 		_underWaterPOV = GetNode<Control>("UnderWaterPOV");
 		_underWaterPOV.Visible = false; // make the underwater pov invisible by default
-
-		// get the neck jiggle physics bone
-		_neckJigglePhysics = GetNode<SpringBoneSimulator3D>("FullPlayerModel/Armature/Skeleton3D/HeadMovement");
 
 		// client code for when setting up their camera and stuff
 		// if we are the player, then use the camera for this player
@@ -695,20 +669,18 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			// Reset their global position
 			GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 1, 0); 
 
-			UpdateSeatIntent((int)_seat, false);
-			UpdateOarAnimationIntent((int)_seat, 1, false);
+			// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
+			Rpc(MethodName.SetSitStandState, false, (int)_seat);
+
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 
 			return; // STOP after this we don't wanna take anymore input as if we're sitting
 		}
 
 		if (ArmNode?.Item?.Data?.UseAction is not Oar)
 		{
-			UpdateOarAnimationIntent((int)_seat, 1, false);
 			return;
 		}
-
-		int oarDirection = 1;
-		bool shouldAnimateOar = false;
 
 		// (Boat.SeatIndicies seat, bool stopStart, bool backForward)
 		if (Input.IsActionPressed("move_forward"))
@@ -716,29 +688,35 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			// Broadcast move forward
 			// have to send the seat as an int because that's a supported variant type: https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_variant.html#c-sharp-variant-compatible-types
 			RequestRowing((int)_seat, true, true);
-			oarDirection = 1;
-			shouldAnimateOar = true;
+
+			// trigger the oar animation as well
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, true);
 		} 
 		// If user pressing forward and backward they'll go forward
 		else if (Input.IsActionPressed("move_backward"))
 		{
 			// Broadcast move backward
 			RequestRowing((int)_seat, true, false);
-			oarDirection = -1;
-			shouldAnimateOar = true;
-		}
 
-		UpdateOarAnimationIntent((int)_seat, oarDirection, shouldAnimateOar);
+			// trigger the oar animation as well
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, -1, true);
+		}
 
 		// Emit a signal when they're done rowing
 		// Setting the direction doesn't matter in this case
 		if (Input.IsActionJustReleased("move_forward"))
 		{
 			RequestRowing((int)_seat, false, true);
+
+			// stop the rowing animation too
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 		} 
 		else if (Input.IsActionJustReleased("move_backward"))
 		{
 			RequestRowing((int)_seat, false, false); 
+
+			// stop the rowing animation too (direction doesn't actually matter here since we're just stopping the animation)
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, -1, false);
 		}
 	}
 
@@ -746,33 +724,6 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	// Logic for movement depending on player state
 	public override void _PhysicsProcess(double delta)
 	{
-		if (IsMultiplayerAuthority())
-		{
-			if (_hasPendingSeatIntent)
-			{
-				RequestSeatStateConfirmation(_requestedSeatIndex, _requestedSeatIsSitting);
-			}
-
-			if (_hasPendingOarAnimationIntent)
-			{
-				RequestOarAnimationConfirmation(_requestedOarAnimationSeat, _requestedOarAnimationDirection, _requestedOarAnimationStartStop);
-			}
-
-			if (_hasPendingPatchIntent)
-			{
-				if (GodotObject.IsInstanceValid(_pendingPatchHole))
-				{
-					_pendingPatchHole.Rpc(nameof(Hole.RequestPatchConfirmation));
-				}
-				else
-				{
-					// Hole was removed/disposed, clear pending state
-					_hasPendingPatchIntent = false;
-					_pendingPatchHole = null;
-				}
-			}
-		}
-
 		if (IsMultiplayerAuthority() && PlayerHitSwooshAudioGate)
 		{
 			_playerHitSwooshGateTimer -= delta;
@@ -1145,7 +1096,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 				_currSpeed = CrouchingSpeed;
 
 				// Set the head height to be offset by the crouching depth
-				Vector3 targetHeadPosition = new Vector3(_head.Position.X, _standingHeadHeight + _crouchingDepth, _head.Position.Z);
+				Vector3 targetHeadPosition = new Vector3(_head.Position.X, _crouchingDepth + _standingHeadHeight, _head.Position.Z);
 				_head.Position = _head.Position.MoveToward(targetHeadPosition, (float)delta * CrouchLerpSpeed);
 
 				// Disable the staning collision shape
@@ -1255,43 +1206,42 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	{
 		if (Name == multiplayerID.ToString())
 		{
-			BeginRespawnReseat();
+			// If they're in a seat, reset the seat
+			if (CurrPlayerState == PlayerState.Rowing)
+			{
+				// Broadcast stop rowing. The first boolean is all that matters to make them stop rowing
+				RequestRowing((int)_seat, false, false);
+				// Broadcast sitting to false and update their seat (the seat number doesn't matter here)
+				Rpc(MethodName.SetSitStandState, false, (int)_seat);
+				Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
+			}
+
+			// set their position to be the position of the boat but just a little higher so they're not just clipping into it
+			// this shouldn't need to be an rpc call i think because the multiplayer synchronzier should just handle it
+			RequestSitInSeat(-1);
 
 			// put them into the playing state after that so the pause ui goes away
 			CurrGameState = GameState.Playing;
 		}
 	}
 
-	private void BeginRespawnReseat()
-	{
-		if (!IsMultiplayerAuthority())
-		{
-			return;
-		}
-
-		_pendingRespawnReseat = true;
-
-		// Clear stale pending state before starting a fresh unsit -> sit handshake.
-		_hasPendingSeatIntent = false;
-		_requestedSeatIndex = -1;
-		_requestedSeatIsSitting = false;
-		_pendingSeatRequestSerial = -1;
-
-		if (CurrPlayerState == PlayerState.Rowing)
-		{
-			RequestRowing((int)_seat, false, false);
-			UpdateOarAnimationIntent((int)_seat, 1, false);
-			UpdateSeatIntent((int)_seat, false);
-			return;
-		}
-
-		RequestSitInSeat(-1);
-	}
-
 	//RPC Functions
 	public void RequestSitInSeat(int seat)
 	{
-		UpdateSeatIntent(seat, true);
+		RpcId(1, nameof(SitInSeat), seat);
+	}
+	
+	// If seat == -1, sit in next available seat
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
+	public void SitInSeat(int seat)
+	{
+		if (seat == -1) seat = _boat.NextAvailableSeat();
+		
+		if (_boat.IsSeatAvailable(seat))
+		{
+			// Broadcast sitting to true and update their seat
+			Rpc(nameof(SetSitStandState), true, seat);
+		}
 	}
 
 	// Makes sure that PlayerState changes is synced for everyone
@@ -1319,92 +1269,12 @@ public partial class Player : CharacterBody3D, ISyncBuffer
       _knockbackVelocity = Vector3.Zero;
       _applyKnockback = false;
     }
-
-		// --- SPRING BONE LOGIC ---
-    if (_neckJigglePhysics != null)
-    {
-      if (isSitting)
-      {
-        // Turn off the physics processing so it stops freaking out
-        _neckJigglePhysics.ProcessMode = Node.ProcessModeEnum.Disabled;
-      }
-      else
-      {
-        // Turn it back on when they stand up
-        _neckJigglePhysics.ProcessMode = Node.ProcessModeEnum.Inherit;
-      }
-    }
 	}
 
 	// Wrapper for ServerRequestRowing RPC function
 	public void RequestRowing(int seatIdx, bool stopStart, bool backForward)
 	{
 		RpcId(1, MethodName.ServerRequestRowing, seatIdx, stopStart, backForward);
-	}
-
-	public void RequestSeatStateConfirmation(int seatIdx, bool isSitting)
-	{
-		RequestSeatStateConfirmation(seatIdx, isSitting, _seatResetEpoch, _pendingSeatRequestSerial);
-	}
-
-	public void RequestSeatStateConfirmation(int seatIdx, bool isSitting, int resetEpoch, int requestSerial)
-	{
-		if (Multiplayer.IsServer())
-		{
-			ServerRequestSeatState(seatIdx, isSitting, resetEpoch, requestSerial);
-			return;
-		}
-
-		RpcId(1, nameof(ServerRequestSeatState), seatIdx, isSitting, resetEpoch, requestSerial);
-	}
-
-	public void RequestOarAnimationConfirmation(int seatIdx, int direction, bool startStop)
-	{
-		if (Multiplayer.IsServer())
-		{
-			Rpc(nameof(ConfirmOarAnimationState), seatIdx, direction, startStop);
-			return;
-		}
-
-		RpcId(1, nameof(ServerRequestOarAnimationState), seatIdx, direction, startStop);
-	}
-
-	private void UpdateSeatIntent(int seatIdx, bool isSitting)
-	{
-		bool requestedStateChanged = _requestedSeatIndex != seatIdx || _requestedSeatIsSitting != isSitting;
-		if (requestedStateChanged)
-		{
-			_seatRequestSerial++;
-			_requestedSeatIndex = seatIdx;
-			_requestedSeatIsSitting = isSitting;
-			_pendingSeatRequestSerial = _seatRequestSerial;
-			_hasPendingSeatIntent = true;
-		}
-
-		if (_hasPendingSeatIntent)
-		{
-			RequestSeatStateConfirmation(_requestedSeatIndex, _requestedSeatIsSitting, _seatResetEpoch, _pendingSeatRequestSerial);
-		}
-	}
-
-	private void UpdateOarAnimationIntent(int seatIdx, int direction, bool startStop)
-	{
-		bool requestedStateChanged = _requestedOarAnimationSeat != seatIdx
-			|| _requestedOarAnimationDirection != direction
-			|| _requestedOarAnimationStartStop != startStop;
-
-		if (requestedStateChanged)
-		{
-			_requestedOarAnimationSeat = seatIdx;
-			_requestedOarAnimationDirection = direction;
-			_requestedOarAnimationStartStop = startStop;
-			_hasPendingOarAnimationIntent = true;
-		}
-
-		if (_hasPendingOarAnimationIntent)
-		{
-			RequestOarAnimationConfirmation(_requestedOarAnimationSeat, _requestedOarAnimationDirection, _requestedOarAnimationStartStop);
-		}
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
@@ -1447,146 +1317,11 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 		GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.Rowing, seatIdx, stopStart, backForward);
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
-	private void ServerRequestSeatState(int seat, bool isSitting, int resetEpoch, int requestSerial)
-	{
-		if (!Multiplayer.IsServer()) return;
-
-		if (resetEpoch != _seatResetEpoch)
-		{
-			return;
-		}
-
-		if (isSitting)
-		{
-			if (CurrPlayerState == PlayerState.Rowing)
-			{
-				// Idempotent ack: if this player is already seated, reuse that seat.
-				Rpc(nameof(ConfirmSeatState), (int)_seat, true, resetEpoch, requestSerial);
-				return;
-			}
-
-			int chosenSeat = seat;
-			if (chosenSeat == -1)
-			{
-				chosenSeat = _boat.NextAvailableSeat();
-			}
-
-			if (chosenSeat < 0)
-			{
-				return;
-			}
-
-			if (!_boat.IsSeatAvailable(chosenSeat))
-			{
-				return;
-			}
-
-			Rpc(nameof(ConfirmSeatState), chosenSeat, true, resetEpoch, requestSerial);
-			return;
-		}
-
-		int unsitSeat = seat == -1 ? (int)_seat : seat;
-		Rpc(nameof(ConfirmSeatState), unsitSeat, false, resetEpoch, requestSerial);
-	}
-
+	// this will have everyone else's animations for the oars play when this client triggers or un-triggers it
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void ConfirmSeatState(int seat, bool isSitting, int resetEpoch, int requestSerial)
+	private void BroadcastOarAnimation(int seat, int direction, bool startStop)
 	{
-		if (resetEpoch != _seatResetEpoch)
-		{
-			return;
-		}
-
-		if (requestSerial <= _lastAppliedSeatRequestSerial)
-		{
-			return;
-		}
-		_lastAppliedSeatRequestSerial = requestSerial;
-
-		if (isSitting && CurrPlayerState == PlayerState.Rowing && (int)_seat != seat)
-		{
-			// Prevent stale occupancy if seat changed due network timing.
-			SetSitStandState(false, (int)_seat);
-		}
-
-		if (_hasPendingSeatIntent)
-		{
-			bool seatMatches = _requestedSeatIndex == seat || (_requestedSeatIsSitting && _requestedSeatIndex == -1);
-			if (_requestedSeatIsSitting == isSitting && seatMatches)
-			{
-				if (_requestedSeatIsSitting && _requestedSeatIndex == -1)
-				{
-					_requestedSeatIndex = seat;
-				}
-
-				_hasPendingSeatIntent = false;
-				_pendingSeatRequestSerial = -1;
-			}
-		}
-
-		SetSitStandState(isSitting, seat);
-
-		if (IsMultiplayerAuthority() && _pendingRespawnReseat)
-		{
-			if (!isSitting)
-			{
-				RequestSitInSeat(-1);
-			}
-			else
-			{
-				_pendingRespawnReseat = false;
-			}
-		}
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
-	private void ServerRequestOarAnimationState(int seat, int direction, bool startStop)
-	{
-		if (!Multiplayer.IsServer()) return;
-
-		Rpc(nameof(ConfirmOarAnimationState), seat, direction, startStop);
-	}
-
-	// The animation only plays after the host confirms and rebroadcasts the state.
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	private void ConfirmOarAnimationState(int seat, int direction, bool startStop)
-	{
-		if (_hasPendingOarAnimationIntent
-			&& _requestedOarAnimationSeat == seat
-			&& _requestedOarAnimationDirection == direction
-			&& _requestedOarAnimationStartStop == startStop)
-		{
-			_hasPendingOarAnimationIntent = false;
-		}
-
 		GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.AnimateOar), seat, direction, startStop);
-	}
-
-	/// <summary>
-	/// Request to patch a hole. Client will resend until server confirms removal.
-	/// </summary>
-	public void RequestPatch(Hole hole)
-	{
-		if (hole == null) return;
-
-		_hasPendingPatchIntent = true;
-		_pendingPatchHole = hole;
-		if (Multiplayer.IsServer())
-		{
-			hole.RequestPatchConfirmation();
-		}
-		else
-		{
-			hole.Rpc(nameof(Hole.RequestPatchConfirmation));
-		}
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
-	public void OnPatchConfirmed()
-	{
-		_hasPendingPatchIntent = false;
-		_pendingPatchHole = null;
 	}
 
 	public void Reset()
@@ -1598,7 +1333,7 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 			Rpc(nameof(SyncReset));
 
 			// stop the rowing animation too
-			Rpc(nameof(ConfirmOarAnimationState), (int)_seat, 1, false);
+			Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
 
 			// get rid of their pause ui after that
 			CurrGameState = GameState.Playing;
@@ -1609,18 +1344,15 @@ public partial class Player : CharacterBody3D, ISyncBuffer
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true)]
 	private void SyncReset()
 	{
-		_seatResetEpoch++;
-		_seatRequestSerial = 0;
-		_pendingSeatRequestSerial = -1;
-		_lastAppliedSeatRequestSerial = -1;
-		_hasPendingSeatIntent = false;
-		_requestedSeatIndex = -1;
-		_requestedSeatIsSitting = false;
+		// Set the player into the standing state and reset their position and velocity
+		// _currPlayerState = PlayerState.Standing;
+		// Position = Vector3.Zero;
+		// Rotation = Vector3.Zero;
+		// Velocity = Vector3.Zero;
 
+		// Sit in boat which should be reset
 		if (IsMultiplayerAuthority())
-		{
-			BeginRespawnReseat();
-		}
+			RequestSitInSeat(-1);
 	}
 
 	public void OpenInventory(Inventory inventory)
@@ -1830,15 +1562,18 @@ public partial class Player : CharacterBody3D, ISyncBuffer
     {
       // 1. Tell the server to stop the rowing physics for this seat
       RequestRowing((int)_seat, false, false);
-
-			// 2. Request unsit through host-confirmed handshake.
-			UpdateSeatIntent((int)_seat, false);
       
-			// 3. Teleport them slightly up so they don't clip into the boat hull when launched
+      // 2. Run the state change locally IMMEDIATELY so we don't get trapped by the physics frame
+      SetSitStandState(false, (int)_seat);
+      
+      // 3. Now tell everyone else over the network that we stood up
+      Rpc(MethodName.SetSitStandState, false, (int)_seat);
+      
+      // 4. Teleport them slightly up so they don't clip into the boat hull when launched
       GlobalPosition = GetCurrentSeat().GlobalPosition + new Vector3(0, 0.2f, 0); 
       
-			// 4. Request oar stop through host-confirmed handshake.
-			UpdateOarAnimationIntent((int)_seat, 1, false);
+      // 5. Stop their oar animation
+      Rpc(nameof(BroadcastOarAnimation), (int)_seat, 1, false);
     }
 
     // Now that they are officially Standing, apply the new hit

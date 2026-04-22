@@ -14,6 +14,7 @@ public partial class TestLevel : Node
 	private float _allPlayersSwimmingTimer = 0.0f;
 	private bool _isAllSwimmingVisible = false;
 	public bool IsBoatReady { get; private set; } = false;
+  private Node _globalVars;
 
 	// boat object 
 	[Export] private PackedScene BoatScene;
@@ -43,6 +44,8 @@ public partial class TestLevel : Node
     _checkpointContainer = GetNode<Node3D>("CheckpointContainer");
     _itemContainer = GetNode<ItemContainer>("ItemContainer");
     _motivator = FindChild("Motivator", true, false) as Motivator;
+
+    _globalVars = GetTree().Root.GetNode("GlobalVariables");
 
     // load or create save slot
     _gameSaves = GameSaves.LoadOrCreate(SaveSlot);
@@ -109,8 +112,8 @@ public partial class TestLevel : Node
     {
         if (Multiplayer.GetUniqueId() != 1 && Multiplayer.MultiplayerPeer.GetConnectionStatus() == MultiplayerPeer.ConnectionStatus.Connected)
         {
-            _clientNetworkInitialized = true;
-            OnClientConnected(); }
+            OnClientConnected();
+        }
     }
   }
 
@@ -183,7 +186,7 @@ public partial class TestLevel : Node
   {
     // The client runs this when they connect to the host
     // We use a flag to ensure it only runs once
-    if (Multiplayer.IsServer()) return; 
+    if (Multiplayer.IsServer() || _clientNetworkInitialized) return;
     
     _clientNetworkInitialized = true;
     _itemContainer.RpcId(1, nameof(ItemContainer.RequestWorldState));
@@ -321,7 +324,7 @@ public partial class TestLevel : Node
 			}
 		}
 
-		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, _motivator != null ? _motivator.CurrentOffset : -1f, heldItems);
+		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, _motivator != null ? _motivator.CurrentOffset : -1f, (int)_globalVars.Get("motivator_speed"), heldItems);
 	}
 
 	private void LoadGame()
@@ -353,13 +356,16 @@ public partial class TestLevel : Node
 		_inventory.DeserializeInventory(_gameSaves.BoatInventory);
 		_itemContainer.ReceiveWorldItems(_gameSaves.WorldItems);
 
+    _globalVars.Set("motivator_speed", _gameSaves.MotivatorSpeed);
+    GlobalSignalServer.Instance.EmitSignal(GlobalSignalServer.SignalName.UpdateMotivatorSpeed);
+
 		// Broadcast world items to all clients
 		_itemContainer.Rpc(ItemContainer.MethodName.ReceiveWorldItems, _gameSaves.WorldItems);
 
 		if (_motivator != null && _gameSaves.MotivatorOffset >= 0f)
 		{
-			GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.StopMotivator));
 			_motivator.CurrentOffset = _gameSaves.MotivatorOffset;
+      GlobalSignalServer.Instance.EmitSignal(nameof(GlobalSignalServer.StopMotivator));
 		}
 
 		// Reset boat and players

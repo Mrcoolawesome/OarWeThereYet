@@ -40,16 +40,10 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 
-[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_motivator"]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_y2ys1"]
 properties/0/path = NodePath(".:CurrentOffset")
 properties/0/spawn = true
 properties/0/replication_mode = 1
-properties/1/path = NodePath(".:IsMoving")
-properties/1/spawn = true
-properties/1/replication_mode = 2
-properties/2/path = NodePath(".:visible")
-properties/2/spawn = true
-properties/2/replication_mode = 2
 
 [node name="Motivator" type="Area3D"]
 collision_layer = 0
@@ -125,9 +119,6 @@ settings/0/exclude_collision_count = 0
 material_overlay = SubResource("ShaderMaterial_epm6i")
 mesh = SubResource("ArrayMesh_epm6i")
 
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
-replication_config = SubResource("SceneReplicationConfig_motivator")
-
 [node name="Doom" type="AudioStreamPlayer3D" parent="."]
 volume_db = 50.0
 unit_size = 200.0
@@ -135,5 +126,8 @@ max_db = 6.0
 pitch_scale = 0.8
 max_distance = 200.0
 bus = &"Doom"
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_y2ys1")
 
 [editable path="fish"]

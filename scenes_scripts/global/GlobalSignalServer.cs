@@ -92,6 +92,9 @@ public partial class GlobalSignalServer : Node
   [Signal]
   public delegate void StopMotivatorEventHandler();
 
+  [Signal]
+  public delegate void UpdateMotivatorSpeedEventHandler();
+
   public int Health { get; set; }
 
   public override void _Ready()

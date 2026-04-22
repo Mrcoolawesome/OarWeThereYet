@@ -1,6 +1,5 @@
 extends Node
 
-@export var simulate_bad_connection: bool = true
 var multiplayer_peer: SteamMultiplayerPeer = SteamMultiplayerPeer.new()
 var _hosted_lobby_id = 0
 var _max_lobby_members = 4
@@ -52,14 +51,8 @@ func _sync_all_player_colors_to_peer(target_peer_id: int) -> void:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
   # initalize steam
-  Steam.steamInit(4563080, true)
+  Steam.steamInit(480, true)
   Steam.initRelayNetworkAccess() # start steam relay
-
-  if simulate_bad_connection:
-    # Add 150ms delay
-    Steam.setConnectionConfigValueFloat(Steam.NETWORKING_CONFIG_SCOPE_GLOBAL, Steam.NETWORKING_CONFIG_FAKE_PACKET_LAG_SEND, 150)
-    # Add 10% packet loss
-    Steam.setConnectionConfigValueFloat(Steam.NETWORKING_CONFIG_SCOPE_GLOBAL, Steam.NETWORKING_CONFIG_FAKE_PACKET_LOSS_SEND, 10.0)
 
   # connect the 'on_lobby_created' function to the lobby created signal
   Steam.lobby_created.connect(_on_lobby_created)

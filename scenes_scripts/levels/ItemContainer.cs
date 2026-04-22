@@ -4,6 +4,39 @@ using Godot.Collections;
 
 public partial class ItemContainer : Node3D
 {
+	private readonly System.Collections.Generic.Dictionary<string, PendingHeldItemData> _pendingHeldItems = new();
+
+	private readonly struct PendingHeldItemData
+	{
+		public string ItemPath { get; }
+		public int ItemCount { get; }
+
+		public PendingHeldItemData(string itemPath, int itemCount)
+		{
+			ItemPath = itemPath;
+			ItemCount = itemCount;
+		}
+	}
+
+	public override void _Process(double delta)
+	{
+		if (_pendingHeldItems.Count == 0) return;
+
+		var resolvedPlayers = new System.Collections.Generic.List<string>();
+		foreach (var pending in _pendingHeldItems)
+		{
+			if (TryApplyHeldItem(pending.Key, pending.Value.ItemPath, pending.Value.ItemCount))
+			{
+				resolvedPlayers.Add(pending.Key);
+			}
+		}
+
+		foreach (string playerId in resolvedPlayers)
+		{
+			_pendingHeldItems.Remove(playerId);
+		}
+	}
+
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
 	public void RequestWorldState()
 	{
@@ -177,8 +210,23 @@ public partial class ItemContainer : Node3D
 	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false)]
 	private void ReceiveHeldItem(string playerId, string itemPath, int itemCount)
 	{
+		if (!TryApplyHeldItem(playerId, itemPath, itemCount))
+		{
+			// Join snapshots can arrive before the player node is ready.
+			_pendingHeldItems[playerId] = new PendingHeldItemData(itemPath, itemCount);
+		}
+	}
+
+	private bool TryApplyHeldItem(string playerId, string itemPath, int itemCount)
+	{
 		ArmNode arm = GetNodeOrNull<ArmNode>("../" + playerId + "/Head/ArmNode");
-		arm?.SetItem(itemPath, itemCount);
+		if (arm == null)
+		{
+			return false;
+		}
+
+		arm.SetItem(itemPath, itemCount);
+		return true;
 	}
 
 }
