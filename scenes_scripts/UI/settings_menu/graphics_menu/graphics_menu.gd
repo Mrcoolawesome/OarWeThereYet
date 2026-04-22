@@ -69,6 +69,9 @@ var resolutions_array: Array[Vector2i] = [
   Vector2i(800, 600)    # SVGA
 ]
 
+# array to hold resolutions that actually fit on the current screen
+var available_resolutions: Array[Vector2i] = []
+
 func _ready() -> void:
   # load their settings to see what they already have saved
   settings_prefrences = UserSettingPrefrences.load_or_create()
@@ -112,16 +115,22 @@ func _load_ui_stuff() -> void:
   screen_mode_dropdown.DefaultItem = default_item
 
   # RESOLUTION DROPDOWN
+  # Load all the resolutions into the resolution dropdown unconditionally first
+  _load_all_resolutions()
+  
   # only display this if they've selected either windowed or fullscreen
-  if settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_WINDOWED:
+  if settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_WINDOWED or settings_prefrences.display_mode == DisplayServer.WINDOW_MODE_FULLSCREEN:
     resolution_dropdown.visible = true # make it visible
-    # load all the resolutions into the resolution dropdown
-    _load_all_resolutions()
     # load the current resolution into the dropdown menu
     # get the index of the resolution in the table, which will correlate to the index in the dropdown
-    resolution_dropdown.DefaultItem = resolutions_array.find(settings_prefrences.resolution)
+    var default_res_idx: int = available_resolutions.find(settings_prefrences.resolution)
+    if default_res_idx != -1:
+      resolution_dropdown.DefaultItem = default_res_idx
+    else:
+      # If the current resolution isn't in our array (e.g. odd screen size), default to highest available
+      resolution_dropdown.DefaultItem = 0
   else:
-    # make it invisible if they're not in a window mode that makes sense (aka if they're in fullscreen or borderless mode)
+    # make it invisible if they're in borderless mode where resolution is locked to screen size
     resolution_dropdown.visible = false
     
   # VSYNC DROPDOWN
@@ -215,7 +224,7 @@ func _on_screen_mode_dropdown_item_selected(item: int) -> void:
 
 func _on_resolution_dropdown_item_selected(item: int) -> void:
   # get the resoluiton and put it into the prefrences object
-  var new_resolution: Vector2i = resolutions_array[item]
+  var new_resolution: Vector2i = available_resolutions[item]
   settings_prefrences.resolution = new_resolution
   
   if !is_loading_ui:
@@ -223,16 +232,19 @@ func _on_resolution_dropdown_item_selected(item: int) -> void:
 
 # function to pass in all the resolutions into the resolution selection dropdown
 func _load_all_resolutions() -> void:
+  # clear existing items to prevent duplicates if this is called multiple times
+  resolution_dropdown.clear()
+  available_resolutions.clear()
+  
   # get the max screen size
   var max_screen_size: Vector2i = DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
   # load in each resolution into the dropdown that are smaller than their displays
-  var index: int = 0
   for resolution in resolutions_array:
     if resolution.x <= max_screen_size.x && resolution.y <= max_screen_size.y:
+      available_resolutions.append(resolution)
       # turn it into a string
       var string_display_version: String = str(resolution.x) + "x" + str(resolution.y)
-      resolution_dropdown.add_item(string_display_version, index) # need to keep track of the actual index so i know what they're selecting
-    index += 1
+      resolution_dropdown.add_item(string_display_version)
 
 func _on_vsync_dropdown_item_selected(item: int) -> void:
   var converted_value: DisplayServer.VSyncMode = item as DisplayServer.VSyncMode

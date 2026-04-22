@@ -39,12 +39,16 @@ func _ready() -> void:
 	option_button.selected = DefaultItem
 
 func _put_items_into_dropdown() -> void:
+	option_button.clear()
 	# put all the items into the dropdown menu
 	for item in DropdownItems:
 		option_button.add_item(item)
 
 func _on_option_button_item_selected(index: int) -> void:
 	item_selected.emit(index)
+
+func clear() -> void:
+	option_button.clear()
 
 # this is so that an item can be added with an id
 func add_item(display_string: String, id: int = -1) -> void:
