@@ -93,15 +93,15 @@ func _on_cancel_deletion() -> void:
 
 
 func _on_fast_pressed() -> void:
-	GlobalVariables.motivator_speed = 2
+	GlobalVariables.motivator_speed = 5
 	host_button.disabled = false
 
 
 func _on_medium_pressed() -> void:
-	GlobalVariables.motivator_speed = 1
+	GlobalVariables.motivator_speed = 4
 	host_button.disabled = false
 
 
 func _on_slow_pressed() -> void:
-	GlobalVariables.motivator_speed = 0
+	GlobalVariables.motivator_speed = 3
 	host_button.disabled = false

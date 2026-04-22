@@ -14,6 +14,7 @@ public partial class TestLevel : Node
 	private float _allPlayersSwimmingTimer = 0.0f;
 	private bool _isAllSwimmingVisible = false;
 	public bool IsBoatReady { get; private set; } = false;
+  private Node _globalVars;
 
 	// boat object 
 	[Export] private PackedScene BoatScene;
@@ -43,6 +44,8 @@ public partial class TestLevel : Node
     _checkpointContainer = GetNode<Node3D>("CheckpointContainer");
     _itemContainer = GetNode<ItemContainer>("ItemContainer");
     _motivator = FindChild("Motivator", true, false) as Motivator;
+
+    _globalVars = GetTree().Root.GetNode("GlobalVariables");
 
     // load or create save slot
     _gameSaves = GameSaves.LoadOrCreate(SaveSlot);
@@ -321,7 +324,7 @@ public partial class TestLevel : Node
 			}
 		}
 
-		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, _motivator != null ? _motivator.CurrentOffset : -1f, heldItems);
+		_gameSaves.Save(SaveSlot, _inventory, _itemContainer, _motivator != null ? _motivator.CurrentOffset : -1f, (int)_globalVars.Get("motivator_speed"), heldItems);
 	}
 
 	private void LoadGame()
@@ -352,6 +355,8 @@ public partial class TestLevel : Node
 
 		_inventory.DeserializeInventory(_gameSaves.BoatInventory);
 		_itemContainer.ReceiveWorldItems(_gameSaves.WorldItems);
+
+    _globalVars.Set("motivator_speed", _gameSaves.MotivatorSpeed);
 
 		// Broadcast world items to all clients
 		_itemContainer.Rpc(ItemContainer.MethodName.ReceiveWorldItems, _gameSaves.WorldItems);

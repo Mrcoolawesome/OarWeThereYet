@@ -49,6 +49,7 @@ public partial class Motivator : Area3D
   private bool _desiredDoomPlaying = false;
   private double _audioSyncRetryTimer = 0.0;
   private bool _audioSyncAwaitingAck = false;
+  private Node _globalVars;
 
   public override void _EnterTree()
   {
@@ -71,6 +72,8 @@ public partial class Motivator : Area3D
     }
 
     BodyEntered += OnBodyEntered;
+
+    _globalVars = GetTree().Root.GetNode("GlobalVariables");
 
     _animationPlayer = GetNodeOrNull<AnimationPlayer>("fish/AnimationPlayer");
 
@@ -113,6 +116,11 @@ public partial class Motivator : Area3D
     {
       Multiplayer.PeerConnected -= OnPeerConnected;
     }
+  }
+
+  public override void _Process(double delta)
+  {
+    Speed = (int)_globalVars.Get("motivator_speed");
   }
 
   public override void _PhysicsProcess(double delta)
