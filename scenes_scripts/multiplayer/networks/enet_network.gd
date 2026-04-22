@@ -70,8 +70,6 @@ func _process(_delta: float) -> void:
     if status == ResourceLoader.ThreadLoadStatus.THREAD_LOAD_LOADED:
       # done loading
       loading = false
-      # initialize voice before players start spawning in
-      ProxChat.initialize_voice()
       GlobalSignalServer.GoToMainMenu.connect(cleanup_network_state)
       # actually load the level in
       _add_level()
@@ -203,8 +201,6 @@ func _on_server_disconnected():
 
 func cleanup_network_state() -> void:
   print("Cleaning up network state")
-  ProxChat.stop_voice()
-  print("stopped voice")
 
   loading = false
   is_hosting = false
