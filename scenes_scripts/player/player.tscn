@@ -378,17 +378,17 @@ bus = &"PlayerMovementSounds"
 
 [node name="WorldWalkingSingle" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("13_klt8r")
-volume_db = -20.0
+max_db = -5.0
 bus = &"PlayerMovementSounds"
 
 [node name="BoatWalking" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("14_n73fb")
-volume_db = -35.0
+max_db = -20.0
 bus = &"PlayerMovementSounds"
 
 [node name="TreadingWater" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("15_k3sd5")
-volume_db = -20.0
+max_db = -20.0
 bus = &"PlayerMovementSounds"
 
 [node name="AudioInput" type="AudioStreamPlayer3D" parent="AudioStuff"]
@@ -399,23 +399,24 @@ bus = &"MicInput"
 [node name="ProximityChatOutput" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = SubResource("AudioStreamGenerator_0fxne")
 attenuation_model = 2
+unit_size = 50.0
 bus = &"Voice Chat"
 doppler_tracking = 1
 
 [node name="PlayerHitSwooshShortened" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("18_8u33c")
-volume_db = -20.0
+max_db = -20.0
 bus = &"PlayerMovementSounds"
 
 [node name="BellHitSound" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("17_5tvsi")
-volume_db = -20.0
 unit_size = 20.0
+max_db = -20.0
 
 [node name="HitBoatSound" type="AudioStreamPlayer3D" parent="AudioStuff"]
 stream = ExtResource("18_klt8r")
-volume_db = -30.0
 unit_size = 20.0
+max_db = -20.0
 
 [node name="Endgame" type="AudioStreamPlayer" parent="AudioStuff"]
 stream = ExtResource("16_4b7ak")

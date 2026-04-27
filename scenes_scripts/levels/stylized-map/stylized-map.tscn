@@ -186,7 +186,7 @@ noise = SubResource("FastNoiseLite_r0jk7")
 seamless = true
 as_normal_map = true
 
-[sub_resource type="Resource" id="Resource_eub0a"]
+[sub_resource type="Resource" id="Resource_3cg3l"]
 script = ExtResource("8_71wb6")
 MatShaderType = 1
 mat_albedo_color_first = Color(0.4390477, 0.810188, 0.99799937, 1)
@@ -217,7 +217,7 @@ mat_edge_fade = 0.25
 LodLod0Distance = 50.0
 _selectedShader = 1
 
-[sub_resource type="Curve3D" id="Curve3D_1wsx2"]
+[sub_resource type="Curve3D" id="Curve3D_t3pji"]
 resource_local_to_scene = true
 bake_interval = 0.05
 _data = {
@@ -265,11 +265,11 @@ occluder = SubResource("ArrayOccluder3D_dlybm")
 [node name="RiverManager" type="Node3D" parent="."]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 7.5, 1387.26)
 script = ExtResource("6_0rdde")
-ShaderSettings = SubResource("Resource_eub0a")
+ShaderSettings = SubResource("Resource_3cg3l")
 ShapeStepLengthDivs = 8
 ShapeStepWidthDivs = 8
 PointWidths = Array[float]([23.902393, 32.42006, 28.946308, 80.50104, 63.65614, 27.859253, 31.896112, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 59.39387, 52.97687, 40.65703, 40.65703, 40.65703, 40.65703, 16.833715, 20.306177, 40.21755, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 40.65703, 21.35885, 21.493624, 18.437275, 23.140083, 18.668379, 17.788136, 20.318071, 32.206818, 13.336895, 11.627182, 18.435146, 26.135626, 41.78639, 31.696486, 24.981487, 17.728525, 46.307415, 64.34529, 15.8331375, 19.795294, 22.768202, 19.351612, 40.65703, 40.65703, 40.65703, 22.17239, 20.850576, 23.006437, 21.498045, 30.017738, 40.65703, 40.65703, 31.225008, 19.226772, 16.284988, 18.411827, 15.539041, 17.436047, 16.913645, 15.961027, 40.65703, 20.22709, 17.452988, 14.648635, 13.03373, 21.23851, 24.863054, 15.022035, 15.891383, 52.358955, 28.424776, 12.643903, 17.760015, 15.484123, 18.108717, 22.693058, 24.768816, 17.793274, 16.778706, 18.287302, 22.270689])
-Curve = SubResource("Curve3D_1wsx2")
+Curve = SubResource("Curve3D_t3pji")
 metadata/_custom_type_script = "uid://d20js1b0dipxh"
 
 [node name="RiverFloatSystem" type="Node3D" parent="RiverManager"]
@@ -728,20 +728,21 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2496.9272, -88.49762, 169.63)
 
 [node name="AmbeintDesert" parent="AudioContainer" instance=ExtResource("21_etdru")]
 stream = ExtResource("27_ul5uc")
-volume_db = -10.0
+volume_db = -20.0
 autoplay = true
 bus = &"Environment"
 
 [node name="AmbientRiverAudio" parent="AudioContainer" node_paths=PackedStringArray("RiverNode") instance=ExtResource("22_hq8g2")]
 stream = ExtResource("29_eub0a")
-volume_db = -15.0
-unit_size = 50.0
+unit_size = 100.0
+max_db = -20.0
 bus = &"Environment"
 RiverNode = NodePath("../../RiverManager")
 
 [node name="WaterfallFixed" type="AudioStreamPlayer3D" parent="AudioContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 916.4987, -10.711754, 982.84656)
 stream = ExtResource("28_3p6v0")
+volume_db = -20.0
 autoplay = true
 max_distance = 100.0
 bus = &"Environment"
@@ -749,6 +750,7 @@ bus = &"Environment"
 [node name="WaterfallFixed2" type="AudioStreamPlayer3D" parent="AudioContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1415.3037, -20.536928, 817.57526)
 stream = ExtResource("28_3p6v0")
+volume_db = -20.0
 unit_size = 40.0
 autoplay = true
 max_distance = 150.0
@@ -757,6 +759,7 @@ bus = &"Environment"
 [node name="WaterfallFixed3" type="AudioStreamPlayer3D" parent="AudioContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1794.6364, -39.77733, 470.51556)
 stream = ExtResource("28_3p6v0")
+volume_db = -20.0
 unit_size = 70.0
 autoplay = true
 max_distance = 175.0
@@ -765,6 +768,7 @@ bus = &"Environment"
 [node name="WaterfallFixed4" type="AudioStreamPlayer3D" parent="AudioContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2090.3135, -68.93786, 424.19067)
 stream = ExtResource("28_3p6v0")
+volume_db = -20.0
 unit_size = 80.0
 autoplay = true
 max_distance = 200.0

@@ -34,7 +34,7 @@ size_flags_vertical = 3
 [node name="MainVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_60wuw")]
 layout_mode = 2
 size_flags_vertical = 3
-StartingValue = 40.0
+StartingValue = 50.0
 SliderLabelText = "Master Volume"
 
 [node name="VoicechatVolumeSlider" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("2_60wuw")]
@@ -62,6 +62,7 @@ StartingValue = 100.0
 SliderLabelText = "Character Volume"
 
 [node name="MicInputDropdown" parent="MarginContainer/ScrollContainer/VBoxContainer" instance=ExtResource("3_p6ufk")]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 LabelText = "Mic Input"
