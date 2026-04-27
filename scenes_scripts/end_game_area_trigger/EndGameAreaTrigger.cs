@@ -9,6 +9,11 @@ public partial class EndGameAreaTrigger : Area3D
     BodyEntered += OnBodyEntered;
   }
 
+  public override void _ExitTree()
+  {
+    BodyEntered -= OnBodyEntered;
+  }
+
   private void OnBodyEntered(Node3D body)
   {
     // Make sure it is actually the boat hitting the trigger!

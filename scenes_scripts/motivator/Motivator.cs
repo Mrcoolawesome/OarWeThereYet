@@ -107,6 +107,8 @@ public partial class Motivator : Area3D
 
   public override void _ExitTree()
   {
+    BodyEntered -= OnBodyEntered;
+
     if (_subscribedToMotivatorSignals && IsInstanceValid(GlobalSignalServer.Instance))
     {
       GlobalSignalServer.Instance.StartMotivator -= OnStartMotivator;

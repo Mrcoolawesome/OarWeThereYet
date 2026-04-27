@@ -142,6 +142,19 @@ public partial class Boat : RigidBody3D, ISyncBuffer
         _clientSpawning = !Multiplayer.IsServer(); 
     }
 
+    public override void _ExitTree()
+    {
+        if (IsInstanceValid(GlobalSignalServer.Instance))
+        {
+            GlobalSignalServer.Instance.Rowing -= OnPlayerRowing;
+        }
+        if (IsInstanceValid(HealthComponent))
+        {
+            HealthComponent.HealthChanged -= AnnounceHealthUpdate;
+            HealthComponent.Die -= AnnounceDeath;
+        }
+    }
+
     // physics process along with all its associated functions
     public override void _PhysicsProcess(double delta)
     {

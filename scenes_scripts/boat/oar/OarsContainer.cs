@@ -23,6 +23,14 @@ public partial class OarsContainer : Node3D
 		GlobalSignalServer.Instance.AnimateOar += AnimateOar;
 	}
 
+	public override void _ExitTree()
+	{
+		if (IsInstanceValid(GlobalSignalServer.Instance))
+		{
+			GlobalSignalServer.Instance.AnimateOar -= AnimateOar;
+		}
+	}
+
 	/*
 	* Given a seat index and a direciton, determine how to play the animation.
 	* int direction: 1 = forward | -1 = backwards

@@ -8,6 +8,7 @@ public partial class Hud : CanvasLayer
 	private Label _fish;
 	private Label _resetTimerLabel;
 	private Control _resetScreen;
+	private Tween _resetScreenTween;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -48,6 +49,11 @@ public partial class Hud : CanvasLayer
 			GlobalSignalServer.Instance.ResetLevel -= ResetScreen;
 			GlobalSignalServer.Instance.LoadGame -= ResetScreen;
 			GlobalSignalServer.Instance.BoatDeath -= ResetScreen;
+		}
+
+		if (_resetScreenTween != null && _resetScreenTween.IsValid())
+		{
+			_resetScreenTween.Finished -= OnResetScreenTweenFinished;
 		}
 	}
 
@@ -128,13 +134,23 @@ public partial class Hud : CanvasLayer
 		_resetScreen.Modulate = new Color(1, 1, 1, 1);
 		_resetScreen.Visible = true;
 
+		if (_resetScreenTween != null && _resetScreenTween.IsValid())
+		{
+			_resetScreenTween.Kill();
+		}
+
 		// Create a tween for the fade-out effect
-		Tween tween = CreateTween();
+		_resetScreenTween = CreateTween();
 		// Stay visible for a brief moment
-		tween.TweenInterval(0.5f);
+		_resetScreenTween.TweenInterval(0.5f);
 		// Fade out alpha to 0 over 1 second
-		tween.TweenProperty(_resetScreen, "modulate:a", 0.0f, 1.0f);
+		_resetScreenTween.TweenProperty(_resetScreen, "modulate:a", 0.0f, 1.0f);
 		// Hide the control once finished
-		tween.Finished += () => _resetScreen.Visible = false;
+		_resetScreenTween.Finished += OnResetScreenTweenFinished;
+	}
+
+	private void OnResetScreenTweenFinished()
+	{
+		_resetScreen.Visible = false;
 	}
 }

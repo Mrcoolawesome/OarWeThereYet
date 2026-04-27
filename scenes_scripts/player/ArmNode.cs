@@ -618,6 +618,11 @@ public partial class ArmNode : MeshInstance3D
 		InvItem itemObject = activePreserver.ItemObject;
 		int itemCount = activePreserver.ItemCount;
 
+		if (Multiplayer.IsServer())
+		{
+			activePreserver.BodyEntered -= OnLifepreserverBodyEntered;
+		}
+
 		// Delete the preserver from the world and clear active state
 		Rpc(nameof(DeleteWorldItemByName), activePreserver.Name.ToString());
 		Rpc(nameof(SetActiveLifepreserverNode), "");
