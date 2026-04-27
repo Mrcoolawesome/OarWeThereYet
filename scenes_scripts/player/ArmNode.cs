@@ -120,11 +120,11 @@ public partial class ArmNode : MeshInstance3D
 				{
 					if (Item.Data.InHandPosition == Vector3.Zero)
 					{
-						Position = new Vector3(0.0f, 0.23f, -1.4f);
+						Position = new Vector3(0.0f, 0.23f - 1.0f, -1.4f);
 					}
 					else
 					{
-						Position = Item.Data.InHandPosition;
+						Position = new Vector3(Item.Data.InHandPosition.X, Item.Data.InHandPosition.Y - 1.0f, Item.Data.InHandPosition.Z);
 					}
 					Rotation = Item.Data.InHandRotation;
 					SetMesh(Item.Data.ItemMesh);
@@ -150,7 +150,7 @@ public partial class ArmNode : MeshInstance3D
 				Vector3 throwVelocity = (_armVelocity - platformVelocity).LimitLength(MaxThrowVelocity);
 
 				// Reset holding position
-				Position = new Vector3(0.0f, 0.23f, -1.4f);
+				Position = new Vector3(0.0f, 0.23f - 1.0f, -1.4f);
 
 				// Add uncapped platform velocity back on top
 				RequestDropItem(GlobalPosition, throwVelocity + platformVelocity);
