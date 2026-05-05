@@ -10,3 +10,5 @@ var active_network_type: MULTIPLAYER_NETWORK_TYPE = MULTIPLAYER_NETWORK_TYPE.STE
 var save_slot: int = 0;
 
 var motivator_speed: int = -1;
+
+var game_id: int = 4563080

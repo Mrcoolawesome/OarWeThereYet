@@ -51,7 +51,7 @@ func _sync_all_player_colors_to_peer(target_peer_id: int) -> void:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
   # initalize steam
-  Steam.steamInit(480, true)
+  Steam.steamInit(GlobalVariables.game_id, true)
   Steam.initRelayNetworkAccess() # start steam relay
 
   # connect the 'on_lobby_created' function to the lobby created signal
