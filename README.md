@@ -9,7 +9,7 @@ Oar We There Yet is an online co-op physics game about rafting down a dangerous 
 ## Some Things We Accomplished While Making Oar We There Yet
 
 - Motion capture pipeline for looping character animations using Vive trackers, Mocap Fusion, and Blender cleanup.
-- Procedural river map workflow built from Grand Canyon height data, edited for waterfalls, and imported with Terrain3D.
+- Stylized map created from Grand Canyon height data, edited in GIMP to have waterfalls, and imported with Terrain3D.
 - Networked physics syncing for the boat and players using host-authoritative state, prediction, and correction.
 - Stylized shader work for grass and environmental visuals.
 - Character and prop modeling work, including the player face setup, grass clumps, and cactus models.
