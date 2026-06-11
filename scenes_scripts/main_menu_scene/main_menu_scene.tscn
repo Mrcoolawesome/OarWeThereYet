@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" uid="uid://p1gq126hb7ur" path="res://scenes_scripts/environment/rock/rock.tscn" id="11_4pydw"]
 [ext_resource type="Texture2D" uid="uid://2pl5j3hqrvty" path="res://art/textures/solid_color_texture.png" id="12_yegdl"]
 [ext_resource type="AudioStream" uid="uid://cgrhwnug2ut3j" path="res://art/audio/music/All Around the Table-shortened.wav" id="13_13buo"]
-[ext_resource type="Texture2D" uid="uid://dmhaokynvfyah" path="res://art/skyboxequirectangular.png" id="14_860th"]
+[ext_resource type="Texture2D" uid="uid://dskqqe8f0id86" path="res://art/OWTY_sky_002m.jpg" id="14_860th"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rfvfq"]
 resource_name = "Material.004"
